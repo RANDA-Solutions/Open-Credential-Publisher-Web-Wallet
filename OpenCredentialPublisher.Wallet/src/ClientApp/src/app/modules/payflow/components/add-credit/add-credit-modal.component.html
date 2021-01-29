@@ -1,0 +1,35 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">Add Credit<br /><small class="text-muted">Credits may be used to send your assessment scores</small></h4>
+  <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form [formGroup]="form" (ngSubmit)="submit()" class="form-reset">
+  <div class="modal-body ode-info-row">
+      <div class="row justify-content-md-center">
+        <div class="col">
+          <p class="text-center">Select how many credits you would like to purchase.</p>
+        </div>
+      </div>
+      <div class="row justify-content-md-center">
+          <div class="col-md-auto">
+              <div class="form-group">
+                  <label class="control-label">Credits</label>
+                  <input type="number" class="form-control" formControlName="credits" placeholder="Credits" />
+                  <div *ngIf="f.credits.errors && submitted" class="text-danger">
+                      <div *ngIf="f.credits.errors.required">Select the number of credits</div>                        
+                  </div>
+              </div>            
+          </div>
+      </div>
+      <div class="row justify-content-md-center mt-3">
+        <div class="col">
+          <p class="text-center">Then, click <b>CONTINUE</b> to be redirected to our payment gateway.</p>
+        </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary btn-lg" (click)="modal.dismiss()">CANCEL</button>
+    <button type="submit" class="btn btn-outline-primary btn-lg">CONTINUE</button>
+  </div>
+</form>

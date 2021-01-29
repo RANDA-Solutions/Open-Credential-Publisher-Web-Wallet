@@ -1,0 +1,97 @@
+@model Dictionary<String, Object>
+@using System.Text.Json;
+
+@{ void RenderJsonObject(JsonElement element)
+    {
+    <dd class="col-sm-12">
+        @foreach (var prop in element.EnumerateObject())
+        {
+            if (prop.Value.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+    <dl class="row">
+        <dt class="col-sm-12">@prop.Name</dt>
+        @{RenderJsonArray(prop.Value);}
+    </dl> }
+else if (prop.Value.ValueKind == System.Text.Json.JsonValueKind.Object)
+{
+    <dl class="row">
+        <dt class="col-sm-12">
+            @prop.Name
+                <hr />
+            </dt>
+        @{ RenderJsonObject(prop.Value); }
+    </dl>           }
+else
+{
+
+    RenderDefault(prop);
+
+}
+
+}
+    </dd>}
+
+        void RenderJsonArray(JsonElement element)
+        {
+            <dd class="col-sm-12">
+
+            @foreach (var arr in element.EnumerateArray())
+            {
+                if (arr.ValueKind == JsonValueKind.Object)
+                {
+                    RenderJsonObject(arr);
+                }
+                else
+                {
+<dl class="row">
+    <dt class="col-sm-3">
+        @arr
+    </dt>
+    <dd class="col-sm-9">
+        @arr
+    </dd>
+</dl>
+                }
+            }
+                </dd>
+        }
+
+        void RenderDefault(JsonProperty element)
+        {
+<dl class="row">
+    <dt class="col">
+        @element.Name
+    </dt>
+    <dd class="col">
+        @element.Value
+    </dd>
+</dl> } }
+
+
+
+
+
+@if (Model != null)
+{
+    foreach (var key in Model.Keys)
+    {
+        var element = (System.Text.Json.JsonElement)Model[key];
+        if (element.ValueKind == System.Text.Json.JsonValueKind.String)
+        {
+<dt class="col-sm-3">@key</dt>
+                        <dd class="col-sm-9"><pre>@Model[key]</pre></dd> }
+        else if (element.ValueKind == System.Text.Json.JsonValueKind.Object)
+        {
+
+<dt class="col-sm-12">@key
+    <hr /></dt>
+                            RenderJsonObject(element);
+}
+                     
+                    else
+                    {
+<dt class="col-sm-3">@key</dt>
+                        <dd class="col-sm-9"><pre>@Model[key]</pre></dd>}
+                }
+            }
+

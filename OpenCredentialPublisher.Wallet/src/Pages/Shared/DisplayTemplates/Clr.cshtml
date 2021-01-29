@@ -1,0 +1,90 @@
+@model ClrViewModel
+@{
+    ViewData["Title"] = "Comprehensive Learner Record";
+}
+
+<button onclick="topFunction()" id="topBtn" title="Go to top">Top</button>
+
+@* Header *@
+
+<div class="row credential-row mb-3">
+    <div class="col">
+        <div class="card mt-3 mb-3">
+            <h5 class="card-header pg-info">CLR</h5>
+            <div class="card-body card-deck">
+                <div class="card border-0">
+                    <dl class="row">
+                        <dt class="col-sm-3">Id</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(x => x.Id, "Uri")</dd>
+                        <dt class="col-sm-3">Issued</dt>
+                        <dd class="col-sm-9">@Model.IssuedOn</dd>
+                        @if (Model.Name != null)
+                        {
+                            <dt class="col-sm-3">Name</dt>
+                            <dd class="col-sm-9">@Model.Name</dd>
+                        }
+                    </dl>
+                </div>
+                <div class="card border-0">
+                    <div class="row">
+                        <div class="card border-0">
+                            <div class="card-body pb-0 pt-0">
+                                @Html.DisplayFor(m => Model.Verification, "Verification", new { ClrEntityId = Model.ClrId, ClrId = Model.Id })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-deck">
+
+            @* Learner *@
+
+            <div class="card">
+                <h5 class="card-header pg-info">Learner</h5>
+                <div class="card-body">
+                    @Html.DisplayFor(m => m.Learner, "Profile", new { ClrEntityId = Model.ClrId })
+                </div>
+            </div>
+
+            @* Publisher *@
+
+            <div class="card">
+                @if (Model.Learner.Id == Model.Publisher.Id)
+                {
+                    <h5 class="card-header bg-warning">Publisher (Self-Published)</h5>
+                }
+                else
+                {
+                    <h5 class="card-header pg-info">Publisher</h5>
+                }
+                <div class="card-body">
+                    @Html.DisplayFor(m => m.Publisher, "Profile", new { ClrEntityId = Model.ClrId })
+                </div>
+            </div>
+        </div>
+
+        @* Assertions *@
+
+        @if (Model.AllAssertions.Any())
+        {
+            <h5 class="col mt-3 text-center">Assertions</h5>
+
+            @foreach (var assertion in Model.ParentAssertions)
+            {
+                @Html.DisplayFor(m => assertion, "Assertion", new { ClrEntityId = Model.ClrId })
+            }
+        }
+
+        @if (Model.Achievements != null && Model.Achievements.Any())
+        {
+            <h5 class="col mt-3 text-center">Achievements</h5>
+
+            @foreach (var achievement in Model.Achievements)
+            {
+                @Html.DisplayFor(x => achievement, "Achievement", new { ClrEntityId = Model.ClrId })
+            }
+        }
+    </div>
+</div>

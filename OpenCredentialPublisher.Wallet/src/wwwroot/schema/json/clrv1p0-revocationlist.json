@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Comprehensive Learner Record (CLR) Version 1.0 IMS Candidate Final JSON Schema Binding (clrv1p0-revocationlist)",
+  "type": "object",
+  "description": "Author-Jeff Bohrer (IMS Global), Andy Miller (IMS Global);  Version-2.0;  Release Date-May 21, 2020. ",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "issuer",
+    "@context"
+  ],
+  "properties": {
+    "@context": {
+      "type": "string",
+      "description": "URL of the JSON-LD context file",
+      "format": "uri"
+    },
+    "id": {
+      "type": "string",
+      "description": "Model Primitive Datatype = AnyURI. The URI of the RevocationList document. Used during Signed verification.",
+      "format": "uri"
+    },
+    "type": {
+      "type": "string",
+      "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'RevocationList'."
+    },
+    "issuer": {
+      "type": "string",
+      "description": "Model Primitive Datatype = NormalizedString. The id of the Issuer."
+    },
+    "revokedAssertions": {
+      "type": "array",
+      "description": "Model Primitive Datatype = NormalizedString. The ids of revoked assertions, clrs, and endorsements.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$id": "https://www.imsglobal.org/jsd/clr/v1p0/clrv1p0-revocationlist.json"
+}

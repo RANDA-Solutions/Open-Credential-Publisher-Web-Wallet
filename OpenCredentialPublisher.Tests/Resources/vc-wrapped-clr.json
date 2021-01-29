@@ -1,0 +1,3176 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://contexts.ward.guru/clr_v1p0.jsonld"
+  ],
+  "id": "http://vc.example.com/credentials/554934c8-fec7-41da-a50b-4ff2e7eb27ac",
+  "type": [
+    "VerifiableCredential"
+  ],
+  "issuer": "http://vc.example.com/issuers/fd57dbce-9a8b-4840-bbf0-f9c8d95d2759",
+  "issuanceDate": "2020-11-12T16:14:52.1850738Z",
+  "credentialSubject": {
+    "@context": "https://contexts.ward.guru/clr_v1p0.jsonld",
+    "id": "urn:uuid:8462bdc6-da44-4413-aa90-bdbfae954958",
+    "type": "Clr",
+    "achievements": null,
+    "assertions": [
+      {
+        "id": "urn:uuid:cfa8bf28-e06d-4d04-b317-1546d05e801b",
+        "achievement": {
+          "id": "urn:uuid:a8790951-968d-46eb-8a64-e920813cbd2e",
+          "achievementType": "Diploma",
+          "description": "High School Graduation",
+          "name": "Graduation",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "requirement": {
+            "id": "urn:uuidd6b23fd4-5edb-4277-9f12-05b265e34ed4",
+            "narrative": "Completion of graduation requirements"
+          }
+        },
+        "issuedOn": "2013-05-25T00:00:00",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        }
+      },
+      {
+        "id": "urn:uuid:e782fc4a-59d0-47bd-84e6-7d08300a562a",
+        "achievement": {
+          "id": "urn:uuid:7b2654b5-3944-49cb-88bb-e756b734e4e1",
+          "achievementType": "Achievement",
+          "description": "Civics Test",
+          "name": "Civics Test",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "requirement": {
+            "id": "urn:uuidcd1dc18e-3b83-4ef0-bbaa-18de714626d2",
+            "narrative": "Completion of civics test"
+          }
+        },
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        }
+      },
+      {
+        "id": "urn:uuid:0ad320e4-a16c-4d95-b42e-0e97b0d78c0c",
+        "achievement": {
+          "id": "urn:uuid:1b50c0d8-732e-4ee9-80f5-f42a3cc41703",
+          "achievementType": "Achievement",
+          "description": "Class Rank - Weighted",
+          "name": "Class Rank - Weighted",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:eacb9383-c033-4bfd-acbf-4b2208fe6767",
+              "name": "Class Rank - Weighted",
+              "resultType": "ext:Rank"
+            }
+          ],
+          "tags": [
+            "rank"
+          ]
+        },
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:eacb9383-c033-4bfd-acbf-4b2208fe6767",
+            "value": "311 of 390"
+          }
+        ]
+      },
+      {
+        "id": "urn:uuid:342a0cf6-f73f-4042-b2cd-6f14ff86d334",
+        "achievement": {
+          "id": "urn:uuid:6caad902-62d5-4fe8-8df9-4e3a71ac8693",
+          "achievementType": "Achievement",
+          "description": "Based on a 4.0 Scale - Total GPA Points times potential credit, summed, and divided by sum of Potential Credids.",
+          "name": "Standard College Admission GPA",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:2ce5cf4c-85f5-4f96-8f53-aead2cbb090c",
+              "name": "Standard College Admission GPA",
+              "resultType": "GradePointAverage"
+            }
+          ],
+          "tags": [
+            "gpa"
+          ]
+        },
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:2ce5cf4c-85f5-4f96-8f53-aead2cbb090c",
+            "value": "2.5179"
+          }
+        ]
+      },
+      {
+        "id": "urn:uuid:8da577ff-f9a5-4d73-89f1-5f79871be83b",
+        "achievement": {
+          "id": "urn:uuid:7d49fc41-7bb3-4e86-8315-d4f25d8fc28f",
+          "achievementType": "Achievement",
+          "description": "NDUS Core GPA",
+          "name": "NDUS Core GPA",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:0d6f788e-a9ba-4748-9d1a-7d308a639571",
+              "name": "NDUS Core GPA",
+              "resultType": "GradePointAverage"
+            }
+          ],
+          "tags": [
+            "gpa"
+          ]
+        },
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:0d6f788e-a9ba-4748-9d1a-7d308a639571",
+            "value": "2.0000"
+          }
+        ]
+      },
+      {
+        "id": "urn:uuid:d2b81cf8-d211-4983-b54d-cbd0b2bee2da",
+        "achievement": {
+          "id": "urn:uuid:7d2b435b-7ff0-45a0-90e8-98dd8c8579bf",
+          "achievementType": "ext:SchoolEnrollment",
+          "description": "Enrollment Date",
+          "name": "Enrollment",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          }
+        },
+        "issuedOn": "2012-08-23T00:00:00",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        }
+      },
+      {
+        "id": "urn:uuid:3ae721e8-df99-45d8-90ba-3aa794e34857",
+        "achievement": {
+          "id": "urn:uuid:453d6592-59cc-43ff-b51d-e6c282fa25ba",
+          "achievementType": "ext:SchoolExit",
+          "description": "Exit Date / Reason",
+          "name": "Exit",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          }
+        },
+        "issuedOn": "2013-05-25T00:00:00",
+        "narrative": "Graduate",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        }
+      },
+      {
+        "id": "urn:uuid:23615868-29ce-434e-9fc2-0bc940cb5cd8",
+        "achievement": {
+          "id": "urn:uuid:11ef7aaa-0de5-48bc-a8d7-ed72f7864a1d",
+          "achievementType": "Achievement",
+          "name": "NDUS Core Course Credit Totals",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:dd327db8-9fd7-4679-a381-4531eef49aa0",
+              "name": "ENGLA",
+              "resultType": "ext:Credits"
+            },
+            {
+              "id": "urn:uuid:20fc5590-c0aa-4aad-a540-4a7dd65043b5",
+              "name": "Math",
+              "resultType": "ext:Credits"
+            },
+            {
+              "id": "urn:uuid:5a0334d8-78d1-4eec-bc1b-8dbf75e6f250",
+              "name": "SocSt",
+              "resultType": "ext:Credits"
+            },
+            {
+              "id": "urn:uuid:ea892f24-ff23-4713-992b-9e7a66190dfc",
+              "name": "Sci",
+              "resultType": "ext:Credits"
+            }
+          ],
+          "tags": [
+            "credits"
+          ]
+        },
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:dd327db8-9fd7-4679-a381-4531eef49aa0",
+            "value": "5.000"
+          },
+          {
+            "resultDescription": "urn:uuid:20fc5590-c0aa-4aad-a540-4a7dd65043b5",
+            "value": "3.000"
+          },
+          {
+            "resultDescription": "urn:uuid:5a0334d8-78d1-4eec-bc1b-8dbf75e6f250",
+            "value": "3.000"
+          },
+          {
+            "resultDescription": "urn:uuid:ea892f24-ff23-4713-992b-9e7a66190dfc",
+            "value": "3.000"
+          }
+        ]
+      },
+      {
+        "id": "urn:uuid:30ab0f71-9639-4b3e-a1a7-9355d8cda978",
+        "achievement": {
+          "id": "urn:uuid:457a7466-75a0-443e-a7d5-188fc99ac350",
+          "achievementType": "Achievement",
+          "name": "High School Course Credit Totals",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:316ecd46-d32a-4ac5-9221-9e6e0a1d6cb6",
+              "name": "12th",
+              "resultType": "ext:Credits"
+            },
+            {
+              "id": "urn:uuid:36b5ee4f-908d-4d1f-a53d-de4dba3dfdca",
+              "name": "11th",
+              "resultType": "ext:Credits"
+            },
+            {
+              "id": "urn:uuid:bc4943d6-fe5f-4e5a-a5ba-985c2bb42c3e",
+              "name": "10th",
+              "resultType": "ext:Credits"
+            },
+            {
+              "id": "urn:uuid:335b5160-8a92-4d10-8f03-804ed22eb4b2",
+              "name": "9th",
+              "resultType": "ext:Credits"
+            },
+            {
+              "id": "urn:uuid:ef4d7804-bfc3-44ac-9aa1-8bb0d2e6cd94",
+              "name": "Total Earned",
+              "resultType": "ext:Credits"
+            },
+            {
+              "id": "urn:uuid:6b56a600-b0b2-4434-94bd-4bd8c088fdd9",
+              "name": "Total Attempted",
+              "resultType": "ext:Credits"
+            }
+          ],
+          "tags": [
+            "credits"
+          ]
+        },
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:316ecd46-d32a-4ac5-9221-9e6e0a1d6cb6",
+            "value": "5.000"
+          },
+          {
+            "resultDescription": "urn:uuid:36b5ee4f-908d-4d1f-a53d-de4dba3dfdca",
+            "value": "6.000"
+          },
+          {
+            "resultDescription": "urn:uuid:bc4943d6-fe5f-4e5a-a5ba-985c2bb42c3e",
+            "value": "7.500"
+          },
+          {
+            "resultDescription": "urn:uuid:335b5160-8a92-4d10-8f03-804ed22eb4b2",
+            "value": "8.000"
+          },
+          {
+            "resultDescription": "urn:uuid:ef4d7804-bfc3-44ac-9aa1-8bb0d2e6cd94",
+            "value": "26.500"
+          },
+          {
+            "resultDescription": "urn:uuid:6b56a600-b0b2-4434-94bd-4bd8c088fdd9",
+            "value": "28.500"
+          }
+        ]
+      },
+      {
+        "id": "urn:uuid:3fb546ff-e655-4278-917e-f4dde60eabf8",
+        "achievement": {
+          "id": "urn:uuid:137374d9-72bd-43ca-949a-87ada9bc2568",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "AP Computer Science",
+          "fieldOfStudy": "COMPUTER SCIENCE EDUCATION",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:b7df41a5-17a7-4a0e-bd6d-20f59cbe840a",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "AP"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:b7df41a5-17a7-4a0e-bd6d-20f59cbe840a",
+            "value": "D"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:a071967b-ff08-4395-8a9e-b180847c02e9",
+        "achievement": {
+          "id": "urn:uuid:ec60840a-fcc0-41a1-ae54-3095d5ff6758",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 12",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:3240cb57-4553-49fa-8f51-bea7e32cfe57",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.0,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:3240cb57-4553-49fa-8f51-bea7e32cfe57",
+            "value": "F"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:0766fe4f-b693-41f6-8144-8007857bccb9",
+        "achievement": {
+          "id": "urn:uuid:455b7c26-6a6b-4749-a6ad-304b52418b91",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 12",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:07bf5fc0-66f1-4a37-bdaf-bbb8465a73d3",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:07bf5fc0-66f1-4a37-bdaf-bbb8465a73d3",
+            "value": "D"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:3bcc08da-97cb-448c-ae5f-43c2a774e408",
+        "achievement": {
+          "id": "urn:uuid:9df432d6-33a2-4df7-abbe-42ca6e1bb033",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 12 Flip",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:91c4fa3b-9594-4cd2-9781-e8fe60f3d076",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:91c4fa3b-9594-4cd2-9781-e8fe60f3d076",
+            "value": "D"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:c46712e9-9f5e-49d9-9e44-b60268fde8c2",
+        "achievement": {
+          "id": "urn:uuid:05912207-bd9c-48b8-8888-daf0941277c9",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Concert Band",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:9d1f452a-d101-4eb1-beee-87cd23d01e3f",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:9d1f452a-d101-4eb1-beee-87cd23d01e3f",
+            "value": "A"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:de1d1a57-39cb-45f8-92ac-dfd9cec4d084",
+        "achievement": {
+          "id": "urn:uuid:36bb79d8-4852-4ca6-91ca-c60bced0fe53",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Concert Band",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:634bb8f2-5a61-45d6-82b7-d7005c6d78e9",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:634bb8f2-5a61-45d6-82b7-d7005c6d78e9",
+            "value": "A"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:a2771d4c-6c5a-489e-9980-a4f9b2ef4f81",
+        "achievement": {
+          "id": "urn:uuid:7ad9ba1d-a1e2-416d-b157-7f32cbeadc2b",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Computer Prog II",
+          "fieldOfStudy": "INFORMATION TECHNOLOGY",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:5a2da7b9-2f65-47d8-a624-77fc463ec216",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "CTE"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:5a2da7b9-2f65-47d8-a624-77fc463ec216",
+            "value": "C"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:ff4a7623-ec8b-42aa-83bf-f02aa217c8a5",
+        "achievement": {
+          "id": "urn:uuid:9046704e-692d-4a7f-82ae-9ff946ab5883",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Pre-Calculus",
+          "fieldOfStudy": "MATHEMATICS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:73c17614-88be-4f59-b68d-26cfc272e48f",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.0,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:73c17614-88be-4f59-b68d-26cfc272e48f",
+            "value": "W"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:1405569d-43ed-48a5-9edd-5884338e467b",
+        "achievement": {
+          "id": "urn:uuid:d7ae70fb-1a16-4e4f-9aaf-6e5bd39594be",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "PE 12",
+          "fieldOfStudy": "PHYSICAL EDUCATION",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:710f2b95-d904-42ac-8d88-72c8be997aed",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:710f2b95-d904-42ac-8d88-72c8be997aed",
+            "value": "A"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:72e46488-083b-402f-91d5-e1d476eebadc",
+        "achievement": {
+          "id": "urn:uuid:19020e66-dba2-4230-a361-1e56c7395a1d",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Government",
+          "fieldOfStudy": "SOCIAL STUDIES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:0eb43c10-6e21-477c-8bab-68ad79493fe3",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:0eb43c10-6e21-477c-8bab-68ad79493fe3",
+            "value": "D"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:6b3a2797-9d78-4cd8-baf9-4506962b4836",
+        "achievement": {
+          "id": "urn:uuid:f91c0368-213a-4824-a620-bb769d8c0f54",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Economics",
+          "fieldOfStudy": "SOCIAL STUDIES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:a776bcae-fd64-4346-ae0c-672a52065ab0",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:a776bcae-fd64-4346-ae0c-672a52065ab0",
+            "value": "C"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:0a82d26e-22a8-429b-8d81-7aca9368e0ea",
+        "achievement": {
+          "id": "urn:uuid:b84c1ae2-eb7b-400a-9be2-095adfce17a7",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "US History 1945",
+          "fieldOfStudy": "SOCIAL STUDIES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "12",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:d35e2342-9117-4395-ac05-b14833a38480",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:d35e2342-9117-4395-ac05-b14833a38480",
+            "value": "B+"
+          }
+        ],
+        "term": "Z2"
+      },
+      {
+        "id": "urn:uuid:f07ffdd9-57c4-40f2-953c-dd586db57552",
+        "achievement": {
+          "id": "urn:uuid:1f5eb3a2-2858-4359-8e26-2942f1d2f52d",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Web Page Design",
+          "fieldOfStudy": "BUSINESS AND OFFICE TECHNOLOGY",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:c3759133-789a-45aa-80e7-00be9ae6f120",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "CTE"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:c3759133-789a-45aa-80e7-00be9ae6f120",
+            "value": "B+"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:9288a311-4ab8-449f-a874-66c65aad8c6a",
+        "achievement": {
+          "id": "urn:uuid:0de026e5-84d9-4090-ab20-1f89f122671d",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 11",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:50307740-53c9-4446-9e18-6b4365c2c6de",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:50307740-53c9-4446-9e18-6b4365c2c6de",
+            "value": "C"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:202e8957-4656-4242-82e7-6f043aebc89a",
+        "achievement": {
+          "id": "urn:uuid:38e59867-29b7-4da3-bb95-6588ea8c7842",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 11",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:752b35e8-c16d-442f-a071-439fb9a51253",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:752b35e8-c16d-442f-a071-439fb9a51253",
+            "value": "D-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:be45beba-3024-464c-9127-d7d7eaef1bb8",
+        "achievement": {
+          "id": "urn:uuid:781164f0-1f0f-46cc-974e-cc37ab84e666",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "German III",
+          "fieldOfStudy": "FOREIGN LANGUAGES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:c182b3e8-9fe5-4e14-a01a-7cc1ef5dd5c8",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:c182b3e8-9fe5-4e14-a01a-7cc1ef5dd5c8",
+            "value": "C"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:23124bbe-d00f-42be-8677-e8b3ff729497",
+        "achievement": {
+          "id": "urn:uuid:b75c6323-cef8-4484-82d7-05cfcc0529b4",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "German III",
+          "fieldOfStudy": "FOREIGN LANGUAGES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:8086636d-74f6-45c7-a7d3-edd8cf3f8646",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:8086636d-74f6-45c7-a7d3-edd8cf3f8646",
+            "value": "B-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:dcece077-7979-42d7-adec-c051a3f3bc17",
+        "achievement": {
+          "id": "urn:uuid:08813d9e-25ed-4b06-87a1-e7bde0203bda",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Concert Band",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:a9c64960-c926-4bff-ba6b-16da5bd3dd7e",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:a9c64960-c926-4bff-ba6b-16da5bd3dd7e",
+            "value": "A"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:d6678fd1-36c0-4188-8ba2-2cf6f91127fa",
+        "achievement": {
+          "id": "urn:uuid:a0ec7321-64c1-4fa7-a4d4-59a9df2d9887",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Concert Band",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:1de20494-85f5-40f4-ae94-b0b032510450",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:1de20494-85f5-40f4-ae94-b0b032510450",
+            "value": "A"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:f9c13538-f005-40e7-a82e-fea07e57eefe",
+        "achievement": {
+          "id": "urn:uuid:91f31a49-b0af-48ec-ab4a-1ff3e65b1bd1",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "PE 11",
+          "fieldOfStudy": "PHYSICAL EDUCATION",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:1f17ac0a-4c65-4fef-8b38-6ec0e6314664",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:1f17ac0a-4c65-4fef-8b38-6ec0e6314664",
+            "value": "A+"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:47765812-d097-4e5c-9829-c8da0390708b",
+        "achievement": {
+          "id": "urn:uuid:af17e9f1-286f-4dc2-b1f8-5eab423eece4",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Biology",
+          "fieldOfStudy": "SCIENCE",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:eb747418-013b-4886-9222-2cc66619e264",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "DC",
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:eb747418-013b-4886-9222-2cc66619e264",
+            "value": "C-"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:a1afb7de-75f1-4c8d-8c51-e489cc08bc7d",
+        "achievement": {
+          "id": "urn:uuid:bd7fa9f7-75e4-4c09-8cb9-c26388366699",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Biology",
+          "fieldOfStudy": "SCIENCE",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:51c07e73-668f-4954-95b2-b482bb66de93",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:51c07e73-668f-4954-95b2-b482bb66de93",
+            "value": "C-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:16264d44-8263-45cc-b394-400a89534f95",
+        "achievement": {
+          "id": "urn:uuid:370f56e0-890c-423e-9d4f-3b503d0b85e4",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Chemistry",
+          "fieldOfStudy": "SCIENCE",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:f131aba0-32ef-424a-9a14-44b6de3b0ab6",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:f131aba0-32ef-424a-9a14-44b6de3b0ab6",
+            "value": "C"
+          }
+        ],
+        "term": "Z1"
+      },
+      {
+        "id": "urn:uuid:c3b9810e-f48e-4d70-adef-d090615e88d5",
+        "achievement": {
+          "id": "urn:uuid:d12290a7-31d6-4e0c-a455-4f037d11ac65",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "US History 1914",
+          "fieldOfStudy": "SOCIAL STUDIES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:5a251773-7eda-4e29-9b0a-2fa91e2c0d42",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:5a251773-7eda-4e29-9b0a-2fa91e2c0d42",
+            "value": "C"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:9e91e8d2-1708-4247-9cf4-71d48bdf70fb",
+        "achievement": {
+          "id": "urn:uuid:20ea1ecb-adf4-423b-99c9-5d98f79ffc70",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "US History 1945",
+          "fieldOfStudy": "SOCIAL STUDIES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "11",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:dcf6d7ee-2115-4c0a-9d54-ee7563164499",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.0,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:dcf6d7ee-2115-4c0a-9d54-ee7563164499",
+            "value": "F"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:65a86498-83a3-4236-966c-f485a67db7e6",
+        "achievement": {
+          "id": "urn:uuid:fa9eede2-8a0b-4866-97ca-44bd1f7f7112",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Journalism II Yearbook",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:c0aa4d73-97ad-4e56-b3f3-1bae3512093f",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:c0aa4d73-97ad-4e56-b3f3-1bae3512093f",
+            "value": "C+"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:c4552131-8d51-46cf-8362-723bce050056",
+        "achievement": {
+          "id": "urn:uuid:a0623606-7925-4eb0-921e-226103305ccc",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Journalism II Yearbook",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:b330d520-2e7d-45f2-bd99-f66b4af0677c",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:b330d520-2e7d-45f2-bd99-f66b4af0677c",
+            "value": "B-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:b3543f55-bb29-4b6f-a2a9-74670a39d9de",
+        "achievement": {
+          "id": "urn:uuid:a8baf225-a0c3-4f06-8fab-81336c074242",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 10",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:d4bceac5-a746-4033-9240-c607de9277b4",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:d4bceac5-a746-4033-9240-c607de9277b4",
+            "value": "A-"
+          }
+        ],
+        "term": "Z1"
+      },
+      {
+        "id": "urn:uuid:e1a9d83a-b868-455c-94c0-42dc093451a1",
+        "achievement": {
+          "id": "urn:uuid:1be05ce0-00f4-4858-861c-6bf5296409a1",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 10",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:8f098297-39b4-4918-9c2b-7582fe9d8b45",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:8f098297-39b4-4918-9c2b-7582fe9d8b45",
+            "value": "B-"
+          }
+        ],
+        "term": "Z2"
+      },
+      {
+        "id": "urn:uuid:767f7b08-335c-420b-b408-7add017ed386",
+        "achievement": {
+          "id": "urn:uuid:878913ea-44a3-41ba-a88f-2da8c7c0834e",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "German II",
+          "fieldOfStudy": "FOREIGN LANGUAGES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:4fbf88fe-6561-408f-9638-62e2eba2d92e",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:4fbf88fe-6561-408f-9638-62e2eba2d92e",
+            "value": "D"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:ce85f10c-71e9-44e1-8431-d5c514338294",
+        "achievement": {
+          "id": "urn:uuid:4ea84364-b133-48a1-8fe1-4efd4b95f4ab",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "German II",
+          "fieldOfStudy": "FOREIGN LANGUAGES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:800fb94a-c646-4008-a2e2-a10d8b4acc16",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:800fb94a-c646-4008-a2e2-a10d8b4acc16",
+            "value": "B-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:697fac9f-0b89-4a46-9ab2-ead609de6323",
+        "achievement": {
+          "id": "urn:uuid:bea10df6-5667-4f95-9460-8e27832d38de",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Art I",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:31769fee-adfd-4f20-b221-1cd429e44fed",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:31769fee-adfd-4f20-b221-1cd429e44fed",
+            "value": "B-"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:7921515a-90e1-4f6c-bb01-099b75f2acfc",
+        "achievement": {
+          "id": "urn:uuid:be20aa0d-c39d-4658-9723-4264a8ffcc71",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Sophomore Band",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:526dbb71-9045-4d15-b6bc-bdb2a0f5ecf7",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:526dbb71-9045-4d15-b6bc-bdb2a0f5ecf7",
+            "value": "A-"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:3b2afe7a-a815-4fe6-bf5c-38252eceaab3",
+        "achievement": {
+          "id": "urn:uuid:011b285c-ab51-4a98-8f42-f450f03865cb",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Art I",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:cc0d3dc6-95d5-455d-a4d7-fac1df741d95",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:cc0d3dc6-95d5-455d-a4d7-fac1df741d95",
+            "value": "B"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:fa526ba8-e301-498c-8abf-a0af7fed78ca",
+        "achievement": {
+          "id": "urn:uuid:5200d6b2-28d6-4bea-b0f0-64a0c5feb036",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Sophomore Band",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:0c6e732f-19af-42b8-8f56-1a39819f70df",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:0c6e732f-19af-42b8-8f56-1a39819f70df",
+            "value": "A"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:813aa6d7-4144-430a-a25e-1ee28dfd4a91",
+        "achievement": {
+          "id": "urn:uuid:ac77a097-c785-424a-b261-ee6c962828de",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Computer Prog I",
+          "fieldOfStudy": "INFORMATION TECHNOLOGY",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:fc276115-82cd-4a05-b21b-fab78d40cf90",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "CTE"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:fc276115-82cd-4a05-b21b-fab78d40cf90",
+            "value": "A-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:144d3c7d-4959-4edb-87ef-f3072ef2552d",
+        "achievement": {
+          "id": "urn:uuid:365e9aa9-ab14-44d3-ab84-7b6e0796132f",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Algebra II",
+          "fieldOfStudy": "MATHEMATICS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:217c9250-cba5-47b7-9ae7-f12ba3699f76",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:217c9250-cba5-47b7-9ae7-f12ba3699f76",
+            "value": "D"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:a6a6f233-743f-40f9-89ba-6aa7fb016e33",
+        "achievement": {
+          "id": "urn:uuid:00b3ed7b-c1b4-466b-a175-f3fdc3a7eec3",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Algebra II",
+          "fieldOfStudy": "MATHEMATICS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:bb340f2c-3e0b-4add-90e7-c241cef27498",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:bb340f2c-3e0b-4add-90e7-c241cef27498",
+            "value": "C-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:c0e6297b-f97d-4215-8925-1a6dff5b2c63",
+        "achievement": {
+          "id": "urn:uuid:527f8df9-674f-4313-b171-70fc7bcd838a",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "PE 10",
+          "fieldOfStudy": "PHYSICAL EDUCATION",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:0404e042-72eb-4fdc-890d-511cb0668d1f",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:0404e042-72eb-4fdc-890d-511cb0668d1f",
+            "value": "C"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:79a96a12-1455-43c9-8b95-34ea6f818d9b",
+        "achievement": {
+          "id": "urn:uuid:ed1c544d-f0be-4a17-b204-3eff94a9f696",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Chemistry",
+          "fieldOfStudy": "SCIENCE",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:61e61e96-0292-4068-8f1c-6095a9d76ead",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.0,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:61e61e96-0292-4068-8f1c-6095a9d76ead",
+            "value": "F"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:326f828e-8cd9-41fd-8afb-59ece3e71984",
+        "achievement": {
+          "id": "urn:uuid:6e007a46-f079-4c33-9243-7e4f62f6c2da",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Chemistry",
+          "fieldOfStudy": "SCIENCE",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "10",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:55e81ea6-138f-4f46-8d93-7ab98f82a85c",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:55e81ea6-138f-4f46-8d93-7ab98f82a85c",
+            "value": "D-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:f54a693c-04ee-4ea2-998e-67d79170c042",
+        "achievement": {
+          "id": "urn:uuid:cb32dfc9-aef7-4ff4-993c-b5c0f26097c2",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 9",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:2d3b09bd-04af-47d9-87a0-b48430bc31bf",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:2d3b09bd-04af-47d9-87a0-b48430bc31bf",
+            "value": "B+"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:1d2b8438-692f-4c6a-b4e7-cd833fd0816d",
+        "achievement": {
+          "id": "urn:uuid:e86baa68-df1d-4652-b038-35df6ec26591",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "English 9",
+          "fieldOfStudy": "ENGLISH/LANGUAGE ARTS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:0afaff2f-38c5-483a-bd77-706780a21c53",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:0afaff2f-38c5-483a-bd77-706780a21c53",
+            "value": "B"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:bfc57b1c-cfad-43db-8227-7e0b20b967fe",
+        "achievement": {
+          "id": "urn:uuid:f2dff0c2-2b8c-43cd-8119-4b984c9a6848",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "German I",
+          "fieldOfStudy": "FOREIGN LANGUAGES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:8632b107-7e96-451d-916c-8ca48c011444",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:8632b107-7e96-451d-916c-8ca48c011444",
+            "value": "B-"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:10b05159-7127-4b9a-bb75-6bf08296db2a",
+        "achievement": {
+          "id": "urn:uuid:6f60f278-ac88-411d-9d1b-08a7004c5130",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "German I",
+          "fieldOfStudy": "FOREIGN LANGUAGES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:c9b1e160-5404-4c4a-829d-a7ebae88dc86",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:c9b1e160-5404-4c4a-829d-a7ebae88dc86",
+            "value": "C+"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:30b3ab36-c86e-47f0-8517-76443ff9be63",
+        "achievement": {
+          "id": "urn:uuid:70ad2ae0-dec7-4879-8f13-ebce4399de3f",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Band",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:3b6963a0-04bb-4f2e-9da3-f17d0682f15b",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:3b6963a0-04bb-4f2e-9da3-f17d0682f15b",
+            "value": "A-"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:883aea28-e428-4653-96ae-06efbba1ed45",
+        "achievement": {
+          "id": "urn:uuid:10c22e23-789f-4dc7-af29-86db640d3c4b",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Band",
+          "fieldOfStudy": "Fine and Performing Art",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:7acde3ca-0e38-4f73-b839-53aa1bfb5ca9",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:7acde3ca-0e38-4f73-b839-53aa1bfb5ca9",
+            "value": "A-"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:8e3c709b-5f65-4db6-a7e1-e1656bd28110",
+        "achievement": {
+          "id": "urn:uuid:6356a119-915c-4fc8-b93f-e0a5d6c84c12",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Career Ed",
+          "fieldOfStudy": "GENERAL EDUCATION",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:b5cebd1b-a6b8-4573-9a53-06519f565f0e",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:b5cebd1b-a6b8-4573-9a53-06519f565f0e",
+            "value": "B"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:792daf4b-3127-4d8b-9c1e-dcce1358adda",
+        "achievement": {
+          "id": "urn:uuid:d0caf464-3a59-47e5-bd0a-73f126cded68",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Geometry",
+          "fieldOfStudy": "MATHEMATICS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:4774c6d2-d4bd-4bea-bd2a-cc9fcef9df92",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:4774c6d2-d4bd-4bea-bd2a-cc9fcef9df92",
+            "value": "C"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:6a1bc66a-9572-4173-be78-3175f7ed7e37",
+        "achievement": {
+          "id": "urn:uuid:b4370e44-8918-4c16-8c31-1ae24bf47230",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Geometry",
+          "fieldOfStudy": "MATHEMATICS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:b9a59779-ef1d-41dd-bd79-635446e6a4e9",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:b9a59779-ef1d-41dd-bd79-635446e6a4e9",
+            "value": "C+"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:ada60763-e9f0-4c68-8268-ff7ed947b18f",
+        "achievement": {
+          "id": "urn:uuid:8133c3d2-e879-4638-b7c9-b010b89d894b",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "PE 9",
+          "fieldOfStudy": "PHYSICAL EDUCATION",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:edb2bd3d-f5e3-45c2-ac89-938d6040e9af",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": []
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:edb2bd3d-f5e3-45c2-ac89-938d6040e9af",
+            "value": "A"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:914ff7b4-e80a-4152-b6f4-3d53188c8917",
+        "achievement": {
+          "id": "urn:uuid:e8056004-29c8-469a-b5eb-bd1ffe91d5d1",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Physical Science",
+          "fieldOfStudy": "SCIENCE",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:5ab67256-f317-4dbb-be81-54a8c16e4917",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:5ab67256-f317-4dbb-be81-54a8c16e4917",
+            "value": "B+"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:5371b40a-ab6f-4144-88b5-8f063a092bc7",
+        "achievement": {
+          "id": "urn:uuid:a03db07e-c13f-4a61-81c7-bbf16c7a6fe5",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Physical Science",
+          "fieldOfStudy": "SCIENCE",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:cd1b22bf-1a3b-4e88-91d3-508fb328ba93",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:cd1b22bf-1a3b-4e88-91d3-508fb328ba93",
+            "value": "B"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:f6636c0b-0b41-4fe5-9821-62d7e5a208f4",
+        "achievement": {
+          "id": "urn:uuid:e3120400-3db7-4070-a1ef-2916bd584143",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Global Studies",
+          "fieldOfStudy": "SOCIAL STUDIES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:38d1ed7a-95f1-4405-961e-dac5972ef2a5",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:38d1ed7a-95f1-4405-961e-dac5972ef2a5",
+            "value": "B-"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:c7325047-b5fa-48d8-998b-d22b2c8b98a8",
+        "achievement": {
+          "id": "urn:uuid:561b7058-f9dc-4247-8fc6-271a41b65be2",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Global Studies",
+          "fieldOfStudy": "SOCIAL STUDIES",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:0c98f5ff-79df-4b99-b9d9-169013bb385b",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:0c98f5ff-79df-4b99-b9d9-169013bb385b",
+            "value": "B"
+          }
+        ],
+        "term": "S2"
+      },
+      {
+        "id": "urn:uuid:d127517e-e119-4be5-a7c1-80b561463e70",
+        "achievement": {
+          "id": "urn:uuid:d3344070-6a7e-4362-b881-8c7ec1837aca",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Algebra 8",
+          "fieldOfStudy": "MATHEMATICS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:03334068-e7ea-4672-9314-045c80baddcc",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:03334068-e7ea-4672-9314-045c80baddcc",
+            "value": "B"
+          }
+        ],
+        "term": "S1"
+      },
+      {
+        "id": "urn:uuid:44903a6e-3d8c-4b4e-b501-7a7542fbad53",
+        "achievement": {
+          "id": "urn:uuid:6292a986-3711-4a77-90a8-1db125f69485",
+          "achievementType": "Course",
+          "creditsAvailable": 0.5,
+          "name": "Algebra 8",
+          "fieldOfStudy": "MATHEMATICS",
+          "issuer": {
+            "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+            "address": {
+              "addressCountry": "USA",
+              "addressLocality": "Bismarck",
+              "addressRegion": "ND",
+              "postalCode": "58501",
+              "streetAddress": "800 N 8th Street"
+            },
+            "name": "Bismarck High School",
+            "sourcedId": "0800109700912",
+            "telephone": "701-323-48"
+          },
+          "level": "9",
+          "resultDescriptions": [
+            {
+              "id": "urn:uuid:1d495f11-cf1b-4190-aada-663dd94ad150",
+              "name": "Term Grade",
+              "resultType": "LetterGrade"
+            }
+          ],
+          "tags": [
+            "Core"
+          ]
+        },
+        "creditsEarned": 0.5,
+        "issuedOn": "2020-10-14T14:10:02.8629556Z",
+        "recipient": {
+          "type": "id",
+          "identity": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+          "hashed": false
+        },
+        "results": [
+          {
+            "resultDescription": "urn:uuid:1d495f11-cf1b-4190-aada-663dd94ad150",
+            "value": "C+"
+          }
+        ],
+        "term": "S2"
+      }
+    ],
+    "issuedOn": "2020-10-14T14:10:02.8629556Z",
+    "learner": {
+      "id": "urn:uuid:163542ad-2f71-4735-8268-18f92efde733",
+      "address": {
+        "addressCountry": "USA",
+        "addressLocality": "Bismarck",
+        "addressRegion": "ND",
+        "postalCode": "58504",
+        "streetAddress": "789 Demo St. 1234"
+      },
+      "name": "Student2 DEMO",
+      "sourcedId": "22257",
+      "studentId": "2645082212",
+      "telephone": "7015551234"
+    },
+    "name": "Student Transcript",
+    "partial": true,
+    "publisher": {
+      "id": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+      "address": {
+        "addressCountry": "USA",
+        "addressLocality": "Bismarck",
+        "addressRegion": "ND",
+        "postalCode": "58501",
+        "streetAddress": "800 N 8th Street"
+      },
+      "name": "Bismarck High School",
+      "publicKey": {
+        "id": "https://localhost/api/keys/R-QXrJUVbvFV1SgDevQ8eg",
+        "owner": "urn:uuid967906cd-ad51-43b4-bca3-f22cb896da24",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq77xDEsGU3wx/4A+DwwH\naVwq/WUJ73aL2lgBxDGZDhiutr47aHGQNCgKCdO9KhIEhGN/uLoraKQMHWtejync\n1zCeC4Z27kE2e+2qhJt66TITYZj9wJAjKkxx9vZmiDR4DBGRNIspVZTr9vkOoV/a\n3/t9mXXvVibYFj17rAdVN/R46y/1OWxIKY1diPKLCs42L74ZHbEedL3Cr0QkOU7W\nAWbcGIaTmi4LzUD8aZVSwzNqGsdvMyY7LZyvBC/pc3fuVSAi88A0u1BfF4BkCogs\nAQf7IODJhGbbkz4nI/BtoXe+eH1aS+BFZ56nHeqYiqYA15ciclnsS7CE0brHHF1b\nRQIDAQAB\n-----END PUBLIC KEY-----\n"
+      },
+      "revocationList": "https://localhost/api/revocations/R-QXrJUVbvFV1SgDevQ8eg",
+      "sourcedId": "0800109700912",
+      "telephone": "701-323-48"
+    },
+    "revocationReason": null,
+    "revoked": false,
+    "signedAssertions": null,
+    "verification": {
+      "type": "Signed"
+    }
+  },
+  "proof": {
+    "type": "RsaSignature2018",
+    "created": "2020-11-12T16:14:52.1854166Z",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "https://localhost/api/keys/2d4a8e6b-d204-4304-9362-ce4c9d586423",
+    "challenge": "f0a36c01-0669-4bd7-bc95-e1874030d6c2",
+    "signature": "Gol3ADtea1ARSF_MpaBE5QcFyd3Cb2A4NjaA-GyyfZcHZw4MvElAm5-H9DHahV673DE4mJpufNohO_3CKs1pVi6MMZnzTWMON2W6vM7nGGF0fx-_JUhoe8SB0xFOVt6I2NJFSLLZXRJnS8W5A15uM7B1qhev2_N75WTgsUBQsRWepOjE4FCcKkArlDiaHkPEf_xuRB1kLgaoc26kp5oCFgcTEK1VZ0bweQY8sV6pr89vtLzzJTXlnfOP3CTavnolZQyrVfNeRJL0dhEwoamtBr6rf86Wr82ykJgs5ubhWx7xRczJV87-uNWfrR_7V-l0oe5d0yMZqXUx8A8x5k3WvA"
+  }
+}

@@ -1,0 +1,48 @@
+[
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    "inputFiles": [
+      "wwwroot/css/site.css",
+      "wwwroot/css/fonts.css"
+    ],
+    "minify": { "enabled": true }
+  },
+  {
+    "outputFileName": "wwwroot/js/site.min.js",
+    "inputFiles": [
+      "wwwroot/js/site.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/css/vendor.min.css",
+    "inputFiles": [
+      "wwwroot/css/bootstrap.custom.min.css",
+      "wwwroot/lib/font-awesome/fontawesome.css",
+      "wwwroot/lib/font-awesome/brands.css",
+      "wwwroot/lib/font-awesome/solid.css"
+    ],
+    "minify": { "enabled": true }
+  },
+  {
+    "outputFileName": "wwwroot/js/vendor.min.js",
+    "inputFiles": [
+      "wwwroot/lib/jquery/jquery.js",
+      "wwwroot/lib/bootstrap/js/bootstrap.js",
+      "wwwroot/lib/jquery-unobtrusive-ajax/jquery.unobtrusive-ajax.js",
+      "wwwroot/lib/jquery-validate/jquery.validate.js",
+      "wwwroot/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js",
+      "wwwroot/lib/showdown/showdown.js",
+      "wwwroot/lib/font-awesome/js/all.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  }
+]

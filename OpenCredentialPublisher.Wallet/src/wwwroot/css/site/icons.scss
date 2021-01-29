@@ -1,0 +1,202 @@
+%custom-icon {
+    align-items: center;
+    padding: .375rem .75rem;
+    margin-bottom: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap;
+    width: 22px;
+    height: 27px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.add-on {
+    display: flex;
+}
+
+.add-button-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/add-button-icon.png');
+}
+
+.blank-icon {
+    @extend %custom-icon;
+}
+
+.callout-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/callout-icon.png');
+}
+
+.callout-icon-black {
+    @extend %custom-icon;
+    background-image: url('/images/icons/callout-icon-black.png');
+}
+
+.checkmark-badge-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/checkmark-badge-icon.png');
+}
+
+.checkmark-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/checkmark-icon.png');
+}
+
+.checkmark-icon-default {
+    @extend %custom-icon;
+    background-image: url('/images/icons/checkmark-icon-default.png');
+}
+
+.checkmark-icon-verified {
+    @extend %custom-icon;
+    background-image: url('/images/icons/checkmark-icon-verified.png');
+}
+
+.checkmark-progress-checked {
+    @extend %custom-icon;
+    background-image: url('/images/icons/checkmark-progress-checked.png');
+}
+
+.checkmark-progress-default {
+    @extend %custom-icon;
+    background-image: url('/images/icons/checkmark-progress-default.png');
+}
+
+.clock-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/clock-icon.png');
+}
+
+.credential-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/credential-icon.png');
+}
+
+.credential-icon-active {
+    @extend %custom-icon;
+    background-image: url('/images/icons/credential-icon-active.png');
+}
+
+.credential-icon-default {
+    @extend %custom-icon;
+    background-image: url('/images/icons/credential-icon-default.png');
+}
+
+.credential-icon-new {
+    @extend %custom-icon;
+    background-image: url('/images/icons/credential-icon-new.png');
+}
+
+.credential-icon-tab {
+    @extend .credential-icon-default;
+}
+
+.link-active .credential-icon-tab {
+    background-image: url('/images/icons/credential-icon-active.png') !important;
+}
+
+.details-button-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/details-button-icon.png');
+}
+
+
+.details-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/details-icon.png');
+}
+
+.expand-button-icon.collapsed {
+    background-image: url('/images/icons/expand-button-icon.png');
+}
+
+.expand-button-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/details-button-icon.png');
+}
+
+
+.folio-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/folio-icon.png');
+}
+
+.folio-icon-active {
+    @extend %custom-icon;
+    background-image: url('/images/icons/folio-icon-active.png');
+}
+
+.folio-icon-default {
+    @extend %custom-icon;
+    background-image: url('/images/icons/folio-icon-default.png');
+}
+
+.folio-icon-tab {
+    @extend .folio-icon-default;
+}
+
+.link-active .folio-icon-tab {
+    background-image: url('/images/icons/folio-icon-active.png') !important;
+}
+
+.logout-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/logout-icon.png');
+}
+
+.logout-icon-default {
+    @extend %custom-icon;
+    background-image: url('/images/icons/logout-icon-default.png');
+}
+
+.paper-airplane-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/paper-airplane-icon.png');
+}
+
+.pencil-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/pencil-icon.png');
+}
+
+.pencil-icon-gray {
+    @extend %custom-icon;
+    background-image: url('/images/icons/pencil-icon-gray.png');
+}
+
+.remove-button-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/remove-button-icon.png');
+}
+
+.secure-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/secure-icon.png');
+}
+
+.transactions-icon-active {
+    @extend %custom-icon;
+    background-image: url('/images/icons/transactions-icon-active.png');
+}
+
+.transactions-icon-default {
+    @extend %custom-icon;
+    background-image: url('/images/icons/transactions-icon-default.png');
+}
+
+.transactions-icon-tab {
+    @extend .transactions-icon-default;
+}
+
+.link-active .transactions-icon-tab {
+    background-image: url('/images/icons/transactions-icon-active.png') !important;
+}
+
+.user-icon {
+    @extend %custom-icon;
+    background-image: url('/images/icons/user-icon.png');
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Comprehensive Learner Record (CLR) Version 1.0 IMS Candidate Final JSON Schema Binding (clrv1p0-cryptographickey)",
+  "type": "object",
+  "description": "Author-Jeff Bohrer (IMS Global), Andy Miller (IMS Global);  Version-2.0;  Release Date-May 21, 2020. ",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "owner",
+    "publicKeyPem",
+    "@context"
+  ],
+  "properties": {
+    "@context": {
+      "type": "string",
+      "description": "URL of the JSON-LD context file",
+      "format": "uri"
+    },
+    "id": {
+      "type": "string",
+      "description": "Model Primitive Datatype = NormalizedString. The URI of the CryptographicKey document. Used during signed verification."
+    },
+    "type": {
+      "type": "string",
+      "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'CryptographicKey'."
+    },
+    "owner": {
+      "type": "string",
+      "description": "Model Primitive Datatype = NormalizedString. The identifier for the Profile that owns this PUBLIC KEY and the PRIVATE KEY used to sign the assertion or endorsement."
+    },
+    "publicKeyPem": {
+      "type": "string",
+      "description": "Model Primitive Datatype = String. The PUBLIC KEY in PEM format corresponding to the PRIVATE KEY used by the owner to sign the assertion or endorsement. The PEM key encoding is a widely-used method to express public keys, compatible with almost every Secure Sockets Layer library implementation."
+    }
+  },
+  "$id": "https://www.imsglobal.org/jsd/clr/v1p0/clrv1p0-cryptographickey.json"
+}

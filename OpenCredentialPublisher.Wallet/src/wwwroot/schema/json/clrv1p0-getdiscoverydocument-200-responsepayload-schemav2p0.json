@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Comprehensive Learner Record (CLR) Version 1.0 IMS Candidate Final JSON Schema Binding (getDiscoveryDocument-200-responsepayload-schema)",
+  "type": "object",
+  "description": "Author-Jeff Bohrer (IMS Global), Andy Miller (IMS Global);  Version-2.0;  Release Date-May 21, 2020. ",
+  "additionalProperties": false,
+  "required": [
+    "authorizationUrl",
+    "name",
+    "privacyPolicyUrl",
+    "registrationUrl",
+    "scopesOffered",
+    "termsOfServiceUrl",
+    "tokenUrl",
+    "@context"
+  ],
+  "properties": {
+    "@context": {
+      "type": "string",
+      "description": "URL of the JSON-LD context file",
+      "format": "uri"
+    },
+    "type": {
+      "type": "string",
+      "description": "Alias for JSON-LD @type. Used to set the type of a node or the datatype of a typed value."
+    },
+    "authorizationUrl": {
+      "type": "string",
+      "description": "Model Primitive Datatype = AnyURI. A fully qualifed URL to the provider's OAuth 2.0 Authorization endpoint.",
+      "format": "uri"
+    },
+    "image": {
+      "type": "string",
+      "description": "Model Primitive Datatype = NormalizedString. An image representing the provider. May be a Data URI or the URL where the image may be found."
+    },
+    "name": {
+      "type": "string",
+      "description": "Model Primitive Datatype = String. The user-facing name of the platform providing CLR services."
+    },
+    "privacyPolicyUrl": {
+      "type": "string",
+      "description": "Model Primitive Datatype = AnyURI. A fully qualified URL to the provider's privacy policy.",
+      "format": "uri"
+    },
+    "registrationUrl": {
+      "type": "string",
+      "description": "Model Primitive Datatype = AnyURI. A fully qualified URL to the provider's OAuth 2.0 Registration endpoint.",
+      "format": "uri"
+    },
+    "scopesOffered": {
+      "type": "array",
+      "description": "Model Primitive Datatype = AnyURI. An array of OAuth 2.0 Scopes supported by the provider.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "termsOfServiceUrl": {
+      "type": "string",
+      "description": "Model Primitive Datatype = AnyURI. A fully qualified URL to the provider's terms of service.",
+      "format": "uri"
+    },
+    "tokenUrl": {
+      "type": "string",
+      "description": "Model Primitive Datatype = AnyURI. A fully qualified URL to the provider's OAuth 2.0 Token endpoint.",
+      "format": "uri"
+    }
+  },
+  "$id": "getDiscoveryDocument-200-responsepayload-schema.json"
+}

@@ -1,0 +1,75 @@
+@page "{id}"
+@model OpenCredentialPublisher.ClrWallet.Pages.Links.DisplayModel
+@{
+    Layout = "Shared/_LinkLayout";
+    ViewData["Title"] = "Comprehensive Learner Record";
+}
+
+@* Structured Data *@
+
+<style>
+    .pg-info, .bg-info, .pg-info:hover, .bg-info:hover {
+        background-color: #9206EA !important;
+        border-color: #9206EA !important;
+    }
+
+    .btn-info {
+        background-color: #9206EA !important;
+        border-color: #9206EA !important;
+    }
+</style>
+
+@if (Model.ShowData)
+{
+    <script type="application/ld+json">
+    @Html.Raw(Model.Clr.ToJson())
+    </script>}
+
+<div class="text-center mb-3">
+    <h1 class="display-4">Comprehensive Learner Record</h1>
+</div>
+
+@if (Model.ShowData && Model.ShowDownloadVCJsonButton)
+{
+    <div class="row">
+        <div class="col">
+            <form method="post" class="float-right">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" asp-page-handler="DownloadVCJson" class="btn btn-lg btn-outline-secondary text-secondary" title="Download Verifiable Credential"><i class="fas fa-file-download fa-2x"></i></button>
+            </form>
+        </div>
+    </div>
+}
+
+@if (Model.RequiresAccessKey && !Model.ShowData)
+{
+
+            
+<div class="row justify-content-center my-5">
+    <div class="col-4">
+        <section class="default-container p-5">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mt-2"></div>
+            <form method="post">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend mr-3">
+                        <span class="secure-icon"></span>
+                    </div>
+                    <input type="password" asp-for="AccessKey" placeholder="Access Key" class="form-control" />
+                    <span asp-validation-for="AccessKey" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-outline-primary btn-lg" asp-page="Display" asp-page-handler="access">Submit</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+            }
+
+            @if (Model.ShowData)
+            {
+                @Html.DisplayFor(m => m.Clr, "Clr")
+            }
+            @section Scripts
+{
+                @{ await Html.RenderPartialAsync("_DisplayScriptsPartial"); }
+            }

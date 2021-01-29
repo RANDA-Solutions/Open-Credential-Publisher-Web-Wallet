@@ -1,0 +1,1214 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Comprehensive Learner Record (CLR) Version 1.0 IMS Candidate Final JSON Schema Binding (postClr-requestpayload-schema)",
+  "type": "object",
+  "description": "Author-Jeff Bohrer (IMS Global), Andy Miller (IMS Global);  Version-2.0;  Release Date-May 21, 2020. ",
+  "additionalProperties": false,
+  "required": [
+    "@context"
+  ],
+  "properties": {
+    "@context": {
+      "type": "string",
+      "description": "URL of the JSON-LD context file",
+      "format": "uri"
+    },
+    "type": {
+      "type": "string",
+      "description": "Alias for JSON-LD @type. Used to set the type of a node or the datatype of a typed value."
+    },
+    "clr": {
+      "description": "The Clr if not signed.",
+      "$ref": "#/definitions/ClrDType"
+    },
+    "signedClr": {
+      "type": "string",
+      "description": "Model Primitive Datatype = String. The signed Clr in JWS Compact Serialization format.",
+      "pattern": "^([A-Za-z0-9-_]{4,})\\.([-A-Za-z0-9-_]{4,})\\.([A-Za-z0-9-_]{4,})$"
+    }
+  },
+  "definitions": {
+    "AchievementDType": {
+      "type": "object",
+      "description": "An accomplishment such as completing a degree, mastering a competency, or course completion that may be asserted about one or more learners.",
+      "required": [
+        "id",
+        "name",
+        "issuer"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Globally unique IRI for the Achievement. If the IRI is a URL it must resolve to an Achievement resource."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'Achievement'."
+        },
+        "achievementType": {
+          "description": "A CLR Achievement can represent many different types of achievement from an assessment result to membership. Use 'Achievement' to indicate an achievement not in the list of allowed values.",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Achievement",
+                "AssessmentResult",
+                "Award",
+                "Badge",
+                "Certificate",
+                "Certification",
+                "Course",
+                "CommunityService",
+                "Competency",
+                "Co-Curricular",
+                "Degree",
+                "Diploma",
+                "Fieldwork",
+                "License",
+                "Membership"
+              ]
+            },
+            {
+              "type": "string",
+              "description": "Model Primitive Datatype = String.",
+              "pattern": "(ext:)[a-z|A-Z|0-9|.|-|_]+"
+            }
+          ]
+        },
+        "alignments": {
+          "type": "array",
+          "description": "Alignment objects describe an alignment between this achievement and a node in an educational framework.",
+          "items": {
+            "$ref": "#/definitions/AlignmentDType"
+          }
+        },
+        "associations": {
+          "type": "array",
+          "description": "Associations between this achievement and other achievements.",
+          "items": {
+            "$ref": "#/definitions/AssociationDType"
+          }
+        },
+        "creditsAvailable": {
+          "type": "number",
+          "description": "Model Primitive Datatype = Float. Credit hours associated with this entity, or credit hours possible. For example '3.0'.",
+          "format": "float"
+        },
+        "description": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A short description of the achievement. May be the same as name if no description is available."
+        },
+        "endorsements": {
+          "type": "array",
+          "description": "Allows endorsers to make specific claims about the Achievement.",
+          "items": {
+            "$ref": "#/definitions/EndorsementDType"
+          }
+        },
+        "humanCode": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The code, generally human readable, associated with an achievement."
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the achievement."
+        },
+        "fieldOfStudy": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Category, subject, area of study,  discipline, or general branch of knowledge. Examples include Business, Education, Psychology, and Technology. "
+        },
+        "image": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. IRI of an image representing the achievement. May be a Data URI or the URL where the image may be found."
+        },
+        "issuer": {
+          "description": "A profile describing the individual or organization that issues assertions of this achievement.",
+          "$ref": "#/definitions/ProfileDType"
+        },
+        "level": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Text that describes the level of achievement apart from how the achievement was performed or demonstrated. Examples would include 'Level 1', 'Level 2', 'Level 3', or 'Bachelors', 'Masters', 'Doctoral'."
+        },
+        "requirement": {
+          "description": "Criteria object describing how to earn the achievement.",
+          "$ref": "#/definitions/CriteriaDType"
+        },
+        "resultDescriptions": {
+          "type": "array",
+          "description": "The set of result descriptions that may be asserted as results with this achievement.",
+          "items": {
+            "$ref": "#/definitions/ResultDescriptionDType"
+          }
+        },
+        "signedEndorsements": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. Signed endorsements in JWS Compact Serialization format.",
+          "items": {
+            "type": "string",
+            "pattern": "^([A-Za-z0-9-_]{4,})\\.([-A-Za-z0-9-_]{4,})\\.([A-Za-z0-9-_]{4,})$"
+          }
+        },
+        "specialization": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Name given to the focus, concentration, or specific area of study defined in the achievement. Examples include Entrepreneurship, Technical Communication, and Finance."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. Tags that describe the type of achievement.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "patternProperties": {
+        "^[^:][^:]*:[^:][^:]*$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    "AddressDType": {
+      "type": "object",
+      "description": "Based on schema.org Address object.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the Address."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'Address'."
+        },
+        "addressCountry": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The country. For example, USA. You can also provide the two-letter ISO 3166-1 alpha-2 country code."
+        },
+        "addressLocality": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The locality. For example, Mountain View."
+        },
+        "addressRegion": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The region. For example, CA."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The postal code. For example, 94043."
+        },
+        "postOfficeBoxNumber": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The post office box number for PO box addresses."
+        },
+        "streetAddress": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The street address. For example, 1600 Amphitheatre Pkwy."
+        }
+      }
+    },
+    "AlignmentDType": {
+      "type": "object",
+      "description": "Alignment is based on the schema.org AlignmentObject.",
+      "additionalProperties": false,
+      "required": [
+        "targetName",
+        "targetType",
+        "targetUrl"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the object."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'Alignment'."
+        },
+        "educationalFramework": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the framework to which the resource being described is aligned."
+        },
+        "targetCode": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. If applicable, a locally unique string identifier that identifies the alignment target within its framework."
+        },
+        "targetDescription": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The description of a node in an established educational framework."
+        },
+        "targetName": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of a node in an established educational framework."
+        },
+        "targetType": {
+          "description": "The type of the alignment target node. This is an extensible enumerated vocabulary. Extending the vocabulary makes use of a naming convention.",
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "Model Primitive Datatype = String.",
+              "pattern": "(ext:)[a-z|A-Z|0-9|.|-|_]+"
+            },
+            {
+              "type": "string",
+              "enum": [
+                "CFItem",
+                "CFRubric",
+                "CFRubricCriterion",
+                "CFRubricCriterionLevel",
+                "CTDL"
+              ]
+            }
+          ]
+        },
+        "targetUrl": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. The URL of a node in an established educational framework. When the alignment is to a CASE framework and the CASE Service support the CASE JSON-LD binding, the URL should be the 'uri' of the node document, otherwise the URL should be the CASE Service endpoint URL that returns the node JSON.",
+          "format": "uri"
+        }
+      }
+    },
+    "ArtifactDType": {
+      "type": "object",
+      "description": "An artifact that is part of an evidence object.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of the object. Normally 'Artifact'."
+        },
+        "description": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A description of the artifact."
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the artifact."
+        },
+        "url": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. IRI of the artifact. May be a Data URI or the URL where the artifact may be found."
+        }
+      }
+    },
+    "AssertionDType": {
+      "type": "object",
+      "description": "Assertions are representations of an Achievement awarded to a Learner.  It is used to share information about the Achievement Assertion, such as a result and verification method. Assertions are packaged for transmission as JSON objects with a set of mandatory and optional properties.",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Globally unique IRI for the Assertion. If the IRI is a URL it must resolve to an Assertion resource. If the Assertion is verified using Hosted verification, the IRI must be a URL."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'Assertion'."
+        },
+        "achievement": {
+          "description": "Required unless the assertion is an Open Badge.",
+          "$ref": "#/definitions/AchievementDType"
+        },
+        "creditsEarned": {
+          "type": "number",
+          "description": "Model Primitive Datatype = Float. The number of credits earned, generally in semester or quarter credit hours.  This field correlates with the Achievement creditsAvailable field.",
+          "format": "float"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "Model Primitive Datatype = DateTime. If present, the assertion is not valid after this date.",
+          "format": "date-time"
+        },
+        "endorsements": {
+          "type": "array",
+          "description": "Allows endorsers to make specific claims about the assertion.",
+          "items": {
+            "$ref": "#/definitions/EndorsementDType"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "description": "Evidence describing the work that the recipient did to earn the achievement. This can be a webpage that links out to other pages if linking directly to the work is infeasible.",
+          "items": {
+            "$ref": "#/definitions/EvidenceDType"
+          }
+        },
+        "image": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found."
+        },
+        "issuedOn": {
+          "type": "string",
+          "description": "Model Primitive Datatype = DateTime. Timestamp of when the achievement was awarded. Required unless the assertion is revoked.",
+          "format": "date-time"
+        },
+        "licenseNumber": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The license number that was issued with this assertion."
+        },
+        "narrative": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A narrative that describes the connection between multiple pieces of evidence. Likely only present if evidence is a multi-value array. Markdown allowed."
+        },
+        "recipient": {
+          "description": "The recipient of the achievement. Required unless the assertion is revoked.",
+          "$ref": "#/definitions/IdentityDType"
+        },
+        "results": {
+          "type": "array",
+          "description": "The set of results being asserted.",
+          "items": {
+            "$ref": "#/definitions/ResultDType"
+          }
+        },
+        "revocationReason": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Optional published reason for revocation, if revoked."
+        },
+        "revoked": {
+          "type": "boolean",
+          "description": "Model Primitive Datatype = Boolean. Defaults to false if this assertion is not referenced in a RevocationList. If revoked is true, only revoked and id are required properties, and many issuers strip a hosted assertion down to only those properties when revoked."
+        },
+        "role": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Role, position, or title of the learner when demonstrating or performing the achievement or evidence of learning being asserted. Examples include 'Student President', 'Intern', 'Captain', etc."
+        },
+        "signedEndorsements": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. Signed endorsements in JWS Compact Serialization format.",
+          "items": {
+            "type": "string",
+            "pattern": "^([A-Za-z0-9-_]{4,})\\.([-A-Za-z0-9-_]{4,})\\.([A-Za-z0-9-_]{4,})$"
+          }
+        },
+        "source": {
+          "description": "The person, organization, or system that assessed the achievement. The Achievement issuer is responsible for supporting verification.",
+          "$ref": "#/definitions/ProfileDType"
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Model Primitive Datatype = DateTime. If present, the assertion is not valid before this date.",
+          "format": "date-time"
+        },
+        "term": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The academic term in which this assertion was achieved."
+        },
+        "verification": {
+          "description": "Instructions for third parties to verify this assertion.",
+          "$ref": "#/definitions/VerificationDType"
+        }
+      },
+      "patternProperties": {
+        "^[^:][^:]*:[^:][^:]*$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    "AssociationDType": {
+      "type": "object",
+      "description": "Association is based on the CASE AssociationLink object. An Association associates (relates) one Achievement with another Achievement.",
+      "additionalProperties": false,
+      "required": [
+        "associationType",
+        "targetId",
+        "title"
+      ],
+      "properties": {
+        "associationType": {
+          "type": "string",
+          "description": "The type of association. This uses an enumerated vocabulary.",
+          "enum": [
+            "exactMatchOf",
+            "exemplar",
+            "hasSkillLevel",
+            "isChildOf",
+            "isParentOf",
+            "isPartOf",
+            "isPeerOf",
+            "isRelatedTo",
+            "precedes",
+            "replacedBy"
+          ]
+        },
+        "targetId": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The '@id' of another achievement, or target of the association."
+        },
+        "title": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A human readable title for the associated achievement."
+        }
+      }
+    },
+    "ClrDType": {
+      "type": "object",
+      "description": "A collection of assertions for a single person reported by a single publisher.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "issuedOn",
+        "learner",
+        "publisher"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Globally unique IRI for the CLR. If the IRI is a URL is must resolve to a CLR resource and conform to the getClr endpoint format. If the CLR is verified using Hosted verification, the IRI must be a URL."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'CLR'."
+        },
+        "achievements": {
+          "type": "array",
+          "description": "Array of achievements that are related directly or indirectly through associations with the asserted achievements in the CLR. Primarily used to represent hierarchical pathways. Asserted achievements may appear in both this array and in the achievement assertion. If asserted achievements do appear in both places, they MUST match exactly.",
+          "items": {
+            "$ref": "#/definitions/AchievementDType"
+          }
+        },
+        "assertions": {
+          "type": "array",
+          "description": "The learner's asserted achievements.",
+          "items": {
+            "$ref": "#/definitions/AssertionDType"
+          }
+        },
+        "issuedOn": {
+          "type": "string",
+          "description": "Model Primitive Datatype = DateTime. Timestamp of when the CLR was published.",
+          "format": "date-time"
+        },
+        "learner": {
+          "description": "The profile describing the recipient of the achievement assertions.",
+          "$ref": "#/definitions/ProfileDType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Optional name of the CLR."
+        },
+        "partial": {
+          "type": "boolean",
+          "description": "Model Primitive Datatype = Boolean. True if CLR does not contain all the assertions known by the publisher for the learner at the time the CLR is issued. Useful if you are sending a small set of achievements in real time when they are achieved. If False or omitted, the CLR SHOULD be interpreted as containing all the assertions for the learner known by the publisher at the time of issue."
+        },
+        "publisher": {
+          "description": "A profile describing the publisher of the CLR.",
+          "$ref": "#/definitions/ProfileDType"
+        },
+        "revocationReason": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. If revoked, optional reason for revocation."
+        },
+        "revoked": {
+          "type": "boolean",
+          "description": "Model Primitive Datatype = Boolean. If True the CLR is revoked."
+        },
+        "signedAssertions": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. Signed assertions in JWS Compact Serialization format.",
+          "items": {
+            "type": "string",
+            "pattern": "^([A-Za-z0-9-_]{4,})\\.([-A-Za-z0-9-_]{4,})\\.([A-Za-z0-9-_]{4,})$"
+          }
+        },
+        "verification": {
+          "description": "Instructions for third parties to verify this CLR.",
+          "$ref": "#/definitions/VerificationDType"
+        }
+      }
+    },
+    "CriteriaDType": {
+      "type": "object",
+      "description": "Descriptive metadata about the achievements necessary to be recognized with an Assertion of a particular AchievementType. This data is added to the AchievementType so that it may be rendered when that AchievementType is displayed, instead of simply a link to human-readable criteria external to the Achievement Assertion. Embedding criteria allows either enhancement of an external criteria page or increased portability and ease of use by allowing issuers to skip hosting the formerly-required external criteria page altogether.",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. The URI of a webpage that describes the criteria for the Achievement in a human-readable format.",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'Criteria'."
+        },
+        "narrative": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A narrative of what is needed to earn the achievement. Markdown allowed."
+        }
+      },
+      "patternProperties": {
+        "^[^:][^:]*:[^:][^:]*$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    "CryptographicKeyDType": {
+      "type": "object",
+      "description": "Based on the Key class from the W3C Web Payments Community Group Security Vocabulary. A CryptographicKey document identifies and describes a public key used to verify signed Assertions.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "owner",
+        "publicKeyPem"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The URI of the CryptographicKey document. Used during signed verification."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'CryptographicKey'."
+        },
+        "owner": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The identifier for the Profile that owns this PUBLIC KEY and the PRIVATE KEY used to sign the assertion or endorsement."
+        },
+        "publicKeyPem": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The PUBLIC KEY in PEM format corresponding to the PRIVATE KEY used by the owner to sign the assertion or endorsement. The PEM key encoding is a widely-used method to express public keys, compatible with almost every Secure Sockets Layer library implementation."
+        }
+      }
+    },
+    "EndorsementDType": {
+      "type": "object",
+      "description": "An endorsement claim.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "claim",
+        "issuedOn",
+        "issuer",
+        "verification"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Globally unique IRI for the Endorsement. If this Endorsement will be verified using Hosted verification, the value should be the URL of the hosted version of the Endorsement."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'Endorsement'."
+        },
+        "claim": {
+          "description": "An entity, identified by an id and additional properties that the endorser would like to claim about that entity.",
+          "$ref": "#/definitions/EndorsementClaimDType"
+        },
+        "issuedOn": {
+          "type": "string",
+          "description": "Model Primitive Datatype = DateTime. Timestamp of when the endorsement was published.",
+          "format": "date-time"
+        },
+        "issuer": {
+          "description": "The issuer's Profile.",
+          "$ref": "#/definitions/EndorsementProfileDType"
+        },
+        "revocationReason": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. If revoked, optional reason for revocation."
+        },
+        "revoked": {
+          "type": "boolean",
+          "description": "Model Primitive Datatype = Boolean. If True the endorsement is revoked."
+        },
+        "verification": {
+          "description": "Instructions for third parties to verify this assertion of endorsement.",
+          "$ref": "#/definitions/VerificationDType"
+        }
+      }
+    },
+    "EndorsementClaimDType": {
+      "type": "object",
+      "description": "An entity, identified by an id and additional properties that the endorser would like to claim about that entity.",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The 'id' of the Profile, Achievement, or Assertion being endorsed."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'EndorsementClaim'."
+        },
+        "endorsementComment": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. An endorer's comment about the quality or fitness of the endorsed entity. Markdown allowed."
+        }
+      },
+      "patternProperties": {
+        "^[^:][^:]*:[^:][^:]*$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    "EndorsementProfileDType": {
+      "type": "object",
+      "description": "A Profile is a collection of information that describes the person or organization using Comprehensive Learner Record (CLR). Publishers, learners, and issuers must be represented as profiles. Recipients, endorsers, or other entities may also be represented using this vocabulary. An EndorsementProfile cannot have endorsements.",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Globally unique IRI for the Profile."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'EndorsementProfile'. Unlike Profile, EndorsementProfile cannot have endorsements."
+        },
+        "address": {
+          "description": "An address for the individual or organization.",
+          "$ref": "#/definitions/AddressDType"
+        },
+        "description": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A short description of the individual or organization."
+        },
+        "email": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A contact email address for the individual or organization."
+        },
+        "image": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Image representing the individual or organization."
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the individual or organization."
+        },
+        "publicKey": {
+          "description": "The CrytographicKey object used to verify signed Assertions, Clrs, and Endorsements.",
+          "$ref": "#/definitions/CryptographicKeyDType"
+        },
+        "revocationList": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. The URL of the Revocation List document used for marking revocation of signed Assertions, CLRs, and Endorsements. Required for issuer profiles.",
+          "format": "uri"
+        },
+        "sourcedId": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The individual's unique 'sourcedId' value, which is used for providing interoperability with IMS Learning Information Services (LIS)."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. An institution's student identifier for the person. This is frequently issued through a Student Information System."
+        },
+        "telephone": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Primary phone number for the individual or organization."
+        },
+        "url": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. Web resource that uniquely represents or belongs to the individual. This may be a resource about the individual, hosting provided by the instution to the individual, or an web resource independently controlled by the individual.",
+          "format": "uri"
+        },
+        "verification": {
+          "description": "Instructions for how to verify Assertion issued by this Profile.",
+          "$ref": "#/definitions/VerificationDType"
+        }
+      },
+      "patternProperties": {
+        "^[^:][^:]*:[^:][^:]*$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    "EvidenceDType": {
+      "type": "object",
+      "description": "One or more artifacts that represent supporting evidence for the record. Examples include text, media, websites, etc.",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. The URI of a webpage presenting evidence of achievement.",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'Evidence'."
+        },
+        "artifacts": {
+          "type": "array",
+          "description": "Artifacts that are part of the evidence.",
+          "items": {
+            "$ref": "#/definitions/ArtifactDType"
+          }
+        },
+        "audience": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A description of the intended audience for a piece of evidence."
+        },
+        "description": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A longer description of the evidence."
+        },
+        "genre": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A string that describes the type of evidence. For example, Poetry, Prose, Film."
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the evidence."
+        },
+        "narrative": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A narrative that describes the evidence and process of achievement that led to an assertion. Markdown allowed."
+        }
+      }
+    },
+    "IdentityDType": {
+      "type": "object",
+      "description": "A collection of information about the recipient of an achievement assertion.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "identity",
+        "hashed"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the Identity."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The type should identify the property by which the recipient of an Assertion is identified. This value should be an IRI mapped in the present context. For example, 'id' indicates that the identity property value is the id of the recipient's profile."
+        },
+        "identity": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Either the hash of the identity or the plaintext value. If it's possible that the plaintext transmission and storage of the identity value would leak personally identifiable information where there is an expectation of privacy, it is strongly recommended that an IdentityHash be used."
+        },
+        "hashed": {
+          "type": "boolean",
+          "description": "Model Primitive Datatype = Boolean. Whether or not the identity value is hashed."
+        },
+        "salt": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. If the recipient is hashed, this should contain the string used to salt the hash. If this value is not provided, it should be assumed that the hash was not salted."
+        }
+      }
+    },
+    "ProfileDType": {
+      "type": "object",
+      "description": "A Profile is a collection of information that describes the person or organization using Comprehensive Learner Record (CLR). Publishers, learners, and issuers must be represented as profiles. Recipients, endorsers, or other entities may also be represented using this vocabulary.",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Globally unique IRI for the Learner, Publisher, and Issuer Profile. If the IRI is a URL it must resolve to a Profile resource. The Assertion Recipient is identified by reference to the Learner's Profile via the id, email, url, telephone, sourcedId, or studentId property."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'Profile'."
+        },
+        "address": {
+          "description": "An address for the individual or organization.",
+          "$ref": "#/definitions/AddressDType"
+        },
+        "description": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A short description of the individual or organization."
+        },
+        "email": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A contact email address for the individual or organization."
+        },
+        "endorsements": {
+          "type": "array",
+          "description": "Allows endorsers to make specific claims about the individual or organization represented by this profile.",
+          "items": {
+            "$ref": "#/definitions/EndorsementDType"
+          }
+        },
+        "image": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. IRI of an image representing the individual or organization. May be a DATA URI or the URL where the image may be found."
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the individual or organization."
+        },
+        "publicKey": {
+          "description": "The CrytographicKey object used to verify signed Assertions, Clrs, and Endorsements.",
+          "$ref": "#/definitions/CryptographicKeyDType"
+        },
+        "revocationList": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. The URL of the Revocation List document used for marking revocation of signed Assertions, CLRs, and Endorsements. Required for issuer profiles.",
+          "format": "uri"
+        },
+        "signedEndorsements": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. Signed endorsements in JWS Compact Serialization format.",
+          "items": {
+            "type": "string",
+            "pattern": "^([A-Za-z0-9-_]{4,})\\.([-A-Za-z0-9-_]{4,})\\.([A-Za-z0-9-_]{4,})$"
+          }
+        },
+        "sourcedId": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The individual's or organization's unique 'sourcedId' value, which is used for providing interoperability with other identity systems."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. An institution's student identifier for the person. This is frequently issued through a Student Information System."
+        },
+        "telephone": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Primary phone number for the individual or organization."
+        },
+        "url": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. Web resource that uniquely represents or belongs to the individual. This may be a resource about the individual, hosting provided by the instution to the individual, or an web resource independently controlled by the individual.",
+          "format": "uri"
+        },
+        "verification": {
+          "description": "Issuer and publisher profiles should have a verification property with a type of 'Verification'. Instructions for how to verify assertions and endorsements issued by the individual or organization represented by this profile.",
+          "$ref": "#/definitions/VerificationDType"
+        }
+      },
+      "patternProperties": {
+        "^[^:][^:]*:[^:][^:]*$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    "ResultDType": {
+      "type": "object",
+      "description": "Describes a result of an achievement.",
+      "additionalProperties": false,
+      "required": [
+        "resultDescription"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the object."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'Result'."
+        },
+        "achievedLevel": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The id of the RubricCriterionLevel achieved."
+        },
+        "alignments": {
+          "type": "array",
+          "description": "The alignments between this result and nodes in external frameworks. This set of alignments are in addition to the set of alignments defined in the corresponding ResultDescription object.",
+          "items": {
+            "$ref": "#/definitions/AlignmentDType"
+          }
+        },
+        "resultDescription": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The id of the ResultDescription describing this result."
+        },
+        "value": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A grade or value representing the result of the performance, or demonstration, of the achievement.  For example, 'A' if the recipient received a grade of A in the class. "
+        }
+      }
+    },
+    "ResultDescriptionDType": {
+      "type": "object",
+      "description": "Describes a possible achievement result.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "resultType"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the ResultDescription."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'ResultDescription'."
+        },
+        "alignments": {
+          "type": "array",
+          "description": "The alignments between this result description and nodes in external frameworks.",
+          "items": {
+            "$ref": "#/definitions/AlignmentDType"
+          }
+        },
+        "allowedValues": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. The ordered from 'low' to 'high' set of allowed values.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the result."
+        },
+        "requiredLevel": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The id of the RubricCriterionLevel required to 'pass'."
+        },
+        "requiredValue": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The value from allowedValues or within the range of valueMin to valueMax required to 'pass'."
+        },
+        "resultType": {
+          "description": "The type of result. This is an extensible enumerated vocabulary.",
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "Model Primitive Datatype = String.",
+              "pattern": "(ext:)[a-z|A-Z|0-9|.|-|_]+"
+            },
+            {
+              "type": "string",
+              "enum": [
+                "GradePointAverage",
+                "LetterGrade",
+                "Percent",
+                "PerformanceLevel",
+                "PredictedScore",
+                "Result",
+                "RawScore",
+                "RubricCriterion",
+                "RubricCriterionLevel",
+                "RubricScore",
+                "ScaledScore"
+              ]
+            }
+          ]
+        },
+        "rubricCriterionLevels": {
+          "type": "array",
+          "description": "The ordered from 'low' to 'high' set of rubric criterion levels that may be asserted.",
+          "items": {
+            "$ref": "#/definitions/RubricCriterionLevelDType"
+          }
+        },
+        "valueMax": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The maximum possible result that may be asserted."
+        },
+        "valueMin": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The minimum possible result that may be asserted."
+        }
+      }
+    },
+    "RubricCriterionLevelDType": {
+      "type": "object",
+      "description": "Describes a rubric criterion level.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the ResultCriterionLevel."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The JSON-LD type of this object. Normally 'RubricCriterionLevel'."
+        },
+        "alignments": {
+          "type": "array",
+          "description": "The alignments between this rubric criterion level and nodes in external frameworks.",
+          "items": {
+            "$ref": "#/definitions/AlignmentDType"
+          }
+        },
+        "description": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A description of the rubric criterion level."
+        },
+        "level": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The rubric performance level in terms of success."
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the RubricCriterionLevel."
+        },
+        "points": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The number of grade points corresponding to a specific rubric level."
+        }
+      }
+    },
+    "VerificationDType": {
+      "type": "object",
+      "description": "Information a reviewer can use to verify an Assertion, Clr, or Endorsement.",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the Verification."
+        },
+        "type": {
+          "type": "string",
+          "description": "The JSON-LD type of this object. The strongly typed value indicates the verification method.",
+          "enum": [
+            "Hosted",
+            "Signed",
+            "Verification"
+          ]
+        },
+        "allowedOrigins": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. The host registered name subcomponent of an allowed origin. Any given id URI will be considered valid.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "creator": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. The (HTTP) id of the key used to sign the Assertion, CLR, or Endorsement. If not present, verifiers will check the public key declared in the referenced issuer Profile. If a key is declared here, it must be authorized in the issuer Profile as well. creator is expected to be the dereferencable URI of a document that describes a CryptographicKey.",
+          "format": "uri"
+        },
+        "startsWith": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. The URI fragment that the verification property must start with. Valid Assertions, Clrs, and Endorsements must have an id within this scope. Multiple values allowed, and Assertions, Clrs, and Endorsements will be considered valid if their id starts with one of these values.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verificationProperty": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The property to be used for verification. Only 'id' is supported. Verifiers will consider 'id' the default value if verificationProperty is omitted or if an issuer Profile has no explicit verification instructions, so it may be safely omitted."
+        }
+      }
+    }
+  },
+  "$id": "postClr-requestpayload-schema.json"
+}

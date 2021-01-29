@@ -1,0 +1,21 @@
+@model OpenCredentialPublisher.ClrLibrary.Models.CryptographicKeyDType
+
+@if (Model != null)
+{
+    <dl class="row">
+        <dt class="col-sm-3">Public Key</dt>
+        <dd class="col-sm-9">
+            <a href="@Model.Id">@Model.Id</a>
+        </dd>
+        @if (Model.Owner != null)
+        {
+            <dt class="col-sm-3">Owner</dt>
+            <dd class="col-sm-9">@Model.Owner</dd>
+        }
+        @*@if (Model.PublicKeyPem != null)
+        {
+            <dt class="col-sm-3">Key</dt>
+            <dd class="col-sm-9"><pre>@Model.PublicKeyPem</pre></dd>
+        }*@
+    </dl>
+}

@@ -1,0 +1,21 @@
+@using OpenCredentialPublisher.ClrLibrary.Models
+@model EndorsementDType
+<li class="list-group-item">
+    <div class="card-deck">
+        <div class="card border-0">
+            <dl class="row">
+                    <dt class="col-sm-3">Issued On</dt>
+                    <dd class="col-sm-9">@Model.IssuedOn</dd>
+                @if (Model.Claim != null)
+                {
+                    <dt class="col-sm-3">Claim</dt>
+                    <dd class="col-sm-9">@Model.Claim.EndorsementComment</dd>
+                }
+            </dl>
+            @Html.DisplayFor(m => Model.Verification, "Verification", new { ClrEntityId = ViewData["ClrEntityId"], EndorsementId = Model.Id })
+        </div>
+        <div class="card border-0">
+            @Html.DisplayFor(m => Model.Issuer, "EndorsementProfile")
+        </div>
+    </div>
+</li>

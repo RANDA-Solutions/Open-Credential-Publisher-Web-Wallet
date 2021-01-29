@@ -1,0 +1,95 @@
+@page
+@model OpenCredentialPublisher.ClrWallet.Pages.Sources.DetailsModel
+@{
+    ViewData["Title"] = "Source Details";
+}
+
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+            <h1>Source Details</h1>
+
+
+            <div class="alert alert-primary">
+                <p>
+                    A CLR source is a platform which has one or more of your CLRs. This application will connect to the source and
+                    get your CLRs.
+                </p>
+                <p>
+                    The table below shows the CLRs this application received from this source.
+                </p>
+            </div>
+
+            <div asp-validation-summary="All" class="alert alert-danger mt-2"></div>
+
+            <form method="post">
+                <dl class="row">
+                    <dt class="col-sm-2">Name</dt>
+                    <dd class="col-sm-10">@Html.DisplayFor(m => Model.Authorization.Source.Name)</dd>
+                    <dt class="col-sm-2">URL</dt>
+                    <dd class="col-sm-10">
+                        <a href="@Html.DisplayFor(m => Model.Authorization.Source.Url)">
+                            @Html.DisplayFor(m => Model.Authorization.Source.Url)
+                        </a>
+                    </dd>
+                    <dt class="col-sm-2">
+                        CLRs
+
+                    </dt>
+                    <dd class="col-sm-10">
+                        @if (Model.Authorization != null)
+                        {
+                            @if (!Model.Authorization.Clrs.Any())
+                            {
+                                <div>
+                                    Click
+                                    <button type="submit" class="btn btn-link p-0" style="vertical-align: baseline">Refresh</button>
+                                    to get your CLRs from @Model.Authorization.Source.Name.
+                                </div>
+                            }
+                            else
+                            {
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Publisher</th>
+                                            <th>Published</th>
+                                            <th>Retrieved</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var clr in Model.Authorization.Clrs)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayFor(m => clr.PublisherName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(m => clr.IssuedOn)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(m => clr.RefreshedAt)
+                                                </td>
+                                                <td>
+                                                    <a asp-page="/Clrs/Display" asp-route-id="@clr.Id">Display</a> |
+                                                    <a asp-page="/Clrs/Delete" asp-route-id="@clr.Id">Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        }
+                        <div class="mt-2"><button type="submit" class="btn btn-primary">Refresh CLRs</button></div>
+                    </dd>
+                </dl>
+            </form>
+
+            <div>
+                <a asp-page="./Delete" asp-route-id="@Model.Authorization?.Id">Delete</a> |
+                <a asp-page="./Index">Back to List of Sources</a>
+            </div>
+        </section>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<section class="login-form">
+    <form id="account" method="post">
+        <h4>ENTER YOUR LOGIN INFORMATION</h4>
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend mr-3">
+                <span class="user-icon"></span>
+            </div>
+            <input asp-for="Input.Email" placeholder="Username" class="form-control" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend mr-3">
+                <span class="secure-icon"></span>
+            </div>
+            <input asp-for="Input.Password" placeholder="Password" class="form-control" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend mr-3">
+                <span class="blank-icon"></span>
+            </div>
+            <button type="submit" id="btn-login-form" class="btn btn-outline-primary btn-lg">LOGIN</button>
+        </div>
+
+        <div class="input-group">
+
+            <div class="input-group-prepend mr-3">
+                <span class="blank-icon"></span>
+            </div>
+            <div class="form-control-plaintext">
+                <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a> <br />
+                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
+            </div>
+        </div>
+    </form>
+</section>

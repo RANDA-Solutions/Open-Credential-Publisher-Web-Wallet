@@ -1,0 +1,112 @@
+/* You can add global styles to this file, and also import other style files */
+/* Provide sufficient contrast against white background */
+
+code {
+  color: #e01a76;
+}
+
+.text-waiting-status {
+  color: #FF9E1B; 
+}
+
+.text-sky-blue {
+  color: #019CDE;
+}
+
+.text-navy-blue {
+  color: #084060;
+}
+
+.text-light-blue {
+  color: #C2F1F2;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.info-row-description {
+  font-size: 10pt;
+  font-weight: normal;
+  color: #999999;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  padding: 6px 0px;
+  border-radius: 15px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.42857;
+}
+.margin-top-10 {
+  margin-top: 10px;
+}
+
+.margin-top-20 {
+  margin-top: 20px;
+}
+
+.margin-bottom-15 {
+  margin-bottom: 15px;
+}
+
+.margin-right-5 {
+  margin-right: 5px;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.text-align-left {
+  text-align: left;
+}
+
+.portfolio-main-card {
+  border-radius: 20px;
+  border: solid 1px #0099F8;
+  background-color: #0099F8;
+  padding: 5px 20px;
+  z-index: 99;
+  position: relative;
+  color: #ffffff;
+}
+
+.portfolio-main-card-child {
+  border-radius: 20px;
+  background-color: #f4f4f4;
+  padding:30px 20px;
+  margin-top:-30px;
+}
+
+.vertical-align-md {
+  margin:auto;
+  padding:10px;
+}
+
+.row-padding {
+  border-bottom:1px solid #DDFCFD;
+  padding:15px 0;
+}
+
+.component-container {
+    position:relative;
+    top:110px;
+  background-color: white;
+  border-radius: 10px;
+  /*box-shadow: 0 3px 6px black;*/
+  box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
+  padding: 20px; /* This will need playing around with */
+}
+
+.grey {
+    color: #d4d4d4;
+}
+
+.margin-bottom-40 {
+    margin-bottom: 40px;
+}

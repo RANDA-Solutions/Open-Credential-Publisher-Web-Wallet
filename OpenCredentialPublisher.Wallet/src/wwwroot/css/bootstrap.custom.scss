@@ -1,0 +1,120 @@
+// Dark Blue
+$darkBlue:#003B5C; 
+// Gray
+$gray:#D7D2CB; 
+// Parchment
+$parchment:#F4EFE6;
+// White
+$white:#F9F7F2;
+// Blue
+$blue: #52E4EA;
+// Baby Blue
+$babyBlue:#D2ECF7;
+// Orange
+$orange:#FF9E1B;
+// Cream
+$cream:#FAEFE1;
+// Hot Pink
+$hotPink:#E61B59;
+// Pink
+$pink:#FFD9E4;
+// Aqua
+$aqua:#00BCC4;
+// Light Aqua
+$lightAqua:#C2F1F2;
+// Primary Background
+$backgroundWhite:#FAF8F5;
+// Title  
+$titleWhite:#FEFEFC;
+
+$body-bg: $backgroundWhite;
+
+$theme-colors: ( "primary": $blue, "secondary": $orange, "danger": $hotPink, "info": #9206EA );
+
+$colors: (
+    "white": $white
+);
+
+$btn-font-size-lg: 14px;
+
+@import "fonts.scss";
+
+$font-family-sans-serif: Typold-Regular;
+$font-family-base: $font-family-sans-serif;
+
+@import "../lib/bootstrap/scss/bootstrap";
+
+html {
+    background-color: white;
+}
+
+body {
+    background: transparent;
+}
+
+.pg-info {
+    background-color: #9206EA !important;
+}
+
+nav.navbar {
+    background-color: transparent;
+    color: $white;
+    height: 97px;
+}
+
+.login-body section h4 {
+    color: $blue;
+}
+
+.btn-outline-primary {
+    border-color: $blue !important;
+}
+
+.btn-outline-secondary, .btn-outline-primary {
+    color: black !important;
+    border-width: 2px !important;
+    border-radius: 10px !important;
+}
+
+.btn-outline-secondary.text-secondary {
+    color: $orange !important;
+}
+
+.btn-outline-secondary.text-secondary:hover {
+    color: white !important;
+}
+
+input.form-control {
+    border: 0;
+    border-bottom: 2px solid black !important;
+    border-radius: 0 !important;
+    font-size: 16px;
+    color: black;
+    background-color: white !important;
+}
+
+input.form-control:focus {
+    box-shadow: 0 0 black !important;
+}
+
+#navigation::before {
+    content: "";
+    background: linear-gradient(to left, #9206ea, #9058fb 17%, #2b85f9 57%, #00b5f8 100%);
+    position: absolute;
+    height: 332px;
+    width: 200vw;
+    left: -100vw;
+    z-index: -1;
+}
+
+.link-active .nav-link, .link-active .nav-link:hover {
+    color: $blue !important;
+}
+
+.text-light, a.text-light:focus, a.text-light:hover {
+    color: white;
+}
+
+a.text-light:focus, a.text-light:hover {
+    font-weight: bold;
+}

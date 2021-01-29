@@ -1,0 +1,308 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Comprehensive Learner Record (CLR) Version 1.0 IMS Candidate Final JSON Schema Binding (clrv1p0-endorsement)",
+  "type": "object",
+  "description": "Author-Jeff Bohrer (IMS Global), Andy Miller (IMS Global);  Version-2.0;  Release Date-May 21, 2020. ",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "claim",
+    "issuedOn",
+    "issuer",
+    "verification",
+    "@context"
+  ],
+  "properties": {
+    "@context": {
+      "type": "string",
+      "description": "URL of the JSON-LD context file",
+      "format": "uri"
+    },
+    "id": {
+      "type": "string",
+      "description": "Model Primitive Datatype = NormalizedString. Globally unique IRI for the Endorsement. If this Endorsement will be verified using Hosted verification, the value should be the URL of the hosted version of the Endorsement."
+    },
+    "type": {
+      "type": "string",
+      "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'Endorsement'."
+    },
+    "claim": {
+      "description": "An entity, identified by an id and additional properties that the endorser would like to claim about that entity.",
+      "$ref": "#/definitions/EndorsementClaimDType"
+    },
+    "issuedOn": {
+      "type": "string",
+      "description": "Model Primitive Datatype = DateTime. Timestamp of when the endorsement was published.",
+      "format": "date-time"
+    },
+    "issuer": {
+      "description": "The issuer's Profile.",
+      "$ref": "#/definitions/EndorsementProfileDType"
+    },
+    "revocationReason": {
+      "type": "string",
+      "description": "Model Primitive Datatype = String. If revoked, optional reason for revocation."
+    },
+    "revoked": {
+      "type": "boolean",
+      "description": "Model Primitive Datatype = Boolean. If True the endorsement is revoked."
+    },
+    "verification": {
+      "description": "Instructions for third parties to verify this assertion of endorsement.",
+      "$ref": "#/definitions/VerificationDType"
+    }
+  },
+  "definitions": {
+    "AddressDType": {
+      "type": "object",
+      "description": "Based on schema.org Address object.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the Address."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'Address'."
+        },
+        "addressCountry": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The country. For example, USA. You can also provide the two-letter ISO 3166-1 alpha-2 country code."
+        },
+        "addressLocality": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The locality. For example, Mountain View."
+        },
+        "addressRegion": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The region. For example, CA."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The postal code. For example, 94043."
+        },
+        "postOfficeBoxNumber": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The post office box number for PO box addresses."
+        },
+        "streetAddress": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The street address. For example, 1600 Amphitheatre Pkwy."
+        }
+      }
+    },
+    "CryptographicKeyDType": {
+      "type": "object",
+      "description": "Based on the Key class from the W3C Web Payments Community Group Security Vocabulary. A CryptographicKey document identifies and describes a public key used to verify signed Assertions.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "owner",
+        "publicKeyPem"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The URI of the CryptographicKey document. Used during signed verification."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this object. Normally 'CryptographicKey'."
+        },
+        "owner": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The identifier for the Profile that owns this PUBLIC KEY and the PRIVATE KEY used to sign the assertion or endorsement."
+        },
+        "publicKeyPem": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The PUBLIC KEY in PEM format corresponding to the PRIVATE KEY used by the owner to sign the assertion or endorsement. The PEM key encoding is a widely-used method to express public keys, compatible with almost every Secure Sockets Layer library implementation."
+        }
+      }
+    },
+    "EndorsementClaimDType": {
+      "type": "object",
+      "description": "An entity, identified by an id and additional properties that the endorser would like to claim about that entity.",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The 'id' of the Profile, Achievement, or Assertion being endorsed."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'EndorsementClaim'."
+        },
+        "endorsementComment": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. An endorer's comment about the quality or fitness of the endorsed entity. Markdown allowed."
+        }
+      },
+      "patternProperties": {
+        "^[^:][^:]*:[^:][^:]*$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    "EndorsementProfileDType": {
+      "type": "object",
+      "description": "A Profile is a collection of information that describes the person or organization using Comprehensive Learner Record (CLR). Publishers, learners, and issuers must be represented as profiles. Recipients, endorsers, or other entities may also be represented using this vocabulary. An EndorsementProfile cannot have endorsements.",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Globally unique IRI for the Profile."
+        },
+        "type": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. The JSON-LD type of this entity. Normally 'EndorsementProfile'. Unlike Profile, EndorsementProfile cannot have endorsements."
+        },
+        "address": {
+          "description": "An address for the individual or organization.",
+          "$ref": "#/definitions/AddressDType"
+        },
+        "description": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A short description of the individual or organization."
+        },
+        "email": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. A contact email address for the individual or organization."
+        },
+        "image": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Image representing the individual or organization."
+        },
+        "name": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The name of the individual or organization."
+        },
+        "publicKey": {
+          "description": "The CrytographicKey object used to verify signed Assertions, Clrs, and Endorsements.",
+          "$ref": "#/definitions/CryptographicKeyDType"
+        },
+        "revocationList": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. The URL of the Revocation List document used for marking revocation of signed Assertions, CLRs, and Endorsements.",
+          "format": "uri"
+        },
+        "sourcedId": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The individual's unique 'sourcedId' value, which is used for providing interoperability with IMS Learning Information Services (LIS)."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. An institution's student identifier for the person. This is frequently issued through a Student Information System."
+        },
+        "telephone": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. Primary phone number for the individual or organization."
+        },
+        "url": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. Web resource that uniquely represents or belongs to the individual. This may be a resource about the individual, hosting provided by the instution to the individual, or an web resource independently controlled by the individual.",
+          "format": "uri"
+        },
+        "verification": {
+          "description": "Instructions for how to verify Assertion issued by this Profile.",
+          "$ref": "#/definitions/VerificationDType"
+        }
+      },
+      "patternProperties": {
+        "^[^:][^:]*:[^:][^:]*$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    "VerificationDType": {
+      "type": "object",
+      "description": "Information a reviewer can use to verify an Assertion or an Endorsement.",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Unique IRI for the Verification."
+        },
+        "type": {
+          "type": "string",
+          "description": "The JSON-LD type of this object. The strongly typed value indicates the verification method.",
+          "enum": [
+            "Hosted",
+            "Signed",
+            "Verification"
+          ]
+        },
+        "allowedOrigins": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. The host registered name subcomponent of an allowed origin. Any given id URI will be considered valid.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "creator": {
+          "type": "string",
+          "description": "Model Primitive Datatype = AnyURI. The (HTTP) id of the key used to sign the Assertion, CLR, or Endorsement. If not present, verifiers will check the public key declared in the referenced issuer Profile. If a key is declared here, it must be authorized in the issuer Profile as well. creator is expected to be the dereferencable URI of a document that describes a CryptographicKey.",
+          "format": "uri"
+        },
+        "startsWith": {
+          "type": "array",
+          "description": "Model Primitive Datatype = String. The URI fragment that the verification property must start with. Valid Assertions must have an id within this scope. Multiple values allowed, and Assertions will be considered valid if their id starts with one of these values.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verificationProperty": {
+          "type": "string",
+          "description": "Model Primitive Datatype = String. The property to be used for verification. Only 'id' is supported. Verifiers will consider 'id' the default value if verificationProperty is omitted or if an issuer Profile has no explicit verification instructions, so it may be safely omitted."
+        }
+      }
+    }
+  },
+  "$id": "https://www.imsglobal.org/jsd/clr/v1p0/clrv1p0-endorsement.json"
+}

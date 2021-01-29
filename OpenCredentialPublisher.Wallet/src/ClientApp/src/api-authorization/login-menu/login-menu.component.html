@@ -1,0 +1,9 @@
+<ul class="navbar-nav" *ngIf="isAuthenticated | async">
+    <li class="nav-item ml-4">
+        <a  class="nav-link text-light" [routerLink]='["/authentication/profile"]' title="Manage"><span class="user-icon mr-2"></span> Profile</a>
+    </li>
+    <li class="nav-item ml-4">
+        <a  class="nav-link text-light" [routerLink]='["/authentication/logout"]' [state]='{ local: true }' title="Logout"><span class="logout-icon-default mr-2"></span> Logout</a>
+    </li>
+</ul>
+

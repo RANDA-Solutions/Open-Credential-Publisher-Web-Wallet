@@ -1,0 +1,14 @@
+<section class="component-container">
+    <h4 class="text-center mb-3">Folio</h4>
+    <p class="text-center mb-3">
+        Start a folio to share verifiable credential with your selected organization or institution.
+    </p>
+    <div class="text-center mb-3">
+        <a class="btn btn-outline-primary btn-lg mr-3" [routerLink]="['/folio/start']">START NEW FOLIO</a>
+        <a class="btn btn-outline-primary btn-lg mr-3" [routerLink]="['/folio/sendAll']">SEND ALL CREDENTIALS</a>
+        <a class="btn btn-outline-primary btn-lg" (click)="verify()">CLICK TO VERIFY</a>
+    </div>
+    <p class="text-center">
+        <a [routerLink]="['/folio/drafts']">View Drafts</a>
+    </p>
+</section>

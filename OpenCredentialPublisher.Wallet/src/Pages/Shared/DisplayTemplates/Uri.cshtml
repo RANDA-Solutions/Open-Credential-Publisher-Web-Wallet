@@ -1,0 +1,6 @@
+@model string
+
+@if (!string.IsNullOrEmpty(Model))
+{
+    <div class="text-truncate" data-toggle="tooltip" title="@Model">@Model</div>
+}

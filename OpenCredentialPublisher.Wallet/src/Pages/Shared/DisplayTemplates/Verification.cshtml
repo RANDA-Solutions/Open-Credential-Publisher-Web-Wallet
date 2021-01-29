@@ -1,0 +1,52 @@
+@using OpenCredentialPublisher.ClrWallet.Extensions
+@model OpenCredentialPublisher.ClrLibrary.Models.VerificationDType
+
+@if (Model != null)
+{
+    const string labels = "<div>Hosted</div>" +
+                          "<div>Signed</div>";
+
+    // If resultId == null, this is the verification object for an issuer profile
+
+    var resultId = ViewData["AssertionId"] ?? ViewData["endorsementId"] ?? ViewData["clrId"];
+
+    <form method="post" data-ajax="true" data-ajax-method="post" data-ajax-loading="#loader" data-ajax-complete="verify_complete">
+        <dl class="row">
+            @if (resultId != null)
+            {
+                <dt class="col-sm-3">
+                    <input type="hidden" name="ClrEntityId" value="@ViewData["ClrEntityId"]"/>
+                    <input type="hidden" name="LinkId" value="@ViewData["LinkId"]"/>
+                    <input type="hidden" name="AssertionId" value="@ViewData["AssertionId"]"/>
+                    <input type="hidden" name="ClrId" value="@ViewData["ClrId"]"/>
+                    <input type="hidden" name="EndorsementId" value="@ViewData["EndorsementId"]"/>
+                    <input type="submit" class="btn btn-info" asp-page-handler="" value="Verify"/>
+                </dt>
+                <dd class="col-sm-9">
+                    @Model.Type.ToEnumMemberValue()
+                    <img src="~/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
+                         data-toggle="tooltip" data-html="true" title="@labels"/>
+                    <span class="col-sm-9" id="verification-result-@resultId.ToString().SafeId()"></span>
+                </dd>
+                @if (Model.Creator != null)
+                {
+                    <dt class="col-sm-3">Creator</dt>
+                    <dd class="col-sm-9">@Model.Creator</dd>
+                }
+            }
+            else
+            {
+                @if (Model.AllowedOrigins != null && Model.AllowedOrigins.Any())
+                {
+                    <dt class="col-sm-3">Allowed Origins</dt>
+                    <dd class="col-sm-9">@string.Join(", ", Model.AllowedOrigins)</dd>
+                }
+                @if (Model.StartsWith != null && Model.StartsWith.Any())
+                {
+                    <dt class="col-sm-3">Starts With</dt>
+                    <dd class="col-sm-9">@string.Join(", ", Model.StartsWith)</dd>
+                }
+            }
+        </dl>
+    </form>
+}

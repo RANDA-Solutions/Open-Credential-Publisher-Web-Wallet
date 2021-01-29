@@ -1,0 +1,41 @@
+@page
+@model OpenCredentialPublisher.ClrWallet.Pages.Sources.RegisterModel
+@{
+    ViewData["Title"] = "Connect CLR Source";
+}
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+            <h1>Connect CLR Source</h1>
+
+            <div asp-validation-summary="All" class="alert alert-danger mt-2"></div>
+
+            <div class="alert alert-primary">
+                <p>
+                    A CLR source is a platform which has one or more of your CLRs. This application connects to the source to
+                    get your CLRs.
+                </p>
+            </div>
+
+            <form method="post">
+                <div class="form-group">
+                    <label asp-for="SelectedSource">Select a known source</label>
+                    <select asp-for="SelectedSource" asp-items="@Model.Sources" class="custom-select">
+                        <option value="">Select a source</option>
+                    </select>
+                    <span asp-validation-for="SelectedSource" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SourceUrl">Or enter the URL for a new source</label>
+                    <input type="url" asp-for="SourceUrl" class="form-control" placeholder="Enter the source platform URL" />
+                    <span asp-validation-for="SourceUrl" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Connect</button>
+            </form>
+
+            <div class="mt-2">
+                <a asp-page="./Index">Back to List of Sources</a>
+            </div>
+        </section>
+    </div>
+</div>

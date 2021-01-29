@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Comprehensive Learner Record (CLR) Version 1.0 IMS Candidate Final JSON Schema Binding (getClrs-400-401-403-404-421-responsepayload-schema)",
+  "type": "object",
+  "description": "Author-Jeff Bohrer (IMS Global), Andy Miller (IMS Global);  Version-2.0;  Release Date-May 21, 2020. ",
+  "additionalProperties": false,
+  "required": [
+    "imsx_codeMajor",
+    "imsx_severity"
+  ],
+  "properties": {
+    "imsx_codeMajor": {
+      "type": "string",
+      "description": "The code major value (from the corresponding enumerated vocabulary).",
+      "enum": [
+        "success",
+        "failure",
+        "processing",
+        "unsupported"
+      ]
+    },
+    "imsx_severity": {
+      "type": "string",
+      "description": "The severity value (from the corresponding enumerated vocabulary).",
+      "enum": [
+        "status",
+        "warning",
+        "error"
+      ]
+    },
+    "imsx_description": {
+      "type": "string",
+      "description": "Model Primitive Datatype = String. A human readable description supplied by the entity creating the status code information."
+    },
+    "imsx_codeMinor": {
+      "description": "The set of reported code minor status codes.",
+      "$ref": "#/definitions/imsx_CodeMinorDType"
+    }
+  },
+  "definitions": {
+    "imsx_CodeMinorDType": {
+      "type": "object",
+      "description": "This is the container for the set of code minor status codes reported in the responses from the Service Provider.",
+      "additionalProperties": false,
+      "required": [
+        "imsx_codeMinorField"
+      ],
+      "properties": {
+        "imsx_codeMinorField": {
+          "type": "array",
+          "description": "Each reported code minor status code.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/imsx_CodeMinorFieldDType"
+          }
+        }
+      }
+    },
+    "imsx_CodeMinorFieldDType": {
+      "type": "object",
+      "description": "This is the container for a single code minor status code.",
+      "additionalProperties": false,
+      "required": [
+        "imsx_codeMinorFieldName",
+        "imsx_codeMinorFieldValue"
+      ],
+      "properties": {
+        "imsx_codeMinorFieldName": {
+          "type": "string",
+          "description": "Model Primitive Datatype = NormalizedString. Tiis should contain the identity of the system that has produced the code minor status code report."
+        },
+        "imsx_codeMinorFieldValue": {
+          "type": "string",
+          "description": "The code minor status code (this is a value from the corresponding enumerated vocabulary).",
+          "enum": [
+            "forbidden",
+            "fullsuccess",
+            "internal_server_error",
+            "invalid_data",
+            "invalid_query_parameter",
+            "server_busy",
+            "unauthorizedrequest"
+          ]
+        }
+      }
+    }
+  },
+  "$id": "getClrs-400-401-403-404-421-responsepayload-schema.json"
+}

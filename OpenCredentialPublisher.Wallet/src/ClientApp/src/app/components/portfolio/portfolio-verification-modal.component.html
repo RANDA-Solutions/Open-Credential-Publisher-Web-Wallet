@@ -1,0 +1,69 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Verify Identity</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form-reset">
+    <div class="modal-body">
+        <div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="control-label">Social Security Number</label>
+                        <input type="text" class="form-control" formControlName="ssn" placeholder="Social Security Number" />
+                        <div *ngIf="f.ssn.errors && submitted" class="text-danger">
+                            <div *ngIf="f.ssn.errors.required">Social Security Number is required</div>                        
+                        </div>
+                    </div>            
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">  
+                        <label class="control-label">Date of Birth</label>
+                        <input type="text" class="form-control" formControlName="dob" placeholder="Date of Birth" />
+                        <div *ngIf="f.dob.errors && submitted" class="text-danger">
+                            <div *ngIf="f.dob.errors.required">Date of Birth is required</div>                        
+                        </div>
+                    </div>              
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">   
+                        <label class="control-label">Name</label>
+                        <select class="form-control" formControlName="nameSelectionId">
+                            <option value="" selected>Select your name from list</option>
+                            <option *ngFor="let name of model.names" [value]="name.selectionId">{{name.value}}</option>
+                        </select>
+                        <div *ngIf="f.nameSelectionId.errors" class="text-danger">
+                            <div *ngIf="submitted && f.nameSelectionId.errors.required">Please select a name</div>
+                        </div>
+                    </div>              
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">   
+                        <label class="control-label">Address</label>
+                        <select class="form-control" formControlName="addressSelectionId">
+                            <option value="" selected>Select an address that you have resided in</option>
+                            <option *ngFor="let address of model.addresses" [value]="address.selectionId">{{address.value}}</option>
+                        </select>
+                        <div *ngIf="f.addressSelectionId.errors" class="text-danger">
+                            <div *ngIf="submitted && f.addressSelectionId.errors.required">Please select a name</div>
+                        </div>
+                    </div>              
+                </div>
+            </div>
+        </div>
+        <!-- <div *ngIf="isProcessing">
+            <div style="text-align: center;">PROCESSING...</div>
+        </div>         -->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="disableVerifyBtn">Verify</button>
+    </div>
+  </form>

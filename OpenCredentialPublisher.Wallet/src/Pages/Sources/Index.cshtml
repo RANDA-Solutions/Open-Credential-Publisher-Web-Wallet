@@ -1,0 +1,54 @@
+@page
+@model OpenCredentialPublisher.ClrWallet.Pages.Sources.IndexModel
+@{
+    ViewData["Title"] = "CLR Sources";
+}
+
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+            <h1>Your CLR Sources</h1>
+
+            <div class="alert alert-primary">
+                <p>
+                    A Comprehensive Learner Record (CLR) is a record of your curricular and non-curricular learning achievements.
+                    Each CLR comes from a single publisher (such as your school) and contains one or more of your achievements.
+                </p>
+                <p>
+                    A CLR source is a platform which has one or more of your CLRs. This application connects to the source to
+                    get your CLRs.
+                </p>
+            </div>
+            <p>
+                <a asp-page="./Register">Connect to a source</a>
+            </p>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>URL</th>
+                        <th class="text-center">CLRs</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Authorizations)
+                    {
+                        <tr>
+                            <td>@item.Source.Name</td>
+                            <td>@item.Source.Url</td>
+                            <td class="text-center">@item.Clrs.Count</td>
+                            <td>
+                                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <a asp-page="/Index">Back to Dashboard</a>
+        </section>
+    </div>
+</div>
