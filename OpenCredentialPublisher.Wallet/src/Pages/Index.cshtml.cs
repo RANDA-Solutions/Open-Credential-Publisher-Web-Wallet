@@ -12,11 +12,9 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly WalletDbContext _context;
 
-        public IndexModel(WalletDbContext context)
+        public IndexModel()
         {
-            _context = context;
         }
 
         public List<AuthorizationModel> Authorizations { get; set; }

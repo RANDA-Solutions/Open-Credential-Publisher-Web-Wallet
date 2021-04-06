@@ -5,38 +5,38 @@ using OpenCredentialPublisher.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using OpenCredentialPublisher.Services.Implementations;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 {
     public class DeleteModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly LinkService _linkService;
 
-        public DeleteModel(WalletDbContext context)
+        public DeleteModel(LinkService linkService)
         {
-            _context = context;
+            _linkService = linkService;
         }
 
         public LinkModel Link { get; set; }
 
-        public void OnGet(string id)
+        public async Task OnGet(string id)
         {
-            OnPageLoad(id);
+            await OnPageLoad(id);
         }
 
         public async Task<IActionResult> OnPost(string id)
         {
-            OnPageLoad(id);
+            await OnPageLoad(id);
 
             if (!ModelState.IsValid) return Page();
 
-            _context.Links.Remove(Link);
-            await _context.SaveChangesAsync();
+            await _linkService.DeleteAsync(id);
 
             return RedirectToPage("./Index");
         }
 
-        private void OnPageLoad(string id)
+        private async Task OnPageLoad(string id)
         {
             if (id == null)
             {
@@ -44,7 +44,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
                 return;
             }
 
-            Link = _context.Links.Include(l => l.Shares).SingleOrDefault(p => p.Id == id);
+            Link = await _linkService.GetAsync(id);
 
             if (Link == null)
             {

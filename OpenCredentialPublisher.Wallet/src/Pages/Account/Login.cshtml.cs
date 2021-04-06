@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using Microsoft.Extensions.Options;
+using OpenCredentialPublisher.Data.Options;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Account
 {
@@ -21,14 +23,17 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly SiteSettingsOptions _siteSettings;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, 
+        public LoginModel(SignInManager<ApplicationUser> signInManager,
             ILogger<LoginModel> logger,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IOptions<SiteSettingsOptions> siteSettings)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _siteSettings = siteSettings?.Value;
         }
 
         [BindProperty]
@@ -44,8 +49,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            public string Username { get; set; }
 
             [Required]
             [DataType(DataType.Password)]
@@ -78,28 +82,22 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
-                }
-                else
+                var user = await _userManager.FindByNameAsync(Input.Username) ?? await _userManager.FindByEmailAsync(Input.Username);
+                if (user == null)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return Page();
                 }
+
+                if (!await _userManager.CheckPasswordAsync(user, Input.Password))
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
+                }
+
+                await _signInManager.SignInAsync(user, new AuthenticationProperties { ExpiresUtc = DateTime.UtcNow.AddMinutes(_siteSettings.SessionTimeout), AllowRefresh = true, IssuedUtc = DateTime.UtcNow, RedirectUri = returnUrl });
+                _logger.LogInformation("User logged in.");
+                return LocalRedirect(returnUrl);
             }
 
             // If we got this far, something failed, redisplay form

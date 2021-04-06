@@ -1,0 +1,53 @@
+@page "{id}"
+@using OpenCredentialPublisher.Services.SignalR;
+
+@model OpenCredentialPublisher.Wallet.Pages.Wallets.EditModel
+@{
+    ViewData["Title"] = "Name your connection";
+}
+
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+            <h3 class="mb-3">Your Connection</h3>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">Current Name</dt>
+                <dd class="col-sm-10">
+                    @if (!String.IsNullOrEmpty(Model.Wallet.WalletName))
+                    {
+                        @Html.DisplayFor(model => model.Wallet.WalletName)}
+                </dd>
+                <dt class="col-sm-2"><abbr title="@HelpTextConstants.RelationshipDID">Relationship DID</abbr></dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Wallet.RelationshipDid)
+                </dd>
+                <dt class="col-sm-2">Created</dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Wallet.CreatedOn)
+                </dd>
+            </dl>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <form id="form-wallet-name" class="my-5" method="post">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend mr-3">
+                            <i class="fas fa-wallet fa-2x"></i>
+                        </div>
+                        <input asp-for="Input.Name" placeholder="Nickname for this connection" class="form-control" value="@Model.Wallet.WalletName" />
+                        <span asp-validation-for="Input.Name" class="text-danger"></span>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend mr-3">
+                            <span class="blank-icon"></span>
+                        </div>
+                        <button type="submit" id="btn-login-form" class="btn btn-outline-primary btn-lg">Save</button>
+                    </div>
+                </form>
+            <br />
+            <a asp-page="./Index">Back to Connected Wallets</a>
+        </section>
+    </div>
+</div>
+
+

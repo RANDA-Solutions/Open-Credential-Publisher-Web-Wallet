@@ -1,0 +1,22 @@
+@page
+@model OpenCredentialPublisher.ClrWallet.Pages.Sources.TestingModel
+@{
+    ViewData["Title"] = "Testing";
+}
+<form method="post" action="https://api.badgr.io/o/token">
+    <div class="input-group mb-3">
+        <div class="input-group-prepend mr-3">
+            <span class="user-icon"></span>
+        </div>
+        <input name="username" placeholder="Username or Email" class="form-control" />
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend mr-3">
+            <span class="secure-icon"></span>
+        </div>
+        <input name="password" placeholder="Password" class="form-control" />
+    </div>
+    <div class="row mt-5">
+            <button type="submit" class="nav-link text-light">Login</button>
+        </div>
+</form>

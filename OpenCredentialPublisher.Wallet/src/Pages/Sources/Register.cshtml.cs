@@ -1,3 +1,20 @@
+using IdentityModel;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using OpenCredentialPublisher.ClrLibrary;
+using OpenCredentialPublisher.ClrWallet.Extensions;
+using OpenCredentialPublisher.ClrWallet.Utilities;
+using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
+using OpenCredentialPublisher.Shared.Utilities;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,42 +27,31 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using OpenCredentialPublisher.ClrLibrary;
-using OpenCredentialPublisher.Data.Contexts;
-using OpenCredentialPublisher.Data.Models;
-using OpenCredentialPublisher.ClrWallet.Extensions;
-using OpenCredentialPublisher.ClrWallet.Utilities;
-using IdentityModel;
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Serilog;
 using RegistrationRequest = OpenCredentialPublisher.ClrLibrary.OAuth.RegistrationRequest;
 using RegistrationResponse = OpenCredentialPublisher.ClrLibrary.OAuth.RegistrationResponse;
-using OpenCredentialPublisher.Services.Extensions;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 {
     public class RegisterModel : PageModel
     {
-        private readonly WalletDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _factory;
+        private readonly AuthorizationsService _authorizationsService;
+        private readonly BadgrService _openBadgeService;
+        private readonly LogHttpClientService _logHttpClientService;
 
         public RegisterModel(
-            WalletDbContext context,
             IConfiguration configuration,
-            IHttpClientFactory factory)
-        {
-            _context = context;
+            IHttpClientFactory factory,
+            AuthorizationsService authorizationsService,
+            BadgrService openBadgeService,
+            LogHttpClientService logHttpClientService)
+        {           
             _configuration = configuration;
             _factory = factory;
+            _authorizationsService = authorizationsService;
+            _openBadgeService = openBadgeService;
+            _logHttpClientService = logHttpClientService;
         }
 
         /// <summary>
@@ -54,11 +60,36 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
         [BindProperty]
         [DisplayName("Selected Source")]
         public int? SelectedSource { get; set; }
-
+        /// <summary>
+        /// The source to register with (hidden, on 2nd form).
+        /// </summary>
+        [BindProperty]
+        [DisplayName("Selected Source")]
+        public int? SelectedSourceBasic { get; set; }
+        /// <summary>
+        /// The source to register with.
+        /// </summary>
+        [BindProperty]
+        [DisplayName("User Name")]
+        public string UserName { get; set; }
+        /// <summary>
+                                                /// The source to register with.
+                                                /// </summary>
+        [BindProperty]
+        [DisplayName("Password")]
+        public string Password { get; set; }
         /// <summary>
         /// A list of known resource servers.
         /// </summary>
         public List<SelectListItem> Sources { get; set; }
+        /// <summary>
+        /// A list of known resource servers.
+        /// </summary>
+        public List<SourceModel> SourceModels { get; set; }
+        /// <summary>
+        /// A csv list of Sources (Id) requiring client/basic authentication for a token
+        /// </summary>
+        public string ClientSourceIds { get; set; }
 
         /// <summary>
         /// The base URL of a resource server. Supplied by the user if they think it is
@@ -111,10 +142,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 return Page();
             }
 
-            var authorization = await _context.Authorizations
-                .Include(p => p.Source)
-                .ThenInclude(s => s.DiscoveryDocument)
-                .SingleOrDefaultAsync(p => p.Id == State);
+            var authorization = await _authorizationsService.GetDeepAsync(State);
 
             if (authorization == null)
             {
@@ -125,15 +153,14 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
             if (Error == null)
             {
                 authorization.AuthorizationCode = Code;
-                authorization.Scopes = Scope?.Split(' ').ToList();
-                await _context.SaveChangesAsync();
+                authorization.Scopes = Scope?.Replace(System.Environment.NewLine," ").Split(' ').ToList();
+                await _authorizationsService.UpdateAsync(authorization);
             }
             else
             {
                 // Remove the authorization
 
-                _context.Authorizations.Remove(authorization);
-                await _context.SaveChangesAsync();
+                await _authorizationsService.DeleteAsync(authorization.Id);
 
                 // Reload the known sources
 
@@ -143,6 +170,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 return Page();
             }
 
+            authorization.Scopes.Add(OidcConstants.StandardScopes.OfflineAccess); // only include offline_access scope when requesting access_token
             await GetAccessToken(authorization);
             if (!ModelState.IsValid) return Page();
 
@@ -174,9 +202,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
             }
             else
             {
-                sourceModel = await _context.Sources
-                    .Include(s => s.DiscoveryDocument)
-                    .SingleAsync(s => s.Id == SelectedSource);
+                sourceModel = await _authorizationsService.GetSourceAsync(SelectedSource.Value);
             }
 
             var response = await AuthorizeClient(sourceModel);
@@ -184,7 +210,26 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 
             return Page();
         }
+        public async Task<IActionResult> OnPostBasic()
+        {
+            SourceModel sourceModel;
 
+            await LoadKnownSources();
+
+            if (SelectedSourceBasic != null)
+            {
+                sourceModel = await _authorizationsService.GetSourceAsync(SelectedSourceBasic.Value);
+
+                await _openBadgeService.GetAccessTokenBasic(sourceModel, UserName, Password, User.UserId());
+            }
+            else
+            {
+                ModelState.AddModelError(nameof(SourceUrl), "Please select a source or enter a source URL.");
+                return Page();
+            }
+
+            return Page();
+        }
         #region GetDiscoveryDocument
 
         private async Task<SourceModel> GetResourceServerConfiguration()
@@ -209,10 +254,8 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 }
 
                 // Make sure the user has not registered with this resource server before
-                
-                var source = await _context.Sources
-                    .Include(p => p.DiscoveryDocument)
-                    .SingleOrDefaultAsync(p => p.Url == SourceUrl.AbsoluteUri);
+
+                var source = await _authorizationsService.GetSourceByUrlAsync(SourceUrl.AbsoluteUri);
 
                 if (source != null)
                 {
@@ -233,6 +276,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 {
                     var client = _factory.CreateClient("default");
                     response = await client.SendAsync(request);
+                    await _logHttpClientService.LogAsync(response);
                 }
                 catch (Exception e)
                 {
@@ -291,8 +335,8 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                     Url = SourceUrl.AbsoluteUri
                 };
 
-                await _context.Sources.AddAsync(source);
-                await _context.SaveChangesAsync();
+                await _authorizationsService.AddSourceAsync(source);
+
                 return source;
             }
             catch (Exception e)
@@ -354,6 +398,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 {
                     var client = _factory.CreateClient(ClrHttpClient.Default);
                     response = await client.SendAsync(request);
+                    await _logHttpClientService.LogAsync(response);
                 }
                 catch (Exception e)
                 {
@@ -373,7 +418,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 source.ClientId = registrationResponse.ClientId;
                 source.ClientSecret = registrationResponse.ClientSecret;
                 source.Scope = registrationResponse.Scope;
-                await _context.SaveChangesAsync();
+                await _authorizationsService.UpdateSourceAsync(source);
             }
             catch (Exception e)
             {
@@ -381,8 +426,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 
                 // Remove the provider record
 
-                _context.Sources.Remove(source);
-                await _context.SaveChangesAsync();
+                await _authorizationsService.DeleteSourceAsync(source.Id);
 
                 ModelState.AddModelError(string.Empty, e.Message);
             }
@@ -406,11 +450,10 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
             {
                 CodeVerifier = Crypto.CreateRandomString(43,
                     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-~"),
-                Source = source,
+                SourceForeignKey = source.Id,
                 UserId = User.UserId()
             };
-            await _context.Authorizations.AddAsync(authorization);
-            await _context.SaveChangesAsync();
+            await _authorizationsService.AddAsync(authorization);
 
             string codeChallenge;
             using (var sha256 = SHA256.Create())
@@ -465,12 +508,13 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
             {
                 var client = _factory.CreateClient(ClrHttpClient.Default);
                 response = await client.SendAsync(request);
+                await _logHttpClientService.LogAsync(response);
 
                 // Only use the authorization_code and code_verifier once
 
                 authorization.AuthorizationCode = null;
                 authorization.CodeVerifier = null;
-                await _context.SaveChangesAsync();
+                await _authorizationsService.UpdateAsync(authorization);
             }
             catch (Exception e)
             {
@@ -478,8 +522,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 
                 // Remove the source
 
-                _context.Authorizations.Remove(authorization);
-                await _context.SaveChangesAsync();
+                await _authorizationsService.DeleteAsync(authorization.Id);
 
                 // Reload the known sources
 
@@ -496,15 +539,15 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 var tokenResponse = await ProtocolResponse.FromHttpResponseAsync<TokenResponse>(response);
                 authorization.AccessToken = tokenResponse.AccessToken;
                 authorization.RefreshToken = tokenResponse.RefreshToken;
-                authorization.Scopes = GetScopesFromAccessToken(tokenResponse.AccessToken);
-                await _context.SaveChangesAsync();
+                authorization.Scopes = tokenResponse.Scope?.Replace(System.Environment.NewLine, " ").Split(' ').ToList();
+                authorization.ValidTo = DateTimeOffset.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
+                await _authorizationsService.UpdateAsync(authorization);
             }
             else
             {
                 // Remove the source
 
-                _context.Authorizations.Remove(authorization);
-                await _context.SaveChangesAsync();
+                await _authorizationsService.DeleteAsync(authorization.Id);
 
                 // Reload the known sources
 
@@ -543,14 +586,15 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
         /// </summary>
         private async Task LoadKnownSources()
         {
-            Sources = await _context.Sources
-                .Where(s => s.Authorizations.All(a => a.UserId != User.UserId()))
+           SourceModels = await _authorizationsService.GetUnusedSourcesAsync(User.UserId());
+            ClientSourceIds = string.Join(",", SourceModels.Where(s => s.SourceTypeId == SourceTypeEnum.OpenBadge).Select(s => s.Id.ToString()).ToArray());
+            Sources = SourceModels
                 .Select(s => new SelectListItem
                 {
                     Value = s.Id.ToString(),
                     Text = s.Name
                 })
-                .ToListAsync();
+                .ToList();
         }
 
         #endregion

@@ -12,16 +12,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
 {
     public class CreateModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly CredentialService _credentialService;
 
-        public CreateModel(WalletDbContext context)
+        public CreateModel(CredentialService credentialService)
         {
-            _context = context;
+            _credentialService = credentialService;
         }
 
         [BindProperty]
@@ -37,15 +38,6 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
 
         public async Task<IActionResult> OnPost()
         {
-            foreach (var selectedClr in Clrs)
-            {
-                selectedClr.Clr = await _context.Clrs
-                    .Include(x => x.Authorization)
-                    .ThenInclude(x => x.Source)
-                    .Where(x => x.Id == selectedClr.Clr.Id)
-                    .SingleAsync();
-            }
-
             if (Clrs.All(x => x.Selected == false))
             {
                 ModelState.AddModelError(nameof(Clrs), "Please select at least one CLR.");
@@ -56,88 +48,17 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
                 return Page();
             }
 
-            var newClr = new ClrDType
-            {
-                Assertions = new List<AssertionDType>(),
-                Id = $"urn:uuid:{Guid.NewGuid():D}",
-                IssuedOn = DateTime.Now.ToLocalTime(),
-                Name = Name,
-                SignedAssertions = new List<string>()
-            };
-
-            foreach (var selectedClr in Clrs)
-            {
-                if (selectedClr.Selected)
-                {
-                    var clr = JsonSerializer.Deserialize<ClrDType>(selectedClr.Clr.Json);
-
-                    if (!string.IsNullOrEmpty(selectedClr.Clr.SignedClr))
-                    {
-                        clr = selectedClr.Clr.SignedClr.DeserializePayload<ClrDType>();
-                    }
-
-                    // Assume all the CLRs are for the same person
-
-                    newClr.Learner = clr.Learner;
-                    newClr.Publisher = clr.Learner;
-
-                    foreach (var assertion in clr.Assertions ?? new List<AssertionDType>())
-                    {
-                        newClr.Assertions.Add(assertion);
-                    }
-
-                    foreach (var signedAssertion in clr.SignedAssertions ?? new List<string>())
-                    {
-                        newClr.SignedAssertions.Add(signedAssertion);
-                    }
-                }
-            }
-
-            var credentialPackage = new CredentialPackageModel()
-            {
-                UserId = User.UserId(),
-                TypeId = PackageTypeEnum.Clr,
-                CreatedAt = DateTime.UtcNow,
-                ModifiedAt = DateTime.UtcNow,
-                Clr = new ClrModel
-                {
-                    AssertionsCount = newClr.Assertions.Count + newClr.SignedAssertions.Count,
-                    Identifier = newClr.Id,
-                    IssuedOn = newClr.IssuedOn,
-                    Json = JsonSerializer.Serialize(newClr),
-                    LearnerName = newClr.Learner.Name,
-                    Name = newClr.Name,
-                    PublisherName = newClr.Publisher.Name,
-                    RefreshedAt = newClr.IssuedOn
-                }
-            };
-            
-            await _context.CredentialPackages.AddAsync(credentialPackage);
-            await _context.SaveChangesAsync();
-
+            await _credentialService.CreateClrFromSelectedAsync(User.UserId(), Name, Clrs.Where(x => x.Selected).Select(x => x.Clr.Id).ToArray());
             return RedirectToPage("./Index");
         }
 
         public async Task<List<SelectedClr>> LoadClrs()
         {
-            var packages = await _context.CredentialPackages
-                .Include(cp => cp.VerifiableCredential)
-                .ThenInclude(cp => cp.Clrs)
-                .ThenInclude(clr => clr.Authorization)
-                .ThenInclude(clra => clra.Source)
-                .Include(cp => cp.Clr)
-                .ThenInclude(c => c.Authorization)
-                .ThenInclude(a => a.Source)
-                .Where(package => package.UserId == User.UserId())
-                .OrderBy(x => x.CreatedAt)
-                .ToListAsync();
+            var clrs = await _credentialService.GetAllClrsAsync(User.UserId());
 
-            var clrs = new List<SelectedClr>(
-                packages.Where(p => p.TypeId == PackageTypeEnum.Clr).Select(p => new SelectedClr { Clr = p.Clr, Selected = false }));
+            var selectedClrs = clrs.Select( c => new SelectedClr { Clr = c, Selected = false }).ToList();
 
-            clrs.AddRange(packages.Where(p => p.TypeId == PackageTypeEnum.VerifiableCredential).SelectMany(p => p.VerifiableCredential.Clrs).Select(p => new SelectedClr { Clr = p, Selected = false }));
-
-            return clrs;
+            return selectedClrs;
 
         }
 

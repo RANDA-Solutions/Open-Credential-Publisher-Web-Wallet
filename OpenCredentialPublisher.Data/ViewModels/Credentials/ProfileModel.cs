@@ -8,7 +8,9 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
     public class ProfileModel
     {
         public bool HasProfileImage { get; set; }
+        public string ProfileImageUrl { get; set; }
         public string DisplayName { get; set; }
+        public bool MissingDisplayName => String.IsNullOrEmpty(DisplayName);
         public Int32 Credentials { get; set; }
         public Int32 Achievements { get; set; }
         public Int32 ActiveLinks { get; set; }

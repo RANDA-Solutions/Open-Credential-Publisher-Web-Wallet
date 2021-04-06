@@ -96,7 +96,7 @@
                     <div id="achievementIssuerBody-@Model.Id.SafeId()" class="collapse">
                         <div class="card-body card-deck">
                             <div class="card border-0">
-                                @Html.DisplayFor(m => Model.Issuer, "Profile", new { ClrEntityId = ViewData["ClrEntityId"]})
+                                @Html.DisplayFor(m => Model.Issuer, "Profile", new { ClrEntityId = ViewData["ClrEntityId"], ProfileType = "Issuer"})
                             </div>
                             <div class="card border-0">
                                 @Html.DisplayFor(m => Model.Issuer.PublicKey, "PublicKey")

@@ -16,7 +16,7 @@ namespace OpenCredentialPublisher.Services.Drawing
         public const string PageOutlineBase = "OpenCredentialPublisher-QRCode-";
         public const string SourceApplicationName = "Wallet";
         private const string ZeroWidthNonJoiner = "\u200C";
-        public static byte[] AppendQRCodePage(byte[] pdfBytes, string url, string accessKey, string sourceApplicationName)
+        public static byte[] AppendQRCodePage(byte[] pdfBytes, string url, string accessKey)
         {
             VerdanaFontResolver.Apply();
 
@@ -25,8 +25,6 @@ namespace OpenCredentialPublisher.Services.Drawing
             using var document = PdfReader.Open(stream, PdfDocumentOpenMode.Modify);
             var page = document.AddPage();
             var graphics = XGraphics.FromPdfPage(page);
-            RemovePage(document, sourceApplicationName);
-            document.Outlines.Add(new PdfSharp.Pdf.PdfOutline(PageOutlineBase + sourceApplicationName, page));
 
             const double margin = 10;
 
@@ -86,20 +84,19 @@ namespace OpenCredentialPublisher.Services.Drawing
             }
             var urlY = clickTextY + 30;
             var urlFont = new XFont("Verdana", 12, XFontStyle.Underline);
-            var weblinkRect = new XRect(5, urlY - 200, page.Width - 5, 60);
+            var weblinkRect = new XRect(5, urlY - 200, page.Width - 5, 55);
             var pdfRectangle = new PdfRectangle(weblinkRect);
             
             page.AddWebLink(pdfRectangle, url);
-            var urlRect = new XRect(5, urlY, page.Width - 5, 60);
+            var urlRect = new XRect(5, urlY, page.Width - 5, 55);
             graphics.DrawString(displayUrl, urlFont,
                 XBrushes.Blue, urlRect, XStringFormats.Center);
 
-            var accessKeyY = urlY + 50;
+            var accessKeyY = urlY + 75;
             graphics.DrawString($"Then, when prompted, enter the Access Key: {accessKey}", pageFont,
                 XBrushes.Black, new XRect(margin, accessKeyY, page.Width, 20),
                 XStringFormats.Center);
             graphics.Save();
-
             using var saveStream = new MemoryStream();
             document.Save(saveStream);
             return saveStream.ToArray();

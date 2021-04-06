@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using System.Web;
 using System.Net.Mime;
 using OpenCredentialPublisher.ClrLibrary.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace OpenCredentialPublisher.Services.Implementations
 {
@@ -32,16 +33,19 @@ namespace OpenCredentialPublisher.Services.Implementations
         private readonly HostSettings _hostSettings;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ConnectService> _logger;
-        public ConnectService(WalletDbContext context, CredentialService credentialService, HostSettings hostSettings, IHttpClientFactory httpClientFactory, ILogger<ConnectService> logger)
+        private readonly LogHttpClientService _logHttpClientService;
+        public ConnectService(WalletDbContext context, CredentialService credentialService, HostSettings hostSettings, IHttpClientFactory httpClientFactory
+            , LogHttpClientService logHttpClientService, ILogger<ConnectService> logger)
         {
             _context = context;
             _credentialService = credentialService;
             _hostSettings = hostSettings;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+            _logHttpClientService = logHttpClientService;
         }
 
-        public async Task<int?> ConnectAsync(PageModel page, ConnectGetModel model)
+        public async Task<CredentialResponse> ConnectAsync(PageModel page, ConnectGetModel model)
         {
             var source = await GetSourceAsync(model);
             var authorization = await GetAuthorizationAsync(page.User.UserId(), source, model);
@@ -49,6 +53,22 @@ namespace OpenCredentialPublisher.Services.Implementations
             if (authorization.UserId == page.User.UserId())
             {
                 return await GetCredentialAsync(page, source, authorization);
+            }
+            else
+            {
+                // trying to add an existing credential to another account
+                throw new Exception("This credential is not valid and will not be added to your account.");
+            }
+        }
+
+        public async Task<CredentialResponse> ConnectAsync(ControllerBase controller, string userId, ConnectGetModel model)
+        {
+            var source = await GetSourceAsync(model);
+            var authorization = await GetAuthorizationAsync(userId, source, model);
+
+            if (authorization.UserId == userId)
+            {
+                return await GetCredentialAsync(controller, userId, source, authorization);
             }
             else
             {
@@ -72,7 +92,19 @@ namespace OpenCredentialPublisher.Services.Implementations
             return token;
         }
 
-        public async Task<int?> GetCredentialAsync(PageModel page, SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
+        public async Task<CredentialResponse> GetCredentialAsync(PageModel page, SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
+        {
+            var contentString = await GetContentStringAsync(source, authorization, discoveryDocument);
+            return await _credentialService.ProcessJson(page, contentString, authorization);
+        }
+
+        public async Task<CredentialResponse> GetCredentialAsync(ControllerBase controller, string userId, SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
+        {
+            var contentString = await GetContentStringAsync(source, authorization, discoveryDocument);
+            return await _credentialService.ProcessJson(controller, userId, contentString, authorization);
+        }
+
+        private async Task<string> GetContentStringAsync(SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
         {
             discoveryDocument ??= await GetDiscoveryDocumentAsync(source.Url);
             using var client = _httpClientFactory.CreateClient();
@@ -98,19 +130,19 @@ namespace OpenCredentialPublisher.Services.Implementations
                 };
 
                 using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                await _logHttpClientService.LogAsync(response);
+
                 response.EnsureSuccessStatusCode();
 
                 if (response.Content is object)
                 {
                     if (response.Content.Headers.ContentType.MediaType == JsonMediaType)
                     {
-                        var contentString = await response.Content.ReadAsStringAsync();
-                        return await _credentialService.ProcessJson(page, contentString);
+                        return await response.Content.ReadAsStringAsync();
                     }
                     else if (response.Content.Headers.ContentType.MediaType == MediaTypeNames.Text.Plain)
                     {
-                        var contentString = await response.Content.ReadAsStringAsync();
-                        return await _credentialService.ProcessJson(page, contentString);
+                        return await response.Content.ReadAsStringAsync();
                     }
                 }
             }
@@ -124,6 +156,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            await _logHttpClientService.LogAsync(response);
             response.EnsureSuccessStatusCode();
             if (response.Content is object) { 
                 return await response.Content.ReadAsStringAsync();
@@ -138,6 +171,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            await _logHttpClientService.LogAsync(response);
             response.EnsureSuccessStatusCode();
             if (response.Content is object)
             {

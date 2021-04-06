@@ -6,7 +6,7 @@
 
 <header id="navigation">
     <div class="container">
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-md navbar-toggleable-md navbar-dark border-bottom box-shadow mb-3">
             <a class="navbar-brand" href="/Credentials">
                 <img src="~/images/ocp-logo.png" class="logo-image" alt="OPEN CREDENTIAL PUBLISHER" />
             </a>
@@ -20,24 +20,18 @@
                         aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex">
-
+                <div class="navbar-collapse collapse ">
                     <ul class="navbar-nav mr-auto ml-3">
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-page="/Credentials/Index" asp->
                                 <span class="credential-icon-default mr-2"></span> Credentials
                             </a>
                         </li>
-                        @*<li class="nav-item ml-4">
-                    <a class="nav-link text-light" href="/portfolio">
-                        <span class="folio-icon-default mr-2"></span> Folio
-                    </a>
-                </li>
-                <li class="nav-item ml-4">
-                    <a class="nav-link text-light" href="/transactions">
-                        <span class="transactions-icon-default mr-1"></span> Transactions
-                    </a>
-                </li>*@
+                        <li class="nav-item text-nowrap">
+                            <a class="nav-link text-light" asp-page="/Wallets/Index" asp->
+                                <span class="fas fa-wallet font-1-5x mr-2"></span> Wallets
+                            </a>
+                        </li>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

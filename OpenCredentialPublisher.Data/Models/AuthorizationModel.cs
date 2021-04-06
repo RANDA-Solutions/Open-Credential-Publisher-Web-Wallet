@@ -68,5 +68,11 @@ namespace OpenCredentialPublisher.Data.Models
 
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset? Modified { get; set; }
+        public DateTimeOffset ValidTo { get; set; }
+        public bool IsDeleted { get; set; }
+        /// <summary>
+        /// All the CredentialPackages tied to this authorization.
+        /// </summary>
+        public List<CredentialPackageModel> CredentialPackages { get; set; }
     }
 }

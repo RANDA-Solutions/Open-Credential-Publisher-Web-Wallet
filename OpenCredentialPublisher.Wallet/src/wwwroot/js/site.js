@@ -51,6 +51,7 @@ jQuery(function ($) {
 verify_complete = (xhr) => {
     var response = JSON.parse(xhr.responseText);
     $("#verification-result-" + response.id).html(response.message);
+    $("#revocationlist-result-" + response.id).html(response.revocationsMessage);
     $('[data-toggle="tooltip"]').tooltip();
 }
 

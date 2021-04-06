@@ -1,4 +1,4 @@
-@page "{id}"
+@page "{id}/{key:maxlength(16)?}"
 @model OpenCredentialPublisher.ClrWallet.Pages.Links.DisplayModel
 @{
     Layout = "Shared/_LinkLayout";
@@ -22,7 +22,7 @@
 @if (Model.ShowData)
 {
     <script type="application/ld+json">
-    @Html.Raw(Model.Clr.ToJson())
+    @Html.Raw(Model.Clr.RawClrDType.ToJson())
     </script>}
 
 <div class="text-center mb-3">

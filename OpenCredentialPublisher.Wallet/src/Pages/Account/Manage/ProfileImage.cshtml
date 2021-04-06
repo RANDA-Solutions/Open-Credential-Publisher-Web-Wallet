@@ -1,0 +1,54 @@
+@page
+@model ProfileImageModel
+@{
+    ViewData["Title"] = "Change Profile Image";
+    ViewData["ActivePage"] = ManageNavPages.ProfileImage;
+}
+
+<h4>Change Profile Picture</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+@if (!String.IsNullOrEmpty(Model.CurrentImageUrl))
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label">Current Picture</label>
+                <div class="">
+                    <img src="@Model.CurrentImageUrl" alt="Profile Picture" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-md-6">
+        <form enctype="multipart/form-data" method="post">
+            <div class="form-group">
+                <label asp-for="Input.ProfileImage" class="control-label"></label>
+                <div class="input-group mb-3">
+                    @*<div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                        </div>*@
+                    <div class="custom-file">
+                        <input type="file" name="Input.ProfileImage" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                        <label class="custom-file-label" for="inputGroupFile01">Choose Picture</label>
+                    </div>
+                </div>
+                <span asp-validation-for="Input.ProfileImage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-primary btn-lg">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/lib/bootstrap-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+    <script>
+        $(function () {
+            bsCustomFileInput.init();
+        });
+    </script>
+}

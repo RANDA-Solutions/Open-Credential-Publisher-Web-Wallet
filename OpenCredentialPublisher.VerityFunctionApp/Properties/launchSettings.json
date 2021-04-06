@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "OpenCredentialPublisher.VerityFunctionApp": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 30658,
+      "useSSL": false
+    }
+  }
+}

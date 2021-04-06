@@ -18,17 +18,47 @@
   font-size: 12px;
   box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2); }
 
-.navbar-brand .logo-image {
-  height: 80px; }
-
 .profile-container {
   position: relative;
-  width: 320px;
   height: 450px; }
+
+@media (max-width: 575px) {
+  .navbar-brand .logo-image {
+    height: 75px; }
+  .profile-container {
+    max-width: 575px;
+    min-width: 320px; }
+  .profile-body {
+    width: 100%; }
+  .profile-picture-container {
+    left: 34%; }
+  .dashboard-container {
+    height: 100%; } }
+
+@media (min-width: 576px) {
+  .navbar-brand .logo-image {
+    height: 80px; }
+  .profile-container {
+    width: 100%; }
+  .profile-body {
+    width: 250px; }
+  .profile-picture-container {
+    left: 21%; }
+  .dashboard-container {
+    height: 380px; } }
+
+@media (min-width: 768px) {
+  .profile-container {
+    width: 320px; }
+  .profile-body {
+    width: 300px; }
+  .profile-picture-container {
+    left: 78px; }
+  .dashboard-container {
+    height: 380px; } }
 
 .profile-picture-container {
   position: absolute;
-  left: 78px;
   background-color: white;
   width: 150px;
   height: 150px;
@@ -39,15 +69,21 @@
   width: 130px;
   height: 130px;
   border-radius: 50%;
-  border: 1px solid #f3f3f3;
   position: absolute;
   top: 50%;
   left: 50%;
   margin: -65px 0px 0px -65px;
-  background-color: steelblue; }
+  background-color: steelblue;
+  overflow: hidden; }
+
+.profile-picture-link-container {
+  height: 100%;
+  padding-top: 36px; }
+
+.profile-picture-circle img {
+  width: 100%; }
 
 .profile-body {
-  width: 300px;
   height: 380px;
   border-radius: 10px;
   background-color: white;
@@ -89,7 +125,6 @@
   margin-left: 15px; }
 
 .dashboard-container {
-  height: 380px;
   padding: 20px 20px; }
 
 .dashboard-title {
@@ -176,6 +211,33 @@
 
 .font-16 {
   font-size: 16px; }
+
+.font-1-5x {
+  font-size: 1.5em; }
+
+.connection-qr-code {
+  width: 300px;
+  height: 300px; }
+
+ul.list-group-plain > li {
+  border: 0;
+  background-color: transparent; }
+
+#connecting-banner {
+  background-color: white;
+  width: 100%;
+  height: 60px;
+  padding-top: 16px;
+  top: 120px;
+  opacity: .9;
+  font-size: 18px; }
+
+.navbar-collapse.show {
+  background: #9206ea;
+  z-index: 3; }
+
+.highlights-group button, .highlights-group-button a {
+  width: 124px; }
 
 .add-button-icon, .blank-icon, .callout-icon, .callout-icon-black, .checkmark-badge-icon, .checkmark-icon, .checkmark-icon-default, .checkmark-icon-verified, .checkmark-progress-checked, .checkmark-progress-default, .clock-icon, .credential-icon, .credential-icon-active, .credential-icon-default, .credential-icon-tab, .credential-icon-new, .details-button-icon, .details-icon, .expand-button-icon, .folio-icon, .folio-icon-active, .folio-icon-default, .folio-icon-tab, .logout-icon, .logout-icon-default, .paper-airplane-icon, .pencil-icon, .pencil-icon-gray, .remove-button-icon, .secure-icon, .transactions-icon-active, .transactions-icon-default, .transactions-icon-tab, .user-icon {
   align-items: center;
@@ -308,8 +370,15 @@
   padding: 50px 0px 50px 50px;
   border-radius: 10px;
   box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
-  width: 465px;
   min-height: 357px; }
+
+@media (max-width: 575px) {
+  .login-body section {
+    width: 323px; } }
+
+@media (min-width: 576px) {
+  .login-body section {
+    width: 465px; } }
 
 .login-body section h4 {
   font-size: 11px;
@@ -332,3 +401,12 @@
 .logo-section .logo-image {
   height: 100px;
   margin-top: 40px; }
+
+.logo-top-section {
+  width: 80%;
+  background: #EFEFEF;
+  padding: 10px;
+  border-radius: 10px 10px 0 0; }
+
+.logo-top-section .logo-image {
+  height: 60px; }

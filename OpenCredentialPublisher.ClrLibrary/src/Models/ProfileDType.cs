@@ -45,7 +45,15 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("address"), Newtonsoft.Json.JsonProperty("address")]
         [Description("Address")]
         public virtual AddressDType Address { get; set; }
-        
+
+        [JsonPropertyName("additionalName"), Newtonsoft.Json.JsonProperty("additionalName")]
+        [Description("An additional name for a person, can be used for a middle name. Model Primitive Datatype = String.")]
+        public string AdditionalName { get; set; }
+
+        [JsonPropertyName("birthDate"), Newtonsoft.Json.JsonProperty("birthDate")]
+        [Description("Birthdate of the person. Model Primitive Datatype = Date.")]
+        public DateTime BirthDate { get; set; }
+
         /// <summary>
         /// A short description of the individual or organization. Model Primitive Datatype = String.
         /// </summary>
@@ -69,7 +77,19 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("endorsements"), Newtonsoft.Json.JsonProperty("endorsements")]
         [Description("Allows endorsers to make specific claims about the individual or organization represented by this profile. ")]
         public virtual List<EndorsementDType> Endorsements { get; set; }
-        
+
+        [JsonPropertyName("familyName"), Newtonsoft.Json.JsonProperty("familyName")]
+        [Description("Family name of a person. In the U.S., the last name of a person. Model Primitive Datatype = String.")]
+        public string FamilyName { get; set; }
+
+        [JsonPropertyName("givenName"), Newtonsoft.Json.JsonProperty("givenName")]
+        [Description("Given name of a person. In the U.S., the first name of a person. Model Primitive Datatype = String.")]
+        public string GivenName { get; set; }
+
+        [JsonPropertyName("identifiers"), Newtonsoft.Json.JsonProperty("identifiers")]
+        [Description("A set of System Identifiers that represent other identifiers for this Profile.")]
+        public List<SystemIdentifierDType> Identifiers { get; set; }
+
         /// <summary>
         /// IRI of an image representing the individual or organization. May be a DATA URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -86,7 +106,15 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("name"), Newtonsoft.Json.JsonProperty("name")]
         [Description("The name of the individual or organization. Model Primitive Datatype = String.")]
         public string Name { get; set; }
-        
+
+        [JsonPropertyName("official"), Newtonsoft.Json.JsonProperty("official")]
+        [Description("The name of the authorized official for the Issuer. Model Primitive Datatype = String.")]
+        public string Official { get; set; }
+
+        [JsonPropertyName("parentOrg"), Newtonsoft.Json.JsonProperty("parentOrg")]
+        [Description("The parent organization of the person or organization represented by this organization. Model Primitive Datatype = String.")]
+        public ProfileDType ParentOrg { get; set; }
+
         /// <summary>
         /// Gets or Sets PublicKey
         /// </summary>

@@ -15,8 +15,15 @@
     <div class="container h-100">
         <partial name="_CookieConsentPartial" />
         <div class="row justify-content-md-center align-items-center h-100">
-            @(await Html.PartialAsync("_LogoPartial"))
-            <div class="col-md-auto login-body">
+            <div class="d-none d-lg-block col-md-auto">
+                <div class="logo-section">
+                    @(await Html.PartialAsync("_LogoPartial"))
+                </div>
+            </div>
+            <div class="col-auto login-body">
+                <div class="d-lg-none d-block logo-top-section mx-auto">
+                    @(await Html.PartialAsync("_LogoPartial"))
+                </div>
                 @RenderBody()
             </div>
         </div>

@@ -1,36 +1,105 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using OpenCredentialPublisher.ClrLibrary;
 using OpenCredentialPublisher.ClrLibrary.Extensions;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Badgr;
 using OpenCredentialPublisher.Services.Extensions;
-using IdentityModel;
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Services.Implementations
 {
     public class ClrService
     {
         private readonly WalletDbContext _context;
+        private readonly AuthorizationsService _authorizationsService;
+        private readonly CredentialService _credentialService;
         private readonly IHttpClientFactory _factory;
         private readonly SchemaService _schemaService;
-
-        public ClrService(WalletDbContext context, IHttpClientFactory factory, IConfiguration configuration, SchemaService schemaService)
+        private readonly LogHttpClientService _logHttpClientService;
+        
+        // ClrService - it is presumed revocation will be reflected by current source, no need to check prior revocationList
+        public ClrService(WalletDbContext context, IHttpClientFactory factory, IConfiguration configuration, AuthorizationsService authorizationsService, SchemaService schemaService
+            , CredentialService credentialService, LogHttpClientService logHttpClientService)
         {
             _context = context;
+            _authorizationsService = authorizationsService;
             _factory = factory;
             _schemaService = schemaService;
+            _logHttpClientService = logHttpClientService;
+            _credentialService = credentialService;
+        }
+
+        /// <summary>
+        /// Get a hosted Clr.
+        /// </summary>
+        /// <param name="page">The PageModel calling this method.</param>
+        /// <param name="authorizationId">The authorization id for the resource server.</param>
+        /// <param name="clrId">The clr id which must be a URL.</param>
+        public async Task<ClrDType> DeleteClrAsync(PageModel page, string authorizationId, string clrId)
+        {
+            if (authorizationId == null)
+            {
+                page.ModelState.AddModelError(string.Empty, "Missing authorization id.");
+                return null;
+            }
+
+            var authorization = await _authorizationsService.GetDeepAsync(authorizationId);
+
+            if (authorization == null)
+            {
+                page.ModelState.AddModelError(string.Empty, $"Cannot find authorization {authorizationId}.");
+                return null;
+            }
+
+            if (authorization.AccessToken == null)
+            {
+                page.ModelState.AddModelError(string.Empty, "No access token.");
+                return null;
+            }
+
+            if (!await _authorizationsService.RefreshTokenAsync(page, authorization))
+            {
+                page.ModelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
+                return null;
+            }
+
+            // Get the CLR
+
+            var request = new HttpRequestMessage(HttpMethod.Delete, clrId);
+            request.Headers.Accept.ParseAdd(ClrConstants.MediaTypes.JsonLdMediaType);
+            request.Headers.Accept.ParseAdd(ClrConstants.MediaTypes.JsonMediaType);
+            request.SetBearerToken(authorization.AccessToken);
+
+            var client = _factory.CreateClient();
+
+            var response = await client.SendAsync(request);
+            await _logHttpClientService.LogAsync(response);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+                // Validate the response data
+
+                await _schemaService.ValidateSchemaAsync<ClrDType>(page.Request, content);
+
+                if (!page.ModelState.IsValid) return null;
+
+                return JsonSerializer.Deserialize<ClrDType>(content);
+            }
+
+            page.ModelState.AddModelError(string.Empty, response.ReasonPhrase);
+            return null;
         }
 
         /// <summary>
@@ -47,11 +116,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return null;
             }
 
-            var authorization = await _context.Authorizations
-                .Include(a => a.Clrs)
-                .Include(a => a.Source)
-                .ThenInclude(s => s.DiscoveryDocument)
-                .SingleOrDefaultAsync(a => a.Id == authorizationId);
+            var authorization = await _authorizationsService.GetDeepAsync(authorizationId);
 
             if (authorization == null)
             {
@@ -65,13 +130,11 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return null;
             }
 
-            if (!TokenIsValid(authorization))
+            if (!await _authorizationsService.RefreshTokenAsync(page, authorization))
             {
                 page.ModelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
                 return null;
             }
-
-            if (!await RefreshTokenAsync(page, authorization)) return null;
 
             // Get the CLR
 
@@ -83,6 +146,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var client = _factory.CreateClient();
 
             var response = await client.SendAsync(request);
+            await _logHttpClientService.LogAsync(response);
 
             if (response.IsSuccessStatusCode)
             {
@@ -90,7 +154,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
                 // Validate the response data
 
-                await _schemaService.ValidateSchemaAsync<ClrDType>(page, content);
+                await _schemaService.ValidateSchemaAsync<ClrDType>(page.Request, content);
 
                 if (!page.ModelState.IsValid) return null;
 
@@ -100,7 +164,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             page.ModelState.AddModelError(string.Empty, response.ReasonPhrase);
             return null;
         }
-
+        
         /// <summary>
         /// Get fresh copies of the CLRs from the resource server.
         /// </summary>
@@ -114,11 +178,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return;
             }
 
-            var authorization = await _context.Authorizations
-                .Include(a => a.Clrs)
-                .Include(a => a.Source)
-                .ThenInclude(s => s.DiscoveryDocument)
-                .SingleOrDefaultAsync(a => a.Id == id);
+            var authorization = await _authorizationsService.GetDeepAsync(id);
 
             if (authorization == null)
             {
@@ -132,16 +192,13 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return;
             }
 
-            if (!TokenIsValid(authorization))
+            if (!await _authorizationsService.RefreshTokenAsync(page, authorization))
             {
                 page.ModelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
                 return;
             }
 
-            if (!await RefreshTokenAsync(page, authorization)) return;
-
             // Get the CLRs
-
             var serviceUrl = string.Concat(authorization.Source.Url.EnsureTrailingSlash(), "ims/clr/v1p0/clrs");
 
             var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
@@ -149,94 +206,16 @@ namespace OpenCredentialPublisher.Services.Implementations
             request.Headers.Accept.ParseAdd(ClrConstants.MediaTypes.JsonMediaType);
             request.SetBearerToken(authorization.AccessToken);
 
-            var client = _factory.CreateClient();
+            var client = _factory.CreateClient("default");
 
             var response = await client.SendAsync(request);
+            await _logHttpClientService.LogAsync(response);
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
 
-                // Validate the response data
-
-                await _schemaService.ValidateSchemaAsync<ClrSetDType>(page, content);
-
-                if (!page.ModelState.IsValid) return;
-
-                var clrSet = JsonSerializer.Deserialize<ClrSetDType>(content);
-
-                var credentialPackage = await _context.CredentialPackages
-                        .Include(cp => cp.ClrSet)
-                        .ThenInclude(set => set.Clrs)
-                        .FirstOrDefaultAsync(cp => cp.UserId == page.User.UserId() && cp.ClrSet.Identifier == clrSet.Id);
-
-                if (credentialPackage == null)
-                {
-                    credentialPackage = new CredentialPackageModel
-                    {
-                        TypeId = PackageTypeEnum.ClrSet,
-                        UserId = page.User.UserId(),
-                        CreatedAt = DateTime.UtcNow,
-                        ClrSet = new ClrSetModel
-                        {
-                            Identifier = clrSet.Id,
-                            Json = content,
-                            ClrsCount = clrSet.Clrs.Count,
-                            Clrs = new List<ClrModel>()
-                        }
-                    };
-                }
-                // Save each CLR
-
-                foreach (var clr in clrSet.Clrs)
-                {
-                    var model = credentialPackage.ClrSet.Clrs.SingleOrDefault(c => c.Identifier == clr.Id);
-                    if (model == null)
-                    {
-                        model = new ClrModel { Identifier = clr.Id, CredentialPackage = credentialPackage };
-                        authorization.Clrs.Add(model);
-                        model.ClrSet.Clrs.Add(model);
-                    }
-
-                    model.AssertionsCount = (clr.Assertions?.Count ?? 0)
-                                            + (clr.SignedAssertions?.Count ?? 0);
-                    model.IssuedOn = clr.IssuedOn;
-
-                    // Add @context to each clr in case it is downloaded
-                    clr.Context = clrSet.Context;
-
-                    model.Json = JsonSerializer.Serialize(clr, new JsonSerializerOptions { IgnoreNullValues = true });
-                    model.LearnerName = clr.Learner.Name;
-                    model.Name = clr.Name;
-                    model.PublisherName = clr.Publisher.Name;
-                    model.RefreshedAt = DateTime.Now;
-                }
-
-                foreach (var signedClr in clrSet.SignedClrs)
-                {
-                    var clr = signedClr.DeserializePayload<ClrDType>();
-
-                    var model = credentialPackage.ClrSet.Clrs.SingleOrDefault(c => c.Identifier == clr.Id);
-
-                    if (model == null)
-                    {
-                        model = new ClrModel { Identifier = clr.Id };
-                        authorization.Clrs.Add(model);
-                        model.ClrSet.Clrs.Add(model);
-                    }
-
-                    model.AssertionsCount = (clr.Assertions?.Count ?? 0)
-                                            + (clr.SignedAssertions?.Count ?? 0);
-                    model.IssuedOn = clr.IssuedOn;
-                    model.Json = JsonSerializer.Serialize(clr, new JsonSerializerOptions { IgnoreNullValues = true });
-                    model.LearnerName = clr.Learner.Name;
-                    model.Name = clr.Name;
-                    model.PublisherName = clr.Publisher.Name;
-                    model.RefreshedAt = DateTime.Now;
-                    model.SignedClr = signedClr;
-                }
-
-                await _context.SaveChangesAsync();
+                await SaveClrDataAsync(page, content, authorization);
             }
             else
             {
@@ -244,80 +223,112 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
         }
 
-        /// <summary>
-        /// Returns false if the access token has expired and cannot be refreshed.
-        /// </summary>
-        private static bool TokenIsValid(AuthorizationModel authorization)
+        private async Task SaveClrDataAsync(PageModel page, string content, AuthorizationModel authorization)
         {
-            // Make sure the token has not expired
 
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(authorization.AccessToken);
-            if (token.ValidTo >= DateTime.UtcNow)
+            // Validate the response data
+
+            await _schemaService.ValidateSchemaAsync<ClrSetDType>(page.Request, content);
+
+            if (!page.ModelState.IsValid) return;
+
+            //Turn EF Tracking on for untracked authorization
+            _context.Attach(authorization);
+
+            var clrsetDType = JsonSerializer.Deserialize<ClrSetDType>(content); //clrSet.Id will always be null at least from imsglobal as there is no explicit set definition                
+
+            var credentialPackage = await _context.CredentialPackages
+                    .Include(cp => cp.ClrSet)
+                    .ThenInclude(set => set.Clrs)
+                    .FirstOrDefaultAsync(cp => cp.UserId == page.User.UserId() && cp.ClrSet.Identifier == clrsetDType.Context);
+
+            if (credentialPackage == null)
             {
-                return true;
+                var pkgType = authorization.Source.SourceTypeId switch
+                {
+                    SourceTypeEnum.OpenBadge => PackageTypeEnum.OpenBadge,
+                    SourceTypeEnum.Clr => PackageTypeEnum.ClrSet,
+                    _ => throw new NotImplementedException()
+                };
+                credentialPackage = new CredentialPackageModel
+                {
+                    TypeId = pkgType,
+                    AuthorizationForeignKey = authorization.Id,
+                    UserId = page.User.UserId(),
+                    CreatedAt = DateTime.UtcNow,
+                    ClrSet = new ClrSetModel
+                    {
+                        CredentialPackage = credentialPackage,
+                        Identifier = clrsetDType.Context,
+                        Json = content,
+                        ClrsCount = clrsetDType.Clrs.Count,
+                        Clrs = new List<ClrModel>()
+                    }
+                };
+                _context.CredentialPackages.Add(credentialPackage);
             }
 
-            // If it has expired, check for a refresh token
+            // Save each CLR
 
-            return authorization.RefreshToken != null;
-        }
-
-        /// <summary>
-        /// Get a new access token using the refresh token
-        /// </summary>
-        /// <returns></returns>
-        private async Task<bool> RefreshTokenAsync(PageModel page, AuthorizationModel authorization)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, authorization.Source.DiscoveryDocument.TokenUrl);
-            request.Headers.Accept.Clear();
-            request.Headers.Accept.ParseAdd(ClrConstants.MediaTypes.JsonMediaType);
-            request.SetBasicAuthenticationOAuth(authorization.Source.ClientId, authorization.Source.ClientSecret);
-
-            var parameters = new Dictionary<string, string>
+            foreach (var clrDType in clrsetDType.Clrs)
             {
-                {OidcConstants.TokenRequest.GrantType, OidcConstants.GrantTypes.RefreshToken},
-                {OidcConstants.TokenRequest.RefreshToken, authorization.RefreshToken}
-            };
+                var clr = credentialPackage.ClrSet.Clrs.SingleOrDefault(c => c.Identifier == clrDType.Id);
+                if (clr == null)
+                {
+                    clr = new ClrModel { Identifier = clrDType.Id, ClrSet = credentialPackage.ClrSet };
+                    clr.AuthorizationForeignKey = authorization.Id;
+                    clr.ClrSetId = credentialPackage.ClrSet.Id;
+                }
 
-            request.Content = new FormUrlEncodedContent(parameters);
+                clr.AssertionsCount = (clrDType.Assertions?.Count ?? 0)
+                                        + (clrDType.SignedAssertions?.Count ?? 0);
+                clr.IssuedOn = clrDType.IssuedOn;
 
-            HttpResponseMessage response;
-            try
-            {
-                var client = _factory.CreateClient();
-                Log.Debug($"Sending token refresh request: {request.Method} {request.RequestUri}");
-                response = await client.SendAsync(request);
-            }
-            catch (Exception e)
-            {
-                page.ModelState.AddModelError(string.Empty, e.Message);
-                Log.Error(e, e.Message);
-                return false;
+                // Add @context to each clr in case it is downloaded
+                clrDType.Context = clrsetDType.Context;
+
+                clr.Json = JsonSerializer.Serialize(clrDType, new JsonSerializerOptions { IgnoreNullValues = true });
+                clr.LearnerName = clrDType.Learner.Name;
+                clr.Name = clrDType.Name;
+                clr.PublisherName = clrDType.Publisher.Name;
+                clr.RefreshedAt = DateTime.Now;
+                if (_context.Entry(clr).State == EntityState.Detached)
+                {
+                    credentialPackage.ClrSet.Clrs.Add(clr);
+                }
             }
 
-            // Parse the response
-
-            var tokenResponse = await ProtocolResponse.FromHttpResponseAsync<TokenResponse>(response);
-
-            if (tokenResponse.IsError)
+            foreach (var signedClrDType in clrsetDType.SignedClrs)
             {
-                page.ModelState.AddModelError(string.Empty, $"Token refresh failed with error '{tokenResponse.Error}'.");
+                var clrDType = signedClrDType.DeserializePayload<ClrDType>();
 
-                // Delete the authorization to force re-authorization
-                _context.Authorizations.Remove(authorization);
-                await _context.SaveChangesAsync();
+                var clr = credentialPackage.ClrSet.Clrs.SingleOrDefault(c => c.Identifier == clrDType.Id);
 
-                return false;
+                if (clr == null)
+                {
+                    clr = new ClrModel { Identifier = clrDType.Id, ClrSet = credentialPackage.ClrSet };
+                    clr.AuthorizationForeignKey = authorization.Id;
+                    clr.ClrSetId = credentialPackage.ClrSet.Id;
+                }
+
+                clr.AssertionsCount = (clrDType.Assertions?.Count ?? 0)
+                                        + (clrDType.SignedAssertions?.Count ?? 0);
+                clr.IssuedOn = clrDType.IssuedOn;
+                clr.Json = JsonSerializer.Serialize(clrDType, new JsonSerializerOptions { IgnoreNullValues = true });
+                clr.LearnerName = clrDType.Learner.Name;
+                clr.Name = clrDType.Name;
+                clr.PublisherName = clrDType.Publisher.Name;
+                clr.RefreshedAt = DateTime.Now;
+                clr.SignedClr = signedClrDType;
+                if (_context.Entry(clr).State == EntityState.Detached)
+                {
+                    credentialPackage.ClrSet.Clrs.Add(clr);
+                }
             }
 
-            Log.Information("Access token refreshed.");
-
-            authorization.AccessToken = tokenResponse.AccessToken;
-            authorization.RefreshToken = tokenResponse.RefreshToken;
             await _context.SaveChangesAsync();
-
-            return true;
+            
         }
+        
     }
 }

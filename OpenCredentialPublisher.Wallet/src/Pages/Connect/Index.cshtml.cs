@@ -32,13 +32,21 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Connect
             try
             {
                 var result = await _connectService.ConnectAsync(this, GetModel);
-                if (result.HasValue)
-                    return RedirectToPage("/Credentials/Display", new  { id = result.Value });
+                if (result.HasError)
+                {
+                    foreach(var error in result.ErrorMessages)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+                    return Page();
+                }
+                if (result.Id.HasValue)
+                    return RedirectToPage("/Credentials/Display", new  { id = result.Id.Value });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "There was a problem processing this request.", GetModel);
-                ModelState.AddModelError(null, ex.Message);
+                ModelState.AddModelError("", ex.Message);
             }
             return Page();
         }

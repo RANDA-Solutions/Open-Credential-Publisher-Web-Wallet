@@ -1,24 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using OpenCredentialPublisher.Data.Contexts;
-using OpenCredentialPublisher.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
 {
     public class CreateModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly EmailHelperService _emailHelperService;
 
-        public CreateModel(WalletDbContext context)
+        public CreateModel(EmailHelperService emailHelperService)
         {
-            _context = context;
+            _emailHelperService = emailHelperService;
         }
 
         [BindProperty, Required]
@@ -28,7 +25,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
 
         public string LinkId { get; set; }
 
-        public async Task OnGet(string linkId)
+        public void OnGet(string linkId)
         {
             LinkId = linkId;
         }
@@ -44,8 +41,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
                 CreatedOn = DateTimeOffset.UtcNow,
                 UserId = User.UserId()
             };
-            await _context.Recipients.AddAsync(recipient);
-            await _context.SaveChangesAsync();
+            await _emailHelperService.AddRecipientAsync(recipient);
 
             return RedirectToPage("./Index", new { LinkId = linkId });
         }

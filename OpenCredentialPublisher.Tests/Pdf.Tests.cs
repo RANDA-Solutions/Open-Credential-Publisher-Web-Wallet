@@ -17,7 +17,7 @@ namespace OpenCredentialPublisher.Tests
             var fileBytes = new byte[stream.Length];
             stream.Read(fileBytes, 0, fileBytes.Length);
             var accessKey = $"{Guid.NewGuid()}";
-            var pdfBytes = PdfUtility.AppendQRCodePage(fileBytes, $"https://ocp-wallet-qa.azurewebsites.net/link/displey/access/{accessKey}", "123456789", nameof(PdfTests));
+            var pdfBytes = PdfUtility.AppendQRCodePage(fileBytes, $"https://ocp-wallet-qa.azurewebsites.net/Links/Display/BeO9z0lzjkwhI1En9clkkP-lHbRYa0TnB_yBfJbcsBE", "Rv8wJnP7LDFMRLc7");
             Assert.IsTrue(pdfBytes.Length > fileBytes.Length);
             File.WriteAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "pdf-with-qr-code.pdf"), pdfBytes);
         }

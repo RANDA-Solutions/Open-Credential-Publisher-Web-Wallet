@@ -31,6 +31,6 @@ namespace OpenCredentialPublisher.Data.Models
 
     public enum ShareTypeEnum
     {
-        Email = 1, Pdf = 2
+        Email = 1, Pdf = 2, Wallet = 3
     }
 }

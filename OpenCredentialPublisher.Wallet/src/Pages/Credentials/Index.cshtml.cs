@@ -1,62 +1,70 @@
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
+using OpenCredentialPublisher.ClrLibrary;
+using OpenCredentialPublisher.ClrWallet.Utilities;
+using OpenCredentialPublisher.Data.Dtos;
+using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Options;
+using OpenCredentialPublisher.Data.ViewModels.Credentials;
+using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
-using OpenCredentialPublisher.ClrLibrary;
-using OpenCredentialPublisher.ClrLibrary.Models;
-using OpenCredentialPublisher.Data.Contexts;
-using OpenCredentialPublisher.Data.Models;
-using OpenCredentialPublisher.ClrWallet.Utilities;
-using JetBrains.Annotations;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using OpenCredentialPublisher.Services.Implementations;
-using OpenCredentialPublisher.Data.ViewModels.Credentials;
-using OpenCredentialPublisher.Services.Extensions;
-using OpenCredentialPublisher.Credentials.Clrs.Utilities;
-using OpenCredentialPublisher.Wallet.Extensions;
-using OpenCredentialPublisher.Services.Drawing;
-using OpenCredentialPublisher.Data.Dtos;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
 {
     public class IndexModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly RevocationService _revocationService;
+        private readonly AuthorizationsService _authorizationsService;
         private readonly ClrService _clrService;
+        private readonly BadgrService _badgrService;
         private readonly SchemaService _schemaService;
         private readonly CredentialService _credentialService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SiteSettingsOptions _siteSettingsOptions;
 
         public IndexModel(
-            WalletDbContext context,
+            AuthorizationsService authorizationsService, 
             SchemaService schemaService,
             ClrService clrService,
-            CredentialService credentialService)
+            BadgrService badgrService,
+            RevocationService revocationService,
+            CredentialService credentialService,
+            UserManager<ApplicationUser> userManager,
+            IOptions<SiteSettingsOptions> siteSettingsOptions)
         {
-            _context = context;
+            _authorizationsService = authorizationsService;
+            _revocationService = revocationService;
             _clrService = clrService;
+            _badgrService = badgrService;
             _schemaService = schemaService;
             _credentialService = credentialService;
+            _userManager = userManager;
+            _siteSettingsOptions = siteSettingsOptions?.Value ?? default(SiteSettingsOptions);
         }
+
+        public bool EnableSource => _siteSettingsOptions.EnableSource;
+        public bool EnableCollections => _siteSettingsOptions.EnableCollections;
 
         public ProfileModel Profile { get; set; }
         public DashboardModel Dashboard { get; set; }
 
-        public List<CredentialPackageModel> CredentialPackages { get; set; } = new List<CredentialPackageModel>();
+        public List<CredentialPackageViewModel> CredentialPackageVMs { get; set; } = new List<CredentialPackageViewModel>();
 
-        public List<CredentialPackageModel> Clrs => CredentialPackages.Where(cp => cp.TypeId == PackageTypeEnum.Clr).ToList();
-        public List<CredentialPackageModel> ClrSets => CredentialPackages.Where(cp => cp.TypeId == PackageTypeEnum.ClrSet).ToList();
+        public List<CredentialPackageViewModel> Clrs => CredentialPackageVMs.Where(cp => cp.CredentialPackage.TypeId == PackageTypeEnum.Clr).ToList();
+        public List<CredentialPackageViewModel> ClrSets => CredentialPackageVMs.Where(cp => cp.CredentialPackage.TypeId == PackageTypeEnum.ClrSet).ToList();
 
         public List<LinkModel> Links { get; set; }
-        public List<CredentialPackageModel> VerifiableCredentials => CredentialPackages.Where(cp => cp.TypeId == PackageTypeEnum.VerifiableCredential).ToList();
+        public List<CredentialPackageViewModel> VerifiableCredentials => CredentialPackageVMs.Where(cp => cp.CredentialPackage.TypeId == PackageTypeEnum.VerifiableCredential).ToList();
 
         
         [BindProperty]
@@ -76,8 +84,14 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
         public async Task<IActionResult> OnPostRefreshAsync(string id)
         {
             await LoadPackages();
-
-            await _clrService.RefreshClrsAsync(this, id);
+            if ((await _authorizationsService.GetSourceTypeAsync(id)).Equals(SourceTypeEnum.OpenBadge))
+            {
+                await _badgrService.RefreshBackpackAsync(this, id);
+            }
+            else
+            {
+                await _clrService.RefreshClrsAsync(this, id);
+            }
             
             return Page();
         }
@@ -87,7 +101,8 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
         {
             if (!id.HasValue) return Page();
 
-            var clr = await _context.Clrs.FindAsync(id);
+            var clr = await _credentialService.GetClrAsync(id.Value);
+
             if (clr == null) return Page();
 
             var fileDownloadName = clr.Name ?? clr.PublisherName;
@@ -113,7 +128,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
 
             if (!ModelState.IsValid) return Page();
 
-            await _credentialService.ProcessJson(this, clrJson);
+            await _credentialService.ProcessJson(this, clrJson, null);
 
             if (!ModelState.IsValid) return Page();
 
@@ -125,19 +140,17 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
         
         public async Task<IActionResult> OnGetPdf(int clrId, string assertionId, string evidenceName, int artifactId)
         {
-            var clr = await _context.Clrs
-                .Include(c => c.CredentialPackage)
-                .FirstOrDefaultAsync(c => c.Id == clrId && c.CredentialPackage.UserId == User.UserId());
+            var clr = await _credentialService.GetClrAsync(User.UserId(), clrId);
+
             if (clr == null)
             {
                 ModelState.AddModelError("", "Something went wrong with that operation.");
             }
 
-            var model = System.Text.Json.JsonSerializer.Deserialize<ClrViewModel>(clr.Json);
-            model.BuildAssertionsTree();
+            var clrVM = ClrViewModel.FromClrModel(clr);
 
-            var assertion = model.AllAssertions.FirstOrDefault(a => a.Id == assertionId);
-            var evidence = assertion.Evidence.FirstOrDefault(e => e.Name == evidenceName);
+            var assertionVM = clrVM.AllAssertions.FirstOrDefault(a => a.Assertion.Id == assertionId);
+            var evidence = assertionVM.Assertion.Evidence.FirstOrDefault(e => e.Name == evidenceName);
             var artifact = evidence.Artifacts.FirstOrDefault(a => a.ArtifactKey == artifactId);
 
             return new JsonResult(new PdfGetResponseModel { DataUrl = artifact.Url });
@@ -146,37 +159,25 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
 
         private async Task LoadPackages()
         {
-            var cpIds = CredentialPackages.Select(cp => cp.Id).ToArray();
-            var credentialPackages = _context.CredentialPackages
-                .Include(p => p.VerifiableCredential)
-                .ThenInclude(vc => vc.Clrs)
-                .ThenInclude(clr => clr.Authorization)
-                .ThenInclude(auth => auth.Source)
-                .Include(p => p.VerifiableCredential)
-                .ThenInclude(vc => vc.ClrSets)
-                .ThenInclude(sets => sets.Clrs)
-                .ThenInclude(clr => clr.Authorization)
-                .ThenInclude(auth => auth.Source)
-                .Include(p => p.Clr)
-                .ThenInclude(c => c.Authorization)
-                .ThenInclude(a => a.Source)
-                .Where(package => package.UserId == User.UserId() && cpIds.All(cp => package.Id != cp));
+            var userId = User.UserId();
+            var cpIds = CredentialPackageVMs.Select(cp => cp.CredentialPackage.Id).ToArray();
+            var credentialPackagesQuery = _credentialService.GetAllDeep(userId);
+            credentialPackagesQuery = credentialPackagesQuery.Where(package => cpIds.All(cp => package.Id != cp));
 
-            Links = await _context.Links
-                .Where(l => l.UserId == User.UserId())
-                .ToListAsync();
+            Links = await _credentialService.GetAllLinksAsync(userId);
 
             var assertions = 0;
             
-            foreach (var cp in credentialPackages)
+            foreach (var cp in credentialPackagesQuery)
             {
-                cp.BuildView();
-                assertions += cp.AssertionsCount;
-                CredentialPackages.Add(cp);
+                var cpVM = CredentialPackageViewModel.FromCredentialPackageModel(cp);
+                await _revocationService.MarkPackageViewModelRevocationsAsync(userId, cpVM);
+                assertions += cpVM.AssertionsCount;
+                CredentialPackageVMs.Add(cpVM);
             }
 
-            CredentialPackages = CredentialPackages.OrderByDescending(cp => cp.CreatedAt).ToList();
-            var package = CredentialPackages.FirstOrDefault(cp => cp.HasPdfs && cp.Pdfs.Any(pdf => pdf.ArtifactName.Contains("transcript", StringComparison.OrdinalIgnoreCase)));
+            CredentialPackageVMs = CredentialPackageVMs.OrderByDescending(cp => cp.CredentialPackage.CreatedAt).ToList();
+            var package = CredentialPackageVMs.FirstOrDefault(cp => cp.HasPdfs && cp.Pdfs.Any(pdf => pdf.ArtifactName.Contains("transcript", StringComparison.OrdinalIgnoreCase)));
             PdfShareViewModel pdfShareViewModel = null;
             if (package != null)
             {
@@ -184,10 +185,13 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
 
             }
 
+            var user = await _userManager.GetUserAsync(User);
             Profile = new ProfileModel
             {
-                HasProfileImage = false,
-                Credentials = CredentialPackages.Count(c => c.VerifiableCredential != null),
+                DisplayName = user.DisplayName,
+                HasProfileImage = !String.IsNullOrEmpty(user.ProfileImageUrl),
+                ProfileImageUrl = user.ProfileImageUrl,
+                Credentials = CredentialPackageVMs.Count(c => c.CredentialPackage.VerifiableCredential != null),
                 Achievements = assertions,
                 ActiveLinks = Links.Count()
             };

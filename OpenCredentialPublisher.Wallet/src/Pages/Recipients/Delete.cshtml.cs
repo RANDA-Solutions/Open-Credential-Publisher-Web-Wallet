@@ -1,44 +1,41 @@
-using System.Linq;
-using System.Threading.Tasks;
-using OpenCredentialPublisher.Data.Contexts;
-using OpenCredentialPublisher.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Services.Extensions;
-using Microsoft.EntityFrameworkCore;
+using OpenCredentialPublisher.Services.Implementations;
+using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
 {
     public class DeleteModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly EmailHelperService _emailHelperService;
 
-        public DeleteModel(WalletDbContext context)
+        public DeleteModel(EmailHelperService emailHelperService)
         {
-            _context = context;
+            _emailHelperService = emailHelperService;
         }
 
         public RecipientModel Recipient { get; set; }
         public string LinkId { get; set; }
-        public void OnGet(int id, string linkId)
+        public async Task OnGet(int id, string linkId)
         {
             LinkId = linkId;
-            OnPageLoad(id);
+            await OnPageLoad(id);
         }
 
         public async Task<IActionResult> OnPost(int? id, string linkId)
         {
-            OnPageLoad(id);
+            await OnPageLoad(id);
 
             if (!ModelState.IsValid) return Page();
 
-            _context.Recipients.Remove(Recipient);
-            await _context.SaveChangesAsync();
+            await _emailHelperService.DeleteRecipientAsync(Recipient);
 
             return RedirectToPage("./Index", new { LinkId = linkId });
         }
 
-        private void OnPageLoad(int? id)
+        private async Task OnPageLoad(int? id)
         {
             if (id == null)
             {
@@ -46,7 +43,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
                 return;
             }
 
-            Recipient = _context.Recipients.AsNoTracking().SingleOrDefault(p => p.UserId == User.UserId() && p.Id == id);
+            Recipient = await _emailHelperService.GetRecipientAsync(User.UserId(), id.Value);
 
             if (Recipient == null)
             {

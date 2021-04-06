@@ -18,6 +18,7 @@
             </div>
 
             <form method="post">
+                <button style="visibility:hidden;" id="btnSubmit" type="submit" class="btn btn-primary">Submit</button>
                 <div class="form-group">
                     <label asp-for="SelectedSource">Select a known source</label>
                     <select asp-for="SelectedSource" asp-items="@Model.Sources" class="custom-select">
@@ -30,7 +31,7 @@
                     <input type="url" asp-for="SourceUrl" class="form-control" placeholder="Enter the source platform URL" />
                     <span asp-validation-for="SourceUrl" class="text-danger"></span>
                 </div>
-                <button type="submit" class="btn btn-primary">Connect</button>
+                <button id="btnConnect" type="button" class="btn btn-primary" onclick="connect()">Connect</button>
             </form>
 
             <div class="mt-2">
@@ -38,4 +39,52 @@
             </div>
         </section>
     </div>
+    <div id="modal-connect-provider" class="modal" role="dialog" style="font-size:13px;">
+        <div class="modal-dialog">
+            <div class="modal-content" style="padding-bottom:60px;">
+                <div class="modal-header" style="border-bottom:none;">
+                    <span aria-hidden="true" class="remove-button-icon" data-dismiss="modal" style="margin-top:9px;cursor:pointer"></span>
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn btn-lg btn-outline-primary" data-dismiss="modal" aria-label="Verify">
+                        <span aria-hidden="true">Cancel</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formClientLogin" method="post" asp-page-handler="Basic">
+                        <input id="hidSelectedSource" type="hidden" name="SelectedSourceBasic" />
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend mr-3">
+                                <span class="user-icon"></span>
+                            </div>
+                            <input name="username" placeholder="Username or Email" class="form-control" />
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend mr-3">
+                                <span class="secure-icon"></span>
+                            </div>
+                            <input name="password" placeholder="Password" class="form-control" />
+                        </div>
+                        <div class="row mt-5">
+                                <button type="submit">Test</button>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+@section Scripts {
+    <script>        
+        $(".modal-dialog").css("width", "60%");
+        
+        function connect() {
+            var clientIds = "@(Model.ClientSourceIds)".split(",");
+            if (clientIds.includes($("#SelectedSource").val())) {
+                $("#hidSelectedSource").val($("#SelectedSource").val());
+                $('#modal-connect-provider').modal('show');
+            } else {
+                $("#btnSubmit").click();
+            }
+        }
+    </script>
+}

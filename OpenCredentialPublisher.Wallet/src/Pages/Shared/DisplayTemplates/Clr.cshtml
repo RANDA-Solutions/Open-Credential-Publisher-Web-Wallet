@@ -1,3 +1,4 @@
+@using OpenCredentialPublisher.Data.ViewModels.Credentials;
 @model ClrViewModel
 @{
     ViewData["Title"] = "Comprehensive Learner Record";
@@ -10,18 +11,22 @@
 <div class="row credential-row mb-3">
     <div class="col">
         <div class="card mt-3 mb-3">
-            <h5 class="card-header pg-info">CLR</h5>
+            <h5 class="card-header pg-info">
+                CLR @if (@Model.Clr.IsRevoked)
+                    {
+                        <span class="alert-danger">REVOKED</span>
+                    }</h5>
             <div class="card-body card-deck">
                 <div class="card border-0">
                     <dl class="row">
                         <dt class="col-sm-3">Id</dt>
-                        <dd class="col-sm-9">@Html.DisplayFor(x => x.Id, "Uri")</dd>
+                        <dd class="col-sm-9">@Html.DisplayFor(x => x.Clr.Identifier, "Uri")</dd>
                         <dt class="col-sm-3">Issued</dt>
-                        <dd class="col-sm-9">@Model.IssuedOn</dd>
-                        @if (Model.Name != null)
+                        <dd class="col-sm-9">@Model.Clr.IssuedOn</dd>
+                        @if (Model.Clr.Name != null)
                         {
                             <dt class="col-sm-3">Name</dt>
-                            <dd class="col-sm-9">@Model.Name</dd>
+                            <dd class="col-sm-9">@Model.Clr.Name</dd>
                         }
                     </dl>
                 </div>
@@ -29,7 +34,7 @@
                     <div class="row">
                         <div class="card border-0">
                             <div class="card-body pb-0 pt-0">
-                                @Html.DisplayFor(m => Model.Verification, "Verification", new { ClrEntityId = Model.ClrId, ClrId = Model.Id })
+                                @Html.DisplayFor(m => Model.RawClrDType.Verification, "Verification", new { ClrEntityId = Model.Clr.Id, ClrId = Model.Clr.Identifier })
                             </div>
                         </div>
                     </div>
@@ -44,14 +49,14 @@
             <div class="card">
                 <h5 class="card-header pg-info">Learner</h5>
                 <div class="card-body">
-                    @Html.DisplayFor(m => m.Learner, "Profile", new { ClrEntityId = Model.ClrId })
+                    @Html.DisplayFor(m => m.RawClrDType.Learner, "Profile", new { ClrEntityId = Model.Clr.Id, ProfileType = "Learner" })
                 </div>
             </div>
 
             @* Publisher *@
 
             <div class="card">
-                @if (Model.Learner.Id == Model.Publisher.Id)
+                @if (Model.RawClrDType.Learner.Id == Model.RawClrDType.Publisher.Id)
                 {
                     <h5 class="card-header bg-warning">Publisher (Self-Published)</h5>
                 }
@@ -60,7 +65,7 @@
                     <h5 class="card-header pg-info">Publisher</h5>
                 }
                 <div class="card-body">
-                    @Html.DisplayFor(m => m.Publisher, "Profile", new { ClrEntityId = Model.ClrId })
+                    @Html.DisplayFor(m => m.RawClrDType.Publisher, "Profile", new { ClrEntityId = Model.Clr.Id, ProfileType = "Publisher" })
                 </div>
             </div>
         </div>
@@ -73,17 +78,17 @@
 
             @foreach (var assertion in Model.ParentAssertions)
             {
-                @Html.DisplayFor(m => assertion, "Assertion", new { ClrEntityId = Model.ClrId })
+                @Html.DisplayFor(m => assertion, "Assertion", new { ClrEntityId = Model.Clr.Id })
             }
         }
 
-        @if (Model.Achievements != null && Model.Achievements.Any())
+        @if (Model.RawClrDType.Achievements != null && Model.RawClrDType.Achievements.Any())
         {
             <h5 class="col mt-3 text-center">Achievements</h5>
 
-            @foreach (var achievement in Model.Achievements)
+            @foreach (var achievement in Model.RawClrDType.Achievements)
             {
-                @Html.DisplayFor(x => achievement, "Achievement", new { ClrEntityId = Model.ClrId })
+                @Html.DisplayFor(x => achievement, "Achievement", new { ClrEntityId = Model.Clr.Id })
             }
         }
     </div>

@@ -48,6 +48,17 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account
         public class InputModel
         {
             [Required]
+            [MaxLength(255)]
+            [Display(Name = "Username")]
+            public string Username { get; set; }
+
+            [Required]
+            [MaxLength(255)]
+            [Display(Name = "Displayable Name")]
+            public string DisplayName { get; set; }
+
+
+            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
@@ -76,7 +87,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Username, Email = Input.Email, DisplayName = Input.DisplayName };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

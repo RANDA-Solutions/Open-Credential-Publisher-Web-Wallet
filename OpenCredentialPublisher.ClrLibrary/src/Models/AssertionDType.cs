@@ -58,9 +58,9 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// If present, the assertion is not valid after this date. Model Primitive Datatype = DateTime.
         /// </summary>
         /// <value>If present, the assertion is not valid after this date. Model Primitive Datatype = DateTime.</value>
-        [JsonPropertyName("endDate"), Newtonsoft.Json.JsonProperty("endDate")]
+        [JsonPropertyName("activityEndDate"), Newtonsoft.Json.JsonProperty("activityEndDate")]
         [Description("If present, the assertion is not valid after this date. Model Primitive Datatype = DateTime.")]
-        public DateTime? EndDate { get; set; }
+        public DateTime? ActivityEndDate { get; set; }
 
         /// <summary>
         /// Allows endorsers to make specific claims about the assertion. 
@@ -78,6 +78,9 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [Description("Evidence describing the work that the recipient did to earn the achievement. This can be a webpage that links out to other pages if linking directly to the work is infeasible. ")]
         public virtual List<EvidenceDType> Evidence { get; set; }
 
+        [JsonPropertyName("expires"), Newtonsoft.Json.JsonProperty("expires")]
+        [Description("If the achievement has some notion of expiry, this indicates a timestamp when an assertion should no longer be considered valid. After this time, the assertion should be considered expired. Model Primitive Datatype = DateTime.")]
+        public DateTime? Expires { get; set; }
         /// <summary>
         /// IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -168,9 +171,9 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// If present, the assertion is not valid before this date. Model Primitive Datatype = DateTime.
         /// </summary>
         /// <value>If present, the assertion is not valid before this date. Model Primitive Datatype = DateTime.</value>
-        [JsonPropertyName("startDate"), Newtonsoft.Json.JsonProperty("startDate")]
+        [JsonPropertyName("activityStartDate"), Newtonsoft.Json.JsonProperty("activityStartDate")]
         [Description("If present, the assertion is not valid before this date. Model Primitive Datatype = DateTime.")]
-        public DateTime? StartDate { get; set; }
+        public DateTime? ActivityStartDate { get; set; }
 
         /// <summary>
         /// The academic term in which this assertion was achieved. Model Primitive Datatype = String.

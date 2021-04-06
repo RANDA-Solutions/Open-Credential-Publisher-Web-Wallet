@@ -21,10 +21,10 @@
   {
     "outputFileName": "wwwroot/css/vendor.min.css",
     "inputFiles": [
-      "wwwroot/css/bootstrap.custom.min.css",
       "wwwroot/lib/font-awesome/fontawesome.css",
       "wwwroot/lib/font-awesome/brands.css",
-      "wwwroot/lib/font-awesome/solid.css"
+      "wwwroot/lib/font-awesome/solid.css",
+      "wwwroot/css/bootstrap.custom.css"
     ],
     "minify": { "enabled": true }
   },
@@ -32,7 +32,7 @@
     "outputFileName": "wwwroot/js/vendor.min.js",
     "inputFiles": [
       "wwwroot/lib/jquery/jquery.js",
-      "wwwroot/lib/bootstrap/js/bootstrap.js",
+      "wwwroot/lib/bootstrap/dist/js/bootstrap.js",
       "wwwroot/lib/jquery-unobtrusive-ajax/jquery.unobtrusive-ajax.js",
       "wwwroot/lib/jquery-validate/jquery.validate.js",
       "wwwroot/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js",

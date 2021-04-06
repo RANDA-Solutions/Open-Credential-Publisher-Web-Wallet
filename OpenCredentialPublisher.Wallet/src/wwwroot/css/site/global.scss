@@ -21,19 +21,78 @@
     box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
 }
 
-.navbar-brand .logo-image {
-    height: 80px;
-}
 
 .profile-container {
     position: relative;
-    width: 320px;
     height: 450px;
+}
+
+@media (max-width: 575px) {
+    .navbar-brand .logo-image {
+        height: 75px;
+    }
+    .profile-container {
+        max-width: 575px;
+        min-width: 320px;
+    }
+
+    .profile-body {
+        width: 100%;
+    }
+
+    .profile-picture-container {
+        left: 34%;
+    }
+
+    .dashboard-container {
+        height: 100%;
+    }
+}
+
+// small
+@media (min-width: 576px) {
+    .navbar-brand .logo-image {
+        height: 80px;
+    }
+
+    .profile-container {
+        width: 100%;
+    }
+
+    .profile-body {
+        width: 250px;
+    }
+
+    .profile-picture-container {
+        left: 21%;
+    }
+
+    .dashboard-container {
+        height: 380px;
+    }
+}
+
+// medium
+@media (min-width: 768px) {
+    .profile-container {
+        width: 320px;
+    }
+
+    .profile-body {
+        width: 300px;
+    }
+
+    .profile-picture-container {
+        left: 78px;
+    }
+
+    .dashboard-container {
+        height: 380px;
+    }
 }
 
 .profile-picture-container {
     position: absolute;
-    left: 78px;
     background-color: white;
     width: 150px;
     height: 150px;
@@ -45,16 +104,25 @@
     width: 130px;
     height: 130px;
     border-radius: 50%;
-    border: 1px solid #f3f3f3;
     position: absolute;
     top: 50%;
     left: 50%;
     margin: -65px 0px 0px -65px;
     background-color: steelblue;
+    overflow: hidden;
+}
+
+.profile-picture-link-container {
+    height: 100%;
+    padding-top: 36px;
+}
+
+.profile-picture-circle img {
+    width: 100%;
 }
 
 .profile-body {
-    width: 300px;
+    
     height: 380px;
     border-radius: 10px;
     background-color: white;
@@ -104,7 +172,6 @@
 }
 
 .dashboard-container {
-    height: 380px;
     padding: 20px 20px;
 }
 
@@ -209,4 +276,37 @@
 
 .font-16 {
     font-size: 16px;
+}
+
+.font-1-5x {
+    font-size: 1.5em;
+}
+
+.connection-qr-code {
+    width: 300px;
+    height: 300px;
+}
+
+ul.list-group-plain > li {
+    border: 0;
+    background-color: transparent;
+}
+
+#connecting-banner {
+    background-color: white;
+    width: 100%;
+    height: 60px;
+    padding-top: 16px;
+    top: 120px;
+    opacity: .9;
+    font-size: 18px;
+}
+
+.navbar-collapse.show {
+    background: #9206ea;
+    z-index: 3;
+}
+
+.highlights-group button, .highlights-group-button a {
+    width: 124px;
 }

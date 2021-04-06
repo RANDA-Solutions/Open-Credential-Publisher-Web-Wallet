@@ -9,16 +9,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
+using OpenCredentialPublisher.Data.ViewModels.Credentials;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 {
     public class CreateModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly CredentialService _credentialService;
+        private readonly LinkService _linkService;
 
-        public CreateModel(WalletDbContext context)
+        public CreateModel(CredentialService credentialService, LinkService linkService)
         {
-            _context = context;
+            _credentialService = credentialService;
+            _linkService = linkService;
         }
 
         [BindProperty]
@@ -26,26 +30,22 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 
         public async Task OnGet()
         {
-            var clrs = _context.Clrs
-                .Include(clr => clr.CredentialPackage)
-                .Include(c => c.Authorization)
-                .ThenInclude(a => a.Source)
-                .Where(c => c.CredentialPackage.UserId == User.UserId());
+            var clrs = await _credentialService.GetAllClrsAsync(User.UserId());
 
             Links = new List<LinkViewModel>();
-
             foreach (var clr in clrs.OrderBy(c => c.IssuedOn).ThenBy(c => c.Name))
             {
+                var clrVm = ClrViewModel.FromClrModel(clr);
                 Links.Add(new LinkViewModel
                 {
-                    ClrId = clr.Id,
-                    AddedOn = clr.CredentialPackage.CreatedAt.ToLocalTime(),
-                    CreatedAt = clr.IssuedOn,
-                    Name = clr.Name,
-                    Nickname = clr.Name,
-                    SourceId =  clr.Authorization?.Source?.Id,
-                    SourceName = clr.Authorization?.Source?.Name,
-                    PublisherName = clr.PublisherName
+                    ClrId = clrVm.Clr.Id,
+                    AddedOn = clrVm.AncestorCredentialPackage.CreatedAt.ToLocalTime(),
+                    CreatedAt = clrVm.Clr.IssuedOn,
+                    Name = clrVm.Clr.Name,
+                    Nickname = clrVm.Clr.Name,
+                    SourceId = clrVm.Clr.Authorization?.Source?.Id,
+                    SourceName = clrVm.Clr.Authorization?.Source?.Name,
+                    PublisherName = clrVm.Clr.PublisherName
                 });
             }
         }
@@ -62,12 +62,11 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
                 return Page();
             }
 
-            var clr = await _context.Clrs.SingleAsync(c => c.Id == clrId);
+            var clr = await _credentialService.GetClrAsync(clrId.Value);
 
-            var link = new LinkModel {Clr = clr, UserId = User.UserId(), Nickname = model.Nickname, CreatedAt = DateTimeOffset.UtcNow};
+            var link = new LinkModel {ClrForeignKey = clr.Id, UserId = User.UserId(), Nickname = model.Nickname, CreatedAt = DateTimeOffset.UtcNow};
 
-            await _context.Links.AddAsync(link);
-            await _context.SaveChangesAsync();
+            await _linkService.AddAsync(link);            
 
             return RedirectToPage("./Index");
         }

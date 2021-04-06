@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace OpenCredentialPublisher.Data.Models
 {
@@ -31,12 +32,18 @@ namespace OpenCredentialPublisher.Data.Models
         /// <summary>
         /// Primary key.
         /// </summary>
+        [Key]
         public int Id { get; set; }
 
         /// <summary>
         /// The name of the resource server (also in the Discovery Document).
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// All the revocations tied to this resource server.
+        /// </summary>
+        public List<RevocationModel> Revocations { get; set; }
 
         /// <summary>
         /// The scopes the authorization server and resource server support.
@@ -47,5 +54,10 @@ namespace OpenCredentialPublisher.Data.Models
         /// The base URL for the resource server.
         /// </summary>
         public string Url { get; set; }
+
+        /// <summary>
+        /// BitMap of entitytypes the source provides
+        /// </summary>
+        public SourceTypeEnum SourceTypeId { get; set; } 
     }
 }

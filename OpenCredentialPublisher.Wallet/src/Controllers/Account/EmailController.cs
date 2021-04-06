@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Wallet.Controllers.Account
 {
-    [Route("api/account/[controller]")]
+    [Route(ApiConstants.AccountRoutePattern)]
     [ApiController]
     public class EmailController : ControllerBase
     {

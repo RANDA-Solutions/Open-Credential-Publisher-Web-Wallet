@@ -5,16 +5,17 @@ using OpenCredentialPublisher.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using OpenCredentialPublisher.Services.Implementations;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
 {
     public class DeleteModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly CredentialService _credentialService;
 
-        public DeleteModel(WalletDbContext context)
+        public DeleteModel(CredentialService credentialService)
         {
-            _context = context;
+            _credentialService = credentialService;
         }
 
         public ClrModel Clr { get; set; }
@@ -31,9 +32,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
             if (!ModelState.IsValid) return Page();
 
             // Remove the CLR
-
-            _context.Clrs.Remove(Clr);
-            await _context.SaveChangesAsync();
+            await _credentialService.DeleteClrAsync(Clr.Id);
 
             return RedirectToPage("./Index");
         }
@@ -42,10 +41,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
         {
             if (!ModelState.IsValid) return;
 
-            Clr = await _context.Clrs
-                .Include(c => c.Authorization)
-                .ThenInclude(a => a.Source)
-                .SingleOrDefaultAsync(p => p.Id == id);
+            Clr = await _credentialService.GetClrAsync(id.Value);
 
             if (Clr == null)
             {

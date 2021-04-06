@@ -10,6 +10,7 @@ using OpenCredentialPublisher.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Data.ViewModels.Credentials;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
 {
@@ -17,14 +18,16 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
     {
         public bool ShowDownloadVCJsonButton { get; set; }
 
-
         public DisplayModel(
-            WalletDbContext context,
+            CredentialService credentialService,
+            CredentialPackageService credentialPackageService,
             IHttpClientFactory factory,
             IConfiguration configuration,
-            ClrService clrService,
-            ConnectService connectService)
-        : base(context, factory, configuration, clrService, connectService)
+            ConnectService connectService,
+            RevocationService revocationService,
+            BadgrService badgrService,
+            ClrService clrService)
+        : base(factory, configuration, clrService, connectService, credentialService, credentialPackageService, badgrService, revocationService)
         {
         }
 
@@ -32,9 +35,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
         {
             if (id == null) return NotFound();
 
-            var package = await Context.CredentialPackages
-                .Include(l => l.VerifiableCredential)
-                .FirstOrDefaultAsync(l => l.UserId == User.UserId() && l.Id == id);
+            var package = await _credentialService.GetWithSourcesAsync(User.UserId(), id.Value);
 
             if (package?.VerifiableCredential != null)
             {
@@ -43,55 +44,34 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
             return NotFound();
         }
 
-        public async Task OnGet(int? id)
+        public async Task<IActionResult> OnGet(int? id, string action = null)
         {
             if (id == null)
             {
                 ModelState.AddModelError(string.Empty, "Missing Credential id.");
-                return;
+                return Page();
             }
 
-            var package = await Context.CredentialPackages
-                .FirstOrDefaultAsync(clrModel => clrModel.Id == id);
-
-            if (package == null)
+            if (action == "b2c")
             {
-                ModelState.AddModelError(string.Empty, $"Cannot find credential {id}.");
-                return;
+                // id = await BadgrService.CreateClrFromBadgeAsync(id.Value, User.UserId());
+                id = await _badgrService.ConvertClrFromBadgeAsync(id.Value, User.UserId());
             }
 
-            if (package.TypeId == PackageTypeEnum.Clr)
+            var credentialPackage = await _credentialPackageService.GetCredentialPackageAsync(id.Value, User.UserId());
+            if (credentialPackage == null)
             {
-                var credentialPackage = await Context.CredentialPackages.AsNoTracking()
-                .Include(cp => cp.Clr).FirstOrDefaultAsync(cp => cp.Id == id);
+                ModelState.AddModelError(string.Empty, "Missing Credential.");
+                return Page();
+            }
+            CredentialPackageViewModel = await _credentialPackageService.GetCredentialPackageViewModelAsync(credentialPackage);
 
-                CredentialPackage = credentialPackage;
-                CredentialPackage.BuildView();
-            }
-            else if (package.TypeId == PackageTypeEnum.ClrSet)
+            if (credentialPackage.TypeId == PackageTypeEnum.Clr)
             {
-                throw new NotImplementedException("Not fully implemented.");
+                await _revocationService.MarkClrViewModelRevocationsAsync(User.UserId(), CredentialPackageViewModel.ClrVM);
             }
-            else if (package.TypeId == PackageTypeEnum.VerifiableCredential)
-            {
-                var credentialPackage = await Context.CredentialPackages.AsNoTracking()
-                .Include(cp => cp.VerifiableCredential)
-                .ThenInclude(vc => vc.ClrSets)
-                .ThenInclude(clrSets => clrSets.Clrs)
-                .Include(cp => cp.VerifiableCredential)
-                .ThenInclude(vc => vc.Clrs)
-                .FirstOrDefaultAsync(cp => cp.Id == id);
+            return Page();
 
-                CredentialPackage = credentialPackage;
-                CredentialPackage.BuildView();
-
-                ShowDownloadVCJsonButton = true;
-            }
-            else
-            {
-                throw new NotImplementedException("Not fully implemented.");
-            }
-            
         }
     }
 }

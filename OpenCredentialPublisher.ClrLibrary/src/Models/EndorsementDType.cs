@@ -9,6 +9,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
@@ -86,7 +87,14 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("verification"), Newtonsoft.Json.JsonProperty("verification")]
         [Description("Verification")]
         public virtual VerificationDType Verification { get; set; }
-        
+
+        /// <summary>
+        /// Additional properties of the object
+        /// </summary>
+        [JsonExtensionData]
+        [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
+        public Dictionary<string, object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+
         /// <summary>
         /// Returns the JSON string presentation of the object
         /// </summary>
