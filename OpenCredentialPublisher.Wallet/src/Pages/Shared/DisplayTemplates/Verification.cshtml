@@ -10,7 +10,7 @@
 
     var resultId = ViewData["AssertionId"] ?? ViewData["endorsementId"] ?? ViewData["clrId"];
 
-    <form method="post" data-ajax="true" data-ajax-method="post" data-ajax-loading="#loader" data-ajax-complete="verify_complete">
+    <form method="post" data-ajax="true" data-ajax-method="post" data-ajax-loading="#loader" data-ajax-complete="verify_complete" asp-page-handler="">
         <dl class="row">
             @if (resultId != null)
             {
@@ -20,13 +20,16 @@
                     <input type="hidden" name="AssertionId" value="@ViewData["AssertionId"]"/>
                     <input type="hidden" name="ClrId" value="@ViewData["ClrId"]"/>
                     <input type="hidden" name="EndorsementId" value="@ViewData["EndorsementId"]"/>
-                    <input type="submit" class="btn btn-info" asp-page-handler="" value="Verify"/>
+                    <input type="submit" class="btn btn-info"  value="Verify"/>
                 </dt>
                 <dd class="col-sm-9">
-                    @Model.Type.ToEnumMemberValue()
-                    <img src="~/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
-                         data-toggle="tooltip" data-html="true" title="@labels"/>
-                    <span class="col-sm-9" id="verification-result-@resultId.ToString().SafeId()"></span>
+                    <div class ="row mb-2"><span id="revocationlist-result-@resultId.ToString().SafeId()"></span></div>
+                    <div class ="row">
+                        @Model.Type.ToEnumMemberValue()
+                        <img src="~/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
+                             data-toggle="tooltip" data-html="true" title="@labels"/>
+                        <span class="col-sm-9" id="verification-result-@resultId.ToString().SafeId()"></span>
+                    </div>
                 </dd>
                 @if (Model.Creator != null)
                 {

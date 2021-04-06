@@ -37,36 +37,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var link in Model.Links)
+                    @foreach (var linkVM in Model.LinkVMs)
                     {
                         <tr>
                             <td>
-                                @if (link.Clr.Authorization == null)
+                                @if (linkVM.ClrVM.Clr.Authorization == null)
                                 {
                                     <span>Upload</span>
                                 }
                                 else
                                 {
                                     <img src="~/images/noun_right_975614.svg" height="30" width="30"
-                                         title="Source: @link.Clr.Authorization.Source.Name" />
+                                         title="Source: @linkVM.ClrVM.Clr.Authorization.Source.Name" />
                                 }
                             </td>
-                            <td>@link.Clr.PublisherName</td>
-                            <td>@link.Clr.Name</td>
-                            <td>@link.Clr.IssuedOn.ToShortDateString()</td>
-                            <td>@link.Clr.CredentialPackage.CreatedAt.ToShortDateString()</td>
+                            <td>@linkVM.ClrVM.Clr.PublisherName</td>
+                            <td>@linkVM.ClrVM.Clr.Name</td>
+                            <td>@linkVM.ClrVM.Clr.IssuedOn.ToShortDateString()</td>
+                            <td>@(linkVM.ClrVM.AncestorCredentialPackage.CreatedAt.ToShortDateString()) </td>
                             <td class="overflow-hidden" style="max-width: 20em;">
-                                <a href="@Model.GetLinkUrl(link.Id)">@Model.GetLinkUrl(link.Id)</a>
+                                <a href="@Model.GetLinkUrl(linkVM.Link.Id)">@Model.GetLinkUrl(linkVM.Link.Id)</a>
                             </td>
-                            <td class="text-center">@link.DisplayCount</td>
-                            <td>@link.Nickname</td>
+                            <td class="text-center">@linkVM.Link.DisplayCount</td>
+                            <td>@linkVM.Link.Nickname</td>
                             <td style="white-space: nowrap">
-                                @if (link.ClrViewModel.HasPdf)
+                                @if (linkVM.ClrVM.HasPdf)
                                 {
-                                    foreach (var pdf in link.ClrViewModel.Pdfs)
+                                    foreach (var pdf in linkVM.ClrVM.Pdfs)
                                     {
                                 <form method="post">
-                                    <input type="hidden" name="id"  value="@link.Id" />
+                                    <input type="hidden" name="id"  value="@linkVM.Link.Id" />
                                     <input type="hidden" name="clrId" value="@pdf.ClrId" />
                                     <input type="hidden" name="assertionId" value="@pdf.AssertionId" />
                                     <input type="hidden" name="artifactId" value="@pdf.ArtifactId" />
@@ -76,8 +76,8 @@
                                 </form>
                                     }
                                 }
-                                <a asp-page="./Share" asp-route-id="@link.Id" title="Share Through Email"><i class="fas fa-upload fa-2x"></i></a>
-                                <a asp-page="./Delete" asp-route-id="@link.Id" title="Delete Link"><i class="fas fa-trash fa-2x"></i></a>
+                                <a asp-page="./Share" asp-route-id="@linkVM.Link.Id" title="Share Through Email"><i class="fas fa-upload fa-2x"></i></a>
+                                <a asp-page="./Delete" asp-route-id="@linkVM.Link.Id" title="Delete Link"><i class="fas fa-trash fa-2x"></i></a>
                             </td>
                         </tr>
                     }

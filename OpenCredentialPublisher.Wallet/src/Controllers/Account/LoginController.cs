@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Wallet.Controllers.Account
 {
-    [Route("api/account/[controller]")]
+    [Route(ApiConstants.AccountRoutePattern)]
     [ApiController]
     public class LoginController : ControllerBase
     {
@@ -68,7 +68,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
             else
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                return new JsonResult(new LoginModel { Result = LoginResultEnum.Error, ErrorMessage = "Invalid login attempt." });
+                return new JsonResult(new LoginModel { Result = LoginResultEnum.Error, ErrorMessages = new List<string> { "Invalid login attempt." } });
             }
         }
     }

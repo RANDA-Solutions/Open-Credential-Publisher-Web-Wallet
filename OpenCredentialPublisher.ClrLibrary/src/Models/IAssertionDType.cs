@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Comprehensive Learner Record Service OpenAPI (YAML) Definition
  *
  * The Comprehensive Learner Record Service enables the exchange of data about users and their achievements between a Comprehensive Learner Record Service Provider and the consumers of the associated data. This service has been described using the IMS Model Driven Specification development approach, this being the Platform Specific Model (PSM) of the service.
@@ -21,9 +21,10 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         int AssertionKey { get; set; }
         string Context { get; set; }
         float? CreditsEarned { get; set; }
-        DateTime? EndDate { get; set; }
+        DateTime? ActivityEndDate { get; set; }
         List<EndorsementDType> Endorsements { get; set; }
         List<EvidenceDType> Evidence { get; set; }
+        DateTime? Expires { get; set; }
         string Id { get; set; }
         string Image { get; set; }
         bool IsSigned { get; set; }
@@ -37,7 +38,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         string Role { get; set; }
         List<string> SignedEndorsements { get; set; }
         ProfileDType Source { get; set; }
-        DateTime? StartDate { get; set; }
+        DateTime? ActivityStartDate { get; set; }
         string Term { get; set; }
         string Type { get; set; }
         VerificationDType Verification { get; set; }

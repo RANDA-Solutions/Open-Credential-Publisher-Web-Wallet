@@ -1,14 +1,13 @@
-using OpenCredentialPublisher.ClrLibrary.Converters;
 using Newtonsoft.Json;
-using OpenCredentialPublisher.Credentials.Cryptography;
+using OpenCredentialPublisher.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using OpenCredentialPublisher.ClrLibrary.Converters.Newtonsoft;
 using System.Security.Cryptography;
 using System.Text.Json;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
 {
@@ -84,7 +83,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
             using var crypto = new RSACryptoServiceProvider();
             crypto.ImportCspBlob(publicKeyBytes);
 
-            var signedBytes = Base64UrlEncoder.DecodeBytes(proof.Signature);
+            var signedBytes = WebEncoders.Base64UrlDecode(proof.Signature);
             var originalBytes = UTF8Encoding.UTF8.GetBytes(json);
             var digest = ComputeHash("RS512", originalBytes);
 

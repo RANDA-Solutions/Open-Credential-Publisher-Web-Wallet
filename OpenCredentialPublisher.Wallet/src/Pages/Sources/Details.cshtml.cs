@@ -15,17 +15,20 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 {
     public class DetailsModel : PageModel
     {
-        private readonly WalletDbContext _context;
         private readonly ClrService _clrService;
+        private readonly AuthorizationsService _authorizationsService;
+        private readonly BadgrService _badgrService;
 
         public DetailsModel(
-            WalletDbContext context,
             IHttpClientFactory factory,
             IConfiguration configuration,
-            ClrService clrService)
+            ClrService clrService,
+            BadgrService badgrService,
+            AuthorizationsService authorizationsService)
         {
-            _context = context;
             _clrService = clrService;
+            _badgrService = badgrService;
+            _authorizationsService = authorizationsService;
         }
 
         public AuthorizationModel Authorization { get; set; }
@@ -52,9 +55,16 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 
             if (!ModelState.IsValid) return Page();
 
-            await _clrService.RefreshClrsAsync(this, id);
+            if ((await _authorizationsService.GetSourceTypeAsync(id)).Equals(SourceTypeEnum.OpenBadge))
+            {
+                await _badgrService.RefreshBackpackAsync(this, id);
+            }
+            else
+            {
+                await _clrService.RefreshClrsAsync(this, id);
+            }
 
-            // Return redirect to this age so user can display CLRs
+            // Return redirect to this page so user can display CLRs
             // and return back to this page without being prompted to resubmit
 
             if (ModelState.IsValid)
@@ -73,11 +83,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 return;
             }
 
-            Authorization = await _context.Authorizations
-                .Include(a => a.Clrs)
-                .Include(a => a.Source)
-                .ThenInclude(s => s.DiscoveryDocument)
-                .SingleOrDefaultAsync(a => a.Id == id && a.UserId == User.UserId());
+            Authorization = await _authorizationsService.GetDeepAsync(id);
 
             if (Authorization == null)
             {
@@ -91,28 +97,9 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 return;
             }
 
-            if (TokenIsValid()) return;
+            if (await _authorizationsService.RefreshTokenAsync(this, Authorization)) return;
 
             ModelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
-        }
-
-        /// <summary>
-        /// Returns false if the access token has expired and cannot be refreshed.
-        /// </summary>
-        private bool TokenIsValid()
-        {
-            // Make sure the token has not expired
-
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(Authorization.AccessToken);
-            if (token.ValidTo >= DateTime.UtcNow)
-            {
-                return true;
-            }
-
-            // If it has expired, check for a refresh token
-
-            return Authorization.RefreshToken != null;
-        }
+        }        
    }
 }

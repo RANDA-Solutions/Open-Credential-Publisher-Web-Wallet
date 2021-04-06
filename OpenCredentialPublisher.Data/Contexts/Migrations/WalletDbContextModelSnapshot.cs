@@ -150,6 +150,120 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("OpenCredentialPublisher.ClrLibrary.Models.IdentityDType", b =>
+                {
+                    b.Property<int>("IdentityKey")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AdditionalProperties")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Hashed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Identity")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Salt")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdentityKey");
+
+                    b.ToTable("IdentityDType");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.AgentContextModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AgentName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContextJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DomainDid")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndpointUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IssuerDid")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IssuerRegistered")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("IssuerVerKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Network")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProvisioningTokenId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SdkVerKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SdkVerKeyId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ThreadId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VerityAgentVerKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VerityPublicDid")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VerityPublicVerKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VerityUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Version")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WalletKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WalletPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AgentContexts");
+                });
+
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -161,6 +275,10 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
@@ -191,6 +309,9 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ProfileImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -236,6 +357,9 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Property<string>("Endpoint")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
@@ -257,6 +381,9 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTimeOffset>("ValidTo")
+                        .HasColumnType("datetimeoffset");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SourceForeignKey");
@@ -264,6 +391,142 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Authorizations");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.Badgr.BadgrAssertionModel", b =>
+                {
+                    b.Property<int>("BadgrAssertionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Acceptance")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdditionalProperties")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BadgeClassJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BadgeClassOpenBadgeId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BadgeJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Badgeclass")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BadgrBackpackId")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("Expires")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InternalIdentifier")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IssueStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("IssuedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Issuer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IssuerJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IssuerOpenBadgeId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Narrative")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OpenBadgeId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Pending")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("RecipientIdentityKey")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RecipientJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RevocationReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Revoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SignedAssertion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ValidationStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BadgrAssertionId");
+
+                    b.HasIndex("BadgrBackpackId");
+
+                    b.HasIndex("RecipientIdentityKey");
+
+                    b.ToTable("BadgrAssertions");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.Badgr.BadgrBackpackModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AssertionsCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CredentialPackageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Identifier")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("IssuedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Json")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Provider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RevocationReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Revoked")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CredentialPackageId")
+                        .IsUnique();
+
+                    b.ToTable("BadgrBackpacks");
                 });
 
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CertificateModel", b =>
@@ -376,12 +639,158 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.ToTable("ClrSets");
                 });
 
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ConnectionRequestModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<Guid?>("AgentContextId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ConnectionRequestStep")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ThreadId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("WalletRelationshipId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentContextId");
+
+                    b.HasIndex("ThreadId")
+                        .IsUnique()
+                        .HasFilter("[ThreadId] IS NOT NULL");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WalletRelationshipId");
+
+                    b.ToTable("ConnectionRequests");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ConnectionRequestStep", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ConnectionRequestSteps");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 0,
+                            Name = "Initiated"
+                        },
+                        new
+                        {
+                            Id = 1,
+                            Name = "PendingAgent"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "StartingInvitation"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "RequestingInvitation"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "InvitationGenerated"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "InvitationAccepted"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "InvitationCompleted"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Error"
+                        });
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialDefinition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<Guid>("AgentContextId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CredentialDefinitionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CredentialSchemaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("ModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ThreadId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentContextId");
+
+                    b.HasIndex("CredentialSchemaId");
+
+                    b.ToTable("CredentialDefinitions");
+                });
+
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialPackageModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AuthorizationForeignKey")
+                        .HasColumnType("nvarchar(450)")
+                        .HasMaxLength(450);
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -407,9 +816,196 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorizationForeignKey");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("CredentialPackages");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialRequestModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<Guid?>("AgentContextId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("CredentialDefinitionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CredentialPackageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CredentialRequestStep")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CredentialSchemaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ThreadId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("WalletRelationshipId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentContextId");
+
+                    b.HasIndex("CredentialDefinitionId");
+
+                    b.HasIndex("CredentialPackageId");
+
+                    b.HasIndex("CredentialSchemaId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WalletRelationshipId");
+
+                    b.ToTable("CredentialRequests");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialRequestStep", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CredentialRequestSteps");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 0,
+                            Name = "Initiated"
+                        },
+                        new
+                        {
+                            Id = 1,
+                            Name = "PendingAgent"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "PendingSchema"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "PendingCredentialDefinition"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "ReadyToSend"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "SendingOffer"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "OfferSent"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "OfferAccepted"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "CheckingRevocationStatus"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "CredentialIsRevoked"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "CredentialIsStillValid"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Error"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "ErrorWritingSchema"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "ErrorWritingCredentialDefinition"
+                        });
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialSchema", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Attributes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Hash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SchemaId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThreadId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TypeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Version")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CredentialSchema");
                 });
 
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.DiscoveryDocumentModel", b =>
@@ -467,6 +1063,66 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.ToTable("DiscoveryDocumentModel");
                 });
 
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.HttpClientLog", b =>
+                {
+                    b.Property<int>("HttpClientLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Machine")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestContentBody")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestHeaders")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestIpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestRouteData")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestRouteTemplate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RequestTimestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RequestUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponseContentBody")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponseContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponseHeaders")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ResponseStatusCode")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ResponseTimestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("User")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("HttpClientLogId");
+
+                    b.ToTable("HttpClientLogs");
+                });
+
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.IdentityCertificateModel", b =>
                 {
                     b.Property<int>("Id")
@@ -502,6 +1158,9 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("CredentialRequestId")
+                        .HasColumnType("int");
+
                     b.Property<int>("DisplayCount")
                         .HasColumnType("int");
 
@@ -521,6 +1180,8 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClrForeignKey");
+
+                    b.HasIndex("CredentialRequestId");
 
                     b.HasIndex("UserId");
 
@@ -562,6 +1223,48 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ProvisioningTokenModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<Guid>("AgentContextId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Nonce")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sig")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SponseeId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SponsorId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SponsorVerKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Timestamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentContextId")
+                        .IsUnique();
+
+                    b.ToTable("ProvisioningToken");
+                });
+
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.RecipientModel", b =>
                 {
                     b.Property<int>("Id")
@@ -587,6 +1290,41 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Recipients");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.RevocationModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IssuerId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RevocationListId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RevokedId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SourceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Revocations");
                 });
 
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ShareModel", b =>
@@ -648,6 +1386,11 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         {
                             Id = 2,
                             Name = "Pdf"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Wallet"
                         });
                 });
 
@@ -669,6 +1412,9 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
 
                     b.Property<string>("Scope")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SourceTypeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
@@ -800,6 +1546,50 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.ToTable("VerifiableCredentials");
                 });
 
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.WalletRelationshipModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<Guid>("AgentContextId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("InviteUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsConnected")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("ModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("RelationshipDid")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RelationshipVerKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("WalletName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentContextId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WalletRelationships");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -864,6 +1654,26 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.Badgr.BadgrAssertionModel", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.Badgr.BadgrBackpackModel", "BadgrBackpack")
+                        .WithMany("BadgrAssertions")
+                        .HasForeignKey("BadgrBackpackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OpenCredentialPublisher.ClrLibrary.Models.IdentityDType", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientIdentityKey");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.Badgr.BadgrBackpackModel", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.CredentialPackageModel", "CredentialPackage")
+                        .WithOne("BadgrBackpack")
+                        .HasForeignKey("OpenCredentialPublisher.Data.Models.Badgr.BadgrBackpackModel", "CredentialPackageId");
+                });
+
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ClrModel", b =>
                 {
                     b.HasOne("OpenCredentialPublisher.Data.Models.AuthorizationModel", "Authorization")
@@ -895,11 +1705,81 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         .HasForeignKey("VerifiableCredentialId");
                 });
 
-            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialPackageModel", b =>
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ConnectionRequestModel", b =>
                 {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.AgentContextModel", "AgentContext")
+                        .WithMany()
+                        .HasForeignKey("AgentContextId");
+
                     b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.WalletRelationshipModel", "WalletRelationship")
+                        .WithMany()
+                        .HasForeignKey("WalletRelationshipId");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialDefinition", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.AgentContextModel", "AgentContext")
+                        .WithMany()
+                        .HasForeignKey("AgentContextId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.CredentialSchema", "CredentialSchema")
+                        .WithMany("CredentialDefinitions")
+                        .HasForeignKey("CredentialSchemaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialPackageModel", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.AuthorizationModel", "Authorization")
+                        .WithMany("CredentialPackages")
+                        .HasForeignKey("AuthorizationForeignKey")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.CredentialRequestModel", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.AgentContextModel", "AgentContext")
+                        .WithMany()
+                        .HasForeignKey("AgentContextId");
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.CredentialDefinition", "CredentialDefinition")
+                        .WithMany()
+                        .HasForeignKey("CredentialDefinitionId");
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.CredentialPackageModel", "CredentialPackage")
+                        .WithMany()
+                        .HasForeignKey("CredentialPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.CredentialSchema", "CredentialSchema")
+                        .WithMany()
+                        .HasForeignKey("CredentialSchemaId");
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.WalletRelationshipModel", "WalletRelationship")
+                        .WithMany("CredentialRequests")
+                        .HasForeignKey("WalletRelationshipId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -921,6 +1801,10 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("OpenCredentialPublisher.Data.Models.CredentialRequestModel", "CredentialRequest")
+                        .WithMany()
+                        .HasForeignKey("CredentialRequestId");
+
                     b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -935,8 +1819,30 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         .HasForeignKey("ShareId");
                 });
 
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ProvisioningTokenModel", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.AgentContextModel", "AgentContext")
+                        .WithOne("ProvisioningToken")
+                        .HasForeignKey("OpenCredentialPublisher.Data.Models.ProvisioningTokenModel", "AgentContextId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.RecipientModel", b =>
                 {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.RevocationModel", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.SourceModel", "Source")
+                        .WithMany("Revocations")
+                        .HasForeignKey("SourceId");
+
                     b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -959,7 +1865,20 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                 {
                     b.HasOne("OpenCredentialPublisher.Data.Models.CredentialPackageModel", "CredentialPackage")
                         .WithOne("VerifiableCredential")
-                        .HasForeignKey("OpenCredentialPublisher.Data.Models.VerifiableCredentialModel", "CredentialPackageId")
+                        .HasForeignKey("OpenCredentialPublisher.Data.Models.VerifiableCredentialModel", "CredentialPackageId");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.WalletRelationshipModel", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.AgentContextModel", "AgentContext")
+                        .WithMany()
+                        .HasForeignKey("AgentContextId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

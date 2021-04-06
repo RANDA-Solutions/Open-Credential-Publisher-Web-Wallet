@@ -14,34 +14,56 @@
     border-radius: 10px;
     //box-shadow: 0 3px 6px black;
     box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2) ;
-    width: 465px;
     min-height: 357px;
 }
 
-.login-body section h4 {
-    font-size: 11px;
-    font-weight: bold;
+@media (max-width: 575px) {
+    .login-body section {
+        width: 323px;
+    }
 }
 
-.login-body section a {
-    font-size: 14px;
+@media (min-width: 576px) {
+    .login-body section {
+        width: 465px;
+    }
 }
 
-.login-logo {
-    color: black;
-}
+    .login-body section h4 {
+        font-size: 11px;
+        font-weight: bold;
+    }
 
-.logo-section {
-    background: #EFEFEF;
-    padding: 20px;
-    margin-right: -40px;
-    border-radius: 10px;
-    height: 230px;
-    //box-shadow: 0 3px 6px black;
-    box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
-}
+    .login-body section a {
+        font-size: 14px;
+    }
 
-.logo-section .logo-image {
-    height: 100px;
-    margin-top: 40px;
-}
+    .login-logo {
+        color: black;
+    }
+
+    .logo-section {
+        background: #EFEFEF;
+        padding: 20px;
+        margin-right: -40px;
+        border-radius: 10px;
+        height: 230px;
+        //box-shadow: 0 3px 6px black;
+        box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo-section .logo-image {
+        height: 100px;
+        margin-top: 40px;
+    }
+
+    .logo-top-section {
+        width: 80%;
+        background: #EFEFEF;
+        padding: 10px;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .logo-top-section .logo-image {
+        height: 60px;
+    }

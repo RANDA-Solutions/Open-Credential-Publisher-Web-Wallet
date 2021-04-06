@@ -127,14 +127,30 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("signedAssertions"), Newtonsoft.Json.JsonProperty("signedAssertions")]
         [Description("Signed assertions in JWS Compact Serialization format. Model Primitive Datatype = String. ")]
         public List<string> SignedAssertions { get; set; }
-        
+
+        /// <summary>
+        /// Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String. 
+        /// </summary>
+        /// <value>Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String. </value>
+        [JsonPropertyName("signedEndorsements"), Newtonsoft.Json.JsonProperty("signedEndorsements")]
+        [Description("Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String. ")]
+        public List<string> SignedEndorsements { get; set; }
+
         /// <summary>
         /// Gets or Sets Verification
         /// </summary>
         [JsonPropertyName("verification"), Newtonsoft.Json.JsonProperty("verification")]
         [Description("Verification")]
         public virtual VerificationDType Verification { get; set; }
-        
+
+        /// <summary>
+        /// Additional properties of the object
+        /// </summary>
+        [JsonExtensionData]
+        [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
+        public Dictionary<String, Object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+
+
         /// <summary>
         /// Returns the JSON string presentation of the object
         /// </summary>

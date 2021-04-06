@@ -94,7 +94,11 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("humanCode"), Newtonsoft.Json.JsonProperty("humanCode")]
         [Description("The code, generally human readable, associated with an achievement. Model Primitive Datatype = String.")]
         public string HumanCode { get; set; }
-        
+
+        [JsonPropertyName("identifiers"), Newtonsoft.Json.JsonProperty("identifiers")]
+        [Description("A set of System Identifiers that represent other identifiers for this Achievement.")]
+        public List<SystemIdentifierDType> Identifiers { get; set; }
+
         /// <summary>
         /// The name of the achievement. Model Primitive Datatype = String.
         /// </summary>

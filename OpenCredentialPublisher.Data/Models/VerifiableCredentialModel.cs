@@ -60,46 +60,27 @@ namespace OpenCredentialPublisher.Data.Models
         public List<ClrSetModel> ClrSets { get; set; }
         public List<ClrModel> Clrs { get; set; }
 
-        [JsonIgnore]
-        [NotMapped]
-        public List<ClrViewModel> AllClrs { get; set; } = new List<ClrViewModel>();
+            //public void BuildViews()
+            //{
+            //    VerifiableCredential = Newtonsoft.Json.JsonConvert.DeserializeObject<VerifiableCredential>(Json);
+            //    foreach (var clrSet in ClrSets)
+            //    {
+            //        foreach (var clr in clrSet.Clrs)
+            //        {
+            //            clr.EnhanceClr();
+            //            AssertionsCount += clr.AllAssertions.Count;
+            //            Pdfs.AddRange(clr.Pdfs);
+            //            AllClrs.Add(clr);
+            //        }
+            //    }
 
-        [JsonIgnore]
-        [NotMapped]
-        public VerifiableCredential VerifiableCredential { get; set; }
-
-        [JsonIgnore]
-        [NotMapped]
-        public int AssertionsCount { get; set; }
-        [JsonIgnore]
-        [NotMapped]
-        public List<PdfShareViewModel> Pdfs { get; set; } = new List<PdfShareViewModel>();
-
-        public void BuildViews()
-        {
-            VerifiableCredential = Newtonsoft.Json.JsonConvert.DeserializeObject<VerifiableCredential>(Json);
-            foreach (var clrSet in ClrSets)
-            {
-                foreach (var clr in clrSet.Clrs)
-                {
-                    var viewModel = JsonSerializer.Deserialize<ClrViewModel>(clr.Json);
-                    viewModel.ClrId = clr.Id;
-                    viewModel.BuildAssertionsTree();
-                    AssertionsCount += viewModel.AllAssertions.Count;
-                    Pdfs.AddRange(viewModel.Pdfs);
-                    AllClrs.Add(viewModel);
-                }
-            }
-
-            foreach (var clr in Clrs)
-            {
-                var viewModel = JsonSerializer.Deserialize<ClrViewModel>(clr.Json);
-                viewModel.ClrId = clr.Id;
-                viewModel.BuildAssertionsTree();
-                AssertionsCount += viewModel.AllAssertions.Count;
-                Pdfs.AddRange(viewModel.Pdfs);
-                AllClrs.Add(viewModel);
-            }
+            //    foreach (var clr in Clrs)
+            //    {
+            //        clr.EnhanceClr();
+            //        AssertionsCount += clr.AllAssertions.Count;
+            //        Pdfs.AddRange(clr.Pdfs);
+            //        AllClrs.Add(clr);
+            //    }
+            //}
         }
-    }
 }

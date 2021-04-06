@@ -11,6 +11,10 @@ using Microsoft.Extensions.Configuration;
 using NJsonSchema;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Routing;
+using OpenCredentialPublisher.Data.Abstracts;
 // ReSharper disable StringLiteralTypo
 
 namespace OpenCredentialPublisher.Services.Implementations
@@ -22,9 +26,10 @@ namespace OpenCredentialPublisher.Services.Implementations
         public const string SchemaPath = "/schema/json";
         public const string ClrJsonSchema = "clrv1p0-getclr-200-responsepayload-schemav2p0.json";
         public const string ClrSetJsonSchema = "clrv1p0-getclrs-200-responsepayload-schemav2p0.json";
-
-        public SchemaService(IConfiguration configuration)
+        public readonly IUrlHelper _urlHelper;
+        public SchemaService(IConfiguration configuration, IUrlHelper urlHelper)
         {
+            _urlHelper = urlHelper;
             var schemaLocation = configuration["SchemaLocation"];
             if (!string.IsNullOrEmpty(schemaLocation))
             {
@@ -34,24 +39,22 @@ namespace OpenCredentialPublisher.Services.Implementations
             BasePath = configuration["BasePath"];
         }
 
-        /// <summary>
-        /// Validate JSON against the JSON Schema for a given operation and status code.
-        /// Validation errors are added to the page ModelState.
-        /// </summary>
-        /// <param name="page">The page requesting validation.</param>
-        /// <param name="content">The JSON to be validated.</param>
-        public async Task ValidateSchemaAsync<T>(PageModel page, string content)
+        public async Task<SchemaResult> ValidateSchemaAsync<T>(HttpRequest request, string content)
         {
-            if (string.IsNullOrEmpty(content)) return;
-
-            var builder = new UriBuilder(page.Request.Scheme, page.Request.Host.Host);
-            if (page.Request.Host.Port.HasValue)
+            var schemaResult = new SchemaResult();
+            if (string.IsNullOrEmpty(content))
             {
-                builder.Port = page.Request.Host.Port.Value;
+                schemaResult.ErrorMessages.Add("JSON is null or empty.");
+                return schemaResult;
+            }
+            
+            var builder = new UriBuilder(request.Scheme, request.Host.Host);
+            if (request.Host.Port.HasValue)
+            {
+                builder.Port = request.Host.Port.Value;
             }
             builder.Path = SchemaPath;
             SchemaLocation = builder.ToString();
-
             // Re-serialize the content to remove nulls
             string nullRemovedContent;
             T value;
@@ -63,22 +66,25 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception e)
             {
-                page.ModelState.AddModelError(string.Empty, e.Message);
-                return;
+                schemaResult.ErrorMessages.Add(e.Message);
+                return schemaResult;
             }
 
             string url;
 
             if (typeof(T) == typeof(VerifiableCredential)) // bypass schema check for now until the correct VC schema is found
-                return;
+            {
+                //schemaResult.IsValid = true;
+                return schemaResult;
+            }
             else if (typeof(T) == typeof(ClrDType))
                 url = $"{SchemaLocation.EnsureTrailingSlash()}{ClrJsonSchema}";
             else if (typeof(T) == typeof(ClrSetDType))
                 url = $"{SchemaLocation.EnsureTrailingSlash()}{ClrSetJsonSchema}";
             else
             {
-                page.ModelState.AddModelError(string.Empty, $"Unknown type {typeof(T)}");
-                return;
+                schemaResult.ErrorMessages.Add($"Unknown type {typeof(T)}");
+                return schemaResult;
             }
 
             // Validate the response
@@ -87,9 +93,10 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 var client = new HttpClient();
                 Uri schemaUri;
-                if (page.Url.IsLocalUrl(url))
+                
+                if (_urlHelper.IsLocalUrl(url))
                 {
-                    Uri.TryCreate(page.Request.GetDisplayUrl(), UriKind.Absolute, out var baseUri);
+                    Uri.TryCreate(request.GetDisplayUrl(), UriKind.Absolute, out var baseUri);
                     Uri.TryCreate(baseUri, $"{BasePath}{url}", out schemaUri);
                 }
                 else
@@ -104,14 +111,20 @@ namespace OpenCredentialPublisher.Services.Implementations
                 {
                     foreach (var error in result)
                     {
-                        page.ModelState.AddModelError(string.Empty, error.ToString());
+                        schemaResult.ErrorMessages.Add(error.ToString());
                     }
                 }
             }
             catch (Exception e)
             {
-                page.ModelState.AddModelError(string.Empty, e.Message);
+                schemaResult.ErrorMessages.Add(e.Message);
             }
+            return schemaResult;
         }
+    }
+
+    public class SchemaResult: GenericModel
+    {
+        public bool IsValid => !HasError;
     }
 }

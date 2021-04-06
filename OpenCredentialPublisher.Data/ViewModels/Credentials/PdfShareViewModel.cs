@@ -7,7 +7,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
 {
     public class PdfShareViewModel
     {
-        public ClrViewModel ClrViewModel { get; set; }
+        public ClrViewModel ClrVM { get; set; }
         public int ClrId { get; set; }
         public string AssertionId { get; set; }
         public int ArtifactId { get; set; }

@@ -38,7 +38,11 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("type"), Newtonsoft.Json.JsonProperty("type")]
         [Description("The JSON-LD type of this entity. Normally 'EndorsementProfile'. Unlike Profile, EndorsementProfile cannot have endorsements. Model Primitive Datatype = NormalizedString.")]
         public string Type { get; set; }
-        
+
+        [JsonPropertyName("additionalName"), Newtonsoft.Json.JsonProperty("additionalName")]
+        [Description("An additional name for a person, can be used for a middle name. Model Primitive Datatype = String.")]
+        public string AdditionalName { get; set; }
+
         /// <summary>
         /// Gets or Sets Address
         /// </summary>
@@ -61,7 +65,19 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("email"), Newtonsoft.Json.JsonProperty("email")]
         [Description("A contact email address for the individual or organization. Model Primitive Datatype = String.")]
         public string Email { get; set; }
-        
+
+        [JsonPropertyName("familyName"), Newtonsoft.Json.JsonProperty("familyName")]
+        [Description("Family name of a person. In the U.S., the last name of a person. Model Primitive Datatype = String.")]
+        public string FamilyName { get; set; }
+
+        [JsonPropertyName("givenName"), Newtonsoft.Json.JsonProperty("givenName")]
+        [Description("Given name of a person. In the U.S., the first name of a person. Model Primitive Datatype = String.")]
+        public string GivenName { get; set; }
+
+        [JsonPropertyName("identifiers"), Newtonsoft.Json.JsonProperty("identifiers")]
+        [Description("A set of System Identifiers that represent other identifiers for this Profile.")]
+        public List<SystemIdentifierDType> Identifiers { get; set; }
+
         /// <summary>
         /// Image representing the individual or organization. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -78,7 +94,11 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("name"), Newtonsoft.Json.JsonProperty("name")]
         [Description("The name of the individual or organization. Model Primitive Datatype = String.")]
         public string Name { get; set; }
-        
+
+        [JsonPropertyName("official"), Newtonsoft.Json.JsonProperty("official")]
+        [Description("The name of the authorized official for the Issuer. Model Primitive Datatype = String.")]
+        public string Official { get; set; }
+
         /// <summary>
         /// Gets or Sets PublicKey
         /// </summary>

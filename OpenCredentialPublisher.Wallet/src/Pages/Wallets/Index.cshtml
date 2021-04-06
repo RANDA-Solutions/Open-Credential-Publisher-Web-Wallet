@@ -1,0 +1,196 @@
+@page "{handler?}"
+@using OpenCredentialPublisher.Wallet.Extensions;
+@using OpenCredentialPublisher.Services.SignalR; 
+@model OpenCredentialPublisher.Wallet.Pages.Wallets.IndexModel
+@{
+    ViewData["Title"] = "Connected Wallets";
+}
+
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+            <h1>Your connected wallets</h1>
+
+            @*<div class="alert alert-primary">
+            A link is a URL you can share with people that lets them see your credential. The people that click on the link will
+            only be able to see the one credential you select. You can see how many times people have displayed your credential in the
+            table below.
+        </div>*@
+        <div class="row my-3">
+            <div class="col">
+                <button type="button" class="btn btn-outline-primary btn-lg " id="btn-create-wallet">Connect your wallet <span id="btn-create-wallet-loader" class="spinner-border spinner-border-sm" style="display:none;" role="status" aria-hidden="true"></span></button>
+                <button type="button" id="refresh_button" class="btn btn-outline-primary btn-lg float-right">Refresh</button>
+            </div>
+        </div>
+            <form id="create-wallet-form">
+                @Html.AntiForgeryToken()
+            </form>
+
+
+            <table class="table mt-4">
+                <thead>
+
+                    <tr>
+                        <th>Name</th>
+                        <th><abbr title="@HelpTextConstants.RelationshipDID">Relationship DID</abbr></th>
+                        <th><abbr title="@HelpTextConstants.CredentialsSent">Credentials</abbr></th>
+                        <th>Created</th>
+                        <th>Connected</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var relationship in Model.Relationships)
+                    {
+                        <tr>
+                            <td>@relationship.WalletName</td>
+                            <td>
+                                @relationship.RelationshipDid
+                            </td>
+                            <td>
+                                @relationship.CredentialsSent
+                            </td>
+                            @*<td>
+                            <abbr title="@relationship.RelationshipVerKey">@relationship.RelationshipVerKey.Substring(0, 16)</abbr>
+                        </td>*@
+                            <td>
+                                @relationship.CreatedOn.ToString("g")
+                            </td>
+                            <td>
+                                @if (relationship.IsConnected)
+                                {
+                                    <span>
+                                        Connected
+                                    </span> }
+                                else if (!String.IsNullOrEmpty(relationship.InviteUrl))
+                                {
+                                    <a asp-page="./Invitation" asp-route-id="@relationship.Id" title="Complete Relationship">Complete Relationship</a> }
+                                else
+                                {
+                                    <span>Waiting for invitation</span>}
+                            </td>
+                            <td>
+                                @if (relationship.IsConnected)
+                                {
+                                    <a class="btn btn-outline-primary btn-sm" asp-page="./Send" asp-route-id="@relationship.Id" title="Send Credential">Send Credential</a>
+                                }
+                            </td>
+                            <td style="white-space: nowrap">
+                                @if (relationship.IsConnected)
+                                {
+                                    <a class="mr-2" asp-page="./Edit" asp-route-id="@relationship.Id" title="Name this connection"><i class="fas fa-edit fa-2x"></i></a>
+                                }
+                                <a asp-page="./Delete" asp-route-id="@relationship.Id" title="Delete Relationship"><i class="fas fa-trash fa-2x"></i></a>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <a asp-page="/Credentials/Index">Back to Credentials</a>
+
+        </section>
+    </div>
+</div>
+
+<div class="modal fade" id="status-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Connecting Wallet</h5>
+                <button type="button" class="btn-close" style="display:none;" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="status-list" class="list-group list-group-plain text-center">
+                    <li class="static-status list-group-item text-bold">Generating Request</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/signalr/signalr.js"></script>
+    <script>
+        var signalRConnection = null;
+
+        var statuses = {};
+        function connectSignalR() {
+            signalRConnection = new signalR.HubConnectionBuilder()
+                .withUrl("@ConnectionStatusHub.Endpoint")
+                .withAutomaticReconnect()
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            signalRConnection.on('@ConnectionStatusHub.InvitationStatus', (relationshipId, status, done) => {
+                console.log(`SignalR received InvitationReady message (relationshipId: ${relationshipId})`);
+                console.log(status);
+                
+                if (!statuses[status]) {
+                    statuses[status] = true;
+                    addStatus(status);
+                }
+                if (done) {
+                    addStatus("Redirecting to Invitation");
+                    setTimeout(() => {
+                        window.location = `/Wallets/Invitation/${relationshipId}`;
+                    }, 3000);
+                }
+            });
+
+            signalRConnection.onclose(startSignalR);
+
+            // Start the connection.
+            startSignalR();
+        }
+
+
+        async function startSignalR() {
+            try {
+                await signalRConnection.start();
+
+                console.log("SignalR Connected.");
+                //signalRConnection.invoke("JoinGroup", requestId)
+                //    .catch(err => {
+                //        console.log(err);
+                //    });
+            } catch (err) {
+                console.log(err);
+                setTimeout(startSignalR, 5000);
+            }
+        };
+
+        function spinner() {
+            return '<div id="spinner" class="spinner-grow spinner-grow-sm" role="status"></div>';
+        }
+
+        function addStatus(status) {
+            $("#status-list li.text-bold").addClass("disabled");
+            $("#status-list li.text-bold").removeClass("text-bold");
+            $("#spinner").remove();
+            $("#status-list").append(`<li class="list-group-item text-bold">${status.replace(/([A-Z])/g, ' $1').trim()} ${spinner()}</li>`);
+        }
+
+
+        $("#btn-create-wallet").click(function () {
+            $.ajax('/Wallets/Index', {
+                type: 'POST',
+                headers: {
+                    "RequestVerificationToken": $("#create-wallet-form input").val()
+                }
+            }).then(function (data) {
+                connectSignalR();
+
+                $("#status-list").html("");
+                addStatus("Generating Request");
+                $("#status-modal").modal();
+            });
+        });
+
+        $("#refresh_button").click(function () {
+            window.location.reload();
+        })
+    </script>
+}

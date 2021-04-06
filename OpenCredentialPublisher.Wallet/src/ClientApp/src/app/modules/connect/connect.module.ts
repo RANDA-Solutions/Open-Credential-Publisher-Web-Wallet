@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ConnectComponent } from './components/connect.component';
 
 
 
 @NgModule({
-  declarations: [],
+  declarations: [ConnectComponent],
   imports: [
     CommonModule
   ]

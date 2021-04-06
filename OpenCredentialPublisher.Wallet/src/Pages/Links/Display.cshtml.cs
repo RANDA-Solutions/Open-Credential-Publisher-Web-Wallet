@@ -11,11 +11,14 @@ using System.ComponentModel.DataAnnotations;
 using OpenCredentialPublisher.Services.Extensions;
 using System.Linq;
 using System.Text;
+using OpenCredentialPublisher.Data.ViewModels.Credentials;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 { 
     public class DisplayModel : ClrDisplayPageModel
     {
+        private readonly LinkService _linkService;
+
         public bool RequiresAccessKey { get; set; }
         public bool ShowDownloadVCJsonButton { get; set; }
         public bool ShowData { get; set; }
@@ -25,31 +28,36 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
         public string AccessKey { get; set; }
 
         public DisplayModel(
-            WalletDbContext context,
+            CredentialService credentialService,
             IHttpClientFactory factory,
             IConfiguration configuration,
-            ClrService clrService)
-            :base(context, factory, configuration, clrService)
+            RevocationService revocationService,
+            ClrService clrService,
+            BadgrService badgrService,
+            LinkService linkService
+            )
+            :base(credentialService, factory, configuration, revocationService, clrService, badgrService)
         {
+            _linkService = linkService;
         }
 
-        public async Task<IActionResult> OnGet(string id)
+        public async Task<IActionResult> OnGet(string id, string key = null)
         {
             if (id == null) return NotFound();
 
             Id = id;
 
-            var link = await Context.Links
-                .Include(l => l.Clr)
-                .ThenInclude(l => l.CredentialPackage)
-                .Include(l => l.Shares)
-                .SingleOrDefaultAsync(l => l.Id == id);
+            var link = await _linkService.GetDeepAsync(id);
 
             if (link?.Clr == null) return RedirectToPage("NotAvailable");
 
             if (link.RequiresAccessKey)
             {
                 if (User?.UserId() == link.UserId)
+                {
+                    ShowData = true;
+                }
+                else if (!string.IsNullOrEmpty(key) && link.Shares.Any(s => s.AccessKey == key && s.StatusId == StatusEnum.Active))
                 {
                     ShowData = true;
                 }
@@ -68,14 +76,11 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
                 link.DisplayCount += 1;
             }
 
-            await Context.SaveChangesAsync();
+            await _linkService.UpdateAsync(link);
 
-            Clr = JsonSerializer.Deserialize<ClrViewModel>(link.Clr.Json);
-            Clr.ClrId = link.Clr.Id;
-            Clr.BuildAssertionsTree();
-            Clr.Context = "https://purl.imsglobal.org/spec/clr/v1p0/context/imsclr_v1p0.jsonld";
+            Clr = ClrViewModel.FromClrModel(link.Clr);
 
-            ShowDownloadVCJsonButton = ShowData && link.Clr.CredentialPackage.TypeId == PackageTypeEnum.VerifiableCredential;
+            ShowDownloadVCJsonButton = ShowData && Clr.AncestorCredentialPackage.TypeId == PackageTypeEnum.VerifiableCredential;
 
             return Page();
         }
@@ -97,11 +102,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
         {
             if (id == null) return NotFound();
 
-            var link = await Context.Links
-                .Include(l => l.Clr)
-                .ThenInclude(l => l.CredentialPackage)
-                .ThenInclude(l => l.VerifiableCredential)
-                .SingleOrDefaultAsync(l => l.Id == id);
+            var link = await _linkService.GetDeepAsync(id);
 
             if (link.Clr?.CredentialPackage?.VerifiableCredential != null)
             {
@@ -116,10 +117,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 
             Id = id;
 
-            var link = await Context.Links
-                .Include(l => l.Clr)
-                .Include(l => l.Shares)
-                .SingleOrDefaultAsync(l => l.Id == id);
+            var link = await _linkService.GetAsync(id);
 
             if (link?.Clr == null) return NotFound();
 
@@ -138,12 +136,9 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
             }
 
             link.DisplayCount += 1;
-            await Context.SaveChangesAsync();
+            await _linkService.UpdateAsync(link);
 
-            Clr = JsonSerializer.Deserialize<ClrViewModel>(link.Clr.Json);
-            Clr.ClrId = link.Clr.Id;
-            Clr.BuildAssertionsTree();
-            Clr.Context = "https://purl.imsglobal.org/spec/clr/v1p0/context/imsclr_v1p0.jsonld";
+            Clr = ClrViewModel.FromClrModel(link.Clr);
 
             return Page();
         }

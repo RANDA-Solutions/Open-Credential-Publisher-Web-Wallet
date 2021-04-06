@@ -1,11 +1,24 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoginMenuComponent } from './login-menu/login-menu.component';
-import { LoginComponent } from './login/login.component';
-import { LogoutComponent } from './logout/logout.component';
+import { HttpClientModule } from '@angular/common/http';
+import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ApplicationPaths } from './api-authorization.constants';
-import { HttpClientModule } from '@angular/common/http';
+import { ConfirmEmailChangeComponent } from './components/confirm-email/confirm-email-change.component';
+import { ConfirmEmailComponent } from './components/confirm-email/confirm-email.component';
+import { AccessDeniedComponent } from './components/errors/access-denied.component';
+import { LockoutComponent } from './components/errors/lockout.component';
+import { ExternalLoginComponent } from './components/external-login/external-login.component';
+import { ForgotPasswordConfirmationComponent } from './components/forgot-password/forgot-password-confirmation.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { LoginMenuComponent } from './components/login-menu/login-menu.component';
+import { LoginComponent } from './components/login/login.component';
+import { RecoveryCodesComponent } from './components/login/recovery-codes.component';
+import { TwoFactorAuthenticationComponent } from './components/login/two-factor-authentication.component';
+import { LogoutComponent } from './components/logout/logout.component';
+import { RegisterConfirmationComponent } from './components/register/register-confirmation.component';
+import { RegisterComponent } from './components/register/register.component';
+import { ResetPasswordConfirmationComponent } from './components/reset-password/reset-password-confirmation.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 @NgModule({
   imports: [
@@ -24,7 +37,7 @@ import { HttpClientModule } from '@angular/common/http';
       ]
     )
   ],
-  declarations: [LoginMenuComponent, LoginComponent, LogoutComponent],
+  declarations: [LoginMenuComponent, LoginComponent, LogoutComponent, AccessDeniedComponent, LockoutComponent, ConfirmEmailComponent, ConfirmEmailChangeComponent, ExternalLoginComponent, ForgotPasswordComponent, ForgotPasswordConfirmationComponent, TwoFactorAuthenticationComponent, RecoveryCodesComponent, RegisterComponent, RegisterPasswordComponent, RegisterConfirmationComponent, ResetPasswordComponent, ResetPasswordConfirmationComponent],
   exports: [LoginMenuComponent, LoginComponent, LogoutComponent]
 })
 export class ApiAuthorizationModule { }

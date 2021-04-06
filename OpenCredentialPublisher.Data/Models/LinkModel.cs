@@ -23,16 +23,14 @@ namespace OpenCredentialPublisher.Data.Models
         /// <summary>
         /// The primary key.
         /// </summary>
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Key]
         public string Id { get; set; }
 
+        public int ClrForeignKey { get; set; }
         /// <summary>
         /// The CLR this link points to.
         /// </summary>
-        public ClrModel Clr { get; set; }
-        [NotMapped]
-        public ClrViewModel ClrViewModel { get; set; }
-        public int ClrForeignKey { get; set; }
+        public virtual ClrModel Clr { get; set; }        
 
         /// <summary>
         /// The number of times this link has been used to display the CLR.
@@ -53,6 +51,10 @@ namespace OpenCredentialPublisher.Data.Models
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
+
+        public int? CredentialRequestId { get; set; }
+        [ForeignKey("CredentialRequestId")]
+        public CredentialRequestModel CredentialRequest { get; set; }
 
         public List<ShareModel> Shares { get; set; }
 

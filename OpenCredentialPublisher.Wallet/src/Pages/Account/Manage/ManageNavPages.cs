@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,10 +21,12 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account.Manage
         public static string ExternalLogins => "ExternalLogins";
 
         public static string PersonalData => "PersonalData";
+        public static string ProfileImage => "ProfileImage";
 
         public static string TwoFactorAuthentication => "TwoFactorAuthentication";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
+        public static string ProfileImageNavClass(ViewContext viewContext) => PageNavClass(viewContext, ProfileImage);
 
         public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);
 

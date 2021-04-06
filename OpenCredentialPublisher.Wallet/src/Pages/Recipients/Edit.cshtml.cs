@@ -1,24 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using OpenCredentialPublisher.Data.Contexts;
-using OpenCredentialPublisher.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
 {
     public class EditModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly EmailHelperService _emailHelperService;
 
-        public EditModel(WalletDbContext context)
+        public EditModel(EmailHelperService emailHelperService)
         {
-            _context = context;
+            _emailHelperService = emailHelperService;
         }
 
         [BindProperty, Required]
@@ -33,7 +28,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
         public async Task OnGet([Required]int? id, string linkId)
         {
             LinkId = linkId;
-            var existing = await _context.Recipients.FirstOrDefaultAsync(r => r.UserId == User.UserId() && r.Id == id);
+            var existing = await _emailHelperService.GetRecipientAsync(User.UserId(), id.Value);
             if (existing == null)
             {
                 ModelState.AddModelError(string.Empty, $"Cannot find recipient {id}.");
@@ -51,12 +46,12 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
         {
             if (!ModelState.IsValid) return Page();
 
-            var existing = await _context.Recipients.FirstOrDefaultAsync(r => r.UserId == User.UserId() && r.Id == id);
+            var existing = await _emailHelperService.GetRecipientAsync(User.UserId(), id.Value);
             if (existing != null)
             {
                 existing.Name = Name;
                 existing.Email = Email;
-                await _context.SaveChangesAsync();
+                await _emailHelperService.UpdateRecipientAsync(existing);
             }
 
             return RedirectToPage("./Index", new { LinkId = linkId });

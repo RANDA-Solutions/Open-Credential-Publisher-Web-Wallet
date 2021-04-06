@@ -3,6 +3,6 @@
 	<Configurations>Debug;Dev;Qa;Release</Configurations>
     <LangVersion>8.0</LangVersion>
     <Authors>IMS Global; Andy Miller; RANDA Development Team; Keith Williams</Authors>
-    <Version>0.0.1</Version>
+    <Version>0.0.8</Version>
   </PropertyGroup>
 </Project>

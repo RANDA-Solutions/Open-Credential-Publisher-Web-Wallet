@@ -19,7 +19,7 @@ namespace OpenCredentialPublisher.Wallet.Models.Account
         public TwoFactorAuthenticationResultEnum? Result { get; set; }
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
-
+        public string ErrorMessage { get; set; }
         public string ReturnUrl { get; set; }
     }
 

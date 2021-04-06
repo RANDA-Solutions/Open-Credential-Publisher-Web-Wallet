@@ -6,23 +6,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 {
     public class DeleteModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly AuthorizationsService _authorizationsService;
 
-        public DeleteModel(WalletDbContext context)
+        public DeleteModel(AuthorizationsService authorizationsService)
         {
-            _context = context;
+            _authorizationsService = authorizationsService;
         }
 
         public AuthorizationModel Authorization { get; set; }
 
-        public void OnGet(string id)
+        public async Task OnGet(string id)
         {
-            OnPageLoad(id);
+            await OnPageLoad(id);
         }
 
         /**
@@ -30,14 +31,13 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
          */
         public async Task<IActionResult> OnPost(string id)
         {
-            OnPageLoad(id);
+            await OnPageLoad(id);
 
             if (!ModelState.IsValid) return Page();
 
             // Remove the connection
 
-            _context.Authorizations.Remove(Authorization);
-            await _context.SaveChangesAsync();
+            await _authorizationsService.DeleteAsync(id);
 
             return RedirectToPage("./Index");
         }
@@ -49,16 +49,12 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
         {
             if (sourceId == null) return Page();
 
-            var source = await _context.Sources
-                .Include(x => x.Authorizations)
-                .SingleOrDefaultAsync(x => x.Id == sourceId);
-            _context.Sources.Remove(source);
-            await _context.SaveChangesAsync();
+            await _authorizationsService.DeleteSourceAsync(sourceId.Value);
 
             return RedirectToPage("./Index");
         }
 
-        private void OnPageLoad(string id)
+        private async Task OnPageLoad(string id)
         {
             if (id == null)
             {
@@ -66,10 +62,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
                 return;
             }
 
-            Authorization = _context.Authorizations
-                .Include(a => a.Source)
-                .Where(a => a.UserId == User.UserId())
-                .SingleOrDefault(a => a.Id == id);
+            Authorization = await _authorizationsService.GetAsync(User.UserId(), id);
 
             if (Authorization == null)
             {

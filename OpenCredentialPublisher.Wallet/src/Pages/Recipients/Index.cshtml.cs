@@ -1,22 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using OpenCredentialPublisher.Data.Contexts;
-using OpenCredentialPublisher.Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
 {
     public class IndexModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly EmailHelperService _emailHelperService;
 
-        public IndexModel(WalletDbContext context)
+        public IndexModel(EmailHelperService emailHelperService)
         {
-            _context = context;
+            _emailHelperService = emailHelperService;
         }
 
         public string LinkId { get; set; }
@@ -26,8 +23,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Recipients
         public async Task OnGet(string linkId)
         {
             LinkId = linkId;
-            Recipients = await _context.Recipients.AsNoTracking().Where(r => r.UserId == User.UserId())
-                .ToListAsync();
+            Recipients = await _emailHelperService.GetAllRecipientsAsync(User.UserId());
         }
     }
 }

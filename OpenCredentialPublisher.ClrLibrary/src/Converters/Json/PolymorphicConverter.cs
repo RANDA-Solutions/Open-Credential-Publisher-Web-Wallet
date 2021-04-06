@@ -3,6 +3,7 @@ using OpenCredentialPublisher.ClrLibrary.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -19,7 +20,8 @@ namespace OpenCredentialPublisher.ClrLibrary.Converters.Json
             var itemType = typeof(TItem);
             if (itemType.IsInterface)
             {
-                var implementedTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(y => itemType.IsAssignableFrom(y) && !y.IsInterface);
+                
+                var implementedTypes = Assembly.GetAssembly(itemType).GetTypes().Where(y => itemType.IsAssignableFrom(y) && !y.IsInterface);
                 foreach(var implementedType in implementedTypes)
                 {
                     var jsonTypeAttribute = (JsonTypeAttribute)Attribute.GetCustomAttribute(implementedType, typeof(JsonTypeAttribute));

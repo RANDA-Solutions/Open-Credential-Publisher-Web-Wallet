@@ -2,6 +2,11 @@
 @model OpenCredentialPublisher.ClrWallet.Pages.Sources.DetailsModel
 @{
     ViewData["Title"] = "Source Details";
+    var eType = "CLR";
+    if(Model.Authorization.Source.SourceTypeId == SourceTypeEnum.OpenBadge)
+    {
+        eType = "Open Badge";
+    }
 }
 
 <div class="row mt-5">
@@ -12,11 +17,11 @@
 
             <div class="alert alert-primary">
                 <p>
-                    A CLR source is a platform which has one or more of your CLRs. This application will connect to the source and
-                    get your CLRs.
+                    A @eType source is a platform which has one or more of your @(eType)s. This application will connect to the source and
+                    get your @(eType)s.
                 </p>
                 <p>
-                    The table below shows the CLRs this application received from this source.
+                    The table below shows the @(eType)s this application received from this source.
                 </p>
             </div>
 
@@ -44,7 +49,7 @@
                                 <div>
                                     Click
                                     <button type="submit" class="btn btn-link p-0" style="vertical-align: baseline">Refresh</button>
-                                    to get your CLRs from @Model.Authorization.Source.Name.
+                                    to get your @(eType)s from @Model.Authorization.Source.Name.
                                 </div>
                             }
                             else
@@ -81,7 +86,7 @@
                                 </table>
                             }
                         }
-                        <div class="mt-2"><button type="submit" class="btn btn-primary">Refresh CLRs</button></div>
+                        <div class="mt-2"><button type="submit" class="btn btn-primary">Refresh @(eType)s</button></div>
                     </dd>
                 </dl>
             </form>

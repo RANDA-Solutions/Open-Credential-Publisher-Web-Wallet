@@ -1,65 +1,51 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using OpenCredentialPublisher.ClrWallet.Utilities;
+using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Services.Drawing;
+using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
+using OpenCredentialPublisher.Shared.Utilities;
+using OpenCredentialPublisher.Wallet.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using OpenCredentialPublisher.Data.Contexts;
-using OpenCredentialPublisher.Data.Models;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using OpenCredentialPublisher.Services.Extensions;
 using System.Text.Json;
-using OpenCredentialPublisher.ClrWallet.Utilities;
-using OpenCredentialPublisher.Credentials.Clrs.Utilities;
-using OpenCredentialPublisher.Services.Drawing;
-using Microsoft.AspNetCore.Mvc;
-using OpenCredentialPublisher.Wallet.Extensions;
+using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 {
     public class IndexModel : PageModel
     {
-        private readonly WalletDbContext _context;
-
-        public IndexModel(WalletDbContext context)
+        private readonly LinkService _linkService;
+        public IndexModel(LinkService linkService)
         {
-            _context = context;
+            _linkService = linkService;
         }
 
-        public List<LinkModel> Links { get; set; }
+        public List<LinkViewModel> LinkVMs { get; set; }
 
         public async Task OnGet()
         {
-            Links = await _context.Links
-                .Include(l => l.Shares)
-                .Include(l => l.Clr)
-                .ThenInclude(c => c.Authorization)
-                .ThenInclude(a => a.Source)
-                .Include(l => l.Clr)
-                .ThenInclude(c => c.CredentialPackage)
-                .Where(l => l.UserId == User.UserId())
-                .ToListAsync();
+            LinkVMs = new List<LinkViewModel>();
+            var links = await _linkService.GetAllDeepAsync(User.UserId());
 
-            foreach (var link in Links)
+            foreach (var link in links)
             {
-                link.ClrViewModel = JsonSerializer.Deserialize<ClrViewModel>(link.Clr.Json);
-                link.ClrViewModel.ClrId = link.Clr.Id;
-                link.ClrViewModel.BuildAssertionsTree();
+               LinkVMs.Add(LinkViewModel.FromLinkModel(link));
             }
         }
 
         public async Task<IActionResult> OnPostPdf(string id, int clrId, string assertionId, string evidenceName, int artifactId, string artifactName)
         {
-            var link = await _context.Links
-                .Include(l => l.Clr)
-                .FirstOrDefaultAsync(l => l.UserId == User.UserId() && l.Id == id);
+            var link = await _linkService.GetAsync(User.UserId(), id);
             if (link == null)
                 return NotFound();
 
-            var model = JsonSerializer.Deserialize<ClrViewModel>(link.Clr.Json);
-            model.BuildAssertionsTree();
+            var model = (LinkViewModel.FromLinkModel(link));
 
-            var assertion = model.AllAssertions.FirstOrDefault(a => a.Id == assertionId);
-            var evidence = assertion.Evidence.FirstOrDefault(e => e.Name == evidenceName);
+            var assertionVM = model.ClrVM.AllAssertions.FirstOrDefault(a => a.Assertion.Id == assertionId);
+            var evidence = assertionVM.Assertion.Evidence.FirstOrDefault(e => e.Name == evidenceName);
             var artifact = evidence.Artifacts.FirstOrDefault(a => a.ArtifactKey == artifactId);
 
             var shareModel = new ShareModel
@@ -73,12 +59,12 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
             };
 
             link.RequiresAccessKey = true;
-
-            await _context.Shares.AddAsync(shareModel);
-            await _context.SaveChangesAsync();
+            link.ModifiedAt = DateTimeOffset.UtcNow;
+            await _linkService.AddShareAsync(shareModel);
+            await _linkService.UpdateAsync(link);
 
             var (mimeType, bytes) = DataUrlUtility.ParseDataUrl(artifact.Url);
-            bytes = PdfUtility.AppendQRCodePage(bytes, this.GetLinkUrl(link.Id), shareModel.AccessKey, PdfUtility.SourceApplicationName);
+            bytes = PdfUtility.AppendQRCodePage(bytes, this.GetLinkUrl(link.Id), shareModel.AccessKey);
             return new FileContentResult(bytes, mimeType) { FileDownloadName = $"{artifactName}.pdf" };
         }
 

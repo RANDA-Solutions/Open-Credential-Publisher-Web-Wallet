@@ -6,27 +6,24 @@ using OpenCredentialPublisher.Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using OpenCredentialPublisher.Services.Extensions;
+using OpenCredentialPublisher.Services.Implementations;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 {
     public class IndexModel : PageModel
     {
-        private readonly WalletDbContext _context;
+        private readonly AuthorizationsService _authorizationsService;
 
-        public IndexModel(WalletDbContext context)
+        public IndexModel(AuthorizationsService authorizationsService)
         {
-            _context = context;
+            _authorizationsService = authorizationsService;
         }
 
         public IList<AuthorizationModel> Authorizations { get;set; }
 
         public async Task OnGet()
         {
-            Authorizations = await _context.Authorizations
-                .Include(a => a.Clrs)
-                .Include(a => a.Source)
-                .Where(a => a.UserId == User.UserId())
-                .ToListAsync();
+            Authorizations = await _authorizationsService.GetAllAsync(User.UserId());
         }
     }
 }

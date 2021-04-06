@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        public string Username { get; set; }
+        public bool EmailIsConfirmed { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -34,21 +34,29 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account.Manage
 
         public class InputModel
         {
+            [Display(Name ="Username")]
+            public string Username { get; set; }
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [MaxLength(255)]
+            [Display(Name ="Displayable Name")]
+            public string DisplayName { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
+            EmailIsConfirmed = await _userManager.IsEmailConfirmedAsync(user);
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                Username = userName,
+                PhoneNumber = phoneNumber,
+                DisplayName = user.DisplayName
             };
         }
 
@@ -78,6 +86,29 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account.Manage
                 return Page();
             }
 
+            if (user.EmailConfirmed)
+            {
+                var username = await _userManager.GetUserNameAsync(user);
+                if (String.IsNullOrWhiteSpace(Input.Username))
+                {
+                    ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.Username)}", "Username may not be empty.");
+                    await LoadAsync(user);
+                    return Page();
+                }
+                if (Input.Username != username)
+                {
+                    var setUsernameResult = await _userManager.SetUserNameAsync(user, Input.Username);
+                    if (!setUsernameResult.Succeeded)
+                    {
+                        foreach (var error in setUsernameResult.Errors)
+                            ModelState.AddModelError($"{nameof(Input)}.{ nameof(Input.Username)}", error.Description);
+                        StatusMessage = "There was a problem trying to set username";
+                        await LoadAsync(user);
+                        return Page();
+                    }
+                }
+            }
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
@@ -85,6 +116,19 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Account.Manage
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
+                    return RedirectToPage();
+                }
+            }
+
+            if (Input.DisplayName != user.DisplayName)
+            {
+                user.DisplayName = Input.DisplayName;
+                var setDisplayNameResult = await _userManager.UpdateAsync(user);
+                if (!setDisplayNameResult.Succeeded)
+                {
+                    StatusMessage = "There was an error trying to update your display name.";
+                    foreach (var error in setDisplayNameResult.Errors)
+                        ModelState.AddModelError(null, error.Description);
                     return RedirectToPage();
                 }
             }

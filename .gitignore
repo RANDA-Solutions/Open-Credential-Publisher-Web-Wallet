@@ -347,3 +347,5 @@ ASALocalRun/
 *.db
 ClrBuilder/src/Packages.json
 *.DotSettings
+/OpenCredentialPublisher.VerityFunctionApp/local.settings.json
+/OpenCredentialPublisher.VerityFunctionApp/appsettings.Release.json

@@ -1,7 +1,10 @@
-﻿namespace OpenCredentialPublisher.Data.Models
+namespace OpenCredentialPublisher.Data.Models
 {
     public enum PackageTypeEnum
     {
-        Clr = 1, ClrSet = 2, VerifiableCredential = 3
+        Clr = 1,
+        ClrSet = 2,
+        VerifiableCredential = 3,
+        OpenBadge = 4
     }
 }

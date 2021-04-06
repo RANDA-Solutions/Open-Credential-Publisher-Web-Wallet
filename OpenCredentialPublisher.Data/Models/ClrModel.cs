@@ -1,18 +1,31 @@
+using OpenCredentialPublisher.ClrLibrary.Extensions;
+using OpenCredentialPublisher.ClrLibrary.Models;
+using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text.Json;
 
 namespace OpenCredentialPublisher.Data.Models
 {
-
     /// <summary>
     /// Represents a CLR for an application user. The complete CLR is stored as JSON.
     /// </summary>
     public class ClrModel
     {
+        /**************************************************************************************************/
+        /* START Actual persisted data                                                                    */
+        /**************************************************************************************************/
+        //Foreign Keys
         public int? CredentialPackageId { get; set; }
         public int? VerifiableCredentialId { get; set; }
         public int? ClrSetId { get; set; }
+        /// <summary>
+        /// Foreign key back to the authorization.
+        /// </summary>
+        public string AuthorizationForeignKey { get; set; }
 
         /// <summary>
         /// Number of assertions in this CLR.
@@ -22,12 +35,7 @@ namespace OpenCredentialPublisher.Data.Models
         /// <summary>
         /// The resource server authorization that was used to get this CLR.
         /// </summary>
-        public AuthorizationModel Authorization { get; set; }
-
-        /// <summary>
-        /// Foreign key back to the authorization.
-        /// </summary>
-        public string AuthorizationForeignKey { get; set; }
+        public AuthorizationModel Authorization { get; set; }        
 
         /// <summary>
         /// DateTime when this CLR was issued.
@@ -37,6 +45,7 @@ namespace OpenCredentialPublisher.Data.Models
         /// <summary>
         /// Primary key.
         /// </summary>
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         /// <summary>
@@ -78,9 +87,20 @@ namespace OpenCredentialPublisher.Data.Models
         /// The Signed CLR if it was signed.
         /// </summary>
         public string SignedClr { get; set; }
-
+        /**************************************************************************************************/
+        /* END Actual persisted data                                                                      */
+        /**************************************************************************************************/
+       
+        //possible Parents
         public CredentialPackageModel CredentialPackage { get; set; }
         public VerifiableCredentialModel VerifiableCredential { get; set; }
+        [ForeignKey("ClrSetId")]
         public ClrSetModel ClrSet { get; set; }
+
+        /// <summary>
+        /// true indicates this CLR's Id was received in a revocation list from the source
+        /// </summary>
+        [NotMapped]
+        public bool IsRevoked { get; set; }
     }
 }
