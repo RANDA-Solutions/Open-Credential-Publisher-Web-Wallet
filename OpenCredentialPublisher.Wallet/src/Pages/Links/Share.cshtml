@@ -1,25 +1,27 @@
 @page
 @model OpenCredentialPublisher.ClrWallet.Pages.Links.SharePageModel
 @{
-    ViewData["Title"] = "Share Link";
+    ViewData["Title"] = "Email your credential";
 }
 
 <div class="row mt-5">
     <div class="col">
         <section class="default-container p-5">
-            <h1>Share your credential by Email</h1>
+            <h1>Email your credential</h1>
 
-            <div class="alert alert-primary">
-                <p>
-                    Use this page to share credentials through email 
-                </p>
-            </div>
+            
 
             @if (Model.Link != null)
             {
                 var dict = new Dictionary<string, string> { { "linkId", Model.Link.Id } };
-                <h4>You are sharing this credential <b>@Html.DisplayFor(model => model.Link.Nickname)</b></h4>
                 <div>
+                    <div class="row">
+                        <div class="col">
+                            <h5>Credential shared: <b>@Html.DisplayFor(model => model.Link.Nickname)</b></h5>
+                        </div>
+                        @*<div class="col">
+                        </div>*@
+                    </div>
                     <hr />
                     <form method="post">
                         @if (Model.Recipients != null && Model.Recipients.Any())
@@ -27,16 +29,22 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <label>Who are you sending this to?</label>
+                                        <a class="btn btn-outline-secondary btn-sm mb-3" asp-page="/Recipients/Create" asp-all-route-data="dict">Create new recipient</a>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="">Send to:</label>
                                         <select class="form-control" name="RecipientId" asp-for="RecipientId" asp-items="Model.Recipients"></select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Not seeing who you are looking for?</label>
-                                        <a class="btn btn-outline-secondary btn-sm" asp-page="/Recipients/Create" asp-all-route-data="dict">Create a recipient</a>
+                                        <input type="submit" value="Send" class="btn btn-outline-primary btn-lg float-right" />
                                     </div>
-                                    <input type="submit" value="Share" class="btn btn-outline-primary btn-lg" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
                                     <hr />
-                                    <a asp-page="./Index">Back to List of Links</a>
+                                    <a asp-page="./Index">Back to shared credentials</a>
+
                                 </div>
                             </div>
 
@@ -52,7 +60,7 @@
                                             You haven't created any recipients. Click this to <a class="btn btn-outline-primary btn-lg" asp-page="/Recipients/Create" asp-all-route-data="dict">Create a recipient</a>
                                         </p>
                                     </div>
-                                    <a asp-page="./Index">Back to List of Links</a>
+                                    <a asp-page="./Index">Back to shared credentials</a>
                                 </dd>
                             </dl>}
                         <input type="hidden" asp-for="Link.Id" />
@@ -63,7 +71,7 @@
             }
             else
             {
-                <a asp-page="./Index">Back to List of Links</a>
+                <a asp-page="./Index">Back to shared credentials</a>
             }
         </section>
     </div>

@@ -2,6 +2,7 @@ using OpenCredentialPublisher.ClrLibrary.Extensions;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Models.Badgr;
+using OpenCredentialPublisher.Shared.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -16,7 +17,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
         /// </summary>
         public ClrDType RawClrDType { get; set; }
        
-        public bool HasPdf => Pdfs.Any();
+        public bool HasPdf => Pdfs.Any(e => e.IsPdf);
        
         public const string PdfType = "data:application/pdf;";
        
@@ -125,14 +126,14 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
                 if (associatedAssertion.Evidence != null &&
                     associatedAssertion.Evidence
                         .Any(aa => aa.Artifacts != null &&
-                                aa.Artifacts.Any(artifact => artifact.Url != null && artifact.Url.StartsWith(PdfType))))
+                                aa.Artifacts.Any(artifact => artifact.Url != null)))
                 {
 
                     foreach (var evidence in associatedAssertion.Evidence)
                     {
                         foreach (var artifact in evidence.Artifacts)
                         {
-                            if (artifact.Url != null && artifact.Url.StartsWith(PdfType))
+                            if (artifact.Url != null)
                             {
                                 var model = new PdfShareViewModel
                                 {
@@ -141,8 +142,20 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
                                     ArtifactId = artifact.ArtifactKey,
                                     AssertionId = associatedAssertion.Id,
                                     EvidenceName = evidence.Name,
-                                    ArtifactName = artifact.Name ?? artifact.Description
+                                    ArtifactName = artifact.Name ?? artifact.Description,
+                                    IsPdf = artifact.Url.StartsWith(PdfType)
                                 };
+
+                                if (!model.IsPdf)
+                                {
+                                    model.IsUrl = !artifact.Url.StartsWith("data:");
+                                    model.ArtifactUrl = artifact.Url;
+                                    if (!model.IsUrl)
+                                    {
+                                        model.MediaType = DataUrlUtility.GetMediaType(artifact.Url);
+                                    }
+                                }
+
                                 Pdfs.Add(model);
                             }
                         }

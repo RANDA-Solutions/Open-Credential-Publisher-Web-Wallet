@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.ClrLibrary;
 using OpenCredentialPublisher.ClrWallet.Utilities;
 using OpenCredentialPublisher.Data.Dtos;
+using OpenCredentialPublisher.Data.Extensions;
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
@@ -177,11 +178,11 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Clrs
             }
 
             CredentialPackageVMs = CredentialPackageVMs.OrderByDescending(cp => cp.CredentialPackage.CreatedAt).ToList();
-            var package = CredentialPackageVMs.FirstOrDefault(cp => cp.HasPdfs && cp.Pdfs.Any(pdf => pdf.ArtifactName.Contains("transcript", StringComparison.OrdinalIgnoreCase)));
+            var package = CredentialPackageVMs.FirstOrDefault(cp => cp.HasPdfs && cp.Pdfs.HasTranscriptPdf());
             PdfShareViewModel pdfShareViewModel = null;
             if (package != null)
             {
-                pdfShareViewModel = package.Pdfs.FirstOrDefault(pdf => pdf.ArtifactName.Contains("transcript", StringComparison.OrdinalIgnoreCase));
+                pdfShareViewModel = package.Pdfs.GetTranscriptPdf();
 
             }
 

@@ -27,33 +27,19 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages
 {
-    public class CredentialPackageDisplayPageModel : PageModel
+    public class CredentialPackageDisplayPageModel : DisplayPageModel
     {
-        protected readonly IHttpClientFactory _factory;
-        protected readonly ClrService _clrService;
-        protected readonly ConnectService _connectService;
-        protected readonly CredentialService _credentialService;
-        protected readonly CredentialPackageService _credentialPackageService;
-        protected readonly BadgrService _badgrService;
-        protected readonly RevocationService _revocationService;
-
         protected CredentialPackageDisplayPageModel(
             IHttpClientFactory factory,
-            IConfiguration configuration,
             ClrService clrService,
             ConnectService connectService,
             CredentialService credentialService,
             CredentialPackageService credentialPackageService,
             BadgrService badgrService,
-            RevocationService revocationService)
+            RevocationService revocationService):
+                base(factory, clrService, connectService, credentialService, credentialPackageService, badgrService, revocationService)
         {
-            _factory = factory;
-            _clrService = clrService;
-            _connectService = connectService;
-            _credentialService = credentialService;
-            _credentialPackageService = credentialPackageService;
-            _badgrService = badgrService;
-            _revocationService = revocationService;
+            
         }
 
         public CredentialPackageViewModel CredentialPackageViewModel { get; set; }
@@ -66,48 +52,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
             if (package?.VerifiableCredential == null)
                 return new ObjectResult(new Verification(credentialPackageId.ToString(), error: "Cannot find the credential."));
 
-            var revocationResult = await _credentialPackageService.CheckRevocationAsync(package);
-            if (revocationResult.revoked)
-            {
-                return new OkObjectResult(new Verification(credentialPackageId.ToString(), message:
-                    "Revoked <img class='key-host-statement'" +
-                    $" src='{Request.PathBase}/images/noun_Info_742307.svg' style='width: 1.5em'" +
-                    $" data-toggle='tooltip' data-html='true' title='<div>{revocationResult.revocationReason}</div>' />"));
-            }
-
-            var verifiableCredential = JsonSerializer.Deserialize<VerifiableCredential>(package.VerifiableCredential.Json);
-            var verificationUrl = SanitizePath(verifiableCredential.Proof.VerificationMethod);
-
-            var pemString = await _connectService.GetKeyAsync(verificationUrl);
-
-            RSAParameters rsaParameters;
-            await using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(pemString)))
-            {
-                using var reader = new PemReader(stream);
-                rsaParameters = reader.ReadRsaKey();
-            }
-
-            if (verifiableCredential.VerifyProof(rsaParameters))
-            {
-                return new OkObjectResult(new Verification(credentialPackageId.ToString(), message:
-                    "Verified Proof <img class='key-host-statement'" +
-                    $" src='{Request.PathBase}/images/noun_Info_742307.svg' style='width: 1.5em'" +
-                    " data-toggle='tooltip' data-html='true' title='<div>Verification method" +
-                    $" was used to verify proof:</div>{verificationUrl}' />"));
-            }
-
-            return new OkObjectResult(new Verification(credentialPackageId.ToString(), message:
-                        "Proof could not be verified."));
-        }
-
-        private string SanitizePath(string url)
-        {
-            var builder = new UriBuilder(url);
-            if (builder.Path.StartsWith("//"))
-            {
-                builder.Path = builder.Path.Trim('/');
-            }
-            return builder.ToString();
+            return await CheckVerifiableCredential(package, credentialPackageId.ToString());
         }
 
         /// <summary>
@@ -155,26 +100,17 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
 
             if (!string.IsNullOrEmpty(assertionId))
             {
-                var assertionVM = clrVM.AllAssertions?.SingleOrDefault(a => a.Assertion.Id == assertionId && a.Assertion.IsSigned == false);
+                var assertionVM = clrVM.AllAssertions?.SingleOrDefault(a => a.Assertion.Id == assertionId);
 
-                if (assertionVM != null)
+                if (assertionVM != null && !assertionVM.Assertion.IsSigned)
                 {                    
                     result = await VerifyHostedAssertion(clrEntity, assertionVM.Assertion);
                 }
 
-                else if (clrVM.RawClrDType.SignedAssertions != null)
+                else if (assertionVM != null && assertionVM.Assertion.IsSigned)
                 {
-                    foreach (var signedAssertion in clrVM.RawClrDType.SignedAssertions)
-                    {
-                        var sa = signedAssertion.DeserializePayload<AssertionDType>();
-                        var publicKey = assertionVM.AchievementVM.Achievement.Issuer.PublicKey;
-
-                        if (assertionVM.Assertion.Id == assertionId)
-                        {
-                            result = await VerifySignature(assertionId, signedAssertion, publicKey);
-                            break;
-                        }
-                    }
+                    var publicKey = assertionVM.Assertion.Achievement.Issuer.PublicKey;
+                    result = await VerifySignature(assertionId, assertionVM.SignedAssertion, publicKey);
                 }
 
                 if (result == null)

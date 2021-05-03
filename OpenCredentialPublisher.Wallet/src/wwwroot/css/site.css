@@ -239,6 +239,9 @@ ul.list-group-plain > li {
 .highlights-group button, .highlights-group-button a {
   width: 124px; }
 
+.font-12 {
+  font-size: 12px; }
+
 .add-button-icon, .blank-icon, .callout-icon, .callout-icon-black, .checkmark-badge-icon, .checkmark-icon, .checkmark-icon-default, .checkmark-icon-verified, .checkmark-progress-checked, .checkmark-progress-default, .clock-icon, .credential-icon, .credential-icon-active, .credential-icon-default, .credential-icon-tab, .credential-icon-new, .details-button-icon, .details-icon, .expand-button-icon, .folio-icon, .folio-icon-active, .folio-icon-default, .folio-icon-tab, .logout-icon, .logout-icon-default, .paper-airplane-icon, .pencil-icon, .pencil-icon-gray, .remove-button-icon, .secure-icon, .transactions-icon-active, .transactions-icon-default, .transactions-icon-tab, .user-icon {
   align-items: center;
   padding: .375rem .75rem;

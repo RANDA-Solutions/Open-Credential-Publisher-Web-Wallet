@@ -8,7 +8,7 @@
         <section class="default-container p-5">
             <h1>Connect CLR Source</h1>
 
-            <div asp-validation-summary="All" class="alert alert-danger mt-2"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mt-2"></div>
 
             <div class="alert alert-primary">
                 <p>
@@ -43,29 +43,29 @@
         <div class="modal-dialog">
             <div class="modal-content" style="padding-bottom:60px;">
                 <div class="modal-header" style="border-bottom:none;">
-                    <span aria-hidden="true" class="remove-button-icon" data-dismiss="modal" style="margin-top:9px;cursor:pointer"></span>
-                    <h5 class="modal-title"></h5>
-                    <button type="button" class="btn btn-lg btn-outline-primary" data-dismiss="modal" aria-label="Verify">
-                        <span aria-hidden="true">Cancel</span>
-                    </button>
+                    <div class="col-12">
+                    <h4>Use your Badgr Login to connect to Badgr.</h4>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <form id="formClientLogin" method="post" asp-page-handler="Basic">
                         <input id="hidSelectedSource" type="hidden" name="SelectedSourceBasic" />
                         <div class="input-group mb-3">
                             <div class="input-group-prepend mr-3">
-                                <span class="user-icon"></span>
+                                <span><i class="fal fa-user fa-2x icon-color"></i></span>
                             </div>
                             <input name="username" placeholder="Username or Email" class="form-control" />
                         </div>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend mr-3">
-                                <span class="secure-icon"></span>
+                                <span><i class="fal fa-lock-alt fa-2x icon-color"></i></span>
                             </div>
-                            <input name="password" placeholder="Password" class="form-control" />
+                            <input name="password" placeholder="Password" class="form-control" type="password"/>
                         </div>
-                        <div class="row mt-5">
-                                <button type="submit">Test</button>
+                    <p>This information is sent directly to Badgr and for your protection is never saved by Teacher Wallet.</p>
+                        <div class="row mt-5 justify-content-around">
+                                <button type="submit" id="btn-login-form" class="btn btn-outline-primary btn-lg">LOGIN</button>
+                                <button type="button" id="btn-login-cancel" class="btn btn-outline-primary btn-lg"  data-dismiss="modal">CANCEL</button>
                             </div>
                     </form>
                 </div>
@@ -78,12 +78,17 @@
         $(".modal-dialog").css("width", "60%");
         
         function connect() {
-            var clientIds = "@(Model.ClientSourceIds)".split(",");
-            if (clientIds.includes($("#SelectedSource").val())) {
-                $("#hidSelectedSource").val($("#SelectedSource").val());
-                $('#modal-connect-provider').modal('show');
+            if ("@(Model.ClientSourceIds)".length > 0 && $("#SelectedSource").val())
+            {
+                var clientIds = "@(Model.ClientSourceIds)".split(",");
+                if (clientIds.includes($("#SelectedSource").val())) {
+                    $("#hidSelectedSource").val($("#SelectedSource").val());
+                    $('#modal-connect-provider').modal({backdrop: 'static'});
+                } else {
+                    $("#btnSubmit").click();
+                }
             } else {
-                $("#btnSubmit").click();
+                 $("#btnSubmit").click();
             }
         }
     </script>

@@ -37,6 +37,7 @@ namespace OpenCredentialPublisher.ClrWallet
 {
     public class Startup
     {
+
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
@@ -121,7 +122,7 @@ namespace OpenCredentialPublisher.ClrWallet
 
             services.AddSingleton<HostSettings>(sp => Configuration.GetSection(nameof(HostSettings)).Get<HostSettings>());
             services.AddSingleton<MailSettings>(sp => Configuration.GetSection(nameof(MailSettings)).Get<MailSettings>());
-
+            services.AddTransient<EmailService>();
             services.AddTransient<IEmailSender, EmailService>();
             services.AddSingleton<ISigningCredentialStore, IdentityCertificateService>();
             services.AddSingleton<IValidationKeysStore, IdentityCertificateService>();
@@ -180,6 +181,10 @@ namespace OpenCredentialPublisher.ClrWallet
                             sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddAspNetIdentity<ApplicationUser>();
+
+            if (Environment.IsDevelopmentOrLocalhost())
+                builder.AddDeveloperSigningCredential();
+
             var siteSettings = Configuration.GetSection(SiteSettingsOptions.Section).Get<SiteSettingsOptions>();
 
             services.AddRazorPages(options =>
@@ -227,6 +232,7 @@ namespace OpenCredentialPublisher.ClrWallet
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
             }
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCors();

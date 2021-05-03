@@ -21,43 +21,43 @@
                     <dl class="row">
                         @if (Model.CreditsAvailable.HasValue)
                         {
-                            <dt class="col-sm-3">Credits Available</dt>
-                            <dd class="col-sm-9">@Model.CreditsAvailable</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Credits Available</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@Model.CreditsAvailable</dd>
                         }
                         @if (Model.Description != null)
                         {
-                            <dt class="col-sm-3">Description</dt>
-                            <dd class="col-sm-9">@Html.Raw(Model.Description)</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Description</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@Html.Raw(Model.Description)</dd>
                         }
                         @if (Model.FieldOfStudy != null)
                         {
-                            <dt class="col-sm-3">Field of Study</dt>
-                            <dd class="col-sm-9">@Model.FieldOfStudy</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Field of Study</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@Model.FieldOfStudy</dd>
                         }
                         @if (Model.HumanCode != null)
                         {
-                            <dt class="col-sm-3">Human Code</dt>
-                            <dd class="col-sm-9">@Model.HumanCode</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Human Code</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@Model.HumanCode</dd>
                         }
                         @if (Model.Level != null)
                         {
-                            <dt class="col-sm-3">Level</dt>
-                            <dd class="col-sm-9">@Model.Level</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Level</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@Model.Level</dd>
                         }
                         @if (Model.Requirement != null)
                         {
-                            <dt class="col-sm-3">Requirement</dt>
-                            <dd class="col-sm-9 markdown">@Model.Requirement.Narrative</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Requirement</dt>
+                            <dd class="col-12 col-sm-8 col-md-9 markdown">@Model.Requirement.Narrative</dd>
                         }
                         @if (Model.Specialization != null)
                         {
-                            <dt class="col-sm-3">Specialization</dt>
-                            <dd class="col-sm-9">@Model.Specialization</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Specialization</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@Model.Specialization</dd>
                         }
                         @if (Model.Tags != null)
                         {
-                            <dt class="col-sm-3">Tags</dt>
-                            <dd class="col-sm-9">@string.Join(", ", Model.Tags)</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Tags</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@string.Join(", ", Model.Tags)</dd>
                         }
                         @{
                             var achievementTypes = "<div>Achievement</div>" +
@@ -77,12 +77,12 @@
                                          "<div>Membership</div>";
                         }
 
-                        <dt class="col-sm-3">
+                        <dt class="col-12 col-sm-4 col-md-3">
                             Type
                             <img src="~/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
                                  data-toggle="tooltip" data-html="true" title="@achievementTypes" />
                         </dt>
-                        <dd class="col-sm-9">@Model.AchievementType</dd>
+                        <dd class="col-12 col-sm-8 col-md-9">@Model.AchievementType</dd>
                     </dl>
                 </div>
             </div>
@@ -126,24 +126,24 @@
                                         {
                                             <li class="list-group-item">
                                                 <dl class="row">
-                                                    <dt class="col-sm-3">Name</dt>
-                                                    <dd class="col-sm-9">@resultDescription.Name</dd>
-                                                    <dt class="col-sm-3">Type</dt>
-                                                    <dd class="col-sm-9">@resultDescription.ResultType</dd>
+                                                    <dt class="col-12 col-sm-4 col-md-3">Name</dt>
+                                                    <dd class="col-12 col-sm-8 col-md-9">@resultDescription.Name</dd>
+                                                    <dt class="col-12 col-sm-4 col-md-3">Type</dt>
+                                                    <dd class="col-12 col-sm-8 col-md-9">@resultDescription.ResultType</dd>
                                                     @if (resultDescription.AllowedValues != null)
                                                     {
-                                                        <dt class="col-sm-3">Allowed</dt>
-                                                        <dd class="col-sm-9">@string.Join(", ", resultDescription.AllowedValues)</dd>
+                                                        <dt class="col-12 col-sm-4 col-md-3">Allowed</dt>
+                                                        <dd class="col-12 col-sm-8 col-md-9">@string.Join(", ", resultDescription.AllowedValues)</dd>
                                                     }
                                                     @if (resultDescription.ValueMin != null)
                                                     {
-                                                        <dt class="col-sm-3">Min</dt>
-                                                        <dd class="col-sm-9">@resultDescription.ValueMin</dd>
+                                                        <dt class="col-12 col-sm-4 col-md-3">Min</dt>
+                                                        <dd class="col-12 col-sm-8 col-md-9">@resultDescription.ValueMin</dd>
                                                     }
                                                     @if (resultDescription.ValueMax != null)
                                                     {
-                                                        <dt class="col-sm-3">Max</dt>
-                                                        <dd class="col-sm-9">@resultDescription.ValueMax</dd>
+                                                        <dt class="col-12 col-sm-4 col-md-3">Max</dt>
+                                                        <dd class="col-12 col-sm-8 col-md-9">@resultDescription.ValueMax</dd>
                                                     }
                                                 </dl>
                                             </li>
@@ -210,7 +210,7 @@
                                             <dd class="col-sm-10">@alignment.TargetType</dd>
                                             <dt class="col-sm-2">Name</dt>
                                             <dd class="col-sm-10">
-                                                <a href="@alignment.TargetUrl">@alignment.TargetName</a>
+                                                <a href="@alignment.TargetUrl" target="_blank">@alignment.TargetName</a>
                                             </dd>
                                             <dt class="col-sm-2">Description</dt>
                                             <dd class="col-sm-10">@alignment.TargetDescription</dd>
@@ -269,8 +269,8 @@
                                     <dl class="row">
                                         @foreach (var key in Model.AdditionalProperties.Keys)
                                         {
-                                            <dt class="col-sm-3">@key</dt>
-                                            <dd class="col-sm-9">@Model.AdditionalProperties[key]</dd>
+                                            <dt class="col-12 col-sm-4 col-md-3">@key</dt>
+                                            <dd class="col-12 col-sm-8 col-md-9">@Model.AdditionalProperties[key]</dd>
                                         }
                                     </dl>
                                 }

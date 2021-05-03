@@ -67,7 +67,8 @@ namespace OpenCredentialPublisher.Services.Implementations
             else
             {
                 var versionNumber = Convert.ToInt32(version.Replace(".", String.Empty));
-                version = $"{++versionNumber}".Insert(1, ".");
+                version = $"{ ++versionNumber:00}";
+                version = version.Insert(version.Length - 1, ".");
             }
             var credentialSchema = new CredentialSchema
             {

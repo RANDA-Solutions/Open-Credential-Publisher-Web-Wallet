@@ -1,20 +1,24 @@
+@using OpenCredentialPublisher.Data.Options;
+@using Microsoft.Extensions.Options;
+@inject IOptions<SiteSettingsOptions> SiteSettings
 <!DOCTYPE html>
-<html>
+<html class="h-100">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CLR Wallet</title>
-
+    <partial name="_TitlePartial" />
     <partial name="_StylesPartial" />
 </head>
-<body>
+<body class="h-100 d-flex flex-column">
     <div id="loader" style="display:none"></div>
     <div class="container">
         <partial name="_CookieConsentPartial" />
-        <main role="main" class="pb-3">
+        <main role="main" class="mb-3">
             @RenderBody()
         </main>
     </div>
+
+    <partial name="_FooterPartial" />
 
     <partial name="_ScriptsPartial" />
     <script src="~/js/site.js" asp-append-version="true"></script>

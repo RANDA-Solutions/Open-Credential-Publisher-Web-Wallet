@@ -24,8 +24,8 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
         [NotMapped]
         public List<PdfShareViewModel> Pdfs { get; set; } = new List<PdfShareViewModel>();
 
-        [NotMapped]
-        public bool HasPdfs => Pdfs.Any();
+        [NotMapped, JsonIgnore]
+        public bool HasPdfs => Pdfs.Any(e => e.IsPdf);
 
         public static CredentialPackageViewModel FromCredentialPackageModel(CredentialPackageModel pkg)
         {

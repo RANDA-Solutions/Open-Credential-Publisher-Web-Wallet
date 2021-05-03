@@ -28,7 +28,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
         public async Task OnGet()
         {
             LinkVMs = new List<LinkViewModel>();
-            var links = await _linkService.GetAllDeepAsync(User.UserId());
+            var links = _linkService.GetAllDeep(User.UserId()).OrderByDescending(l => l.CreatedAt);
 
             foreach (var link in links)
             {

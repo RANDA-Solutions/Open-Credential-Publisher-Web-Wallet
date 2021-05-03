@@ -15,20 +15,26 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Shared.Utilities;
+using OpenCredentialPublisher.Data.Options;
+using Microsoft.Extensions.Options;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 {
     public class SharePageModel : PageModel
     {
-        private readonly IEmailSender _emailSender;
+        private readonly EmailService _emailSender;
         private readonly EmailHelperService _emailHelperService;
         private readonly LinkService _linkService;
+        private readonly CredentialService _credentialService;
+        private readonly SiteSettingsOptions _siteSettings;
 
-        public SharePageModel(IEmailSender emailSender, EmailHelperService emailHelperService, LinkService linkService)
+        public SharePageModel(EmailService emailSender, EmailHelperService emailHelperService, LinkService linkService, CredentialService credentialService, IOptions<SiteSettingsOptions> siteSettings)
         {
             _emailSender = emailSender;
             _emailHelperService = emailHelperService;
             _linkService = linkService;
+            _credentialService = credentialService;
+            _siteSettings = siteSettings?.Value;
         }
 
         public LinkModel Link { get; set; }
@@ -64,11 +70,15 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 
             await _linkService.AddShareAsync(shareModel);
 
+
+            var link = LinkViewModel.FromLinkModel(Link);
+            var learner_name = link.ClrVM.RawClrDType.Learner.Name;
+
             var message = new MessageModel
             {
                 Recipient = recipient.Email,
-                Body = $"A link has been shared with you!<br />You'll be asked to supply the access key before you may view the shared link.<br /> Please copy the access key {shareModel.AccessKey} and then click the following link, {GetLinkUrl(Link.Id)}",
-                Subject = "Share Request",
+                Body = $"Hello!<br />You have received a verifiable credential from {learner_name}. This credential is the student’s official electronic transcript.<br /><br />Use this unique link to locate the credential: {GetLinkUrl(Link.Id)}<br />You will need this key to access the credential: {shareModel.AccessKey}<br /><br />Once verified, you may download evidence in the form of a transcript document from the verified credential and upload it as needed.<br /><br />Thank you.<br /><br /><hr><p style='font-size: 12px;'><u>About ND Electronic Transcripts</u><br />North Dakota eTranscripts is a free high school transcript exchange system built through the Statewide Longitudinal Data System, allowing for high schools to exchange electronic records within the state as well as to out-of-state colleges. Since the inception of eTranscripts, over 40,000 high school transcripts have been sent, proving the state eTranscripts system saves significant time and cost, which increases efficiencies for both high school and college offices. The {_siteSettings.SiteName} consumes this eTranscript, packages, and signs it as a verifiable credential in the widely accepted IMS Global CLR format for higher education institutions. The student also has the ability to push their Transcript to a cryptographically verifiable mobile wallet.</p>",
+                Subject = $"Verifiable Transcript Credential for {learner_name}",
                 SendAttempts = 0,
                 StatusId = StatusEnum.Created,
                 CreatedOn = DateTimeOffset.UtcNow,
@@ -81,7 +91,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
             Link.ModifiedAt = DateTimeOffset.UtcNow;
             await _linkService.UpdateAsync(Link);
 
-            await _emailSender.SendEmailAsync(message.Recipient, message.Subject, message.Body);
+            await _emailSender.SendEmailAsync(message.Recipient, message.Subject, message.Body, true);
 
             await _emailHelperService.UpdateMessageAsync(message);
 

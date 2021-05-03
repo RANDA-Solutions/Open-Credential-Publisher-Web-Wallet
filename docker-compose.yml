@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  opencredentialpublisher.wallet:
+    image: opencredentialpublisherwallet:linux
+    build:
+      context: .
+      dockerfile: OpenCredentialPublisher.Wallet/src/Dockerfile
+    depends_on:
+      - opencredentialpublisher.verityfunctionapp
+
+  opencredentialpublisher.verityfunctionapp:
+    image: opencredentialpublisherverityfunctionapp:linux
+    build:
+      context: .
+      dockerfile: OpenCredentialPublisher.VerityFunctionApp/Dockerfile

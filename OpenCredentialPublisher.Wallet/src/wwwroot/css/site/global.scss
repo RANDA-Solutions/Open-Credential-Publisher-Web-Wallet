@@ -21,9 +21,13 @@
     box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
 }
 
+.navbar-brand .logo-image {
+    height: 80px;
+}
 
 .profile-container {
     position: relative;
+    width: 320px;
     height: 450px;
 }
 
@@ -122,7 +126,7 @@
 }
 
 .profile-body {
-    
+    width: 300px;
     height: 380px;
     border-radius: 10px;
     background-color: white;
@@ -309,4 +313,8 @@ ul.list-group-plain > li {
 
 .highlights-group button, .highlights-group-button a {
     width: 124px;
+}
+
+.font-12 {
+    font-size: 12px;
 }

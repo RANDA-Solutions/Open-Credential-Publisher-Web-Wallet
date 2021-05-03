@@ -1,2 +1,4 @@
-
-<img class="logo-image mx-auto d-block" src="~/images/ocp-logo.png" alt="OPEN CREDENTIAL PUBLISHER" />
+@using OpenCredentialPublisher.Data.Options;
+@using Microsoft.Extensions.Options;
+@inject IOptions<SiteSettingsOptions> SiteSettings
+<img class="logo-image mx-auto d-block" src="~/images/ocp-logo.png" alt="@SiteSettings?.Value?.SiteName" />

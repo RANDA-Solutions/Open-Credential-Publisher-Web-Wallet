@@ -30,10 +30,10 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 
         public async Task OnGet()
         {
-            var clrs = await _credentialService.GetAllClrsAsync(User.UserId());
+            var clrs = _credentialService.GetAllClrs(User.UserId());
 
             Links = new List<LinkViewModel>();
-            foreach (var clr in clrs.OrderBy(c => c.IssuedOn).ThenBy(c => c.Name))
+            foreach (var clr in clrs.OrderByDescending(c => c.CredentialPackage.CreatedAt).ThenBy(c => c.Name))
             {
                 var clrVm = ClrViewModel.FromClrModel(clr);
                 Links.Add(new LinkViewModel

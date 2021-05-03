@@ -1,6 +1,8 @@
 @using Microsoft.AspNetCore.Identity
 @using OpenCredentialPublisher.Data.Models
-
+@using OpenCredentialPublisher.Data.Options;
+@using Microsoft.Extensions.Options;
+@inject IOptions<SiteSettingsOptions> SiteSettings
 @inject SignInManager<ApplicationUser> SignInManager
 
 
@@ -8,7 +10,7 @@
     <div class="container">
         <nav class="navbar navbar-expand-md navbar-toggleable-md navbar-dark border-bottom box-shadow mb-3">
             <a class="navbar-brand" href="/Credentials">
-                <img src="~/images/ocp-logo.png" class="logo-image" alt="OPEN CREDENTIAL PUBLISHER" />
+                <img src="~/images/ocp-logo.png" class="logo-image" alt="@SiteSettings?.Value?.SiteName" />
             </a>
             @if (SignInManager.IsSignedIn(User))
             {

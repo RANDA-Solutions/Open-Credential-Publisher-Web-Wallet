@@ -2,84 +2,80 @@
 @using OpenCredentialPublisher.Wallet.Extensions;
 @model OpenCredentialPublisher.ClrWallet.Pages.Links.IndexModel
 @{
-    ViewData["Title"] = "Links";
+    ViewData["Title"] = "Share your credential";
 }
 
 <div class="row mt-5">
     <div class="col">
         <section class="default-container p-5">
-            <h1>Your shared credentials</h1>
+            <h1>@ViewData["Title"]</h1>
 
-            <div class="alert alert-primary">
-                A link is a URL you can share with people that lets them see your credential. The people that click on the link will
-                only be able to see the one credential you select. You can see how many times people have displayed your credential in the
-                table below.
+            <div class="alert alert-primary font-16">
+                You have three options to share your credential
+                <ol>
+                    <li>
+                        Below you will see a shareable link.  Copy and paste as needed.
+                    </li>
+                    <li>
+                        Download a PDF copy of your shareable credential.
+                    </li>
+                    <li>
+                        Generate an email.
+                    </li>
+                </ol>
             </div>
 
             <a asp-page="./Create">Share a credential</a>
 
-            <table class="table">
+            <table class="table table-responsive">
                 <thead>
                     <tr>
-                        <th colspan="5">CLR</th>
+                        <th colspan="4">CLR</th>
                         <th colspan="4">Link</th>
                     </tr>
                     <tr>
-                        <th></th>
+                        <th>Nickname</th>
                         <th>Publisher</th>
-                        <th>Name</th>
                         <th>Published</th>
                         <th>Added</th>
                         <th>Shareable Link</th>
                         <th class="text-center">Display Count</th>
-                        <th>Nickname</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var linkVM in Model.LinkVMs)
                     {
-                        <tr>
-                            <td>
-                                @if (linkVM.ClrVM.Clr.Authorization == null)
+                    <tr>
+                        <td>@linkVM.Link.Nickname</td>
+                        <td>@linkVM.ClrVM.Clr.PublisherName</td>
+                        <td>@linkVM.ClrVM.Clr.IssuedOn.ToShortDateString()</td>
+                        <td>@(linkVM.ClrVM.AncestorCredentialPackage.CreatedAt.ToString("g")) </td>
+                        <td class="overflow-hidden" style="max-width: 20em;">
+                            <a href="@Model.GetLinkUrl(linkVM.Link.Id)">@Model.GetLinkUrl(linkVM.Link.Id)</a>
+                        </td>
+                        <td class="text-center">@linkVM.Link.DisplayCount</td>
+
+                        <td style="white-space: nowrap">
+                            @if (linkVM.ClrVM.HasPdf)
+                            {
+                                foreach (var pdf in linkVM.ClrVM.Pdfs)
                                 {
-                                    <span>Upload</span>
+                                    <form method="post">
+                                        <input type="hidden" name="id" value="@linkVM.Link.Id" />
+                                        <input type="hidden" name="clrId" value="@pdf.ClrId" />
+                                        <input type="hidden" name="assertionId" value="@pdf.AssertionId" />
+                                        <input type="hidden" name="artifactId" value="@pdf.ArtifactId" />
+                                        <input type="hidden" name="evidenceName" value="@pdf.EvidenceName" />
+                                        <input type="hidden" name="artifactName" value="@pdf.ArtifactName" />
+                                        <button type="submit" class="btn text-primary btn-sm " title="View @pdf.ArtifactName" asp-page-handler="Pdf"><i class="fas fa-file-pdf fa-2x"></i></button>
+                                    </form>
                                 }
-                                else
-                                {
-                                    <img src="~/images/noun_right_975614.svg" height="30" width="30"
-                                         title="Source: @linkVM.ClrVM.Clr.Authorization.Source.Name" />
-                                }
-                            </td>
-                            <td>@linkVM.ClrVM.Clr.PublisherName</td>
-                            <td>@linkVM.ClrVM.Clr.Name</td>
-                            <td>@linkVM.ClrVM.Clr.IssuedOn.ToShortDateString()</td>
-                            <td>@(linkVM.ClrVM.AncestorCredentialPackage.CreatedAt.ToShortDateString()) </td>
-                            <td class="overflow-hidden" style="max-width: 20em;">
-                                <a href="@Model.GetLinkUrl(linkVM.Link.Id)">@Model.GetLinkUrl(linkVM.Link.Id)</a>
-                            </td>
-                            <td class="text-center">@linkVM.Link.DisplayCount</td>
-                            <td>@linkVM.Link.Nickname</td>
-                            <td style="white-space: nowrap">
-                                @if (linkVM.ClrVM.HasPdf)
-                                {
-                                    foreach (var pdf in linkVM.ClrVM.Pdfs)
-                                    {
-                                <form method="post">
-                                    <input type="hidden" name="id"  value="@linkVM.Link.Id" />
-                                    <input type="hidden" name="clrId" value="@pdf.ClrId" />
-                                    <input type="hidden" name="assertionId" value="@pdf.AssertionId" />
-                                    <input type="hidden" name="artifactId" value="@pdf.ArtifactId" />
-                                    <input type="hidden" name="evidenceName" value="@pdf.EvidenceName" />
-                                    <input type="hidden" name="artifactName" value="@pdf.ArtifactName" />
-                                    <button type="submit" class="btn text-primary btn-sm " title="View @pdf.ArtifactName" asp-page-handler="Pdf"><i class="fas fa-file-pdf fa-2x"></i></button>
-                                </form>
-                                    }
-                                }
-                                <a asp-page="./Share" asp-route-id="@linkVM.Link.Id" title="Share Through Email"><i class="fas fa-upload fa-2x"></i></a>
-                                <a asp-page="./Delete" asp-route-id="@linkVM.Link.Id" title="Delete Link"><i class="fas fa-trash fa-2x"></i></a>
-                            </td>
-                        </tr>
+                            }
+                            <a asp-page="./Share" asp-route-id="@linkVM.Link.Id" title="Share Through Email"><i class="fas fa-upload fa-2x"></i></a>
+                            <a asp-page="./Delete" asp-route-id="@linkVM.Link.Id" title="Delete Link"><i class="fas fa-trash fa-2x"></i></a>
+                        </td>
+                    </tr>
                     }
                 </tbody>
             </table>

@@ -6,53 +6,53 @@ var resultId = ViewData["CredentialPackageId"];
 <div class="row">
     <div class="col">
         <dl class="row">
-            <dt class="col-sm-3">Type</dt>
-            <dd class="col-sm-9">
+            <dt class="col-12 col-sm-4 col-md-3">Type</dt>
+            <dd class="col-12 col-sm-8 col-md-9">
                 @Model.Type
             </dd>
-            <dt class="col-sm-3">Created</dt>
-            <dd class="col-sm-9">
+            <dt class="col-12 col-sm-4 col-md-3">Created</dt>
+            <dd class="col-12 col-sm-8 col-md-9">
                 @Model.Created.ToLocalTime().ToString("g")
             </dd>
-            <dt class="col-sm-3">Purpose</dt>
-            <dd class="col-sm-9">
+            <dt class="col-12 col-sm-4 col-md-3">Purpose</dt>
+            <dd class="col-12 col-sm-8 col-md-9">
                 @Model.ProofPurpose
             </dd>
         </dl>
     </div>
     <div class="col">
         <div class="row">
-            <div class="col-sm-3">
+            <div class="col-12 col-sm-4 col-md-3">
                 <form method="post" action="?handler=VerifiableCredential" data-ajax="true" data-ajax-method="post" data-ajax-loading="#loader" data-ajax-complete="proof_verification_complete">
                     <input type="hidden" name="credentialPackageId" value="@ViewData["CredentialPackageId"]" />
                     <input type="submit" class="btn btn-info" asp-page-handler="VerifiableCredential" value="Verify" />
                     @Html.AntiForgeryToken()
                 </form>
             </div>
-            <div class="col-sm-9">
-                <span class="col-sm-9" id="verifiable-credential-proof-result"></span>
+            <div class="col-12 col-sm-8 col-md-9">
+                <span class="col-12 col-sm-8 col-md-9" id="verifiable-credential-proof-result"></span>
             </div>
         </div>
     </div>
     
 </div>
 <dl class="row">
-    <dt class="col-sm-3">Verification Method</dt>
-    <dd class="col-sm-9">
+    <dt class="col-12 col-sm-4 col-md-3">Verification Method</dt>
+    <dd class="col-12 col-sm-8 col-md-9">
         @Model.VerificationMethod
     </dd>
     @if (Model.Challenge != null)
     {
-        <dt class="col-sm-3">Challenge</dt>
-        <dd class="col-sm-9">@Model.Challenge</dd>
+        <dt class="col-12 col-sm-4 col-md-3">Challenge</dt>
+        <dd class="col-12 col-sm-8 col-md-9">@Model.Challenge</dd>
     }
     @if (Model.Domain != null)
     {
-        <dt class="col-sm-3">Domain</dt>
-        <dd class="col-sm-9">@Model.Domain</dd>
+        <dt class="col-12 col-sm-4 col-md-3">Domain</dt>
+        <dd class="col-12 col-sm-8 col-md-9">@Model.Domain</dd>
     }
-    <dt class="col-sm-3">Signature</dt>
-    <dd class="col-sm-9">
+    <dt class="col-12 col-sm-4 col-md-3">Signature</dt>
+    <dd class="col-12 col-sm-8 col-md-9">
         @Model.Signature
     </dd>
 

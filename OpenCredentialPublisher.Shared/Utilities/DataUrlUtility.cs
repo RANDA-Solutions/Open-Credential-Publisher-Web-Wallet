@@ -23,5 +23,15 @@ namespace OpenCredentialPublisher.Shared.Utilities
             }
             return (null, null);
         }
+
+        public static string GetMediaType(string dataUrl)
+        {
+            var match = Regex.Match(dataUrl, @"data:(?<mime>\w*/\w*);base64,(?<data>[a-zA-Z0-9+/=]*)");
+            if (match.Success)
+            {
+                return match.Groups["mime"].Value;
+            }
+            return "text/plain";
+        }
     }
 }

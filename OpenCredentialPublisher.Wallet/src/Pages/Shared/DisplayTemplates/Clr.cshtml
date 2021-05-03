@@ -2,79 +2,108 @@
 @model ClrViewModel
 @{
     ViewData["Title"] = "Comprehensive Learner Record";
+    var hideClrVerification = (bool)(ViewData["HideClrVerification"] ?? default(bool));
 }
-
-<button onclick="topFunction()" id="topBtn" title="Go to top">Top</button>
 
 @* Header *@
 
 <div class="row credential-row mb-3">
     <div class="col">
         <div class="card mt-3 mb-3">
-            <h5 class="card-header pg-info">
+            <div class="h5 card-header pg-info" data-toggle="collapse" data-target=".clr-section">
                 CLR @if (@Model.Clr.IsRevoked)
                     {
                         <span class="alert-danger">REVOKED</span>
-                    }</h5>
-            <div class="card-body card-deck">
-                <div class="card border-0">
-                    <dl class="row">
-                        <dt class="col-sm-3">Id</dt>
-                        <dd class="col-sm-9">@Html.DisplayFor(x => x.Clr.Identifier, "Uri")</dd>
-                        <dt class="col-sm-3">Issued</dt>
-                        <dd class="col-sm-9">@Model.Clr.IssuedOn</dd>
-                        @if (Model.Clr.Name != null)
-                        {
-                            <dt class="col-sm-3">Name</dt>
-                            <dd class="col-sm-9">@Model.Clr.Name</dd>
-                        }
-                    </dl>
+                    }</div>
+            <div class="card-body clr-section collapse" id="clr">
+                <div class="row ">
+                    <div class="col border-0">
+                        <dl class="row">
+                            <dt class="col-12 col-sm-4 col-md-3">Id</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@Html.DisplayFor(x => x.Clr.Identifier, "Uri")</dd>
+                            <dt class="col-12 col-sm-4 col-md-3">Issued</dt>
+                            <dd class="col-12 col-sm-8 col-md-9">@Model.Clr.IssuedOn</dd>
+                            @if (Model.Clr.Name != null)
+                            {
+                                <dt class="col-12 col-sm-4 col-md-3">Name</dt>
+                                <dd class="col-12 col-sm-8 col-md-9">@Model.Clr.Name</dd>
+                            }
+                        </dl>
+                    </div>
+                    @if (!hideClrVerification)
+                    {
+                    <div class="col border-0">
+                        @Html.DisplayFor(m => Model.RawClrDType.Verification, "Verification", new { ClrEntityId = Model.Clr.Id, ClrId = Model.Clr.Identifier })
+                    </div>
+                    }
+
                 </div>
+                
+                @*<div class="card border-0">
+            <div class="row">
                 <div class="card border-0">
-                    <div class="row">
-                        <div class="card border-0">
-                            <div class="card-body pb-0 pt-0">
-                                @Html.DisplayFor(m => Model.RawClrDType.Verification, "Verification", new { ClrEntityId = Model.Clr.Id, ClrId = Model.Clr.Identifier })
-                            </div>
-                        </div>
+                    <div class="card-body pb-0 pt-0">
+
                     </div>
                 </div>
             </div>
+        </div>*@
+
+            </div>
+            <div class="card-footer clr-section collapse">
+                <button class="btn btn-outline-secondary btn-sm float-right" data-toggle="collapse" data-target="#clr-what">What is this?</button>
+                <p class="collapse" id="clr-what">
+                    Comprehensive Learner Record (CLR): Your learning achievements contained in the document
+                </p>
+            </div>
         </div>
 
-        <div class="card-deck">
+        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2">
+            <div class="col mb-3">
+                @* Learner *@
 
-            @* Learner *@
-
-            <div class="card">
-                <h5 class="card-header pg-info">Learner</h5>
-                <div class="card-body">
-                    @Html.DisplayFor(m => m.RawClrDType.Learner, "Profile", new { ClrEntityId = Model.Clr.Id, ProfileType = "Learner" })
+                <div class="card">
+                    <div class="h5 card-header pg-info" data-toggle="collapse" data-target=".learner-section">Learner</div>
+                    <div class="card-body learner-section">
+                        @Html.DisplayFor(m => m.RawClrDType.Learner, "Profile", new { ClrEntityId = Model.Clr.Id, ProfileType = "Learner" })
+                    </div>
+                    <div class="card-footer learner-section">
+                        <button class="btn btn-outline-secondary btn-sm float-right" data-toggle="collapse" data-target="#learner-what">What is this?</button>
+                        <p class="collapse" id="learner-what">
+                            Learner: Credential Holder
+                        </p>
+                    </div>
                 </div>
             </div>
-
             @* Publisher *@
-
+        <div class="col mb-3">
             <div class="card">
                 @if (Model.RawClrDType.Learner.Id == Model.RawClrDType.Publisher.Id)
                 {
-                    <h5 class="card-header bg-warning">Publisher (Self-Published)</h5>
+                    <div class="h5 card-header bg-warning" data-toggle="collapse" data-target=".publisher-section">Publisher (Self-Published)</div>
                 }
                 else
                 {
-                    <h5 class="card-header pg-info">Publisher</h5>
+                    <div class="h5 card-header pg-info" data-toggle="collapse" data-target=".publisher-section">Publisher</div>
                 }
-                <div class="card-body">
+                <div class="card-body publisher-section">
                     @Html.DisplayFor(m => m.RawClrDType.Publisher, "Profile", new { ClrEntityId = Model.Clr.Id, ProfileType = "Publisher" })
                 </div>
+                <div class="card-footer publisher-section">
+                    <button class="btn btn-outline-secondary btn-sm float-right" data-toggle="collapse" data-target="#publisher-what">What is this?</button>
+                    <p class="collapse" id="publisher-what">
+                        Publisher: The authoritative source who issued the document
+                    </p>
+                </div>
             </div>
+        </div>
         </div>
 
         @* Assertions *@
 
         @if (Model.AllAssertions.Any())
         {
-            <h5 class="col mt-3 text-center">Assertions</h5>
+    <h5 class="col mt-3 text-center">Assertions<br /><small class="text-muted">The information and achievements contained in the credential</small></h5>
 
             @foreach (var assertion in Model.ParentAssertions)
             {

@@ -76,6 +76,21 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             return result;
         }
+
+        public IQueryable<LinkModel> GetAllDeep(string userId)
+        {
+            var result = _context.Links
+                .Include(l => l.Shares)
+                .Include(l => l.Clr)
+                .ThenInclude(c => c.CredentialPackage)
+                .Include(l => l.Clr)
+                .ThenInclude(c => c.ClrSet)
+                .ThenInclude(c => c.CredentialPackage)
+                .Where(l => l.UserId == userId);
+
+            return result;
+        }
+
         public async Task<LinkModel> GetAsync(string userId, string id)
         {
             return await _context.Links
@@ -83,6 +98,16 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .Include(l => l.Clr)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == userId && x.Id == id);
+        }
+
+        public async Task<LinkModel> GetAsync(string userId, int clrId)
+        {
+            return await _context.Links
+                .Include(l => l.Shares)
+                .Include(l => l.Clr)
+                .AsNoTracking()
+                .OrderByDescending(l => l.CreatedAt)
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.ClrForeignKey == clrId);
         }
 
         public async Task<LinkModel> GetAsync(string id)
@@ -117,6 +142,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             return result;
         }
+
         public async Task<ShareModel> AddShareAsync(ShareModel input)
         {
             await _context.Shares.AddAsync(input);
