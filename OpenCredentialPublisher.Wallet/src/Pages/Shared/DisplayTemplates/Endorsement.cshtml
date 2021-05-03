@@ -4,12 +4,12 @@
     <div class="card-deck">
         <div class="card border-0">
             <dl class="row">
-                    <dt class="col-sm-3">Issued On</dt>
-                    <dd class="col-sm-9">@Model.IssuedOn</dd>
+                    <dt class="col-12 col-sm-4 col-md-3">Issued On</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">@Model.IssuedOn</dd>
                 @if (Model.Claim != null)
                 {
-                    <dt class="col-sm-3">Claim</dt>
-                    <dd class="col-sm-9">@Model.Claim.EndorsementComment</dd>
+                    <dt class="col-12 col-sm-4 col-md-3">Claim</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">@Model.Claim.EndorsementComment</dd>
                 }
             </dl>
             @Html.DisplayFor(m => Model.Verification, "Verification", new { ClrEntityId = ViewData["ClrEntityId"], EndorsementId = Model.Id })

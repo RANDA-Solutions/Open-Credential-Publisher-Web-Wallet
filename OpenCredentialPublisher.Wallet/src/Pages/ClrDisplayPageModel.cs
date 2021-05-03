@@ -28,27 +28,19 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages
 {
-    public class ClrDisplayPageModel : PageModel
+    public class ClrDisplayPageModel : DisplayPageModel
     {
-        protected readonly IHttpClientFactory Factory;
-        protected readonly ClrService ClrService;
-        protected readonly BadgrService BadgrService;
-        protected readonly CredentialService CredentialService;
-        protected readonly RevocationService RevocationService;
         protected RevocationListModel _revocationsListModel = new RevocationListModel(new List<RevocationModel>());
         protected ClrDisplayPageModel(
             CredentialService credentialService,
+            ConnectService connectService,
             IHttpClientFactory factory,
             IConfiguration configuration,
             RevocationService revocationService,
             ClrService clrService,
-            BadgrService badgrService)
+            BadgrService badgrService,
+            CredentialPackageService credentialPackageService) : base(factory, clrService, connectService, credentialService, credentialPackageService, badgrService, revocationService)
         {
-            RevocationService = revocationService;
-            CredentialService = credentialService;
-            Factory = factory;
-            ClrService = clrService;
-            BadgrService = badgrService;
         }
 
         public ClrViewModel Clr { get; set; }        
@@ -76,9 +68,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
                 throw new ArgumentException("No target specified");
             }
 
-            var clrEntity = await CredentialService.GetClrAsync(clrEntityId);
-
-            _revocationsListModel = await RevocationService.GetRevocationListAsync(this, clrEntityId);
+            var clrEntity = await _credentialService.GetClrAsync(clrEntityId);
 
             if (clrEntity == null)
             {
@@ -95,6 +85,22 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
                     $" data-toggle='tooltip' data-html='true' title='<div>{clrEntity.CredentialPackage.RevocationReason}</div>' />"
                     , revocationsMessage: _revocationsListModel.Error ?? _revocationsListModel.Message));
                 }
+                if (clrEntity.CredentialPackage.TypeId == PackageTypeEnum.VerifiableCredential)
+                {
+                    var package = await _credentialService.GetAsync(clrEntity.CredentialPackageId ?? 0);
+                    var revocationResult = await _credentialPackageService.CheckRevocationAsync(package);
+                    if (revocationResult.revoked)
+                    {
+                        return new OkObjectResult(new Verification(clrEntity.Identifier, message:
+                            "Revoked <img class='key-host-statement'" +
+                            $" src='{Request.PathBase}/images/noun_Info_742307.svg' style='width: 1.5em'" +
+                            $" data-toggle='tooltip' data-html='true' title='<div>{revocationResult.revocationReason}</div>' />"));
+                    }
+                }
+                else
+                {
+                    _revocationsListModel = await _revocationService.GetRevocationListAsync(this, clrEntityId);
+                }
             }
 
             var clrVM = ClrViewModel.FromClrModel(clrEntity);
@@ -105,9 +111,15 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
             {
                 var assertionVM = clrVM.AllAssertions?.SingleOrDefault(a => a.Assertion.Id == assertionId);
 
-                if (assertionVM != null)
+                if (assertionVM != null && !assertionVM.Assertion.IsSigned)
                 {
                     result = await VerifyHostedAssertion(clrEntity, assertionVM.Assertion);
+                }
+
+                else if (assertionVM != null && assertionVM.Assertion.IsSigned)
+                {
+                    var publicKey = assertionVM.Assertion.Achievement.Issuer.PublicKey;
+                    result = await VerifySignature(assertionId, assertionVM.SignedAssertion, publicKey);
                 }
 
                 if (result == null)
@@ -301,7 +313,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
                 return new Verification(assertion.Id, error: "Not verifiable", revocationsMessage: _revocationsListModel.Error ?? _revocationsListModel.Message);
             }
 
-            var client = Factory.CreateClient(ClrHttpClient.Default);
+            var client = _factory.CreateClient(ClrHttpClient.Default);
             try
             {
                 var response = await client.GetAsync(assertion.Id);
@@ -323,7 +335,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
                         clr.Assertions.Add(newAssertion);
                         clrEntity.Json = JsonSerializer.Serialize(clr, new JsonSerializerOptions { IgnoreNullValues = true });
 
-                        await CredentialService.UpdateClrAsync(clrEntity);
+                        await _credentialService.UpdateClrAsync(clrEntity);
 
                         return new Verification(assertion.Id,
                             "Verified - Refresh page to see updates", revocationsMessage: _revocationsListModel.Error ?? _revocationsListModel.Message);
@@ -350,7 +362,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
 
             try
             {
-                var newClr = await ClrService.GetClrAsync(this, clrEntity.Authorization.Id, clr.Id);
+                var newClr = await _clrService.GetClrAsync(this, clrEntity.Authorization.Id, clr.Id);
 
                 if (ModelState.IsValid)
                 {
@@ -360,7 +372,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
                     {
                         clrEntity.Json = JsonSerializer.Serialize(newClr, new JsonSerializerOptions { IgnoreNullValues = true });
 
-                        await CredentialService.UpdateClrAsync(clrEntity);
+                        await _credentialService.UpdateClrAsync(clrEntity);
 
                         return new Verification(clr.Id,
                             "Verified - Refresh page to see updates", revocationsMessage: _revocationsListModel.Error ?? _revocationsListModel.Message);
@@ -384,7 +396,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
                 return new Verification(endorsement.Id, error: "Not verifiable", revocationsMessage: _revocationsListModel.Error ?? _revocationsListModel.Message);
             }
 
-            var client = Factory.CreateClient(ClrHttpClient.Default);
+            var client = _factory.CreateClient(ClrHttpClient.Default);
             try
             {
                 var response = await client.GetAsync(endorsement.Id);
@@ -452,7 +464,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
                 handler.ValidateToken(compactJws, parameters, out _);
 
                 var keyUri = new Uri(publicKey.Id);
-                var certificate = await CredentialService.GetCertificateAsync(keyUri.Host);
+                var certificate = await _credentialService.GetCertificateAsync(keyUri.Host);
 
                 if (certificate == null)
                 {
@@ -479,17 +491,17 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
 
         private bool CustomCallback(HttpRequestMessage arg1, X509Certificate2 arg2, X509Chain arg3, SslPolicyErrors arg4)
         {
-            var certificate = CredentialService.GetCertificateAsync(arg1.RequestUri.Host).Result;
+            var certificate = _credentialService.GetCertificateAsync(arg1.RequestUri.Host).Result;
             if (certificate == null)
             {
                 certificate = new CertificateModel { Host = arg1.RequestUri.Host };
-                CredentialService.AddCertificateAsync(certificate).Wait();
+                _credentialService.AddCertificateAsync(certificate).Wait();
             }
 
             certificate.IssuedByName = arg2.IssuerName.Format(false);
             certificate.IssuedToName = arg2.SubjectName.Format(false);
 
-            CredentialService.UpdateCertificateAsync(certificate).Wait();
+            _credentialService.UpdateCertificateAsync(certificate).Wait();
 
             return arg4 == SslPolicyErrors.None;
         }
@@ -509,7 +521,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages
                 return recipient.Identity == $"sha256${builder}";
             }
 
-            return recipient.Identity.Equals(learner.Email, StringComparison.InvariantCultureIgnoreCase);
+            return recipient.Identity.Equals(learner.Id, StringComparison.InvariantCultureIgnoreCase);
         }
 
         private class Verification

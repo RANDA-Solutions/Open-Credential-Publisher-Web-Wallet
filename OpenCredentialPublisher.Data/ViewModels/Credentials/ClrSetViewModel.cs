@@ -4,6 +4,7 @@ using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -17,6 +18,8 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
         [JsonIgnore]
         [NotMapped]
         public List<PdfShareViewModel> Pdfs { get; set; } = new List<PdfShareViewModel>();
+        [NotMapped, JsonIgnore]
+        public bool HasPdfs => Pdfs.Any(e => e.IsPdf);
 
         [NotMapped]
         public int AssertionsCount { get; set; }

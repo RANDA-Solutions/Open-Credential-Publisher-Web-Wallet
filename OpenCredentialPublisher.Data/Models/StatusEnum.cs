@@ -14,6 +14,11 @@ namespace OpenCredentialPublisher.Data.Models
         Submitted = 10,
         Active = 11,
         Sent = 12,
-        Error = 13
+        Error = 13,
+        WaitingForScoreReport = 14,
+        ReadyForVerification = 15,
+        Verified = 16,
+        Unused = 17,
+        Success = 18
     }
 }

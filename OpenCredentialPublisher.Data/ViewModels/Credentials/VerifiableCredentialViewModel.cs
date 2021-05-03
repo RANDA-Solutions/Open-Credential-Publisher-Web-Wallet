@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using OpenCredentialPublisher.Data.Models;
+using System.Linq;
 
 namespace OpenCredentialPublisher.Data.ViewModels.Credentials
 {
@@ -32,6 +33,9 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
         [JsonIgnore]
         [NotMapped]
         public List<PdfShareViewModel> Pdfs { get; set; } = new List<PdfShareViewModel>();
+
+        [NotMapped, JsonIgnore]
+        public bool HasPdfs => Pdfs.Any(e => e.IsPdf);
 
         public static VerifiableCredentialViewModel FromVerifiableCredentialModel(VerifiableCredentialModel vc)
         {

@@ -3,19 +3,19 @@
 @if (Model != null)
 {
     <dl class="row">
-        <dt class="col-sm-3">Public Key</dt>
-        <dd class="col-sm-9">
+        <dt class="col-12 col-sm-4 col-md-3">Public Key</dt>
+        <dd class="col-12 col-sm-8 col-md-9">
             <a href="@Model.Id">@Model.Id</a>
         </dd>
         @if (Model.Owner != null)
         {
-            <dt class="col-sm-3">Owner</dt>
-            <dd class="col-sm-9">@Model.Owner</dd>
+            <dt class="col-12 col-sm-4 col-md-3">Owner</dt>
+            <dd class="col-12 col-sm-8 col-md-9">@Model.Owner</dd>
         }
         @*@if (Model.PublicKeyPem != null)
         {
-            <dt class="col-sm-3">Key</dt>
-            <dd class="col-sm-9"><pre>@Model.PublicKeyPem</pre></dd>
+            <dt class="col-12 col-sm-4 col-md-3">Key</dt>
+            <dd class="col-12 col-sm-8 col-md-9"><pre>@Model.PublicKeyPem</pre></dd>
         }*@
     </dl>
 }

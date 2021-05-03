@@ -14,7 +14,7 @@
         <dl class="row">
             @if (resultId != null)
             {
-                <dt class="col-sm-3">
+                <dt class="col col-sm-6 col-md-4 col-lg-3">
                     <input type="hidden" name="ClrEntityId" value="@ViewData["ClrEntityId"]"/>
                     <input type="hidden" name="LinkId" value="@ViewData["LinkId"]"/>
                     <input type="hidden" name="AssertionId" value="@ViewData["AssertionId"]"/>
@@ -22,7 +22,7 @@
                     <input type="hidden" name="EndorsementId" value="@ViewData["EndorsementId"]"/>
                     <input type="submit" class="btn btn-info"  value="Verify"/>
                 </dt>
-                <dd class="col-sm-9">
+                <dd class="col col-sm-6 col-md-8 col-lg-9">
                     <div class ="row mb-2"><span id="revocationlist-result-@resultId.ToString().SafeId()"></span></div>
                     <div class ="row">
                         @Model.Type.ToEnumMemberValue()

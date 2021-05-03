@@ -330,6 +330,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Sources
 
                 source = new SourceModel
                 {
+                    SourceTypeId = SourceTypeEnum.Clr,
                     DiscoveryDocument = discoveryDocument, 
                     Name = discoveryDocument.Name,
                     Url = SourceUrl.AbsoluteUri

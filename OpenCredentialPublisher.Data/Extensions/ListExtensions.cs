@@ -10,12 +10,12 @@ namespace OpenCredentialPublisher.Data.Extensions
     {
         public static bool HasTranscriptPdf(this List<PdfShareViewModel> pdfs)
         {
-            return pdfs != null && pdfs.Any(pdf => pdf.ArtifactName.Contains("transcript", StringComparison.OrdinalIgnoreCase));
+            return pdfs != null && pdfs.Any(pdf => pdf.IsPdf && pdf.ArtifactName.Contains("transcript", StringComparison.OrdinalIgnoreCase));
         }
 
         public static PdfShareViewModel GetTranscriptPdf(this List<PdfShareViewModel> pdfs)
         {
-            return pdfs?.FirstOrDefault(pdf => pdf.ArtifactName.Contains("transcript", StringComparison.OrdinalIgnoreCase));
+            return pdfs?.FirstOrDefault(pdf => pdf.IsPdf && pdf.ArtifactName.Contains("transcript", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

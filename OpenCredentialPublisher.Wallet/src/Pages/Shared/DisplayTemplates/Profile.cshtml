@@ -1,30 +1,30 @@
 @model OpenCredentialPublisher.ClrLibrary.Models.ProfileDType
 
 <dl class="row">
-    <dt class="col-sm-3">Id</dt>
-    <dd class="col-sm-9">@Html.DisplayFor(x => x.Id, "Uri")</dd>
+    <dt class="col-12 col-lg-3">Id</dt>
+    <dd class="col-12 col-lg-9">@Html.DisplayFor(x => x.Id, "Uri")</dd>
     @if (Model.Name != null)
     {
-        <dt class="col-sm-3">Name</dt>
-        <dd class="col-sm-9">@Model.Name</dd>
+        <dt class="col-12 col-lg-3">Name</dt>
+        <dd class="col-12 col-lg-9">@Model.Name</dd>
     }
     @if (Model.Email != null)
     {
-        <dt class="col-sm-3">Email</dt>
-        <dd class="col-sm-9"><a href="mailto:@Model.Email">@Model.Email</a></dd>
+        <dt class="col-12 col-lg-3">Email</dt>
+        <dd class="col-12 col-lg-9"><a href="mailto:@Model.Email">@Model.Email</a></dd>
     }
     @if (Model.Url != null)
     {
-        <dt class="col-sm-3">URL</dt>
-        <dd class="col-sm-9 overflow-ellipsis" data-toggle="tooltip" title="@Model.Url"><a href="@Model.Url">@Model.Url</a></dd>
+        <dt class="col-12 col-lg-3">URL</dt>
+        <dd class="col-12 col-lg-9 overflow-ellipsis" data-toggle="tooltip" title="@Model.Url"><a href="@Model.Url">@Model.Url</a></dd>
     }
     @if (Model.Address != null)
     {
         @if (Model.Address.StreetAddress != null || Model.Address.AddressRegion != null
              || Model.Address.AddressLocality != null || Model.Address.PostalCode != null)
         {
-            <dt class="col-sm-3">Address</dt>
-            <dd class="col-sm-9">
+            <dt class="col-12 col-lg-3">Address</dt>
+            <dd class="col-12 col-lg-9">
                 @if (Model.Address.StreetAddress != null)
                 {
                     <div>@Model.Address.StreetAddress</div>
@@ -45,25 +45,25 @@
     }
     @if (Model.Telephone != null)
     {
-        <dt class="col-sm-3">Phone</dt>
-        <dd class="col-sm-9">@Model.Telephone</dd>
+        <dt class="col-12 col-lg-3">Phone</dt>
+        <dd class="col-12 col-lg-9">@Model.Telephone</dd>
     }
     @if (Model.StudentId != null)
     {
-        <dt class="col-sm-3">Student ID</dt>
-        <dd class="col-sm-9">@Model.StudentId</dd>
+        <dt class="col-12 col-lg-3">Student ID</dt>
+        <dd class="col-12 col-lg-9">@Model.StudentId</dd>
     }
     @if (Model.SourcedId != null)
     {
-        <dt class="col-sm-3">SourcedId</dt>
-        <dd class="col-sm-9">@Model.SourcedId</dd>
+        <dt class="col-12 col-lg-3">SourcedId</dt>
+        <dd class="col-12 col-lg-9">@Model.SourcedId</dd>
     }
     @if (Model.AdditionalProperties != null)
     {
         foreach (var key in Model.AdditionalProperties.Keys)
         {
-            <dt class="col-sm-3">@key</dt>
-            <dd class="col-sm-9"><pre>@Model.AdditionalProperties[key]</pre></dd>
+            <dt class="col-12 col-lg-3">@key</dt>
+            <dd class="col-12 col-lg-9"><pre>@Model.AdditionalProperties[key]</pre></dd>
         }
     }
     @if (ViewData["ProfileType"] == "Publisher")

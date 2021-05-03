@@ -12,6 +12,13 @@ using OpenCredentialPublisher.Services.Extensions;
 using System.Linq;
 using System.Text;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
+using OpenCredentialPublisher.Data.Extensions;
+using OpenCredentialPublisher.Shared.Utilities;
+using OpenCredentialPublisher.Wallet.Extensions;
+using OpenCredentialPublisher.Services.Drawing;
+using System;
+using OpenCredentialPublisher.Data.Options;
+using Microsoft.Extensions.Options;
 
 namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 { 
@@ -21,24 +28,31 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 
         public bool RequiresAccessKey { get; set; }
         public bool ShowDownloadVCJsonButton { get; set; }
+        public bool ShowDownloadPdfButton { get; set; }
+        public PdfShareViewModel TranscriptPdf { get; set; }
         public bool ShowData { get; set; }
         public string Id { get; set; }
+        public SiteSettingsOptions SiteSettings { get; set; }
 
         [BindProperty]    
         public string AccessKey { get; set; }
 
         public DisplayModel(
             CredentialService credentialService,
+            CredentialPackageService credentialPackageService,
+            ConnectService connectService,
             IHttpClientFactory factory,
             IConfiguration configuration,
             RevocationService revocationService,
             ClrService clrService,
             BadgrService badgrService,
-            LinkService linkService
+            LinkService linkService,
+            IOptions<SiteSettingsOptions> siteSettings
             )
-            :base(credentialService, factory, configuration, revocationService, clrService, badgrService)
+            :base(credentialService, connectService, factory, configuration, revocationService, clrService, badgrService, credentialPackageService)
         {
             _linkService = linkService;
+            SiteSettings = siteSettings?.Value;
         }
 
         public async Task<IActionResult> OnGet(string id, string key = null)
@@ -47,7 +61,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 
             Id = id;
 
-            var link = await _linkService.GetDeepAsync(id);
+            var link = await _linkService.GetAsync(id);
 
             if (link?.Clr == null) return RedirectToPage("NotAvailable");
 
@@ -60,6 +74,7 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
                 else if (!string.IsNullOrEmpty(key) && link.Shares.Any(s => s.AccessKey == key && s.StatusId == StatusEnum.Active))
                 {
                     ShowData = true;
+                    AccessKey = key;
                 }
                 else
                 {
@@ -71,18 +86,71 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
                 ShowData = true;
             }
 
-            if (User?.UserId() != link.UserId)
+            if (ShowData)
             {
-                link.DisplayCount += 1;
+                if (User?.UserId() != link.UserId)
+                {
+                    link.DisplayCount += 1;
+                }
+
+                await _linkService.UpdateAsync(link);
+
+                link = await _linkService.GetDeepAsync(link.Id);
+
+                Clr = ClrViewModel.FromClrModel(link.Clr);
+                if (Clr.Pdfs.HasTranscriptPdf())
+                {
+                    ShowDownloadPdfButton = true;
+                    TranscriptPdf = Clr.Pdfs.GetTranscriptPdf();
+                }
+
+                ShowDownloadVCJsonButton = ShowData && Clr.AncestorCredentialPackage.TypeId == PackageTypeEnum.VerifiableCredential;
+            }
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostPdf(string id, int clrId, string assertionId, string evidenceName, int artifactId, string artifactName)
+        {
+            var link = await _linkService.GetAsync(id);
+            ShareModel share;
+            if (link.UserId == User.UserId())
+            {
+                share = link.Shares.FirstOrDefault(s => s.StatusId == StatusEnum.Active);
+                if (share == null)
+                {
+                    share = new ShareModel
+                    {
+                        LinkId = link.Id,
+                        ShareTypeId = ShareTypeEnum.Pdf,
+                        AccessKey = Crypto.CreateRandomString(16),
+                        UseCount = 0,
+                        CreatedOn = DateTimeOffset.UtcNow,
+                        StatusId = StatusEnum.Active
+                    };
+
+                    link.RequiresAccessKey = true;
+                    link.ModifiedAt = DateTimeOffset.UtcNow;
+                    await _linkService.AddShareAsync(share);
+                    await _linkService.UpdateAsync(link);
+                }
+            }
+            else
+            {
+                share = link.Shares.FirstOrDefault(s => s.AccessKey == AccessKey && s.StatusId == StatusEnum.Active);
             }
 
-            await _linkService.UpdateAsync(link);
+            if (share != null)
+            {
+                var model = (LinkViewModel.FromLinkModel(link));
 
-            Clr = ClrViewModel.FromClrModel(link.Clr);
-
-            ShowDownloadVCJsonButton = ShowData && Clr.AncestorCredentialPackage.TypeId == PackageTypeEnum.VerifiableCredential;
-
-            return Page();
+                var assertionVM = model.ClrVM.AllAssertions.FirstOrDefault(a => a.Assertion.Id == assertionId);
+                var evidence = assertionVM.Assertion.Evidence.FirstOrDefault(e => e.Name == evidenceName);
+                var artifact = evidence.Artifacts.FirstOrDefault(a => a.ArtifactKey == artifactId);
+                var (mimeType, bytes) = DataUrlUtility.ParseDataUrl(artifact.Url);
+                bytes = PdfUtility.AppendQRCodePage(bytes, this.GetLinkUrl(link.Id), share.AccessKey);
+                return new FileContentResult(bytes, mimeType) { FileDownloadName = $"{artifactName}.pdf" };
+            }
+            return NotFound();
         }
 
         //public async Task<IActionResult> OnPostDownloadPdf(string id)
@@ -104,11 +172,15 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 
             var link = await _linkService.GetDeepAsync(id);
 
-            if (link.Clr?.CredentialPackage?.VerifiableCredential != null)
+            if (link.UserId == User.UserId() || link.Shares.Any(s => s.AccessKey == AccessKey && s.StatusId == StatusEnum.Active))
             {
-                var package = link.Clr?.CredentialPackage;
-                return new FileContentResult(UTF8Encoding.UTF8.GetBytes(package.VerifiableCredential.Json), "application/json") { FileDownloadName = $"VerifiableCredential-{package.VerifiableCredential.Identifier}.json" };
+                if (link.Clr?.CredentialPackage?.VerifiableCredential != null)
+                {
+                    var package = link.Clr?.CredentialPackage;
+                    return new FileContentResult(UTF8Encoding.UTF8.GetBytes(package.VerifiableCredential.Json), "application/json") { FileDownloadName = $"VerifiableCredential-{package.VerifiableCredential.Identifier}.json" };
+                }
             }
+                
             return NotFound();
         }
         public async Task<IActionResult> OnPostAccess(string id)
@@ -137,8 +209,11 @@ namespace OpenCredentialPublisher.ClrWallet.Pages.Links
 
             link.DisplayCount += 1;
             await _linkService.UpdateAsync(link);
+            link = await _linkService.GetDeepAsync(link.Id);
 
             Clr = ClrViewModel.FromClrModel(link.Clr);
+            ShowDownloadVCJsonButton = ShowData && Clr.AncestorCredentialPackage.TypeId == PackageTypeEnum.VerifiableCredential;
+
 
             return Page();
         }
