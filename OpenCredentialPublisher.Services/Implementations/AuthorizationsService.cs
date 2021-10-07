@@ -1,10 +1,13 @@
 using IdentityModel;
 using IdentityModel.Client;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using OpenCredentialPublisher.ClrLibrary;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
+using OpenCredentialPublisher.Data.ViewModels.nG;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -18,18 +21,20 @@ namespace OpenCredentialPublisher.Services.Implementations
     public class AuthorizationsService
     {
         private readonly WalletDbContext _context;
+        private readonly ETLService _etlService;
         private readonly IHttpClientFactory _factory;
         private readonly LogHttpClientService _logHttpClientService;
 
-        public AuthorizationsService(WalletDbContext context, IHttpClientFactory factory, LogHttpClientService logHttpClientService)
+        public AuthorizationsService(WalletDbContext context, ETLService etlService, IHttpClientFactory factory, LogHttpClientService logHttpClientService)
         {
             _context = context;
+            _etlService = etlService;
             _factory = factory;
             _logHttpClientService = logHttpClientService;
         }
         public async Task<AuthorizationModel> AddAsync(AuthorizationModel input)
         {
-            input.Modified = input.Created = DateTimeOffset.UtcNow;
+            input.ModifiedAt = input.CreatedAt = DateTime.UtcNow;
             await _context.Authorizations.AddAsync(input);
             await _context.SaveChangesAsync();
             _context.Entry(input).State = EntityState.Detached;
@@ -40,25 +45,36 @@ namespace OpenCredentialPublisher.Services.Implementations
             var item = await _context.Authorizations
                     .SingleAsync(x => x.Id == id);
 
-            item.IsDeleted = true;
-            item.Modified = DateTimeOffset.UtcNow;
+            item.Delete();
 
             await _context.SaveChangesAsync();
+
+            var pkgs = await _context.CredentialPackages
+                .Where(c => c.AuthorizationForeignKey == id).ToListAsync();
+
+            foreach (var pkg in pkgs)
+            {
+                await _etlService.DeletePackageAsync(pkg.Id);
+            }
         }
         public async Task<AuthorizationModel> UpdateAsync(AuthorizationModel input)
         {
             _context.Entry(input).State = EntityState.Modified;
-            input.Modified = DateTimeOffset.UtcNow;
+            input.ModifiedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             _context.Entry(input).State = EntityState.Detached;
             return input;
         }
-        public async Task<List<AuthorizationModel>> GetAllAsync(string userId)
+        public async Task<List<AuthorizationVM>> GetAllAsync(string userId)
         {
             var result = await _context.Authorizations.AsNoTracking()
-                .Include(a => a.Clrs)
+                //.Include(a => a.Clrs)
                 .Include(a => a.Source)
                 .Where(l => l.UserId == userId && !l.IsDeleted)
+                .Select(a => new AuthorizationVM() {
+                    Id = a.Id, Name = a.Source.Name, SourceUrl = a.Source.Url,
+                    Type = a.Source.SourceTypeId == SourceTypeEnum.Clr ? $"CLRs" : a.Source.SourceTypeId == SourceTypeEnum.OpenBadge ? $"Open Badges v2.0" : a.Source.SourceTypeId == SourceTypeEnum.OpenBadgeConnect ? $"Open Badge v2.1" : "Other",
+                    ClrCount = 0})
                 .ToListAsync();
 
             return result;
@@ -105,29 +121,41 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .Include(x => x.DiscoveryDocument)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
-        public async Task<List<SourceModel>> GetUnusedSourcesAsync(string userId)
+        public async Task<List<SourceVM>> GetUnusedSourcesAsync(string userId)
         {
             return await _context.Sources.AsNoTracking()
                 .Include(x => x.Authorizations)
                 .Include(x => x.DiscoveryDocument)
                 .Where(s => s.Authorizations.All(a => (a.UserId != userId) || a.IsDeleted))
+                .Select(s => new SourceVM { Id = s.Id.ToString(), Name =
+                    s.SourceTypeId == SourceTypeEnum.Clr ? $"CLRs - {s.Name} ({s.Url})" : s.SourceTypeId == SourceTypeEnum.OpenBadge ? $"Badges v2.0 - {s.Name} ({s.Url})" : s.SourceTypeId == SourceTypeEnum.OpenBadgeConnect ? $"Badges v2.1 - {s.Name} ({s.Url})" : s.Name
+                })
                 .ToListAsync();
         }
-        public async Task<SourceModel> GetSourceByUrlAsync(string url)
+        public async Task<SourceModel> GetSourceByUrlAsync(string url, SourceTypeEnum typeId)
         {
             return await _context.Sources.AsNoTracking()
                 .Include(x => x.Authorizations)
                 .Include(x => x.DiscoveryDocument)
-                .FirstOrDefaultAsync(x => x.Url == url);
+                .FirstOrDefaultAsync(x => x.Url == url && x.SourceTypeId == typeId);
         }
         public async Task DeleteSourceAsync(int id)
         {
             var item = await _context.Sources
                 .SingleOrDefaultAsync(x => x.Id == id);
 
-            _context.Sources.Remove(item);
+            item.Delete();
 
             await _context.SaveChangesAsync();
+
+            var authIds = await _context.Authorizations.AsNoTracking()
+                .Where(a => a.SourceForeignKey == id)
+                .Select(a => a.Id).ToListAsync();
+
+            foreach (var authorizationId in authIds)
+            {
+                await DeleteAsync(authorizationId);
+            }
         }
         public async Task<SourceModel> UpdateSourceAsync(SourceModel input)
         {
@@ -140,7 +168,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         /// Get a new access token using the refresh token
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> RefreshTokenAsync(PageModel page, AuthorizationModel authorization)
+        public async Task<bool> RefreshTokenAsync(ModelStateDictionary modelState, AuthorizationModel authorization)
         {
             if (authorization.ValidTo >= DateTimeOffset.UtcNow)
             {
@@ -174,9 +202,9 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception e)
             {
-                if (page != null)
+                if (modelState != null)
                 {
-                    page.ModelState.AddModelError(string.Empty, e.Message);
+                    modelState.AddModelError(string.Empty, e.Message);
                 }
                 Log.Error(e, e.Message);
                 return false;
@@ -188,9 +216,9 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             if (tokenResponse.IsError)
             {
-                if (page != null)
+                if (modelState != null)
                 {
-                    page.ModelState.AddModelError(string.Empty, $"Token refresh failed with error '{tokenResponse.Error}'.");
+                    modelState.AddModelError(string.Empty, $"Token refresh failed with error '{tokenResponse.Error}'.");
                 }
 
                 // Delete the authorization to force re-authorization
@@ -204,7 +232,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             authorization.AccessToken = tokenResponse.AccessToken;
             authorization.RefreshToken = tokenResponse.RefreshToken;
-            authorization.ValidTo = DateTimeOffset.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
+            authorization.ValidTo = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
             await _context.SaveChangesAsync();
 
             return true;

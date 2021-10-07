@@ -1,0 +1,5 @@
+Using a mobile device? Open using the mobile wallet of your choice using the buttons below:
+
+<ng-container *ngFor="let wallet of mobileWallets">
+	<br /> <a class="btn btn-outline-primary my-1" [href]="wallet.url" target="_blank">{{wallet.title}}</a>
+</ng-container>

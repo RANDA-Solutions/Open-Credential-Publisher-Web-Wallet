@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.Shared.Models
 {
-    [Schema("CLR_Link_Share")]
+    [Schema("CLR_Link_Share", "0.1")]
     public class ClrShareCredential: AbstractCredential
     {
         [JsonIgnore]

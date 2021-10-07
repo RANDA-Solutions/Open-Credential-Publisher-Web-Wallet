@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Contexts;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Services.Interfaces;
@@ -29,9 +30,9 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Handlers
             {
                 //var leaseId = await AcquireLockAsync("register-schema", command.SchemaId.ToString(), TimeSpan.FromSeconds(60));
                 var schema = await _credentialSchemaService.GetCredentialSchemaAsync(command.SchemaId);
-                if (schema.StatusId == Data.Models.StatusEnum.Pending)
+                if (schema.StatusId == StatusEnum.Pending)
                 {
-                    schema.StatusId = Data.Models.StatusEnum.Sent;
+                    schema.StatusId = StatusEnum.Sent;
                     schema = await _credentialSchemaService.UpdateCredentialSchemaAsync(schema);
                     try
                     {
@@ -39,7 +40,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Handlers
                     }
                     catch
                     {
-                        schema.StatusId = Data.Models.StatusEnum.Pending;
+                        schema.StatusId = StatusEnum.Pending;
                         schema = await _credentialSchemaService.UpdateCredentialSchemaAsync(schema);
                         throw;
                     }

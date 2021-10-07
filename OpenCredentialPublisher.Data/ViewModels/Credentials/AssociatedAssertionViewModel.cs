@@ -215,7 +215,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
             throw new NotImplementedException();
         }
 
-        public static implicit operator AssociatedAssertionViewModel(AssertionDType assertion)
+        public static implicit operator AssociatedAssertionViewModel(AugmentedAssertionDType assertion)
         {
             var associatedAssertion = new AssociatedAssertionViewModel
             {

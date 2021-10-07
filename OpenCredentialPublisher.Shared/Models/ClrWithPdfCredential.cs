@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.Shared.Models
 {
-    [Schema("CLR_Transcript_PDF")]
+    [Schema("CLR Transcript PDF", "0.3")]
     public class ClrWithPdfCredential: AbstractCredential
     {
         [JsonIgnore]

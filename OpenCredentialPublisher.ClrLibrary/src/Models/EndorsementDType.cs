@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -20,7 +21,8 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
     /// <summary>
     /// An endorsement claim. 
     /// </summary>
-    public partial class EndorsementDType
+    [NotMapped]
+    public class EndorsementDType
     { 
         /// <summary>
         /// Globally unique IRI for the Endorsement. If this Endorsement will be verified using Hosted verification, the value should be the URL of the hosted version of the Endorsement. Model Primitive Datatype = NormalizedString.
@@ -45,7 +47,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [Required]
         [JsonPropertyName("claim"), Newtonsoft.Json.JsonProperty("claim")]
         [Description("Claim")]
-        public virtual EndorsementClaimDType Claim { get; set; }
+        public EndorsementClaimDType Claim { get; set; }
         
         /// <summary>
         /// Timestamp of when the endorsement was published. Model Primitive Datatype = DateTime.
@@ -93,7 +95,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// </summary>
         [JsonExtensionData]
         [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
-        public Dictionary<string, object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> AdditionalProperties { get; set; }
 
         /// <summary>
         /// Returns the JSON string presentation of the object
@@ -101,7 +103,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

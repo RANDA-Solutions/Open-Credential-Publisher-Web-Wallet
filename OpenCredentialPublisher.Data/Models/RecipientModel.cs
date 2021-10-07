@@ -11,12 +11,14 @@ namespace OpenCredentialPublisher.Data.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 
+        [Required]
         public string Name { get; set; }
+
+        [Required]
         public string Email { get; set; }
 
         public DateTimeOffset CreatedOn { get; set; }

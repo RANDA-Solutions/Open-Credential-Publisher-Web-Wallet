@@ -63,7 +63,7 @@ using System.Text.Json.Serialization;
 
         public override string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

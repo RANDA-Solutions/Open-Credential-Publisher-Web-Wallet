@@ -10,6 +10,7 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -17,10 +18,11 @@ using OpenCredentialPublisher.ClrLibrary.Converters;
 // ReSharper disable UnusedMember.Global
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// This is the container for a single code minor status code. 
     /// </summary>
+    [NotMapped]
     public class ImsxCodeMinorFieldDType
     { 
         /// <summary>
@@ -100,7 +102,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

@@ -9,18 +9,16 @@
  */
 
 using System;
-using System.Linq;
-using System.Text;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using OpenCredentialPublisher.ObcLibrary.Converters;
 
 namespace OpenCredentialPublisher.ObcLibrary.Models
-{ 
+{
     /// <summary>
     /// Configuration information about a single implementation.
     /// </summary>

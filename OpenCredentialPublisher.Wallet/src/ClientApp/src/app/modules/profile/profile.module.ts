@@ -11,14 +11,13 @@ import { GenerateRecoveryCodesComponent } from './components/generate-recovery-c
 import { MainComponent } from './components/main.component';
 import { PersonalDataComponent } from './components/personal-data.component';
 import { ResetAuthenticatorComponent } from './components/reset-authenticator.component';
-import { SetPasswordComponent } from './components/set-password.component';
 import { ShowRecoveryCodesComponent } from './components/show-recovery-codes.component';
 import { TwoFactorAuthenticationComponent } from './components/two-factor-authentication.component';
 
 
 
 @NgModule({
-  declarations: [ChangePasswordComponent, DeletePersonalDataComponent, DisableTwoFactorComponent, DownloadPersonalDataComponent, EmailComponent, EnableAuthenticatorComponent, ExternalLoginsComponent, GenerateRecoveryCodesComponent, MainComponent, PersonalDataComponent, ResetAuthenticatorComponent, SetPasswordComponent, ShowRecoveryCodesComponent, TwoFactorAuthenticationComponent],
+  declarations: [ChangePasswordComponent, DeletePersonalDataComponent, DisableTwoFactorComponent, DownloadPersonalDataComponent, EmailComponent, EnableAuthenticatorComponent, ExternalLoginsComponent, GenerateRecoveryCodesComponent, MainComponent, PersonalDataComponent, ResetAuthenticatorComponent, ShowRecoveryCodesComponent, TwoFactorAuthenticationComponent],
   imports: [
     CommonModule
   ]

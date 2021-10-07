@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -20,6 +21,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
     /// <summary>
     /// Describes a result of an achievement. 
     /// </summary>
+    [NotMapped]
     public partial class ResultDType
     { 
         /// <summary>
@@ -53,7 +55,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("alignments"), Newtonsoft.Json.JsonProperty("alignments")]
         [Description("The alignments between this result and nodes in external frameworks. This set of alignments are in addition to the set of alignments defined in the corresponding ResultDescription object. ")]
         public virtual List<AlignmentDType> Alignments { get; set; }
-        
+
         /// <summary>
         /// The id of the ResultDescription describing this result. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -88,7 +90,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

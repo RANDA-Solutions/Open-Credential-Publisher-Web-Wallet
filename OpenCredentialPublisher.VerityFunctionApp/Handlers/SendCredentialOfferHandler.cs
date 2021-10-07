@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Services.Interfaces;
@@ -44,7 +45,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Handlers
             {
                 //var leaseId = await AcquireLockAsync("send-credential", command.CredentialRequestId.ToString(), TimeSpan.FromSeconds(60));
                 var credentialRequest = await _credentialRequestService.GetCredentialRequestAsync(command.CredentialRequestId);
-                if (credentialRequest.CredentialRequestStep == Data.Models.CredentialRequestStepEnum.ReadyToSend)
+                if (credentialRequest.CredentialRequestStep == CredentialRequestStepEnum.ReadyToSend)
                 {
                     credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.SendingOffer;
                     credentialRequest = await _credentialRequestService.UpdateCredentialRequestAsync(credentialRequest);

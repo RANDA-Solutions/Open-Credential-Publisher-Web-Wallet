@@ -1,0 +1,56 @@
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <section>
+      <span class="h1">Two-factor authentication (2FA)</span>
+      <div *ngIf="vm.statusMessage != null"
+        [ngClass]="{'alert alert-success alert-dismissible': !isError, 'alert alert-danger alert-dismissible': isError}">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        {{vm.statusMessage}}
+      </div>
+      <div>
+        <p>To use an authenticator app go through the following steps:</p>
+        <ol class="list">
+          <li>
+            <p>
+              Download a two-factor authenticator app like Microsoft Authenticator for
+              <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and
+              <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> or
+              Google Authenticator for
+              <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</a> and
+              <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
+            </p>
+          </li>
+          <li>
+            <p>Scan the QR Code or enter this key <kbd>{{vm.sharedKey}}</kbd> into your two factor authenticator app. Spaces and casing do not matter.</p>
+            <div class="alert alert-secondary">Learn how to <a class="font-weight-bold" href="https://go.microsoft.com/fwlink/?Linkid=852423"><span>enable QR code generation</span></a>.</div>
+            <!--<div id="qrCode"></div>
+            <div id="qrCodeData" data-url="vm.authenticatorUri"></div>-->
+            <qrcode [qrdata]="vm.authenticatorUri" [width]="256" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
+          </li>
+          <li>
+            <p>
+              Once you have scanned the QR code or input the key above, your two factor authentication app will provide you
+              with a unique code. Enter the code in the confirmation box below.
+            </p>
+            <div class="row">
+              <div class="col-md-6">
+                <form #f="ngForm" novalidate (ngSubmit)="sendCode(f)">
+                <input type="hidden" name="rememberMachine" id="rememberMachine" value="false"/>
+                <input type="hidden" name="rememberMe" id="rememberMe" value="false"/>
+                  <div class="form-group">
+                    <label for="twoFactorCode">Verification Code</label>
+                    <input type="text" name="twoFactorCode" id="twoFactorCode" class="form-control" required [(ngModel)]="input.twoFactorCode" #twoFactorCode="ngModel"/>
+                    <small [hidden]="twoFactorCode.valid || (twoFactorCode.pristine && !submitted)" class="text-danger">Please enter verification code</small>
+                  </div>
+                  <button type="submit" class="btn btn-outline-primary btn-lg">Verify</button>
+                </form>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+</ng-template>
+

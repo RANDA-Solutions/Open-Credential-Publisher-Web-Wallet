@@ -1,0 +1,16 @@
+<ng-container *ngIf="invitation">
+	<div class="row">
+		<div class="col-12" *ngIf="showUrl">
+			<app-mobile-wallets [payload]="invitation.payload"></app-mobile-wallets>
+		</div>
+		<div class="col-12">
+			<p>
+				Scan the QRCode below with your mobile wallet to prove you hold a <b>{{invitation.credentialName}}</b>
+				credential
+			</p>
+		</div>
+		<div class="col-12 text-center">
+			<img [src]="invitation.qrCodeUrl" />
+		</div>
+	</div>
+</ng-container>

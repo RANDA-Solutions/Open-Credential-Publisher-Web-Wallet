@@ -12,14 +12,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// A collection of assertions for a single person reported by a single publisher. 
     /// </summary>
+    [NotMapped]
     public partial class ClrDType
     { 
         /// <summary>
@@ -53,16 +55,25 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <value>Array of achievements that are related directly or indirectly through associations with the asserted achievements in the CLR. Primarily used to represent hierarchical pathways. Asserted achievements may appear in both this array and in the achievement assertion. If asserted achievements do appear in both places, they MUST match exactly. </value>
         [JsonPropertyName("achievements"), Newtonsoft.Json.JsonProperty("achievements")]
         [Description("Array of achievements that are related directly or indirectly through associations with the asserted achievements in the CLR. Primarily used to represent hierarchical pathways. Asserted achievements may appear in both this array and in the achievement assertion. If asserted achievements do appear in both places, they MUST match exactly. ")]
+       
         public virtual List<AchievementDType> Achievements { get; set; }
-        
+
         /// <summary>
         /// The learner's asserted achievements. 
         /// </summary>
         /// <value>The learner's asserted achievements. </value>
         [JsonPropertyName("assertions"), Newtonsoft.Json.JsonProperty("assertions")]
         [Description("The learner's asserted achievements. ")]
-        public virtual List<AssertionDType> Assertions { get; set; }
-        
+        public List<AssertionDType> Assertions { get; set; }
+
+        /// <summary>
+        /// Allows endorsers to make specific claims about the assertion. 
+        /// </summary>
+        /// <value>Allows endorsers to make specific claims about the assertion. </value>
+        [JsonPropertyName("endorsements"), Newtonsoft.Json.JsonProperty("endorsements")]
+        [Description("Allows endorsers to make specific claims about the CLR, or any assertion, achievement, or profile referenced in the CLR. ")]
+        public virtual List<EndorsementDType> Endorsements { get; set; }
+
         /// <summary>
         /// Timestamp of when the CLR was published. Model Primitive Datatype = DateTime.
         /// </summary>
@@ -103,7 +114,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("publisher"), Newtonsoft.Json.JsonProperty("publisher")]
         [Description("Publisher")]
         public virtual ProfileDType Publisher { get; set; }
-        
+
         /// <summary>
         /// If revoked, optional reason for revocation. Model Primitive Datatype = String.
         /// </summary>
@@ -142,13 +153,12 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("verification"), Newtonsoft.Json.JsonProperty("verification")]
         [Description("Verification")]
         public virtual VerificationDType Verification { get; set; }
-
         /// <summary>
         /// Additional properties of the object
         /// </summary>
         [JsonExtensionData]
         [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
-        public Dictionary<String, Object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+        public Dictionary<String, Object> AdditionalProperties { get; set; }
 
 
         /// <summary>
@@ -157,7 +167,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

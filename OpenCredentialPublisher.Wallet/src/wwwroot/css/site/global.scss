@@ -1,4 +1,6 @@
-/* global */
+
+@import "../Variables.scss";
+
 ::placeholder {
     color: black;
     opacity: 1;
@@ -17,7 +19,6 @@
     width: 100%;
     border-radius: 10px;
     background-color: white;
-    font-size: 12px;
     box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
 }
 
@@ -29,6 +30,10 @@
     position: relative;
     width: 320px;
     height: 450px;
+}
+
+.notice-container {
+    height: 100%;
 }
 
 @media (max-width: 575px) {
@@ -97,6 +102,7 @@
 
 .profile-picture-container {
     position: absolute;
+    left: 78px;
     background-color: white;
     width: 150px;
     height: 150px;
@@ -130,35 +136,33 @@
     height: 380px;
     border-radius: 10px;
     background-color: white;
-    font-size: 12px;
     position: relative;
     top: 70px;
-    padding: 10px 10px 10px 10px;
+    padding: 10px 10px 20px 10px;
     box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
 }
 
 .pencil-container {
-    margin-bottom: 60px;
+    margin-bottom: 45px;
     text-align: right;
 }
 
 .profile-name {
     top: 80px;
     text-align: center;
-    padding-bottom: 20px;
-    font-size: 20px
+    padding-bottom: 10px;
 }
 
 .profile-stats {
     text-align: center;
     color: #0099F8;
-    font-weight: bold;
 }
-
+.profile-stats-container {
+    height: 100%;
+}
 .stats-border {
     border-right: 2px solid #f7f7f7;
 }
-
 .stats-label {
     text-align: center;
     font-weight: bold;
@@ -176,6 +180,7 @@
 }
 
 .dashboard-container {
+    height: 380px;
     padding: 20px 20px;
 }
 
@@ -183,10 +188,11 @@
     color: #65E7EC;
     width: 100px;
     margin-bottom: 10px;
-    font-size: 15px
+    font-size: 16px;
+    font-weight: bold;
 }
 
-.credentials-container, .upload-container, .dashboard-container {
+.credentials-container, .upload-container, .dashboard-container, .notice-container {
     width: 100%;
     border-radius: 10px;
     background-color: white;
@@ -197,10 +203,18 @@
 .credential-row .card {
     background-color: transparent;
     border: 0;
+    padding: 5px;
     border-radius: 20px;
     background-color: #f4f4f4;
 }
 
+.credential-row .card  .sharp {
+    background-color: transparent;
+    border: 0;
+    padding: 5px;
+    border-radius: .25em;
+    background-color: #f4f4f4;
+}
 .credential-row .card .card-header {
     border-radius: 20px;
     border: solid 1px #0099F8;
@@ -209,6 +223,7 @@
     z-index: 99;
     position: relative;
     color: #ffffff;
+    font-weight: $font-weight-semibold;
 }
 
 .credential-row .card .card-body {
@@ -221,6 +236,13 @@
 
 .card-section-body:not(.collapsed) {
     border-top: 2px solid white;
+}
+
+.badge-section.card-section-body:not(.collapsed) {
+    border-top: 2px solid #f4f4f4;
+}
+.thin-corners {
+    border-radius: 4px !important;
 }
 
 .assertion-section {
@@ -286,10 +308,6 @@
     font-size: 1.5em;
 }
 
-.connection-qr-code {
-    width: 300px;
-    height: 300px;
-}
 
 ul.list-group-plain > li {
     border: 0;
@@ -306,6 +324,10 @@ ul.list-group-plain > li {
     font-size: 18px;
 }
 
+#connect-logos {
+    width: 100%;
+}
+
 .navbar-collapse.show {
     background: #9206ea;
     z-index: 3;
@@ -314,7 +336,48 @@ ul.list-group-plain > li {
 .highlights-group button, .highlights-group-button a {
     width: 124px;
 }
+.icon-color {
+    color: $orange;
+}
 
-.font-12 {
-    font-size: 12px;
+a {
+    font-size: 14px;
+    font-weight: 500;
+    /*text-decoration: underline;*/
+}
+
+h1, .h1 {
+    font-family: $font-family-open-sans;
+    font-size: 20px !important;
+    font-weight: $font-weight-semibold;
+}
+
+h2, .h2 {
+    font-family: $font-family-open-sans;
+    font-size: 16px !important;
+    font-weight: $font-weight-semibold;
+}
+
+h3, .h3 {
+    font-family: $font-family-open-sans;
+    font-size: 14px !important;
+    font-weight: $font-weight-semibold;
+}
+
+h4, .h4 {
+    font-family: $font-family-open-sans;
+    font-size: 11px !important;
+    font-weight: bold;
+}
+
+h5, .h5 {
+    font-family: $font-family-open-sans;
+    font-size: 16px !important;
+    font-weight: 500;
+}
+
+.small-text {
+    font-family: $font-family-open-sans;
+    font-size: 14px;
+    font-weight: normal;
 }

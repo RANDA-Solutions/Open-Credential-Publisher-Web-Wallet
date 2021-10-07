@@ -28,21 +28,20 @@ namespace OpenCredentialPublisher.Data.Models
                     new KeyValuePair<string, string>(n.Split("=")[0].Trim(), n.Split("=")[1].Trim())));
 
             if (dictionary.ContainsKey("O"))
-                sb.Append($"<div>{dictionary["O"]}");
+                sb.Append($"{dictionary["O"]}");
 
             if (dictionary.ContainsKey("L"))
             {
-                sb.Append($"<div>{dictionary["L"]}");
+                sb.Append($"{dictionary["L"]}");
                 if (dictionary.ContainsKey("S"))
                     sb.Append($", {dictionary["S"]}");
-                sb.Append("</div>");
             }
 
             if (dictionary.ContainsKey("C"))
-                sb.Append($"<div>{dictionary["C"]}</div>");
+                sb.Append($"{dictionary["C"]}");
 
             if (sb.Length == 0 && dictionary.ContainsKey("CN"))
-                sb.Append($"<div>{dictionary["CN"]}</div>");
+                sb.Append($"{dictionary["CN"]}");
 
             return sb.ToString();
         }

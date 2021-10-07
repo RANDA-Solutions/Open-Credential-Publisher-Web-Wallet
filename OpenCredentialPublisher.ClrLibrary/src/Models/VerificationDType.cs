@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -22,7 +23,8 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
     /// <summary>
     /// Information a reviewer can use to verify an Assertion, Clr, or Endorsement. 
     /// </summary>
-    public partial class VerificationDType
+    [NotMapped]
+    public class VerificationDType
     { 
         /// <summary>
         /// Unique IRI for the Verification. Model Primitive Datatype = NormalizedString.
@@ -77,7 +79,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("allowedOrigins"), Newtonsoft.Json.JsonProperty("allowedOrigins")]
         [Description("The host registered name subcomponent of an allowed origin. Any given id URI will be considered valid. Model Primitive Datatype = String.")]
         public List<string> AllowedOrigins { get; set; }
-        
+
         /// <summary>
         /// The (HTTP) id of the key used to sign the Assertion, CLR, or Endorsement. If not present, verifiers will check the public key declared in the referenced issuer Profile. If a key is declared here, it must be authorized in the issuer Profile as well. creator is expected to be the dereferencable URI of a document that describes a CryptographicKey. Model Primitive Datatype = AnyURI.
         /// </summary>
@@ -93,7 +95,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("startsWith"), Newtonsoft.Json.JsonProperty("startsWith")]
         [Description("The URI fragment that the verification property must start with. Valid Assertions, Clrs, and Endorsements must have an id within this scope. Multiple values allowed, and Assertions, Clrs, and Endorsements will be considered valid if their id starts with one of these values. Model Primitive Datatype = String.")]
         public List<string> StartsWith { get; set; }
-        
+
         /// <summary>
         /// The property to be used for verification. Only 'id' is supported. Verifiers will consider 'id' the default value if verificationProperty is omitted or if an issuer Profile has no explicit verification instructions, so it may be safely omitted. Model Primitive Datatype = String.
         /// </summary>
@@ -115,7 +117,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

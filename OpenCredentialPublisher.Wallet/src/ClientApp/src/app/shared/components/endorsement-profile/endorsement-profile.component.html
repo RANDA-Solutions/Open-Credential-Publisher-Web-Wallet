@@ -1,0 +1,50 @@
+<dt class="col-12 col-lg-3">Id</dt>
+<dd class="col-12 col-lg-9">{{endorsementProfile.id}}</dd>
+<ng-container *ngIf="endorsementProfile.name != null">
+  <dt class="col-12 col-lg-3">Name</dt>
+  <dd class="col-12 col-lg-9">{{endorsementProfile.name}}</dd>
+</ng-container>
+<ng-container *ngIf="endorsementProfile.email != null">
+  <dt class="col-12 col-lg-3">Email</dt>
+  <dd class="col-12 col-lg-9"><a href="mailto:{{endorsementProfile.email}}">{{endorsementProfile.email}}</a></dd>
+</ng-container>
+<ng-container *ngIf="endorsementProfile.url != null">
+  <dt class="col-12 col-lg-3">URL</dt>
+  <dd class="col-12 col-lg-9"><a href="{{endorsementProfile.url}}">{{endorsementProfile.url}}</a></dd>
+</ng-container>
+<ng-container *ngIf="endorsementProfile.address != null">
+  <ng-container *ngIf="endorsementProfile.address.streetAddress != null || endorsementProfile.address.addressRegion != null
+        || endorsementProfile.address.addressLocality != null || endorsementProfile.address.postalCode != null">
+    <dt class="col-12 col-lg-3">Address</dt>
+    <dd class="col-12 col-lg-9">
+      <div *ngIf="endorsementProfile.address.streetAddress != null">{{endorsementProfile.address.streetAddress}}</div>
+      <div>
+        <ng-container *ngIf="endorsementProfile.address.addressRegion != null">
+            {{endorsementProfile.address.addressRegion}},
+        </ng-container>
+        <ng-container *ngIf="endorsementProfile.address.addressLocality != null">
+            {{endorsementProfile.address.addressLocality}}
+        </ng-container>
+        {{endorsementProfile.address.postalCode}}
+      </div>
+    </dd>
+  </ng-container>
+</ng-container>
+<ng-container *ngIf="endorsementProfile.telephone != null">
+  <dt class="col-12 col-lg-3">Phone</dt>
+  <dd class="col-12 col-lg-9">{{endorsementProfile.telephone}}</dd>
+</ng-container>
+<ng-container *ngIf="endorsementProfile.studentId != null">
+  <dt class="col-12 col-lg-3">Student ID</dt>
+  <dd class="col-12 col-lg-9">{{endorsementProfile.studentId}}</dd>
+</ng-container>
+<ng-container *ngIf="endorsementProfile.sourcedId != null">
+  <dt class="col-12 col-lg-3">SourcedId</dt>
+  <dd class="col-12 col-lg-9">{{endorsementProfile.sourcedId}}</dd>
+</ng-container>
+<ng-container *ngIf="endorsementProfile.additionalProperties != null">
+  <ng-container *ngFor="let key of endorsementProfile.additionalProperties.keys">
+    <dt class="col-12 col-lg-3">{{key}}</dt>
+    <dd class="col-12 col-lg-9"><pre>{{endorsementProfile.additionalProperties[key]}}</pre></dd>
+  </ng-container>
+</ng-container>

@@ -1,0 +1,51 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+pool:
+  name: default
+
+steps:
+  - checkout: self
+    submodules: true
+  - task: Npm@0
+    displayName: 'npm install'
+    inputs:
+      cwd: OpenCredentialPublisher.Wallet/src/ClientApp
+      arguments: '--no-progress' 
+  - task: Npm@1
+    displayName: 'npm run'
+    inputs:
+      verbose: false
+      workingDir: OpenCredentialPublisher.Wallet/src/ClientApp
+      command: custom
+      customCommand: 'run build -- --configuration $(environment)'
+  - task: AzureFileCopy@4
+    inputs:
+      SourcePath: 'OpenCredentialPublisher.Wallet/src/ClientApp/dist/*'
+      azureSubscription: 'Azure R&D Subscriptions Connector'
+      Destination: 'AzureBlob'
+      storage: 'ocpwalletclientdev'
+      ContainerName: '$web'
+      AdditionalArgumentsForBlobCopy: --content-type "application/javascript" --recursive --include-pattern '*.js'
+      CleanTargetBeforeCopy: true
+
+  - task: AzureFileCopy@4
+    inputs:
+      SourcePath: 'OpenCredentialPublisher.Wallet/src/ClientApp/dist/*'
+      azureSubscription: 'Azure R&D Subscriptions Connector'
+      Destination: 'AzureBlob'
+      storage: 'ocpwalletclientdev'
+      ContainerName: '$web'
+      AdditionalArgumentsForBlobCopy: --content-type "application/json" --recursive --include-pattern '*.map'
+      CleanTargetBeforeCopy: true
+  - task: AzureFileCopy@4
+    inputs:
+      SourcePath: 'OpenCredentialPublisher.Wallet/src/ClientApp/dist/*'
+      azureSubscription: 'Azure R&D Subscriptions Connector'
+      Destination: 'AzureBlob'
+      storage: 'ocpwalletclientdev'
+      ContainerName: '$web'
+      AdditionalArgumentsForBlobCopy: --recursive --exclude-pattern '*.map;*.js'
+      CleanTargetBeforeCopy: true

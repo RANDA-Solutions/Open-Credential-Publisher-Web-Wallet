@@ -9,18 +9,16 @@
  */
 
 using System;
-using System.Linq;
-using System.Text;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using OpenCredentialPublisher.ObcLibrary.Converters;
 
 namespace OpenCredentialPublisher.ObcLibrary.Models
-{ 
+{
     /// <summary>
     /// Open Badges 2.0 Assertion object.
     /// </summary>
@@ -31,7 +29,7 @@ namespace OpenCredentialPublisher.ObcLibrary.Models
         /// </summary>
         /// <value>Model Primitive Datatype = NormalizedString. Unique IRI for this object.</value>
         [Required]
-        [JsonPropertyName("id")]
+        [JsonPropertyName("id"), Newtonsoft.Json.JsonProperty("id")]
         [Description("Model Primitive Datatype = NormalizedString. Unique IRI for this object.")]
         public string Id { get; set; }
         
@@ -40,7 +38,7 @@ namespace OpenCredentialPublisher.ObcLibrary.Models
         /// </summary>
         /// <value>Model Primitive Datatype = String. The JSON-LD type of this object. Normally 'Assertion'.</value>
         [Required]
-        [JsonPropertyName("type")]
+        [JsonPropertyName("type"), Newtonsoft.Json.JsonProperty("type")]
         [Description("Model Primitive Datatype = String. The JSON-LD type of this object. Normally 'Assertion'.")]
         public string Type { get; set; }
         

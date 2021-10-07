@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -20,6 +21,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
     /// <summary>
     /// Describes a rubric criterion level. 
     /// </summary>
+    [NotMapped]
     public partial class RubricCriterionLevelDType
     { 
         /// <summary>
@@ -46,7 +48,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("alignments"), Newtonsoft.Json.JsonProperty("alignments")]
         [Description("The alignments between this rubric criterion level and nodes in external frameworks. ")]
         public virtual List<AlignmentDType> Alignments { get; set; }
-        
+
         /// <summary>
         /// A description of the rubric criterion level. Model Primitive Datatype = String.
         /// </summary>
@@ -93,7 +95,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

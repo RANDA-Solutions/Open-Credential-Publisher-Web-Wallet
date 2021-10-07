@@ -1,0 +1,20 @@
+<div *ngIf="showSpinner == true; else associationsContent" class="row d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="'loading clrs'"></app-spinner>
+</div>
+<ng-template #associationsContent>
+  <ng-container *ngIf="associations.length > 0">
+    <button class="card-header" [attr.id]="'associationsHeader-' + utils.safeId(id)" data-toggle="collapse" [attr.data-target]="'#associationsBody-' + utils.safeId(id)">
+      Associations
+    </button>
+    <div [attr.id]="'associationsBody-' + utils.safeId(id)" class="collapse">
+      <div class="card-body">
+        <ul class="list-group">
+          <li *ngFor="let association of associations" class="list-group-item">
+            This achievement
+            <app-association [ancestors]="lineage" [ancestorKeys]="lineageKeys" [clrId]="clrId" [association]="association"></app-association>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</ng-template>

@@ -1,11 +1,13 @@
-using Microsoft.Azure.EventGrid.Models;
+using Azure.Messaging.EventGrid;
 using Microsoft.Azure.Relay;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.AzureListener
 {
@@ -20,6 +22,15 @@ namespace OpenCredentialPublisher.AzureListener
                 try
                 {
                     var client = new HttpClient();
+                    if (message != null && message.Contains(@"\u"))
+                    {
+                        message = message.Replace(@"\u0022", "\"");
+                    }
+
+                    if (message != null && (message.StartsWith('"') || message.EndsWith('"')))
+                    {
+                        message = message.Trim('"');
+                    }
 
                     client.PostAsync($"http://localhost:{port}/api/verity", new ByteArrayContent(Encoding.UTF8.GetBytes(message))).GetAwaiter().GetResult();
                 }
@@ -68,13 +79,33 @@ namespace OpenCredentialPublisher.AzureListener
         private void ProcessEventGridEvents(RelayedHttpListenerContext context)
         {
             var content = new StreamReader(context.Request.InputStream).ReadToEnd();
-            EventGridEvent[] eventGridEvents = JsonConvert.DeserializeObject<EventGridEvent[]>(content);
 
-            foreach (EventGridEvent eventGridEvent in eventGridEvents)
+            var eventGridEvents = EventGridEvent.ParseMany(BinaryData.FromString(content));
+
+            var options = new JsonSerializerOptions
             {
-                Console.WriteLine($"Received event {eventGridEvent.Id} with type:{eventGridEvent.EventType}");
-                File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), $"{eventGridEvent.Id}.json"), JsonConvert.SerializeObject(eventGridEvent));
-                handler(eventGridEvent.Data.ToString());
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+
+            foreach (var eventGridEvent in eventGridEvents)
+            {
+                //Console.WriteLine($"Received event {eventGridEvent.Id} with type:{eventGridEvent.EventType} data: {JsonConvert.SerializeObject(eventGridEvent.Data)}");
+
+                var eventGridData = JsonSerializer.Deserialize<dynamic>(eventGridEvent.Data.ToString());
+                if (eventGridData is JsonElement)
+                {
+                    var element = (JsonElement)eventGridData;
+                    if (element.ValueKind == JsonValueKind.String)
+                    {
+                        var elementString = element.GetString();
+                        handler(elementString);
+                    }
+                }
+                else
+                {
+                    File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), $"{eventGridEvent.Id}.json"), JsonSerializer.Serialize(eventGridEvent.Data, options));
+                    handler(eventGridEvent.Data.ToString());
+                }
 
             }
         }

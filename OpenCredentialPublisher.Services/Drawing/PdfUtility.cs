@@ -77,11 +77,11 @@ namespace OpenCredentialPublisher.Services.Drawing
 
 
             var displayUrl = url;
-            if (url.Length > 94)
-            {
+            //if (url.Length > 94)
+            //{
                 var splitLocation = displayUrl.IndexOf("/", displayUrl.IndexOf("//") + 2);
                 displayUrl = displayUrl.Substring(0, splitLocation);
-            }
+            //}
             var urlY = clickTextY + 30;
             var urlFont = new XFont("Verdana", 12, XFontStyle.Underline);
             var weblinkRect = new XRect(5, urlY - 200, page.Width - 5, 55);
@@ -92,10 +92,13 @@ namespace OpenCredentialPublisher.Services.Drawing
             graphics.DrawString(displayUrl, urlFont,
                 XBrushes.Blue, urlRect, XStringFormats.Center);
 
-            var accessKeyY = urlY + 75;
-            graphics.DrawString($"Then, when prompted, enter the Access Key: {accessKey}", pageFont,
-                XBrushes.Black, new XRect(margin, accessKeyY, page.Width, 20),
-                XStringFormats.Center);
+            if (!string.IsNullOrWhiteSpace(accessKey))
+            {
+                var accessKeyY = urlY + 75;
+                graphics.DrawString($"Then, when prompted, enter the Access Key: {accessKey}", pageFont,
+                    XBrushes.Black, new XRect(margin, accessKeyY, page.Width, 20),
+                    XStringFormats.Center);
+            }
             graphics.Save();
             using var saveStream = new MemoryStream();
             document.Save(saveStream);

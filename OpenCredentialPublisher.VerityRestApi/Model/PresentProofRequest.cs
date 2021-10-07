@@ -27,7 +27,7 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
     /// PresentProofRequest
     /// </summary>
     [DataContract]
-        public partial class PresentProofRequest :  IEquatable<PresentProofRequest>, IValidatableObject
+        public partial class PresentProofRequest : Body2, IEquatable<PresentProofRequest>, IValidatableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PresentProofRequest" /> class.
@@ -61,14 +61,7 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
                 this.Id = id;
             }
             // to ensure "forRelationship" is required (not null)
-            if (forRelationship == null)
-            {
-                throw new InvalidDataException("forRelationship is a required property for PresentProofRequest and cannot be null");
-            }
-            else
-            {
-                this.ForRelationship = forRelationship;
-            }
+            this.ForRelationship = forRelationship;
             // to ensure "name" is required (not null)
             if (name == null)
             {
@@ -168,7 +161,7 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
+        public override string ToJson()
         {
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }

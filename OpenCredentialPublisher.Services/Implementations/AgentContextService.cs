@@ -4,6 +4,7 @@ using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -44,6 +45,22 @@ namespace OpenCredentialPublisher.Services.Implementations
             return await _walletContext.AgentContexts
                 .AsNoTracking()
                 .FirstOrDefaultAsync(ac => ac.Id == id);
+        }
+
+        public async Task<AgentContextModel> GetAgentContextByTokenAsync(string token)
+        {
+            return await _walletContext.AgentContexts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(ac => ac.TokenHash == ConvertTokenToHash(token));
+        }
+
+        public string ConvertTokenToHash(string token)
+        {
+            using var hasher = SHA512.Create();
+            var bytes = UTF8Encoding.UTF8.GetBytes(token);
+            var hashBytes = hasher.ComputeHash(bytes);
+            var hashString = Convert.ToBase64String(hashBytes);
+            return hashString;
         }
 
         public async Task<AgentContextModel> GetAgentContextByThreadIdAsync(String threadId)

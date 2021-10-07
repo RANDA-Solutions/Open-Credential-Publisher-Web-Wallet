@@ -1,3 +1,4 @@
+using OpenCredentialPublisher.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -21,5 +22,9 @@ namespace OpenCredentialPublisher.Data.Models
         public int? ShareId { get; set; }
         [ForeignKey("ShareId")]
         public ShareModel Share { get; set; }
+
+        public int? ProofRequestId { get; set; }
+        [ForeignKey("ProofRequestId")]
+        public ProofRequest ProofRequest { get; set; }
     }
 }

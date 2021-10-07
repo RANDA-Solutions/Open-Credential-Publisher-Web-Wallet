@@ -14,7 +14,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using OpenCredentialPublisher.Data.Abstracts;
 using System.Linq;
-
+using OpenCredentialPublisher.Data.ViewModels.nG;
+using Microsoft.AspNetCore.Http;
+//2021-06-17 EF Tracking OK
 namespace OpenCredentialPublisher.Services.Implementations
 {
     public class LinkService
@@ -27,6 +29,178 @@ namespace OpenCredentialPublisher.Services.Implementations
             _context = context;
             _schemaService = schemaService;
         }
+
+        public async Task<List<LinkVM>> GetLinkVMListAsync(string userId, HttpRequest request)
+        {
+            var links = await _context.Links.AsNoTracking()
+                .Include(l => l.Clr)
+                .ThenInclude(c => c.CredentialPackage)
+                .Where(l => l.UserId == userId)
+                .ToListAsync();            
+
+            var linkVMs = new List<LinkVM>();
+
+            foreach (var link in links)
+            {
+                var pdfs = await _context.Artifacts
+                .Where(a => a.ClrId == link.ClrForeignKey && a.Url != null)
+                .OrderByDescending(a => a.CreatedAt)
+                .Select(a => PdfShareViewModel.FromArtifact(a))
+                .ToListAsync();
+
+                var lvm = new LinkVM
+                {
+                    Id = link.Id,
+                    ClrId = link.Clr.ClrId,
+                    ClrIssuedOn = link.Clr.IssuedOn,
+                    ClrPublisherName = link.Clr.PublisherName,
+                    Pdfs = pdfs,
+                    DisplayCount = link.DisplayCount,
+                    Nickname = link.Nickname,
+                    PackageCreatedAt = link.Clr.CredentialPackage.CreatedAt,
+                    Url = GetLinkUrl(request, link.Id)
+                };
+
+                linkVMs.Add(lvm);
+            }
+            return linkVMs;
+        }
+        public async Task<LinkVM> GetLinkVMAsync(string userId, string id, HttpRequest request)
+        {
+            var link = await _context.Links.AsNoTracking()
+                .Include(l => l.Clr)
+                .ThenInclude(c => c.CredentialPackage)
+                .Where(l => l.UserId == userId && l.Id == id)
+                .FirstOrDefaultAsync();
+
+                var pdfs = await _context.Artifacts
+                .Where(a => a.ClrId == link.ClrForeignKey && a.Url != null)
+                .OrderByDescending(a => a.CreatedAt)
+                .Select(a => PdfShareViewModel.FromArtifact(a))
+                .ToListAsync();
+
+                var lvm = new LinkVM
+                {
+                    Id = link.Id,
+                    ClrId = link.Clr.ClrId,
+                    ClrIssuedOn = link.Clr.IssuedOn,
+                    ClrPublisherName = link.Clr.PublisherName,
+                    Pdfs = pdfs,
+                    DisplayCount = link.DisplayCount,
+                    Nickname = link.Nickname,
+                    PackageCreatedAt = link.Clr.CredentialPackage.CreatedAt,
+                    Url = GetLinkUrl(request, link.Id)
+                };
+
+            return lvm;
+        }
+
+        public async Task<List<ClrLinkVM>> GetAllClrsLinkVMsAsync(string userId)
+        {
+            var clrLinkVMs = new List<ClrLinkVM>();
+            var clrs = await _context.Clrs.AsNoTracking()
+                .Include(clr => clr.CredentialPackage)
+                .Include(c => c.Authorization)
+                .ThenInclude(a => a.Source)
+                .Where(c => c.CredentialPackage.UserId == userId)
+                .ToListAsync();
+
+
+            foreach (var clr in clrs)
+            {
+                clrLinkVMs.Add(new ClrLinkVM
+                {
+                    ClrId = clr.ClrId,
+                    AddedOn = clr.CredentialPackage.CreatedAt.ToLocalTime(),
+                    CreatedAt = clr.IssuedOn,
+                    Name = clr.Name,
+                    Nickname = clr.Name,
+                    SourceId = clr.Authorization?.Source?.Id,
+                    SourceName = clr.Authorization?.Source?.Name,
+                    PublisherName = clr.PublisherName
+                });
+            }
+            return clrLinkVMs;
+        }
+        private string GetLinkUrl(HttpRequest request, string id)
+        {
+            //var Request = model.Request;
+            if (Uri.TryCreate($"{request.Scheme}://{request.Host}{request.PathBase}/Public/Links/Display/{id}", UriKind.Absolute, out var url))
+            {
+                return url.AbsoluteUri;
+            }
+
+            return string.Empty;
+        }
+
+        public async Task<LinkModel> GetAsync(string userId, string id)
+        {
+            return await _context.Links
+                .Include(l => l.Shares)
+                .Include(l => l.Clr)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.Id == id);
+        }
+
+        public async Task<LinkModel> GetAsync(string id)
+        {
+            return await _context.Links
+                .Include(l => l.Shares)
+                .Include(l => l.Clr)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+        public async Task<List<PdfShareViewModel>> GetClrPdfsAsync(int id)
+        {
+            var arts =  await _context.Artifacts
+                .Include(a => a.EvidenceArtifact)
+                .ThenInclude(ea => ea.Evidence)
+                .ThenInclude(e => e.AssertionEvidence)
+                .ThenInclude(ae => ae.Assertion)
+                .Where(a => a.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.ClrAssertion.ClrId == id
+                    && a.IsPdf)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+
+            return arts
+                .Select(a => PdfShareViewModel.FromArtifact(a)).ToList();
+        }
+        public async Task<ClrModel> GetSingleClrAsync(int id)
+        {
+            var clr = await _context.Clrs.AsNoTracking()
+                .Include(c => c.CredentialPackage)
+                .Include(c => c.Verification)
+                .Include(c => c.Learner)
+                .Include(c => c.Publisher)
+                .Include(c => c.ClrAchievements)
+                .ThenInclude(c => c.Achievement)
+                .Where(clr => clr.ClrId == id)
+                .FirstOrDefaultAsync();
+
+            return clr;
+        }
+        public async Task<LinkModel> GetLinkClrVCAsync(string id)
+        {
+            var result = await _context.Links.AsNoTracking()
+                .Include(l => l.Shares)
+                .Include(l => l.Clr)
+                .ThenInclude(c => c.Authorization)
+                .ThenInclude(a => a.Source)
+                .Include(l => l.Clr)
+                .Where(l => l.Id == id)
+                .FirstOrDefaultAsync();
+
+            var vc = await _context.VerifiableCredentials.AsNoTracking()
+                .Where(e => e.ParentCredentialPackageId == result.Clr.CredentialPackageId)
+                .FirstOrDefaultAsync();
+
+            result.Clr.ParentVerifiableCredential = vc;
+            //TODO EF Core config issue, wont populate this via include???
+            var cp = await _context.CredentialPackages.FirstOrDefaultAsync(p => p.Id == result.Clr.CredentialPackageId);
+            result.Clr.CredentialPackage = cp;
+            return result;
+        }
+        //End V2 *************************************************************************************************
         public async Task<LinkModel> AddAsync(LinkModel input)
         {
             await _context.Links.AddAsync(input);
@@ -53,7 +227,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         }
         public async Task<List<LinkModel>> GetAllAsync(string userId)
         {
-            var result = await _context.Links
+            var result = await _context.Links.AsNoTracking()
                 .Where(l => l.UserId == userId)
                 .ToListAsync();
 
@@ -61,16 +235,16 @@ namespace OpenCredentialPublisher.Services.Implementations
         }
         public async Task<List<LinkModel>> GetAllDeepAsync(string userId)
         {
-            var result = await _context.Links
+            var result = await _context.Links.AsNoTracking()
                 .Include(l => l.Shares)
                 .Include(l => l.Clr)
                 .ThenInclude(c => c.Authorization)
                 .ThenInclude(a => a.Source)
                 .Include(l => l.Clr)
-                .ThenInclude(c => c.CredentialPackage)
+                .ThenInclude(c => c.ParentCredentialPackage)
                 .Include(l => l.Clr)
-                .ThenInclude(c => c.ClrSet)
-                .ThenInclude(c => c.CredentialPackage)
+                .ThenInclude(c => c.ParentClrSet)
+                .ThenInclude(c => c.ParentCredentialPackage)
                 .Where(l => l.UserId == userId)
                 .ToListAsync();
 
@@ -79,25 +253,16 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public IQueryable<LinkModel> GetAllDeep(string userId)
         {
-            var result = _context.Links
+            var result = _context.Links.AsNoTracking()
                 .Include(l => l.Shares)
                 .Include(l => l.Clr)
                 .ThenInclude(c => c.CredentialPackage)
                 .Include(l => l.Clr)
-                .ThenInclude(c => c.ClrSet)
-                .ThenInclude(c => c.CredentialPackage)
+                .ThenInclude(c => c.ParentClrSet)
+                .ThenInclude(c => c.ParentCredentialPackage)
                 .Where(l => l.UserId == userId);
 
             return result;
-        }
-
-        public async Task<LinkModel> GetAsync(string userId, string id)
-        {
-            return await _context.Links
-                .Include(l => l.Shares)
-                .Include(l => l.Clr)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId == userId && x.Id == id);
         }
 
         public async Task<LinkModel> GetAsync(string userId, int clrId)
@@ -109,37 +274,31 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .OrderByDescending(l => l.CreatedAt)
                 .FirstOrDefaultAsync(x => x.UserId == userId && x.ClrForeignKey == clrId);
         }
-
-        public async Task<LinkModel> GetAsync(string id)
-        {
-            return await _context.Links
-                .Include(l => l.Shares)
-                .Include(l => l.Clr)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id);
-        }
         public async Task<LinkModel> GetDeepAsync(string id)
         {
-            var result = await _context.Links
+            var result = await _context.Links.AsNoTracking()
                 .Include(l => l.Shares)
                 .Include(l => l.Clr)
                 .ThenInclude(c => c.Authorization)
                 .ThenInclude(a => a.Source)
                 .Include(l => l.Clr)
-                .ThenInclude(l => l.VerifiableCredential)
-                .ThenInclude(c => c.CredentialPackage)
+                .ThenInclude(l => l.ParentVerifiableCredential)
+                .ThenInclude(c => c.ParentCredentialPackage)
                 .Include(l => l.Clr)
-                .ThenInclude(c => c.ClrSet)
-                .ThenInclude(l => l.VerifiableCredential)
-                .ThenInclude(c => c.CredentialPackage)
+                .ThenInclude(c => c.ParentClrSet)
+                .ThenInclude(l => l.ParentVerifiableCredential)
+                .ThenInclude(c => c.ParentCredentialPackage)
                 .Include(l => l.Clr)
-                .ThenInclude(c => c.CredentialPackage)
+                .ThenInclude(c => c.ParentCredentialPackage)
                 .Include(l => l.Clr)
-                .ThenInclude(c => c.ClrSet)
-                .ThenInclude(c => c.CredentialPackage)
+                .ThenInclude(c => c.ParentClrSet)
+                .ThenInclude(c => c.ParentCredentialPackage)
                 .Where(l => l.Id == id)
                 .FirstOrDefaultAsync();
 
+            //TODO EF Core config issue, wont populate this via include???
+            var cp = await _context.CredentialPackages.FirstOrDefaultAsync(p => p.Id == result.Clr.CredentialPackageId);
+            result.Clr.CredentialPackage = cp;
             return result;
         }
 

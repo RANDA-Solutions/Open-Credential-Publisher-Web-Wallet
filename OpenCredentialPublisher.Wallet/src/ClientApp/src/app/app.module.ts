@@ -1,80 +1,91 @@
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_BASE_HREF, CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { ApiAuthorizationModule } from 'src/api-authorization/api-authorization.module';
-import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
-import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
+import { CoreModule } from '@core/core.module';
+import { AppService } from '@core/services/app.service';
+import { environment } from '@environment/environment';
+import { AuthModule, EventTypes, LogLevel, OidcClientNotification, PublicEventsService } from 'angular-auth-oidc-client';
+import { AuthStateResult } from 'angular-auth-oidc-client/lib/auth-state/auth-state';
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { MessageService } from 'primeng/api';
+import { filter } from 'rxjs/operators';
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ListCandidateComponent, PortfolioCandidateComponent, PortfolioComponent } from './components';
-import { CodeflowComponent } from './components/codeflow/codeflow.component';
-import { HomeComponent } from './components/home/home.component';
-import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
-import { CandidateProfileComponent } from './components/portfolio/candidate-profile.component';
-import { PortfolioDeleteModalComponent } from './components/portfolio/portfolio-delete-modal.component';
-import { PortfolioVerificationModalComponent } from './components/portfolio/portfolio-verification-modal.component';
-import { VerificationComponent } from './components/verification/verification.component';
-import { DirectivesModule } from './modules/directives/directives.module';
-import { PayflowModule } from './modules/payflow/payflow.module';
-import { SafeUrlPipe } from './pipes/safe-url.pipe';
-import { VerifyResolver } from './resolvers/verify.resolver';
-import {
-  CandidateService,
-  CodeFlowService,
-  HomeService,
-  PortfolioService,
-  VerificationService
-} from './services/';
+import { LoginService } from './auth/auth.service';
+import { LoginCallbackComponent } from './auth/login-callback.component';
+import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
+import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
+import { NavMenuComponent } from './nav-menu/nav-menu.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NavMenuComponent,
-    HomeComponent,
-    ListCandidateComponent,
-    PortfolioCandidateComponent,
-    PortfolioComponent,
-    CodeflowComponent,
-    SafeUrlPipe,
-    PortfolioVerificationModalComponent,
-    PortfolioDeleteModalComponent,
-    CandidateProfileComponent
-  ],
-  imports: [
-    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ApiAuthorizationModule,
-    RouterModule.forRoot([
-      { path: '', component: PortfolioComponent, pathMatch: 'full', canActivate: [AuthorizeGuard]  },
-      { path: 'candidate', component: ListCandidateComponent, canActivate: [AuthorizeGuard] },
-      { path: 'codeflow', component: CodeflowComponent, canActivate: [AuthorizeGuard] },
-      { path: 'folio', canActivate: [AuthorizeGuard], loadChildren: () => import('./modules/folio/folio.module').then(m => m.FolioModule)},
-      { path: 'transactions', canActivate: [AuthorizeGuard], loadChildren: () => import('./modules/transactions/transactions.module').then(m => m.TransactionsModule)},
-      { path: 'portfolio', component: PortfolioComponent, canActivate: [AuthorizeGuard] },
-      { path: 'verify', component: VerificationComponent, canActivate: [AuthorizeGuard], resolve: [VerifyResolver]}
-    ]),
-    FontAwesomeModule,
-    DirectivesModule,
-    PayflowModule    
-  ],
-  providers: [
-    CandidateService,
-    CodeFlowService,
-    HomeService,
-    PortfolioService,
-    VerificationService,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }
-  ],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		LoginCallbackComponent,
+		SourcesCallbackComponent,
+		SourcesErrorComponent,
+		NavMenuComponent
+	],
+	imports: [
+		CommonModule,
+		CoreModule,
+		BrowserModule,
+		FormsModule,
+		ReactiveFormsModule,
+		HttpClientModule,
+		LoggerModule.forRoot({
+			serverLoggingUrl: '/api/clientlog/ngxlogger',
+			level: NgxLoggerLevel.DEBUG,
+			serverLogLevel: NgxLoggerLevel.ERROR
+		}),
+		AppRoutingModule,
+		AuthModule.forRoot({
+			config: {
+				configId: environment.configId,
+				authority: `${environment.baseUrl}`,
+				redirectUrl: `${window.location.origin}/callback`,
+				postLogoutRedirectUri: `${window.location.origin}/credentials`,
+				clientId: 'ocp-wallet-client',
+				scope: 'openid profile roles offline_access', // 'openid profile offline_access ' + your scopes
+				responseType: 'code',
+				silentRenew: true,
+				silentRenewUrl: `'${window.location.origin}/silent-renew.html`,
+				triggerAuthorizationResultEvent: true,
+				useRefreshToken: true,
+				renewTimeBeforeTokenExpiresInSeconds: 30,
+				logLevel: LogLevel.Error,
+				postLoginRoute: `/credentials`,
+				secureRoutes: environment.secureRoutes,
+				historyCleanupOff: true
+			},
+		})
+	],
+	providers: [
+
+		{ provide: APP_BASE_HREF, useValue: '/' }
+		, AppService
+		, MessageService
+	],
+	bootstrap: [AppComponent]
 })
-export class AppModule { 
-  constructor(library: FaIconLibrary) {
-    // Add an icon to the library for convenient access in other components
-    library.addIconPacks(fas);
-  }
+export class AppModule {
+	private debug = false;
+	constructor(private readonly eventService: PublicEventsService, private loginService: LoginService) {
+		this.eventService
+			.registerForEvents()
+			.pipe(filter((notification) => notification.type === EventTypes.ConfigLoaded))
+			.subscribe((config) => {
+				// console.log('ConfigLoaded', config);
+			});
+
+		this.eventService
+			.registerForEvents()
+			.pipe(filter((notification) => notification.type === EventTypes.NewAuthenticationResult))
+			.subscribe((result: OidcClientNotification<AuthStateResult>) => {
+				console.log('isAuthenticated', result.value?.isAuthenticated);
+				this.loginService.reportAuthState(result.value);
+			});
+	}
+
 }

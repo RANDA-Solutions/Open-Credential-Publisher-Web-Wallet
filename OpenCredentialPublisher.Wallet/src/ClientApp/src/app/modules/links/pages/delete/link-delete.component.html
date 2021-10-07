@@ -1,0 +1,47 @@
+<div class="row mt-5">
+  <div class="col">
+    <section class="default-container p-5">
+      <span class="h1">Delete Link</span>
+
+      <div class="alert alert-primary">
+          A link is a URL you can share with people that lets them see your CLR. The people that click on the link will
+          only be able to see the one CLR you select. You can see how many times people have displayed your CLR in the
+          table below.
+      </div>
+      <div class="alert alert-danger">
+          If you delete this link, anyone that clicks on the link will see a "not found" message.
+          This will <b>not</b> delete the CLR and you can create and share another link to the CLR.
+      </div>
+
+      <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+        <span *ngFor="let msg of modelErrors">{{msg}}</span>
+      </div>
+      <ng-container *ngIf="vm.linkId != null">
+        <span class="h3">Are you sure you want to delete this link?</span>
+        <div>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">Nickname</dt>
+                <dd class="col-sm-10">
+                    {{vm.linkNickname}}
+                </dd>
+            </dl>
+            <form method="post">
+                <button type="button"  (click)="deleteLink()" class="btn btn-outline-danger btn-lg">Delete</button>|
+                <a [routerLink]="['/links']">Back to List of Links</a>
+            </form>
+        </div>
+      </ng-container>
+      <a *ngIf="vm.linkId == null" [routerLink]="['/links']">Back to List of Links</a>
+    </section>
+  </div>
+  <ng-template #showLoading>
+    <div class="tw-spinner-overlay" [hidden]="!showSpinner">
+      <div class="tw-spinner-wrapper">
+      </div>
+    </div>
+    <div id="spinner-container" [hidden]="!showSpinner">
+      <app-spinner id="spinner"></app-spinner>
+    </div>
+  </ng-template>
+</div>

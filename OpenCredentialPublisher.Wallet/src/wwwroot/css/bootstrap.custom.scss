@@ -1,47 +1,4 @@
-// Dark Blue
-$darkBlue:#003B5C; 
-// Gray
-$gray:#D7D2CB; 
-// Parchment
-$parchment:#F4EFE6;
-// White
-$white:#F9F7F2;
-// Blue
-$blue: #52E4EA;
-// Baby Blue
-$babyBlue:#D2ECF7;
-// Orange
-$orange:#FF9E1B;
-// Cream
-$cream:#FAEFE1;
-// Hot Pink
-$hotPink:#E61B59;
-// Pink
-$pink:#FFD9E4;
-// Aqua
-$aqua:#00BCC4;
-// Light Aqua
-$lightAqua:#C2F1F2;
-// Primary Background
-$backgroundWhite:#FAF8F5;
-// Title  
-$titleWhite:#FEFEFC;
-
-$body-bg: $backgroundWhite;
-
-$theme-colors: ( "primary": $blue, "secondary": $orange, "danger": $hotPink, "info": #9206EA );
-
-$colors: (
-    "white": $white
-);
-
-$btn-font-size-lg: 14px;
-
-@import "fonts.scss";
-
-$font-family-sans-serif: Typold-Regular;
-$font-family-base: $font-family-sans-serif;
-
+@import "Variables";
 @import "../lib/bootstrap/scss/bootstrap";
 
 html {
@@ -66,21 +23,45 @@ nav.navbar {
     color: $blue;
 }
 
-.btn-outline-primary {
-    border-color: $blue !important;
+.btn {
+    text-decoration: none;
+    text-transform: uppercase;
 }
 
-.btn-outline-secondary, .btn-outline-primary {
+.btn-sm {
+    white-space: nowrap;
+}
+
+
+
+.btn-outline-primary {
+    border-color: #52E4EA !important;
+}
+
+.btn-outline-secondary, .btn-outline-primary, .btn-outline-info {
     color: black !important;
+}
+
+.btn-outline-danger, .btn-outline-secondary, .btn-outline-primary, .btn-outline-info {
     border-width: 2px !important;
     border-radius: 10px !important;
 }
 
 .btn-outline-secondary.text-secondary {
-    color: $orange !important;
+    color: #9206EA !important;
+}
+
+.btn-outline-info.text-secondary {
+    color: #FF9E1B !important;
 }
 
 .btn-outline-secondary.text-secondary:hover {
+    color: white !important;
+}
+.btn-outline-info.text-secondary:hover {
+    color: white !important;
+}
+.btn-outline-danger.text-danger:hover {
     color: white !important;
 }
 
@@ -127,4 +108,30 @@ a.text-light:focus, a.text-light:hover {
     display: flex;
     display: -webkit-flex;
     flex-wrap: wrap;
+}
+dt {
+    font-weight: 600;
+}
+th {
+    font-weight: $font-weight-semibold;
+}
+
+.spinner-grow-lg {
+    width: 4rem;
+    height: 4rem;
+}
+
+
+.alert-info {
+    color: #004085;
+    background-color: #cce5ff;
+    border-color: #b8daff;
+}
+
+.alert-info hr {
+    border-top-color: #a2ceff;
+}
+
+.alert-info .alert-link {
+    color: #8cc3ff;
 }

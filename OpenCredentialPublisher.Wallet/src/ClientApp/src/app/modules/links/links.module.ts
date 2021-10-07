@@ -1,18 +1,43 @@
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { CreateComponent } from './components/create.component';
-import { DeleteComponent } from './components/delete.component';
-import { DisplayComponent } from './components/display.component';
-import { ListComponent } from './components/list.component';
-import { NotAvailableComponent } from './components/not-available.component';
-import { ShareComponent } from './components/share.component';
-
-
-
+import { ModuleWithProviders, NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LogService } from '@core/error-handling/logerror.service';
+import { ClrDetailService } from '@core/services/clrdetail.service';
+import { SharedModule } from '@shared/shared.module';
+import { linkRouter } from './links.router';
+import { LinksService } from './links.service';
+import { CreateLinkComponent } from './pages/create/create-link.component';
+import { LinkListComponent } from './pages/link-list/link-list.component';
+import { NotAvailableComponent } from './pages/not-available/not-available.component';
+import { ShareLinkComponent } from './pages/share-link/share-link.component';
+import { RecipientListComponent } from './pages/recipient-list/recipient-list.component';
+import { DeleteRecipientComponent } from './pages/delete-recipient/delete-recipient.component';
+import { CreateRecipientComponent } from './pages/create-recipient/create-recipient.component';
+import { EditRecipientComponent } from './pages/edit-recipient/edit-recipient.component';
 @NgModule({
-  declarations: [CreateComponent, DeleteComponent, DisplayComponent, ListComponent, NotAvailableComponent, ShareComponent],
-  imports: [
-    CommonModule
-  ]
-})
-export class LinksModule { }
+    imports: [
+      SharedModule,
+      FormsModule,
+      ReactiveFormsModule,
+      linkRouter
+    ],
+    declarations: [
+      LinkListComponent,
+      CreateLinkComponent,
+      NotAvailableComponent,
+      ShareLinkComponent,
+      RecipientListComponent,
+      DeleteRecipientComponent,
+      CreateRecipientComponent,
+      EditRecipientComponent,
+      ],
+      providers: [ LinksService, ClrDetailService, LogService ],
+      entryComponents: [
+      ]
+  })
+export class LinksModule {
+  static forRoot(): ModuleWithProviders<LinksModule> {
+      return {
+        ngModule: LinksModule
+      };
+    }
+  }

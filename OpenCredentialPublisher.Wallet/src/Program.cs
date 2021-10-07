@@ -33,17 +33,21 @@ namespace OpenCredentialPublisher.ClrWallet
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            return Host.CreateDefaultBuilder(args)
+            var builder = Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((context, builder) =>
                 {
                     if (context.HostingEnvironment.IsDevelopmentOrLocalhost())
                         builder.AddUserSecrets<Program>();
-                })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                    webBuilder.UseSerilog();
                 });
+
+            return builder.ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+#if IIS
+                webBuilder.UseIIS();
+#endif
+                webBuilder.UseSerilog();
+            });
         }
     }
 }

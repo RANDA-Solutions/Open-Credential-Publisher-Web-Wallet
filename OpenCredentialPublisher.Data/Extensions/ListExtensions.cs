@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
+using OpenCredentialPublisher.Data.ViewModels.nG;
+using PdfShareViewModel = OpenCredentialPublisher.Data.ViewModels.nG.PdfShareViewModel;
 
 namespace OpenCredentialPublisher.Data.Extensions
 {

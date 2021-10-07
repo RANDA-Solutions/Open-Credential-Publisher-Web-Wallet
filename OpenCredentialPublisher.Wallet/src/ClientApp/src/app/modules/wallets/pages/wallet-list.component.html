@@ -1,0 +1,97 @@
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <div class="row mt-5">
+    <div class="col">
+      <section class="default-container p-5">
+        <span class="h1">Your connected wallets</span>
+        <div class="row my-3">
+          <div class="col d-flex flex-column">
+            <button type="button" class="btn btn-outline-primary btn-lg " (click)="connect(content)"
+              id="btn-create-wallet">
+              Connect your wallet
+              <span id="btn-create-wallet-loader" class="spinner-border spinner-border-sm" style="display:none;" role="status" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="col d-flex flex-column">
+          </div>
+          <div class="col d-flex flex-column justify-content-around align-items-end">
+            <button id="refresh_button" class="btn btn-outline-tertiary" (click)="refresh()" title="Refresh List"><i class="fas fa-sync"></i></button>
+          </div>
+        </div>
+        <div class="row justify-content-start">
+          <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+            <span *ngFor="let msg of modelErrors">{{msg}}</span>
+          </div>
+        </div>
+        <form id="create-wallet-form">
+        </form>
+
+        <div class="mt-4 table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th><abbr title="The decentralized identifier representing the relationship between your mobile wallet and this website.">Relationship DID</abbr></th>
+                <th><abbr title="The total number of credentials sent to this wallet.">Credentials</abbr></th>
+                <th>Created</th>
+                <th>Connected</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let relationship of relationships">
+                <td>{{relationship.walletName}}</td>
+                <td>
+                    {{relationship.relationshipDid}}
+                </td>
+                <td>
+                    {{relationship.credentialsSent}}
+                </td>
+                <td>
+                    {{relationship.createdOn | date: 'M/d/yyyy h:mm a'}}
+                </td>
+                <td>
+                  <span *ngIf="relationship.isConnected == true">
+                      Connected
+                  </span>
+                  <a *ngIf="relationship.isConnected != true && relationship.inviteUrl != null"
+                    [routerLink]="['../invitation', relationship.id]" title="Complete Relationship">Complete Relationship</a>
+                  <span *ngIf="relationship.isConnected != true && relationship.inviteUrl == null">Waiting for invitation</span>
+                </td>
+                <td>
+                  <a *ngIf="relationship.isConnected == true" class="btn btn-outline-primary btn-sm"
+                    [routerLink]="['../send', relationship.id]" title="Send Credential">Send Credential</a>
+                </td>
+                <td style="white-space: nowrap">
+                  <a *ngIf="relationship.isConnected == true" class="mr-2" title="Name this connection"
+                  [routerLink]="['../edit', relationship.id]"><i class="fas fa-edit fa-2x"></i></a>
+                  <a [routerLink]="['../delete', relationship.id]" title="Delete Relationship"><i class="fas fa-trash fa-2x"></i></a>
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <a [routerLink]="['/credentials']">Back to Credentials</a>
+
+      </section>
+    </div>
+    <ng-template #content let-modal>
+        <div class="modal-header">
+            <span class="h5 modal-title" id="staticBackdropLabel">Connecting Wallet</span>
+            <button type="button" class="btn-close" style="display:none;" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <ul id="status-list" class="list-group list-group-plain text-center">
+                <li class="static-status list-group-item text-bold" *ngFor="let status of statuses">
+                  {{status.status}}
+                  <div id="spinner" *ngIf="currStatus == status" class="spinner-grow spinner-grow-sm" role="status"></div>
+                </li>
+            </ul>
+        </div>
+    </ng-template>
+  </div>
+</ng-template>

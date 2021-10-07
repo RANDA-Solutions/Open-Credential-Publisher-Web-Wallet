@@ -46,6 +46,9 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         [DataMember(Name="thid", EmitDefaultValue=false)]
         public string Thid { get; set; }
 
+        [DataMember(Name = "pthid", EmitDefaultValue = false)]
+        public string PThid { get; set; }
+
         /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
@@ -93,6 +96,11 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
                     this.Thid == input.Thid ||
                     (this.Thid != null &&
                     this.Thid.Equals(input.Thid))
+                ) &&
+                (
+                    this.PThid == input.PThid ||
+                    (this.PThid != null &&
+                    this.PThid.Equals(input.PThid))
                 );
         }
 

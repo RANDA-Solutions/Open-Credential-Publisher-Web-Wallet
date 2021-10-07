@@ -95,10 +95,12 @@ namespace OpenCredentialPublisher.Data.Models
         }
         private static void HideSensitiveInfo(ref string content)
         {
-            var start = content.ToLower().IndexOf("password=") + 9;
-            var end = content.IndexOf("&", start);
+            var start = content.ToLower().IndexOf("password=");
+            var end = start;
             if (start > -1)
             {
+                start += 9;
+                end = content.IndexOf("&", start);
                 if (end > -1)
                 {
                     content = content.Substring(0, start) + new string('*', 8) + content.Substring(end);
@@ -108,10 +110,11 @@ namespace OpenCredentialPublisher.Data.Models
                     content = content.Substring(0, start) + new string('*', 8);
                 }
             }
-            start = content.ToLower().IndexOf("username=") + 9;
-            end = content.IndexOf("&", start);
+            start = content.ToLower().IndexOf("username=");
             if (start > -1)
             {
+                start += 9;
+                end = content.IndexOf("&", start);
                 if (end > -1)
                 {
                     content = content.Substring(0, start) + new string('*', 8) + content.Substring(end);

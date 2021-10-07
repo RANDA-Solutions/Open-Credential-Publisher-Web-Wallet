@@ -1,0 +1,36 @@
+<section id="create-proof-form" class="default-container mt-5">
+	<div *ngIf="loading; else proofform" class="d-flex flex-column">
+		<app-spinner id="proof-request-spinner" [message]="message"></app-spinner>
+	  </div>
+	
+	<ng-template #proofform>
+		<div class="col p-4" >
+		<h2>Create a Proof Request</h2>
+		<hr />
+    <form #f="ngForm" novalidate (ngSubmit)="submitRequest(f)">
+        <div *ngIf="modelErrors && modelErrors.length > 0">
+			<div class="alert alert-danger mt-2">
+				<div *ngFor="let msg of modelErrors">{{msg}}</div>
+			</div>
+		</div>
+        <div class="form-group">
+			<select class="form-control" [(ngModel)]="form.credentialSchemaId" name="credentialSchemaId" >
+				<option  [ngValue]="null" selected disabled>Select a Credential Type</option>
+				<option *ngFor="let schema of model.credentialSchemas" [value]="schema.id">{{schemaName(schema)}}</option>
+			  </select>
+        </div>
+        <div class="form-group">
+            <input name="name" class="form-control" placeholder="Your name or organization" [ngModel]="form.name" #name="ngModel" />
+			<small class="text-muted">The user will see what you put here when they receive the proof request.</small><br />
+            <small [hidden]="name.valid || (name.pristine && !submitted)" class="text-danger">Please enter a name</small>
+        </div>
+        <div class="form-group">
+			<input name="notificationAddress" class="form-control" placeholder="Email" [ngModel]="form.notificationAddress" #notificationAddress="ngModel" tmFocus validateEmail />
+			<small class="text-muted">The email address at which you will be notified when the proof request is fulfilled.</small><br />
+            <small [hidden]="notificationAddress.valid || (notificationAddress.pristine && !submitted)" class="text-danger">Please enter a valid email</small>
+        </div>
+        <button type="submit" class="btn btn-outline-primary mr-3"  id="btn-submit-request">CREATE</button>
+    </form>
+	</div>
+	</ng-template>
+</section>

@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="NewDataSet" targetNamespace="Randa.Ets.Data.Xsds" xmlns:mstns="Randa.Ets.Data.Xsds" xmlns="Randa.Ets.Data.Xsds" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DIHistoryReport" msprop:Generator_TableClassName="DIHistoryReportDataTable" msprop:Generator_TableVarName="tableDIHistoryReport" msprop:Generator_TablePropName="DIHistoryReport" msprop:Generator_RowDeletingName="DIHistoryReportRowDeleting" msprop:Generator_RowChangingName="DIHistoryReportRowChanging" msprop:Generator_RowEvHandlerName="DIHistoryReportRowChangeEventHandler" msprop:Generator_RowDeletedName="DIHistoryReportRowDeleted" msprop:Generator_UserTableName="DIHistoryReport" msprop:Generator_RowChangedName="DIHistoryReportRowChanged" msprop:Generator_RowEvArgName="DIHistoryReportRowChangeEvent" msprop:Generator_RowClassName="DIHistoryReportRow">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="candidate" msprop:Generator_TableClassName="candidateDataTable" msprop:Generator_TableVarName="tablecandidate" msprop:Generator_TablePropName="candidate" msprop:Generator_RowDeletingName="candidateRowDeleting" msprop:Generator_RowChangingName="candidateRowChanging" msprop:Generator_RowEvHandlerName="candidateRowChangeEventHandler" msprop:Generator_RowDeletedName="candidateRowDeleted" msprop:Generator_UserTableName="candidate" msprop:Generator_RowChangedName="candidateRowChanged" msprop:Generator_RowEvArgName="candidateRowChangeEvent" msprop:Generator_RowClassName="candidateRow" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="lastname" msprop:Generator_ColumnVarNameInTable="columnlastname" msprop:Generator_ColumnPropNameInRow="lastname" msprop:Generator_ColumnPropNameInTable="lastnameColumn" msprop:Generator_UserColumnName="lastname" type="xs:string" minOccurs="0" msdata:Ordinal="0" />
+              <xs:element name="firstname" msprop:Generator_ColumnVarNameInTable="columnfirstname" msprop:Generator_ColumnPropNameInRow="firstname" msprop:Generator_ColumnPropNameInTable="firstnameColumn" msprop:Generator_UserColumnName="firstname" type="xs:string" minOccurs="0" msdata:Ordinal="1" />
+              <xs:element name="dob" msprop:Generator_ColumnVarNameInTable="columndob" msprop:Generator_ColumnPropNameInRow="dob" msprop:Generator_ColumnPropNameInTable="dobColumn" msprop:Generator_UserColumnName="dob" type="xs:string" minOccurs="0" msdata:Ordinal="2" />
+              <xs:element name="ssn" msprop:Generator_ColumnVarNameInTable="columnssn" msprop:Generator_ColumnPropNameInRow="ssn" msprop:Generator_ColumnPropNameInTable="ssnColumn" msprop:Generator_UserColumnName="ssn" type="xs:string" minOccurs="0" msdata:Ordinal="3" />
+              <xs:element name="address" msprop:Generator_ColumnVarNameInTable="columnaddress" msprop:Generator_ColumnPropNameInRow="address" msprop:Generator_ColumnPropNameInTable="addressColumn" msprop:Generator_UserColumnName="address" type="xs:string" minOccurs="0" msdata:Ordinal="4" />
+              <xs:element name="city" msprop:Generator_ColumnVarNameInTable="columncity" msprop:Generator_ColumnPropNameInRow="city" msprop:Generator_ColumnPropNameInTable="cityColumn" msprop:Generator_UserColumnName="city" type="xs:string" minOccurs="0" msdata:Ordinal="5" />
+              <xs:element name="state" msprop:Generator_ColumnVarNameInTable="columnstate" msprop:Generator_ColumnPropNameInRow="state" msprop:Generator_ColumnPropNameInTable="stateColumn" msprop:Generator_UserColumnName="state" type="xs:string" minOccurs="0" msdata:Ordinal="6" />
+              <xs:element name="zipcode" msprop:Generator_ColumnVarNameInTable="columnzipcode" msprop:Generator_ColumnPropNameInRow="zipcode" msprop:Generator_ColumnPropNameInTable="zipcodeColumn" msprop:Generator_UserColumnName="zipcode" type="xs:string" minOccurs="0" msdata:Ordinal="7" />
+              <xs:element name="test" msprop:Generator_TableClassName="testDataTable" msprop:Generator_TableVarName="tabletest" msprop:Generator_TablePropName="test" msprop:Generator_RowDeletingName="testRowDeleting" msprop:Generator_RowChangingName="testRowChanging" msprop:Generator_RowEvHandlerName="testRowChangeEventHandler" msprop:Generator_RowDeletedName="testRowDeleted" msprop:Generator_UserTableName="test" msprop:Generator_RowChangedName="testRowChanged" msprop:Generator_RowEvArgName="testRowChangeEvent" msprop:Generator_RowClassName="testRow" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="testdate" msprop:Generator_ColumnVarNameInTable="columntestdate" msprop:Generator_ColumnPropNameInRow="testdate" msprop:Generator_ColumnPropNameInTable="testdateColumn" msprop:Generator_UserColumnName="testdate" type="xs:string" minOccurs="0" msdata:Ordinal="0" />
+                    <xs:element name="testname" msprop:Generator_ColumnVarNameInTable="columntestname" msprop:Generator_ColumnPropNameInRow="testname" msprop:Generator_ColumnPropNameInTable="testnameColumn" msprop:Generator_UserColumnName="testname" type="xs:string" minOccurs="0" msdata:Ordinal="1" />
+                    <xs:element name="score" msprop:Generator_ColumnVarNameInTable="columnscore" msprop:Generator_ColumnPropNameInRow="score" msprop:Generator_ColumnPropNameInTable="scoreColumn" msprop:Generator_UserColumnName="score" type="xs:string" minOccurs="0" msdata:Ordinal="2" />
+                    <xs:element name="reportdate" msprop:Generator_ColumnVarNameInTable="columnreportdate" msprop:Generator_ColumnPropNameInRow="reportdate" msprop:Generator_ColumnPropNameInTable="reportdateColumn" msprop:Generator_UserColumnName="reportdate" type="xs:string" minOccurs="0" msdata:Ordinal="3" />
+                    <xs:element name="category" msprop:Generator_TableClassName="categoryDataTable" msprop:Generator_TableVarName="tablecategory" msprop:Generator_TablePropName="category" msprop:Generator_RowDeletingName="categoryRowDeleting" msprop:Generator_RowChangingName="categoryRowChanging" msprop:Generator_RowEvHandlerName="categoryRowChangeEventHandler" msprop:Generator_RowDeletedName="categoryRowDeleted" msprop:Generator_UserTableName="category" msprop:Generator_RowChangedName="categoryRowChanged" msprop:Generator_RowEvArgName="categoryRowChangeEvent" msprop:Generator_RowClassName="categoryRow" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="category1pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory1pointsearned" msprop:Generator_ColumnPropNameInRow="category1pointsearned" msprop:Generator_ColumnPropNameInTable="category1pointsearnedColumn" msprop:Generator_UserColumnName="category1pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category2pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory2pointsearned" msprop:Generator_ColumnPropNameInRow="category2pointsearned" msprop:Generator_ColumnPropNameInTable="category2pointsearnedColumn" msprop:Generator_UserColumnName="category2pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category3pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory3pointsearned" msprop:Generator_ColumnPropNameInRow="category3pointsearned" msprop:Generator_ColumnPropNameInTable="category3pointsearnedColumn" msprop:Generator_UserColumnName="category3pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category4pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory4pointsearned" msprop:Generator_ColumnPropNameInRow="category4pointsearned" msprop:Generator_ColumnPropNameInTable="category4pointsearnedColumn" msprop:Generator_UserColumnName="category4pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category5pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory5pointsearned" msprop:Generator_ColumnPropNameInRow="category5pointsearned" msprop:Generator_ColumnPropNameInTable="category5pointsearnedColumn" msprop:Generator_UserColumnName="category5pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category6pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory6pointsearned" msprop:Generator_ColumnPropNameInRow="category6pointsearned" msprop:Generator_ColumnPropNameInTable="category6pointsearnedColumn" msprop:Generator_UserColumnName="category6pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category7pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory7pointsearned" msprop:Generator_ColumnPropNameInRow="category7pointsearned" msprop:Generator_ColumnPropNameInTable="category7pointsearnedColumn" msprop:Generator_UserColumnName="category7pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category8pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory8pointsearned" msprop:Generator_ColumnPropNameInRow="category8pointsearned" msprop:Generator_ColumnPropNameInTable="category8pointsearnedColumn" msprop:Generator_UserColumnName="category8pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category9pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory9pointsearned" msprop:Generator_ColumnPropNameInRow="category9pointsearned" msprop:Generator_ColumnPropNameInTable="category9pointsearnedColumn" msprop:Generator_UserColumnName="category9pointsearned" type="xs:string" minOccurs="0" />
+                          <xs:element name="category10pointsearned" msprop:Generator_ColumnVarNameInTable="columncategory10pointsearned" msprop:Generator_ColumnPropNameInRow="category10pointsearned" msprop:Generator_ColumnPropNameInTable="category10pointsearnedColumn" msprop:Generator_UserColumnName="category10pointsearned" type="xs:string" minOccurs="0" />
+                        </xs:sequence>
+                        <xs:attribute name="test_Id" msprop:Generator_ColumnVarNameInTable="columntest_Id" msprop:Generator_ColumnPropNameInRow="test_Id" msprop:Generator_ColumnPropNameInTable="test_IdColumn" msprop:Generator_UserColumnName="test_Id" type="xs:int" use="prohibited" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="id" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnid" msprop:Generator_ColumnPropNameInRow="id" msprop:Generator_ColumnPropNameInTable="idColumn" msprop:Generator_UserColumnName="id" type="xs:string" />
+                  <xs:attribute name="test_Id" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columntest_Id" msprop:Generator_ColumnPropNameInRow="test_Id" msprop:Generator_ColumnPropNameInTable="test_IdColumn" msprop:Generator_UserColumnName="test_Id" type="xs:int" msdata:AllowDBNull="false" use="prohibited" />
+                  <xs:attribute name="candidate_Id" msprop:Generator_ColumnVarNameInTable="columncandidate_Id" msprop:Generator_ColumnPropNameInRow="candidate_Id" msprop:Generator_ColumnPropNameInTable="candidate_IdColumn" msprop:Generator_UserColumnName="candidate_Id" type="xs:int" use="prohibited" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnid" msprop:Generator_ColumnPropNameInRow="id" msprop:Generator_ColumnPropNameInTable="idColumn" msprop:Generator_UserColumnName="id" type="xs:string" />
+            <xs:attribute name="candidate_Id" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columncandidate_Id" msprop:Generator_ColumnPropNameInRow="candidate_Id" msprop:Generator_ColumnPropNameInTable="candidate_IdColumn" msprop:Generator_UserColumnName="candidate_Id" type="xs:int" msdata:AllowDBNull="false" use="prohibited" />
+            <xs:attribute name="DIHistoryReport_Id" msprop:Generator_ColumnVarNameInTable="columnDIHistoryReport_Id" msprop:Generator_ColumnPropNameInRow="DIHistoryReport_Id" msprop:Generator_ColumnPropNameInTable="DIHistoryReport_IdColumn" msprop:Generator_UserColumnName="DIHistoryReport_Id" type="xs:int" use="prohibited" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="testyear" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntestyear" msprop:Generator_ColumnPropNameInRow="testyear" msprop:Generator_ColumnPropNameInTable="testyearColumn" msprop:Generator_UserColumnName="testyear" type="xs:string" />
+      <xs:attribute name="DIHistoryReport_Id" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnDIHistoryReport_Id" msprop:Generator_ColumnPropNameInRow="DIHistoryReport_Id" msprop:Generator_ColumnPropNameInTable="DIHistoryReport_IdColumn" msprop:Generator_UserColumnName="DIHistoryReport_Id" type="xs:int" msdata:AllowDBNull="false" use="prohibited" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="NewDataSet" msprop:Generator_DataSetName="NewDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="DIHistoryReport" />
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="test_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:test" />
+      <xs:field xpath="@mstns:test_Id" />
+    </xs:unique>
+    <xs:unique name="candidate_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:candidate" />
+      <xs:field xpath="@mstns:candidate_Id" />
+    </xs:unique>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:DIHistoryReport" />
+      <xs:field xpath="@mstns:DIHistoryReport_Id" />
+    </xs:unique>
+    <xs:keyref name="DIHistoryReport_candidate" refer="Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="candidate" msprop:rel_Generator_ChildPropName="GetcandidateRows" msprop:rel_Generator_UserRelationName="DIHistoryReport_candidate" msprop:rel_Generator_ParentPropName="DIHistoryReportRow" msprop:rel_Generator_RelationVarName="relationDIHistoryReport_candidate" msprop:rel_Generator_UserParentTable="DIHistoryReport">
+      <xs:selector xpath=".//mstns:candidate" />
+      <xs:field xpath="@mstns:DIHistoryReport_Id" />
+    </xs:keyref>
+    <xs:keyref name="candidate_test" refer="candidate_Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="test" msprop:rel_Generator_ChildPropName="GettestRows" msprop:rel_Generator_UserRelationName="candidate_test" msprop:rel_Generator_ParentPropName="candidateRow" msprop:rel_Generator_RelationVarName="relationcandidate_test" msprop:rel_Generator_UserParentTable="candidate">
+      <xs:selector xpath=".//mstns:test" />
+      <xs:field xpath="@mstns:candidate_Id" />
+    </xs:keyref>
+    <xs:keyref name="test_category" refer="test_Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="category" msprop:rel_Generator_ChildPropName="GetcategoryRows" msprop:rel_Generator_UserRelationName="test_category" msprop:rel_Generator_ParentPropName="testRow" msprop:rel_Generator_RelationVarName="relationtest_category" msprop:rel_Generator_UserParentTable="test">
+      <xs:selector xpath=".//mstns:category" />
+      <xs:field xpath="@mstns:test_Id" />
+    </xs:keyref>
+  </xs:element>
+</xs:schema>

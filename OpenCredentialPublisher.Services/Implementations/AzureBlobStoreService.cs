@@ -43,6 +43,26 @@ namespace OpenCredentialPublisher.Services.Implementations
             return filename;
         }
 
+        public async Task<string> SaveToBlobAsync(string containerName, string fileId, string extension, byte[] contents, PublicAccessType publicAccessType = PublicAccessType.None)
+        {
+            var container = new BlobContainerClient(_options.StorageConnectionString, containerName);
+            if (!(await container.ExistsAsync()))
+            {
+                await container.CreateIfNotExistsAsync();
+                await container.SetAccessPolicyAsync(publicAccessType);
+            }
+            var date = DateTimeOffset.UtcNow;
+            var filename = $"{date:yyyy/MM/dd}/{fileId}.{extension}";
+            var location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
+
+            BlobClient blob = container.GetBlobClient(filename);
+            using (var ms = new MemoryStream(contents))
+            {
+                await blob.UploadAsync(ms);
+            }
+            return location;
+        }
+
         public async Task<string> StoreAsync(string filename, byte[] contents, string blobContainerName)
         {
             // Get a reference to a container

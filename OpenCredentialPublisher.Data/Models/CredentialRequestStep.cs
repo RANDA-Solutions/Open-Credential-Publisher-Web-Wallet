@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using OpenCredentialPublisher.Data.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OpenCredentialPublisher.Data.Models

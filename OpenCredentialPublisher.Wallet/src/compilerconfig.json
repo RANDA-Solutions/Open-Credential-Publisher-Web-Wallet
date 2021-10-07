@@ -10,5 +10,13 @@
   {
     "outputFile": "wwwroot/css/site.css",
     "inputFile": "wwwroot/css/site.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/site/login.css",
+    "inputFile": "wwwroot/css/site/login.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/site/global.css",
+    "inputFile": "wwwroot/css/site/global.scss"
   }
 ]

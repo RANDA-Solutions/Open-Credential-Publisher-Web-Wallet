@@ -1,0 +1,88 @@
+<div class="row credential-row mb-3 justify-content-center">
+  <div *ngIf="showSpinner == true; else clrContent" class="d-flex flex-column">
+    <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+  </div>
+  <ng-template #clrContent>
+  <div class="col">
+    <div class="card mt-3 mb-3">
+      <div class="h5 card-header pg-info" data-toggle="collapse" [attr.data-target]="'.clr_' + clr.id.toString()">
+          CLR <span *ngIf="clr.isRevoked" class="alert-danger">REVOKED</span>
+      </div>
+      <div [ngClass]="'clr_' + clr.id.toString() + ' card-body clr-section collapse'" id="clr">
+        <div class="row ">
+          <div class="col border-0">
+            <dl class="row">
+                <dt class="col-12 col-sm-4 col-md-3">Id</dt>
+                <dd class="col-12 col-sm-8 col-md-9">
+                  <div class="text-truncate" data-toggle="tooltip" [title]="clr.identifier">{{clr.identifier}}</div>
+                </dd>
+                <dt class="col-12 col-sm-4 col-md-3">Issued</dt>
+                <dd class="col-12 col-sm-8 col-md-9">{{clr.issuedOn | date: 'M/d/yyyy'}}</dd>
+                <ng-container *ngIf="clr.name != null">
+                    <dt class="col-12 col-sm-4 col-md-3">Name</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">{{clr.name}}</dd>
+                </ng-container>
+            </dl>
+          </div>
+          <div class="col border-0">
+            <app-verification ancestors="clr" [ancestorKeys]="clrId.toString()" [clrId]="clrId" [clrIdentifier]="clr.identifier" [verification]="verification"></app-verification>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer clr-section collapse">
+        <button class="btn btn-outline-tertiary text-black btn-sm float-right" data-toggle="collapse"
+          [attr.id]="'#clr-what_' + clr.id.toString()">What is this?</button>
+        <p class="collapse" [attr.id]="'clr-what_' + clr.id.toString()">
+            Comprehensive Learner Record (CLR): Your learning achievements contained in the document
+        </p>
+      </div>
+    </div>
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2">
+      <!-- Learner -->
+      <div class="col mb-3">
+        <div class="card">
+          <div class="h5 card-header pg-info" data-toggle="collapse" [attr.data-target]="'.clrlearner_' + clrId.toString()">Learner</div>
+          <div [ngClass]="'clrlearner_' + clrId.toString() + ' card-body learner-section'">
+            <dl app-clr-profile ancestors="clr" [ancestorKeys]="clrId.toString()" profileType="learner" [profile]="clr.learner" class="row">
+	          </dl>
+          </div>
+          <div [ngClass]="'clrlearner_' + clrId.toString() + ' card-footer learner-section'">
+            <button class="btn btn-outline-tertiary text-black btn-sm float-right" data-toggle="collapse"
+              [attr.data-target]="'#learner-what_' + clrId.toString()">What is this?</button>
+            <p class="collapse" [attr.id]="'learner-what_' + clrId.toString()">
+                Learner: Credential Holder
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Publisher -->
+      <div class="col mb-3">
+        <div class="card">
+          <div class="h5 card-header" [ngClass]="{ 'pg-info': !isSelfPublished(), 'pg-secondary': isSelfPublished() }" data-toggle="collapse" [attr.data-target]="'.clrpublisher_' + clrId.toString()">{{publisherHeader()}}</div>
+          <div [ngClass]="'clrpublisher_' + clrId.toString() + ' card-body publisher-section'">
+            <dl app-clr-profile ancestors="clr" [ancestorKeys]="clrId.toString()" profileType="publisher" [profile]="clr.publisher" class="row">
+            </dl>
+          </div>
+          <div [ngClass]="'clrpublisher_' + clrId.toString() + ' card-footer publisher-section'">
+            <button class="btn btn-outline-tertiary text-black btn-sm float-right" data-toggle="collapse"
+              [attr.data-target]="'#publisher-what_' + clrId.toString()">What is this?</button>
+            <p class="collapse" [attr.id]="'publisher-what_' + clrId.toString()">
+                Publisher: The authoritative source who issued the document
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Assertions -->
+      <app-clr-assertions ancestors="clr" [ancestorKeys]="clrId.toString()" [clrId]="clr.id" [clrIdentifier]="clr.identifier" [isShare]="true" [isChild]="false"></app-clr-assertions>
+      <ng-container *ngIf="clr.achievementIds.length > 0">
+        <div class="row justify-content-center">
+            <span class="h1 col mt-3 text-center">Achievements</span>
+        </div>
+        <div app-achievement *ngFor="let id of clr.achievementIds" ancestors="clr" [ancestorKeys]="clrId.toString()"
+          [id]="id" [clrId]="clr.id" [clrIdentifier]="clr.identifier" class="card">
+        </div>
+      </ng-container>
+  </div>
+  </ng-template>
+</div>

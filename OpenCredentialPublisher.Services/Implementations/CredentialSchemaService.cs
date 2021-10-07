@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Services.Interfaces;
 using OpenCredentialPublisher.Shared.Commands;
 using System;

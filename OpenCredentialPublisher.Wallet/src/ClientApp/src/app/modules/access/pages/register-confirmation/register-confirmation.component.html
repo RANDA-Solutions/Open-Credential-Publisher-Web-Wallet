@@ -1,0 +1,11 @@
+<section class="register-form">
+    <form>
+    <p *ngIf="userId != null && code != null">
+        For testing purposes, you may <a id="confirm-link" [routerLink]="['/access/email-confirmation']" [queryParams]="qParams">click here to confirm your account</a>.
+        Otherwise, check your email to confirm your account.
+    </p>
+    <p *ngIf="userId == null || code == null">
+        Please check your email to confirm your account.
+    </p>
+  </form>
+</section>

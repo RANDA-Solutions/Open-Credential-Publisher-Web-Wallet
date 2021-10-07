@@ -1,0 +1,43 @@
+<header id="navigation" *ngIf="showNavMenu">
+  <div class="container">
+    <nav id="theTop" class="navbar navbar-expand-md navbar-toggleable-md navbar-light border-bottom box-shadow mb-3">
+      <a class="navbar-brand" [routerLink]="['/']">
+        <img src="assets/images/Logo_with_text.png" alt="Open Credential Publisher" class="logo-image" />
+      </a>
+      <button class="navbar-toggler"
+              type="button"
+              data-toggle="collapse"
+              data-target=".navbar-collapse"
+              aria-controls="navbarSupportedContent" aria-expanded="false"
+              aria-label="Toggle navigation"
+              [attr.aria-expanded]="isExpanded"
+              (click)="toggle()">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse collapse  d-sm-inline-flex justify-content-end"
+           [ngClass]="{ show: isExpanded }">
+        <ul class="navbar-nav mr-auto ml-3">
+          <li class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-light" [routerLink]="['/credentials']"><span class="credential-icon-default mr-2 align-middle"></span><span class="h2"> Credentials</span></a>
+          </li>
+          <li class="nav-item text-nowrap" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-light" [routerLink]="['/wallets/wallet-list']"><span class="fal fa-wallet font-1-5x mr-2 align-middle"></span><span class="h2"> Wallets</span></a>
+          </li>
+        </ul>
+        <ul class="navbar-nav" *ngIf="isAuthenticated">
+          <li class="nav-item">
+            <a class="nav-link text-light" [routerLink]="['/access/logout']" title="Logout">Logout</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav" *ngIf="!(isAuthenticated)">
+          <li class="nav-item">
+            <a class="nav-link text-light" [routerLink]='["/authentication/register"]'>Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" [routerLink]='["/access/login"]'>Login</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+</header>

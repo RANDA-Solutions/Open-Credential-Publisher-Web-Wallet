@@ -8,11 +8,18 @@
     }
   },
   "profiles": {
-    "IIS Express": {
+    "IIS Express - Localhost": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Localhost"
+      }
+    },
+    "IIS Express - Development": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "SelfHost": {
@@ -27,15 +34,13 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-      "publishAllPorts": true,
-      "useSSL": true
-    },
-    "WSL 2": {
-      "commandName": "WSL2",
-      "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-      "publishAllPorts": true,
-      "useSSL": true
+      "environmentVariables": {
+        "ASPNETCORE_URLS": "https://+:443;http://+:80",
+        "ASPNETCORE_HTTPS_PORT": "44393"
+      },
+      "httpPort": 58296,
+      "useSSL": true,
+      "sslPort": 44393
     }
   }
 }

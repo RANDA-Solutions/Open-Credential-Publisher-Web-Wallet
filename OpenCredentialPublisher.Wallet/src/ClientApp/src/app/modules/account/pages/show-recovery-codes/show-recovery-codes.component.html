@@ -1,0 +1,24 @@
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <section>
+      <span class="h1">Recovery Codes</span>
+      <div *ngIf="vm.statusMessage != null"
+          [ngClass]="{'alert alert-success alert-dismissible': !isError, 'alert alert-danger alert-dismissible': isError}" role="alert">
+            <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+            {{vm.statusMessage}}
+      </div>
+      <div class="alert alert-warning" role="alert">
+        <p>
+            <strong>Put these codes in a safe place.</strong>
+        </p>
+        <p>
+            If you lose your device and don't have the recovery codes you will lose access to your account.
+        </p>
+      </div>
+    <div class="row col-9">
+            <code *ngFor="let code of vm.recoveryCodes" class="recovery-code col">{{code}}</code>
+    </div>
+  </section>
+</ng-template>

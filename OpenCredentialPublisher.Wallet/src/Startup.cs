@@ -1,37 +1,48 @@
-using System.Net.Http;
+using Azure.Identity;
+using Azure.Security.KeyVault.Certificates;
+using IdentityServer4;
+using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.EntityFramework.Mappers;
+using IdentityServer4.Stores;
+using Infotekka.ND.IdRampAPI;
+using MediatR;
+using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Serilog;
 using Microsoft.AspNetCore.Identity;
-using IdentityServer4.Stores;
-using IdentityServer4.EntityFramework.DbContexts;
-using System.Linq;
-using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using OpenCredentialPublisher.Data.Contexts;
-using OpenCredentialPublisher.Data.Models;
-using OpenCredentialPublisher.Services.Implementations;
-using OpenCredentialPublisher.Data.Settings;
-using OpenCredentialPublisher.Data.Options;
-using OpenCredentialPublisher.Wallet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using MediatR;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
+using OpenCredentialPublisher.Data.Contexts;
+using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Options;
+using OpenCredentialPublisher.Data.Settings;
+using OpenCredentialPublisher.Data.ViewModels.nG;
+using OpenCredentialPublisher.DependencyInjection;
+using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Services.Interfaces;
 using OpenCredentialPublisher.Services.SignalR;
+using OpenCredentialPublisher.Wallet;
+using OpenCredentialPublisher.Wallet.Auth.Stores;
+using OpenCredentialPublisher.Wallet.Models.Account;
+using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
-using IdentityServer4;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.ClrWallet
 {
@@ -54,18 +65,39 @@ namespace OpenCredentialPublisher.ClrWallet
             services.Configure<AzureBlobOptions>(Configuration.GetSection(AzureBlobOptions.Section));
             services.Configure<AzureQueueOptions>(Configuration.GetSection(AzureQueueOptions.Section));
             services.Configure<AzureListenerOptions>(Configuration.GetSection(AzureListenerOptions.Section));
-            services.Configure<SiteSettingsOptions>(Configuration.GetSection(SiteSettingsOptions.Section));
+            services.Configure<IdRampApiOptions>(Configuration.GetSection(IdRampApiOptions.Section));
+
+            var siteSettingsSection = Configuration.GetSection(SiteSettingsOptions.Section);
+            services.Configure<SiteSettingsOptions>(siteSettingsSection);
+            var siteSettingsOptions = siteSettingsSection.Get<SiteSettingsOptions>();
+            Config.SpaClientUrl = siteSettingsOptions.SpaClientUrl;
+
             services.Configure<VerityOptions>(Configuration.GetSection(VerityOptions.Section));
+            services.Configure<HostSettings>(Configuration.GetSection(nameof(HostSettings)));
+            var keyVaultSection = Configuration.GetSection(nameof(KeyVaultOptions));
+            services.Configure<KeyVaultOptions>(keyVaultSection);
+            var keyVaultOptions = keyVaultSection.Get<KeyVaultOptions>();
+
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
-                .MinimumLevel.Debug()
+                .MinimumLevel.Error()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Error)
                 .Enrich.FromLogContext()
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Literate)
                 .CreateLogger();
+            services.AddControllers()
+                .ConfigureApiBehaviorOptions(options =>
+                { 
+                    options.InvalidModelStateResponseFactory = context =>
+                    {
+                        //object responseObject = context.ModelState.Select(entry => entry.Value.Errors.Select(error => error.ErrorMessage)).Aggregate(Enumerable.Empty<string>(), (agg, val) => agg.Concat(val));
+                        //return new BadRequestObjectResult(responseObject);
+                        return new OkObjectResult(new ApiBadRequestResponse(context.ModelState));
+                    };
+                });
 
             var verityOptions = Configuration.GetSection(VerityOptions.Section).Get<VerityOptions>();
 
@@ -79,7 +111,6 @@ namespace OpenCredentialPublisher.ClrWallet
             if (Environment.IsDevelopmentOrLocalhost())
             {
                 // Accept any server certificate
-
                 services.AddHttpClient(ClrHttpClient.Default, c => { })
                     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                     {
@@ -97,14 +128,6 @@ namespace OpenCredentialPublisher.ClrWallet
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
-
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             var migrationsAssembly = typeof(WalletDbContext).Assembly.GetName().Name;
 
@@ -112,41 +135,26 @@ namespace OpenCredentialPublisher.ClrWallet
             {
                 options.UseSqlServer(connectionString,
                     sql => {
-                        sql.MigrationsAssembly(migrationsAssembly);
                         sql.EnableRetryOnFailure(5);
-                    });
-
+                     });
             });
-            services.AddMemoryCache();
 
+            if (Environment.IsDevelopment())
+                services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddMemoryCache();
+            services.AddHttpContextAccessor();
 
             services.AddSingleton<HostSettings>(sp => Configuration.GetSection(nameof(HostSettings)).Get<HostSettings>());
             services.AddSingleton<MailSettings>(sp => Configuration.GetSection(nameof(MailSettings)).Get<MailSettings>());
-            services.AddTransient<EmailService>();
+
             services.AddTransient<IEmailSender, EmailService>();
             services.AddSingleton<ISigningCredentialStore, IdentityCertificateService>();
             services.AddSingleton<IValidationKeysStore, IdentityCertificateService>();
 
-            services.AddTransient<AuthorizationsService>();
-            services.AddTransient<AzureListenerService>();
-            services.AddTransient<ClrService>();
-            services.AddTransient<CredentialPackageService>();
-            services.AddTransient<CredentialService>();
-            services.AddTransient<ConnectService>();
-            services.AddTransient<ConnectionRequestService>();
-            services.AddTransient<CredentialDefinitionService>();
-            services.AddTransient<CredentialRequestService>();
-            services.AddTransient<CredentialSchemaService>();
-            services.AddTransient<EmailHelperService>();
-            services.AddTransient<LinkService>();
-            services.AddTransient<LogHttpClientService>();
-            services.AddTransient<BadgrService>();
-            services.AddTransient<ProfileImageService>();
-            services.AddTransient<RevocationDocumentService>();
-            services.AddTransient<RevocationService>();
-            services.AddTransient<IQueueService, AzureQueueService>();
-            services.AddTransient<SchemaService>();
-            services.AddTransient<WalletRelationshipService>();
+            RegisterServices.AppServiceRegistration(services);
+
+            services.AddCors(options => CorsConfig.CorsOptions(options, siteSettingsOptions));
 
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IUrlHelper>(x => {
@@ -162,44 +170,177 @@ namespace OpenCredentialPublisher.ClrWallet
                 .AddEntityFrameworkStores<WalletDbContext>()
                 .AddDefaultTokenProviders();
 
-
             var builder = services.AddIdentityServer(options =>
             {
-                options.UserInteraction.LoginUrl = "/Account/Login";
-                options.UserInteraction.LogoutUrl = "/Account/Logout";
+                options.UserInteraction.LoginUrl = "/access/login";
+                options.UserInteraction.LogoutUrl = "/access/logout";
+                options.UserInteraction.ErrorUrl = "/error";
+
+                options.Events.RaiseErrorEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseInformationEvents = true;
+                options.Events.RaiseSuccessEvents = true;
             })
-                .AddConfigurationStore(options =>
-                {
-                    options.ConfigureDbContext = builder =>
-                        builder.UseSqlServer(connectionString,
-                            sql => sql.MigrationsAssembly(migrationsAssembly));
-                })
-                .AddOperationalStore(options =>
-                {
-                    options.ConfigureDbContext = builder =>
-                        builder.UseSqlServer(connectionString,
-                            sql => sql.MigrationsAssembly(migrationsAssembly));
-                })
-                .AddAspNetIdentity<ApplicationUser>();
+            .AddConfigurationStore(options =>
+            {
+                options.ConfigureDbContext = builder =>
+                    builder.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(migrationsAssembly));
+            })
+            .AddOperationalStore(options =>
+            {
+                options.ConfigureDbContext = builder =>
+                    builder.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(migrationsAssembly));
+            });
+            
 
             if (Environment.IsDevelopmentOrLocalhost())
                 builder.AddDeveloperSigningCredential();
-
-            var siteSettings = Configuration.GetSection(SiteSettingsOptions.Section).Get<SiteSettingsOptions>();
-
-            services.AddRazorPages(options =>
+            else
             {
-                options.Conventions.AuthorizeFolder("/");
-                options.Conventions.AllowAnonymousToPage("/Privacy");
-                options.Conventions.AllowAnonymousToPage("/ReleaseNotes");
-                options.Conventions.AllowAnonymousToPage("/Terms");
-                options.Conventions.AllowAnonymousToFolder("/Account");
-                options.Conventions.AllowAnonymousToFolder("/Links");
-            })
-                .AddRazorRuntimeCompilation();
+                var keyVaultName = Configuration["KeyVaultName"];
 
-            services.AddControllers();
+                var certificateClient = new CertificateClient(new Uri($"https://{keyVaultOptions.KeyVaultName}.vault.azure.net/"), new DefaultAzureCredential());
+                var azureResponse = certificateClient.DownloadCertificate(keyVaultOptions.KeyVaultCertificateName);
+                builder.AddSigningCredential(azureResponse.Value);
+            }
 
+            builder.AddApiAuthorization<ApplicationUser, WalletDbContext>(options =>
+             {
+                 options.IdentityResources.AddRange(Config.IdentityResources.ToArray());
+                 options.Clients.AddRange(Config.Clients.ToArray());
+             });
+
+            var authenticationBuilder =
+                services.AddAuthentication()
+                    .AddIdentityServerJwt();
+            
+            // https://damienbod.com/2017/10/16/securing-an-angular-signalr-client-using-jwt-tokens-with-asp-net-core-and-identityserver4/
+            //// Get options from app settings
+            //var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions)).Get<JwtIssuerOptions>();
+
+            //// Configure JwtIssuerOptions
+            //services.Configure<JwtIssuerOptions>(options =>
+            //{
+            //    options.Issuer = jwtAppSettingOptions.Issuer;
+            //    options.Audience = jwtAppSettingOptions.Audience;
+            //    options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+            //});
+
+            //var tokenValidationParameters = new TokenValidationParameters
+            //{
+            //    ValidateIssuer = true,
+            //    ValidIssuer = jwtAppSettingOptions.Issuer,
+
+            //    ValidateAudience = true,
+            //    ValidAudience = jwtAppSettingOptions.Audience,
+
+            //    ValidateIssuerSigningKey = true,
+            //    IssuerSigningKey = _signingKey,
+
+            //    RequireExpirationTime = false,
+            //    ValidateLifetime = true,
+            //    ClockSkew = TimeSpan.Zero
+            //};
+            services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme, options => {
+                //options.ClaimsIssuer = jwtAppSettingOptions.Issuer;
+                //options.TokenValidationParameters = tokenValidationParameters;
+                //options.SaveToken = true;
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if ((context.Request.Path.Value.StartsWith("/hubs")
+                           )
+                            && context.Request.Headers.TryGetValue("Bearer", out StringValues token)
+                        )
+                        {
+                            context.Token = token;
+                        }
+
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        var te = context.Exception;
+                        return Task.CompletedTask;
+                    }
+                };
+            }
+            );
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.IsEssential = true;
+                options.Cookie.SameSite = SameSiteMode.Unspecified;
+            });
+
+            var externalProvidersOptions = Configuration.GetSection(ExternalProvidersOptions.Section).Get<ExternalProvidersOptions>();
+
+            if (externalProvidersOptions?.Configurations != null)
+            {
+
+                foreach (var configuration in externalProvidersOptions.Configurations)
+                {
+                    services.AddOidcStateDataFormatterCache(configuration.AuthenticationScheme);
+
+                    authenticationBuilder.AddOpenIdConnect(configuration.AuthenticationScheme, configuration.DisplayName, options =>
+                    {
+                        options.Authority = configuration.AuthorityUrl;
+                        options.ClientId = configuration.ClientId;
+                        options.ClientSecret = configuration.ClientSecret;
+                        options.ResponseType = configuration.ResponseType;
+                        options.CallbackPath = "/public/account/login/callback";
+                        options.SaveTokens = configuration.SaveTokens;
+                        
+                        options.RequireHttpsMetadata = configuration.RequireHttpsMetadata;
+                        if (!string.IsNullOrEmpty(configuration.MetadataUrl))
+                            options.MetadataAddress = configuration.MetadataUrl;
+                        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                        options.SignOutScheme = IdentityServerConstants.SignoutScheme;
+                        var scopes = configuration.Scopes.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var scope in scopes)
+                            options.Scope.Add(scope);
+                        options.GetClaimsFromUserInfoEndpoint = configuration.GetClaimsFromUserInfoEndpoint;
+
+                        if (configuration.GetClaimsFromUserInfoEndpoint ||
+                            !String.IsNullOrEmpty(configuration.TokenEndpointUrl) ||
+                            !String.IsNullOrEmpty(configuration.AuthorizationEndpointUrl) ||
+                            !String.IsNullOrEmpty(configuration.JwksUri))
+                        {
+                            options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration();
+                            if (!string.IsNullOrEmpty(configuration.JwksUri))
+                                options.Configuration.JwksUri = configuration.JwksUri;
+                            if (configuration.GetClaimsFromUserInfoEndpoint)
+                                options.Configuration.UserInfoEndpoint = configuration.UserInfoEndpointUrl;
+                            if (!String.IsNullOrEmpty(configuration.TokenEndpointUrl))
+                                options.Configuration.TokenEndpoint = configuration.TokenEndpointUrl;
+                            if (!String.IsNullOrEmpty(configuration.AuthorizationEndpointUrl))
+                                options.Configuration.AuthorizationEndpoint = configuration.AuthorizationEndpointUrl;
+                        }
+
+                        options.Events.OnRedirectToIdentityProvider = async context =>
+                        {
+                            if (!string.IsNullOrEmpty(configuration.ReturnUrlParameter))
+                            {
+                                var returnUrl = context.ProtocolMessage.BuildRedirectUrl();
+                                context.ProtocolMessage.RemoveParameter("redirect_uri");
+                                context.ProtocolMessage.SetParameter(configuration.ReturnUrlParameter, returnUrl);
+                            }
+                            await Task.FromResult(0);
+                        };
+                    });
+                }
+            }
+
+            services.AddControllers();// WithViews();
+
+            // In production, the Angular files will be served from this directory
+            if (!Environment.IsDevelopment())
+                services.AddSpaStaticFiles(configuration =>
+                {
+                    configuration.RootPath = "ClientApp/dist";
+                });
             services.AddSignalR();
             services.AddMediatR(typeof(Startup));
         }
@@ -208,7 +349,10 @@ namespace OpenCredentialPublisher.ClrWallet
         public void Configure(IApplicationBuilder app)
         {
             InitializeDatabase(app);
-
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = SameSiteMode.None
+            });
             app.UseForwardedHeaders();
             var basePath = Configuration[OpenCredentialPublisher.ClrWallet.Configuration.BasePath];
             if (!string.IsNullOrEmpty(basePath))
@@ -227,35 +371,67 @@ namespace OpenCredentialPublisher.ClrWallet
                 });
             }
 
-            if (Environment.IsDevelopmentOrLocalhost())
+            if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseMigrationsEndPoint();
             }
-            
+            else
+            {
+                // app.UseExceptionHandler("/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+            //if (!Environment.IsDevelopmentOrLocalhost())
+            //{
+            //    app.UseSpaStaticFiles();
+            //}
+            app.UseRouting();
+            app.UseCors(CorsConfig.PolicyName);
+            app.UseIdentityServer();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCors();
-            app.UseRouting();
-            app.UseIdentityServer();
-            app.UseAuthorization();
+            if (!Environment.IsDevelopment())
+                app.UseSpaStaticFiles();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-                //endpoints.MapDefaultControllerRoute();
-                endpoints.MapRazorPages();
+                endpoints.MapControllers();
                 endpoints.MapHub<ConnectionStatusHub>(ConnectionStatusHub.Endpoint);
                 endpoints.MapHub<CredentialStatusHub>(CredentialStatusHub.Endpoint);
+                endpoints.MapHub<ProofRequestStatusHub>(ProofRequestStatusHub.Endpoint);
             });
+            app.UseWhen(x => !x.Request.Path.Value.Contains("/api/") && !x.Request.Path.Value.Contains("/hubs/"), app1 =>
+             app1.UseSpa(spa =>
+             {
+                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
+                 // see https://go.microsoft.com/fwlink/?linkid=864501
+
+                 spa.Options.SourcePath = "ClientApp";
+                 if (Environment.IsDevelopment())
+                     spa.UseProxyToSpaDevelopmentServer("https://localhost:4200");
+             })
+            );
+            //app.UseSpa(spa =>
+            //{
+            //    // To learn more about options for serving an Angular SPA from ASP.NET Core,
+            //    // see https://go.microsoft.com/fwlink/?linkid=864501
+
+            //    spa.Options.SourcePath = "ClientApp";
+            //    if (Environment.IsDevelopment())
+            //        spa.UseProxyToSpaDevelopmentServer("https://localhost:4200");
+            //});
         }
 
         private void InitializeDatabase(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
-                serviceScope.ServiceProvider.GetRequiredService<WalletDbContext>().Database.Migrate();
+                var walletDbContext = serviceScope.ServiceProvider.GetRequiredService<WalletDbContext>();
+                walletDbContext.Database.Migrate();
+
                 serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
 
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();

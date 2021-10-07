@@ -12,15 +12,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// An accomplishment such as completing a degree, mastering a competency, or course completion that may be asserted about one or more learners. 
     /// </summary>
-    public partial class AchievementDType
+    [NotMapped]
+    public class AchievementDType
     { 
         /// <summary>
         /// Unique IRI for the Achievement. If the id is a URL it must be the location of an Achievement document. Model Primitive Datatype = NormalizedString.
@@ -46,21 +48,20 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("achievementType"), Newtonsoft.Json.JsonProperty("achievementType")]
         [Description("A CLR Achievement can represent many different types of achievement from an assessment result to membership. Use 'Achievement' to indicate an achievement not in the list of allowed values. ")]
         public virtual string AchievementType { get; set; }
-        
+
+        [JsonPropertyName("alignments"), Newtonsoft.Json.JsonProperty("alignments")]
+        [Description("Alignment objects describe an alignment between this achievement and a node in an educational framework. ")]
         /// <summary>
         /// Alignment objects describe an alignment between this achievement and a node in an educational framework. 
         /// </summary>
         /// <value>Alignment objects describe an alignment between this achievement and a node in an educational framework. </value>
-        [JsonPropertyName("alignments"), Newtonsoft.Json.JsonProperty("alignments")]
-        [Description("Alignment objects describe an alignment between this achievement and a node in an educational framework. ")]
         public virtual List<AlignmentDType> Alignments { get; set; }
-        
+        [JsonPropertyName("associations"), Newtonsoft.Json.JsonProperty("associations")]
+        [Description("Associations between this achievement and other achievements. ")]
         /// <summary>
         /// Associations between this achievement and other achievements. 
         /// </summary>
         /// <value>Associations between this achievement and other achievements. </value>
-        [JsonPropertyName("associations"), Newtonsoft.Json.JsonProperty("associations")]
-        [Description("Associations between this achievement and other achievements. ")]
         public virtual List<AssociationDType> Associations { get; set; }
         
         /// <summary>
@@ -78,13 +79,13 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("description"), Newtonsoft.Json.JsonProperty("description")]
         [Description("A short description of the achievement. May be the same as name if no description is available. Model Primitive Datatype = String.")]
         public string Description { get; set; }
-        
+
+        [JsonPropertyName("endorsements"), Newtonsoft.Json.JsonProperty("endorsements")]
+        [Description("Allows endorsers to make specific claims about the Achievement. ")]
         /// <summary>
         /// Allows endorsers to make specific claims about the Achievement. 
         /// </summary>
         /// <value>Allows endorsers to make specific claims about the Achievement. </value>
-        [JsonPropertyName("endorsements"), Newtonsoft.Json.JsonProperty("endorsements")]
-        [Description("Allows endorsers to make specific claims about the Achievement. ")]
         public virtual List<EndorsementDType> Endorsements { get; set; }
         
         /// <summary>
@@ -97,6 +98,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
 
         [JsonPropertyName("identifiers"), Newtonsoft.Json.JsonProperty("identifiers")]
         [Description("A set of System Identifiers that represent other identifiers for this Achievement.")]
+        
         public List<SystemIdentifierDType> Identifiers { get; set; }
 
         /// <summary>
@@ -123,13 +125,13 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image")]
         [Description("IRI of an image representing the achievement. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.")]
         public string Image { get; set; }
-        
-        /// <summary>
-        /// Gets or Sets Issuer
-        /// </summary>
+
         [Required]
         [JsonPropertyName("issuer"), Newtonsoft.Json.JsonProperty("issuer")]
         [Description("Issuer")]
+        /// <summary>
+        /// Gets or Sets Issuer
+        /// </summary>
         public virtual ProfileDType Issuer { get; set; }
         
         /// <summary>
@@ -139,28 +141,27 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("level"), Newtonsoft.Json.JsonProperty("level")]
         [Description("Text that describes the level of achievement apart from how the achievement was performed or demonstrated. Examples would include 'Level 1', 'Level 2', 'Level 3', or 'Bachelors', 'Masters', 'Doctoral'. Model Primitive Datatype = String.")]
         public string Level { get; set; }
-        
+
+        [JsonPropertyName("requirement"), Newtonsoft.Json.JsonProperty("requirement")]
+        [Description("Requirement")]
         /// <summary>
         /// Gets or Sets Requirement
         /// </summary>
-        [JsonPropertyName("requirement"), Newtonsoft.Json.JsonProperty("requirement")]
-        [Description("Requirement")]
         public virtual CriteriaDType Requirement { get; set; }
-        
+
+        [JsonPropertyName("resultDescriptions"), Newtonsoft.Json.JsonProperty("resultDescriptions")]
+        [Description("The set of result descriptions that may be asserted as results with this achievement. ")]
         /// <summary>
         /// The set of result descriptions that may be asserted as results with this achievement. 
         /// </summary>
         /// <value>The set of result descriptions that may be asserted as results with this achievement. </value>
-        [JsonPropertyName("resultDescriptions"), Newtonsoft.Json.JsonProperty("resultDescriptions")]
-        [Description("The set of result descriptions that may be asserted as results with this achievement. ")]
         public virtual List<ResultDescriptionDType> ResultDescriptions { get; set; }
-        
+        [JsonPropertyName("signedEndorsements"), Newtonsoft.Json.JsonProperty("signedEndorsements")]
+        [Description("Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String. ")]
         /// <summary>
         /// Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String. 
         /// </summary>
         /// <value>Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String. </value>
-        [JsonPropertyName("signedEndorsements"), Newtonsoft.Json.JsonProperty("signedEndorsements")]
-        [Description("Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String. ")]
         public List<string> SignedEndorsements { get; set; }
         
         /// <summary>
@@ -170,20 +171,19 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("specialization"), Newtonsoft.Json.JsonProperty("specialization")]
         [Description("Name given to the focus, concentration, or specific area of study defined in the achievement. Examples include Entrepreneurship, Technical Communication, and Finance. Model Primitive Datatype = String.")]
         public string Specialization { get; set; }
-        
+
+        [JsonPropertyName("tags"), Newtonsoft.Json.JsonProperty("tags")]
+        [Description("Tags that describe the type of achievement. Model Primitive Datatype = String.")]
         /// <summary>
         /// Tags that describe the type of achievement. Model Primitive Datatype = String.
         /// </summary>
         /// <value>Tags that describe the type of achievement. Model Primitive Datatype = String.</value>
-        [JsonPropertyName("tags"), Newtonsoft.Json.JsonProperty("tags")]
-        [Description("Tags that describe the type of achievement. Model Primitive Datatype = String.")]
         public List<string> Tags { get; set; }
-        
+        [JsonExtensionData]
+        [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
         /// <summary>
         /// Additional properties of the object
         /// </summary>
-        [JsonExtensionData]
-        [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
         public Dictionary<String, Object> AdditionalProperties { get; set; }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

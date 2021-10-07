@@ -1,0 +1,25 @@
+<button class="card-header" [attr.id]="'additionalPropertiesHeader-' + safeAssertionId" data-toggle="collapse" [attr.data-target]="'#additionalPropertiesBody-'  + safeAssertionId">
+  Additional Properties
+</button>
+<div [attr.id]="'additionalPropertiesBody-' + safeAssertionId" class="collapse">
+  <div class="card-body card-deck">
+    <div class="card border-0">
+      <span class="h4">Additional Assertion Properties</span>
+        <dl *ngIf="additionalProperties != null" class="row">
+          <ng-container *ngFor="let key of additionalProperties.keys">
+            <dt class="col-12 col-sm-4 col-md-3">{{key}}</dt>
+            <dd class="col-12 col-sm-8 col-md-9">{{additionalProperties[key]}}</dd>
+          </ng-container>
+        </dl>
+    </div>
+    <div class="card border-0">
+      <span class="h4">Additional Achievement Properties</span>
+        <dl *ngIf="achievementAdditionalProperties != null" class="row">
+          <ng-container *ngFor="let key of achievementAdditionalProperties.keys">
+            <dt class="col-12 col-sm-4 col-md-3">{{key}}</dt>
+            <dd class="col-12 col-sm-8 col-md-9">{{achievementAdditionalProperties[key]}}</dd>
+          </ng-container>
+        </dl>
+    </div>
+  </div>
+</div>

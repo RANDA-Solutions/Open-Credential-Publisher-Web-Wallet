@@ -1,11 +1,25 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "paths": {
+      "@core/*": [ "app/core/*" ],
+      "@dom_comps/*": [ "app/modules/domains/components/*" ],
+      "@shared/*": [ "app/shared/*" ],
+      "@environment/*": [ "environments/*" ],
+      "@modules/*": [ "app/modules/*" ],
+      "@mocks/*": [ "app/mocks/*" ],
+      "@contracts/*": [ "app/shared/contracts/*" ],
+      "@node_modules/*": [ "../node_modules/*" ],
+      "@root/*": [ "./*" ],
+      "@app/*": [ "app/*" ]
+    },
     "outDir": "../out-tsc/app",
+    "module": "es2020",
     "types": []
   },
   "files": [
     "main.ts",
+    //"**/*.spec.ts",
     "polyfills.ts"
   ],
   "include": [

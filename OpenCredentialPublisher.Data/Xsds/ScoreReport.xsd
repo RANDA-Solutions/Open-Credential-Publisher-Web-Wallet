@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DIScoreReport" targetNamespace="Randa.Ets.Data.Xsds" xmlns:mstns="Randa.Ets.Data.Xsds" xmlns="Randa.Ets.Data.Xsds" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DIScoreReport" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="DIScoreReport" msprop:Generator_DataSetName="DIScoreReport">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="scorereport" msprop:Generator_TableClassName="scorereportDataTable" msprop:Generator_TableVarName="tablescorereport" msprop:Generator_TablePropName="scorereport" msprop:Generator_RowDeletingName="scorereportRowDeleting" msprop:Generator_RowChangingName="scorereportRowChanging" msprop:Generator_RowEvHandlerName="scorereportRowChangeEventHandler" msprop:Generator_RowDeletedName="scorereportRowDeleted" msprop:Generator_UserTableName="scorereport" msprop:Generator_RowChangedName="scorereportRowChanged" msprop:Generator_RowEvArgName="scorereportRowChangeEvent" msprop:Generator_RowClassName="scorereportRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="candidateinfo" msprop:Generator_TableClassName="candidateinfoDataTable" msprop:Generator_TableVarName="tablecandidateinfo" msprop:Generator_TablePropName="candidateinfo" msprop:Generator_RowDeletingName="candidateinfoRowDeleting" msprop:Generator_RowChangingName="candidateinfoRowChanging" msprop:Generator_RowEvHandlerName="candidateinfoRowChangeEventHandler" msprop:Generator_RowDeletedName="candidateinfoRowDeleted" msprop:Generator_UserTableName="candidateinfo" msprop:Generator_RowChangedName="candidateinfoRowChanged" msprop:Generator_RowEvArgName="candidateinfoRowChangeEvent" msprop:Generator_RowClassName="candidateinfoRow" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" msprop:Generator_ColumnVarNameInTable="columnname" msprop:Generator_ColumnPropNameInRow="name" msprop:Generator_ColumnPropNameInTable="nameColumn" msprop:Generator_UserColumnName="name" type="xs:string" minOccurs="0" />
+                    <xs:element name="ssn" msprop:Generator_ColumnVarNameInTable="columnssn" msprop:Generator_ColumnPropNameInRow="ssn" msprop:Generator_ColumnPropNameInTable="ssnColumn" msprop:Generator_UserColumnName="ssn" type="xs:string" minOccurs="0" />
+                    <xs:element name="address" msprop:Generator_ColumnVarNameInTable="columnaddress" msprop:Generator_ColumnPropNameInRow="address" msprop:Generator_ColumnPropNameInTable="addressColumn" msprop:Generator_UserColumnName="address" type="xs:string" minOccurs="0" />
+                    <xs:element name="city" msprop:Generator_ColumnVarNameInTable="columncity" msprop:Generator_ColumnPropNameInRow="city" msprop:Generator_ColumnPropNameInTable="cityColumn" msprop:Generator_UserColumnName="city" type="xs:string" minOccurs="0" />
+                    <xs:element name="state" msprop:Generator_ColumnVarNameInTable="columnstate" msprop:Generator_ColumnPropNameInRow="state" msprop:Generator_ColumnPropNameInTable="stateColumn" msprop:Generator_UserColumnName="state" type="xs:string" minOccurs="0" />
+                    <xs:element name="zipcode" msprop:Generator_ColumnVarNameInTable="columnzipcode" msprop:Generator_ColumnPropNameInRow="zipcode" msprop:Generator_ColumnPropNameInTable="zipcodeColumn" msprop:Generator_UserColumnName="zipcode" type="xs:string" minOccurs="0" />
+                    <xs:element name="gender" msprop:Generator_ColumnVarNameInTable="columngender" msprop:Generator_ColumnPropNameInRow="gender" msprop:Generator_ColumnPropNameInTable="genderColumn" msprop:Generator_UserColumnName="gender" type="xs:string" minOccurs="0" />
+                    <xs:element name="dob" msprop:Generator_ColumnVarNameInTable="columndob" msprop:Generator_ColumnPropNameInRow="dob" msprop:Generator_ColumnPropNameInTable="dobColumn" msprop:Generator_UserColumnName="dob" type="xs:string" minOccurs="0" />
+                    <xs:element name="ethnicity" msprop:Generator_ColumnVarNameInTable="columnethnicity" msprop:Generator_ColumnPropNameInRow="ethnicity" msprop:Generator_ColumnPropNameInTable="ethnicityColumn" msprop:Generator_UserColumnName="ethnicity" type="xs:string" minOccurs="0" />
+                    <xs:element name="highesteduattained" msprop:Generator_ColumnVarNameInTable="columnhighesteduattained" msprop:Generator_ColumnPropNameInRow="highesteduattained" msprop:Generator_ColumnPropNameInTable="highesteduattainedColumn" msprop:Generator_UserColumnName="highesteduattained" type="xs:string" minOccurs="0" />
+                    <xs:element name="ugmajor" msprop:Generator_ColumnVarNameInTable="columnugmajor" msprop:Generator_ColumnPropNameInRow="ugmajor" msprop:Generator_ColumnPropNameInTable="ugmajorColumn" msprop:Generator_UserColumnName="ugmajor" type="xs:string" minOccurs="0" />
+                    <xs:element name="gradmajor" msprop:Generator_ColumnVarNameInTable="columngradmajor" msprop:Generator_ColumnPropNameInRow="gradmajor" msprop:Generator_ColumnPropNameInTable="gradmajorColumn" msprop:Generator_UserColumnName="gradmajor" type="xs:string" minOccurs="0" />
+                    <xs:element name="undergradgpa" msprop:Generator_ColumnVarNameInTable="columnundergradgpa" msprop:Generator_ColumnPropNameInRow="undergradgpa" msprop:Generator_ColumnPropNameInTable="undergradgpaColumn" msprop:Generator_UserColumnName="undergradgpa" type="xs:string" minOccurs="0" />
+                    <xs:element name="aiorg" msprop:Generator_ColumnVarNameInTable="columnaiorg" msprop:Generator_ColumnPropNameInRow="aiorg" msprop:Generator_ColumnPropNameInTable="aiorgColumn" msprop:Generator_UserColumnName="aiorg" type="xs:string" minOccurs="0" />
+                  </xs:sequence>
+                  <xs:attribute name="scorereport_Id" msprop:Generator_ColumnVarNameInTable="columnscorereport_Id" msprop:Generator_ColumnPropNameInRow="scorereport_Id" msprop:Generator_ColumnPropNameInTable="scorereport_IdColumn" msprop:Generator_UserColumnName="scorereport_Id" type="xs:int" use="prohibited" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="currenttest" msprop:Generator_TableClassName="currenttestDataTable" msprop:Generator_TableVarName="tablecurrenttest" msprop:Generator_TablePropName="currenttest" msprop:Generator_RowDeletingName="currenttestRowDeleting" msprop:Generator_RowChangingName="currenttestRowChanging" msprop:Generator_RowEvHandlerName="currenttestRowChangeEventHandler" msprop:Generator_RowDeletedName="currenttestRowDeleted" msprop:Generator_UserTableName="currenttest" msprop:Generator_RowChangedName="currenttestRowChanged" msprop:Generator_RowEvArgName="currenttestRowChangeEvent" msprop:Generator_RowClassName="currenttestRow" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="currenttestinfo" msprop:Generator_TableClassName="currenttestinfoDataTable" msprop:Generator_TableVarName="tablecurrenttestinfo" msprop:Generator_TablePropName="currenttestinfo" msprop:Generator_RowDeletingName="currenttestinfoRowDeleting" msprop:Generator_RowChangingName="currenttestinfoRowChanging" msprop:Generator_RowEvHandlerName="currenttestinfoRowChangeEventHandler" msprop:Generator_RowDeletedName="currenttestinfoRowDeleted" msprop:Generator_UserTableName="currenttestinfo" msprop:Generator_RowChangedName="currenttestinfoRowChanged" msprop:Generator_RowEvArgName="currenttestinfoRowChangeEvent" msprop:Generator_RowClassName="currenttestinfoRow" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="currenttestcategoryinfo" msprop:Generator_TableClassName="currenttestcategoryinfoDataTable" msprop:Generator_TableVarName="tablecurrenttestcategoryinfo" msprop:Generator_TablePropName="currenttestcategoryinfo" msprop:Generator_RowDeletingName="currenttestcategoryinfoRowDeleting" msprop:Generator_RowChangingName="currenttestcategoryinfoRowChanging" msprop:Generator_RowEvHandlerName="currenttestcategoryinfoRowChangeEventHandler" msprop:Generator_RowDeletedName="currenttestcategoryinfoRowDeleted" msprop:Generator_UserTableName="currenttestcategoryinfo" msprop:Generator_RowChangedName="currenttestcategoryinfoRowChanged" msprop:Generator_RowEvArgName="currenttestcategoryinfoRowChangeEvent" msprop:Generator_RowClassName="currenttestcategoryinfoRow" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:attribute name="testcategory" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntestcategory" msprop:Generator_ColumnPropNameInRow="testcategory" msprop:Generator_ColumnPropNameInTable="testcategoryColumn" msprop:Generator_UserColumnName="testcategory" type="xs:string" />
+                              <xs:attribute name="pointsearned" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnpointsearned" msprop:Generator_ColumnPropNameInRow="pointsearned" msprop:Generator_ColumnPropNameInTable="pointsearnedColumn" msprop:Generator_UserColumnName="pointsearned" type="xs:string" />
+                              <xs:attribute name="pointavailable" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnpointavailable" msprop:Generator_ColumnPropNameInRow="pointavailable" msprop:Generator_ColumnPropNameInTable="pointavailableColumn" msprop:Generator_UserColumnName="pointavailable" type="xs:string" />
+                              <xs:attribute name="avgperformancerange" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnavgperformancerange" msprop:Generator_ColumnPropNameInRow="avgperformancerange" msprop:Generator_ColumnPropNameInTable="avgperformancerangeColumn" msprop:Generator_UserColumnName="avgperformancerange" type="xs:string" />
+                              <xs:attribute name="currenttestinfo_Id" msprop:Generator_ColumnVarNameInTable="columncurrenttestinfo_Id" msprop:Generator_ColumnPropNameInRow="currenttestinfo_Id" msprop:Generator_ColumnPropNameInTable="currenttestinfo_IdColumn" msprop:Generator_UserColumnName="currenttestinfo_Id" type="xs:int" use="prohibited" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="testname" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntestname" msprop:Generator_ColumnPropNameInRow="testname" msprop:Generator_ColumnPropNameInTable="testnameColumn" msprop:Generator_UserColumnName="testname" type="xs:string" />
+                        <xs:attribute name="test_code" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntest_code" msprop:Generator_ColumnPropNameInRow="test_code" msprop:Generator_ColumnPropNameInTable="test_codeColumn" msprop:Generator_UserColumnName="test_code" type="xs:string" />
+                        <xs:attribute name="test_name" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntest_name" msprop:Generator_ColumnPropNameInRow="test_name" msprop:Generator_ColumnPropNameInTable="test_nameColumn" msprop:Generator_UserColumnName="test_name" type="xs:string" />
+                        <xs:attribute name="test_type" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntest_type" msprop:Generator_ColumnPropNameInRow="test_type" msprop:Generator_ColumnPropNameInTable="test_typeColumn" msprop:Generator_UserColumnName="test_type" type="xs:string" />
+                        <xs:attribute name="testscore" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntestscore" msprop:Generator_ColumnPropNameInRow="testscore" msprop:Generator_ColumnPropNameInTable="testscoreColumn" msprop:Generator_UserColumnName="testscore" type="xs:string" />
+                        <xs:attribute name="roe" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnroe" msprop:Generator_ColumnPropNameInRow="roe" msprop:Generator_ColumnPropNameInTable="roeColumn" msprop:Generator_UserColumnName="roe" type="xs:string" />
+                        <xs:attribute name="rvsd" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnrvsd" msprop:Generator_ColumnPropNameInRow="rvsd" msprop:Generator_ColumnPropNameInTable="rvsdColumn" msprop:Generator_UserColumnName="rvsd" type="xs:string" />
+                        <xs:attribute name="testdate" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntestdate" msprop:Generator_ColumnPropNameInRow="testdate" msprop:Generator_ColumnPropNameInTable="testdateColumn" msprop:Generator_UserColumnName="testdate" type="xs:string" />
+                        <xs:attribute name="currenttestinfo_Id" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columncurrenttestinfo_Id" msprop:Generator_ColumnPropNameInRow="currenttestinfo_Id" msprop:Generator_ColumnPropNameInTable="currenttestinfo_IdColumn" msprop:Generator_UserColumnName="currenttestinfo_Id" type="xs:int" msdata:AllowDBNull="false" use="prohibited" />
+                        <xs:attribute name="currenttest_Id" msprop:Generator_ColumnVarNameInTable="columncurrenttest_Id" msprop:Generator_ColumnPropNameInRow="currenttest_Id" msprop:Generator_ColumnPropNameInTable="currenttest_IdColumn" msprop:Generator_UserColumnName="currenttest_Id" type="xs:int" use="prohibited" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="currenttest_Id" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columncurrenttest_Id" msprop:Generator_ColumnPropNameInRow="currenttest_Id" msprop:Generator_ColumnPropNameInTable="currenttest_IdColumn" msprop:Generator_UserColumnName="currenttest_Id" type="xs:int" msdata:AllowDBNull="false" use="prohibited" />
+                  <xs:attribute name="scorereport_Id" msprop:Generator_ColumnVarNameInTable="columnscorereport_Id" msprop:Generator_ColumnPropNameInRow="scorereport_Id" msprop:Generator_ColumnPropNameInTable="scorereport_IdColumn" msprop:Generator_UserColumnName="scorereport_Id" type="xs:int" use="prohibited" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="hghsttest" msprop:Generator_TableClassName="hghsttestDataTable" msprop:Generator_TableVarName="tablehghsttest" msprop:Generator_TablePropName="hghsttest" msprop:Generator_RowDeletingName="hghsttestRowDeleting" msprop:Generator_RowChangingName="hghsttestRowChanging" msprop:Generator_RowEvHandlerName="hghsttestRowChangeEventHandler" msprop:Generator_RowDeletedName="hghsttestRowDeleted" msprop:Generator_UserTableName="hghsttest" msprop:Generator_RowChangedName="hghsttestRowChanged" msprop:Generator_RowEvArgName="hghsttestRowChangeEvent" msprop:Generator_RowClassName="hghsttestRow" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="hghsttestinfo" msprop:Generator_TableClassName="hghsttestinfoDataTable" msprop:Generator_TableVarName="tablehghsttestinfo" msprop:Generator_TablePropName="hghsttestinfo" msprop:Generator_RowDeletingName="hghsttestinfoRowDeleting" msprop:Generator_RowChangingName="hghsttestinfoRowChanging" msprop:Generator_RowEvHandlerName="hghsttestinfoRowChangeEventHandler" msprop:Generator_RowDeletedName="hghsttestinfoRowDeleted" msprop:Generator_UserTableName="hghsttestinfo" msprop:Generator_RowChangedName="hghsttestinfoRowChanged" msprop:Generator_RowEvArgName="hghsttestinfoRowChangeEvent" msprop:Generator_RowClassName="hghsttestinfoRow" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="testname" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntestname" msprop:Generator_ColumnPropNameInRow="testname" msprop:Generator_ColumnPropNameInTable="testnameColumn" msprop:Generator_UserColumnName="testname" type="xs:string" />
+                        <xs:attribute name="test_code" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntest_code" msprop:Generator_ColumnPropNameInRow="test_code" msprop:Generator_ColumnPropNameInTable="test_codeColumn" msprop:Generator_UserColumnName="test_code" type="xs:string" />
+                        <xs:attribute name="test_name" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntest_name" msprop:Generator_ColumnPropNameInRow="test_name" msprop:Generator_ColumnPropNameInTable="test_nameColumn" msprop:Generator_UserColumnName="test_name" type="xs:string" />
+                        <xs:attribute name="test_type" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntest_type" msprop:Generator_ColumnPropNameInRow="test_type" msprop:Generator_ColumnPropNameInTable="test_typeColumn" msprop:Generator_UserColumnName="test_type" type="xs:string" />
+                        <xs:attribute name="testscore" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntestscore" msprop:Generator_ColumnPropNameInRow="testscore" msprop:Generator_ColumnPropNameInTable="testscoreColumn" msprop:Generator_UserColumnName="testscore" type="xs:string" />
+                        <xs:attribute name="roe" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnroe" msprop:Generator_ColumnPropNameInRow="roe" msprop:Generator_ColumnPropNameInTable="roeColumn" msprop:Generator_UserColumnName="roe" type="xs:string" />
+                        <xs:attribute name="rvsd" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnrvsd" msprop:Generator_ColumnPropNameInRow="rvsd" msprop:Generator_ColumnPropNameInTable="rvsdColumn" msprop:Generator_UserColumnName="rvsd" type="xs:string" />
+                        <xs:attribute name="testdate" form="unqualified" msprop:Generator_ColumnVarNameInTable="columntestdate" msprop:Generator_ColumnPropNameInRow="testdate" msprop:Generator_ColumnPropNameInTable="testdateColumn" msprop:Generator_UserColumnName="testdate" type="xs:string" />
+                        <xs:attribute name="passingstatusasofreportdate" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnpassingstatusasofreportdate" msprop:Generator_ColumnPropNameInRow="passingstatusasofreportdate" msprop:Generator_ColumnPropNameInTable="passingstatusasofreportdateColumn" msprop:Generator_UserColumnName="passingstatusasofreportdate" type="xs:string" />
+                        <xs:attribute name="requiredscoreasofreportdate" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnrequiredscoreasofreportdate" msprop:Generator_ColumnPropNameInRow="requiredscoreasofreportdate" msprop:Generator_ColumnPropNameInTable="requiredscoreasofreportdateColumn" msprop:Generator_UserColumnName="requiredscoreasofreportdate" type="xs:string" />
+                        <xs:attribute name="requiredminscore" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnrequiredminscore" msprop:Generator_ColumnPropNameInRow="requiredminscore" msprop:Generator_ColumnPropNameInTable="requiredminscoreColumn" msprop:Generator_UserColumnName="requiredminscore" type="xs:string" />
+                        <xs:attribute name="minscoremetnotmet" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnminscoremetnotmet" msprop:Generator_ColumnPropNameInRow="minscoremetnotmet" msprop:Generator_ColumnPropNameInTable="minscoremetnotmetColumn" msprop:Generator_UserColumnName="minscoremetnotmet" type="xs:string" />
+                        <xs:attribute name="hghsttest_Id" msprop:Generator_ColumnVarNameInTable="columnhghsttest_Id" msprop:Generator_ColumnPropNameInRow="hghsttest_Id" msprop:Generator_ColumnPropNameInTable="hghsttest_IdColumn" msprop:Generator_UserColumnName="hghsttest_Id" type="xs:int" use="prohibited" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="hghsttest_Id" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnhghsttest_Id" msprop:Generator_ColumnPropNameInRow="hghsttest_Id" msprop:Generator_ColumnPropNameInTable="hghsttest_IdColumn" msprop:Generator_UserColumnName="hghsttest_Id" type="xs:int" msdata:AllowDBNull="false" use="prohibited" />
+                  <xs:attribute name="scorereport_Id" msprop:Generator_ColumnVarNameInTable="columnscorereport_Id" msprop:Generator_ColumnPropNameInRow="scorereport_Id" msprop:Generator_ColumnPropNameInTable="scorereport_IdColumn" msprop:Generator_UserColumnName="scorereport_Id" type="xs:int" use="prohibited" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="candidateid" form="unqualified" msprop:Generator_ColumnVarNameInTable="columncandidateid" msprop:Generator_ColumnPropNameInRow="candidateid" msprop:Generator_ColumnPropNameInTable="candidateidColumn" msprop:Generator_UserColumnName="candidateid" type="xs:string" />
+            <xs:attribute name="reportdate" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnreportdate" msprop:Generator_ColumnPropNameInRow="reportdate" msprop:Generator_ColumnPropNameInTable="reportdateColumn" msprop:Generator_UserColumnName="reportdate" type="xs:string" />
+            <xs:attribute name="Program" form="unqualified" msprop:Generator_ColumnVarNameInTable="columnProgram" msprop:Generator_ColumnPropNameInRow="Program" msprop:Generator_ColumnPropNameInTable="ProgramColumn" msprop:Generator_UserColumnName="Program" type="xs:string" />
+            <xs:attribute name="scorereport_Id" msdata:AutoIncrement="true" msprop:Generator_ColumnVarNameInTable="columnscorereport_Id" msprop:Generator_ColumnPropNameInRow="scorereport_Id" msprop:Generator_ColumnPropNameInTable="scorereport_IdColumn" msprop:Generator_UserColumnName="scorereport_Id" type="xs:int" msdata:AllowDBNull="false" use="prohibited" />
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="currenttestinfo_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:currenttestinfo" />
+      <xs:field xpath="@mstns:currenttestinfo_Id" />
+    </xs:unique>
+    <xs:unique name="currenttest_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:currenttest" />
+      <xs:field xpath="@mstns:currenttest_Id" />
+    </xs:unique>
+    <xs:unique name="hghsttest_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:hghsttest" />
+      <xs:field xpath="@mstns:hghsttest_Id" />
+    </xs:unique>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:scorereport" />
+      <xs:field xpath="@mstns:scorereport_Id" />
+    </xs:unique>
+    <xs:keyref name="scorereport_hghsttest" refer="Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="hghsttest" msprop:rel_Generator_ChildPropName="GethghsttestRows" msprop:rel_Generator_UserRelationName="scorereport_hghsttest" msprop:rel_Generator_ParentPropName="scorereportRow" msprop:rel_Generator_RelationVarName="relationscorereport_hghsttest" msprop:rel_Generator_UserParentTable="scorereport">
+      <xs:selector xpath=".//mstns:hghsttest" />
+      <xs:field xpath="@mstns:scorereport_Id" />
+    </xs:keyref>
+    <xs:keyref name="hghsttest_hghsttestinfo" refer="hghsttest_Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="hghsttestinfo" msprop:rel_Generator_ChildPropName="GethghsttestinfoRows" msprop:rel_Generator_UserRelationName="hghsttest_hghsttestinfo" msprop:rel_Generator_ParentPropName="hghsttestRow" msprop:rel_Generator_RelationVarName="relationhghsttest_hghsttestinfo" msprop:rel_Generator_UserParentTable="hghsttest">
+      <xs:selector xpath=".//mstns:hghsttestinfo" />
+      <xs:field xpath="@mstns:hghsttest_Id" />
+    </xs:keyref>
+    <xs:keyref name="scorereport_currenttest" refer="Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="currenttest" msprop:rel_Generator_ChildPropName="GetcurrenttestRows" msprop:rel_Generator_UserRelationName="scorereport_currenttest" msprop:rel_Generator_ParentPropName="scorereportRow" msprop:rel_Generator_RelationVarName="relationscorereport_currenttest" msprop:rel_Generator_UserParentTable="scorereport">
+      <xs:selector xpath=".//mstns:currenttest" />
+      <xs:field xpath="@mstns:scorereport_Id" />
+    </xs:keyref>
+    <xs:keyref name="currenttest_currenttestinfo" refer="currenttest_Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="currenttestinfo" msprop:rel_Generator_ChildPropName="GetcurrenttestinfoRows" msprop:rel_Generator_UserRelationName="currenttest_currenttestinfo" msprop:rel_Generator_ParentPropName="currenttestRow" msprop:rel_Generator_RelationVarName="relationcurrenttest_currenttestinfo" msprop:rel_Generator_UserParentTable="currenttest">
+      <xs:selector xpath=".//mstns:currenttestinfo" />
+      <xs:field xpath="@mstns:currenttest_Id" />
+    </xs:keyref>
+    <xs:keyref name="currenttestinfo_currenttestcategoryinfo" refer="currenttestinfo_Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="currenttestcategoryinfo" msprop:rel_Generator_ChildPropName="GetcurrenttestcategoryinfoRows" msprop:rel_Generator_UserRelationName="currenttestinfo_currenttestcategoryinfo" msprop:rel_Generator_ParentPropName="currenttestinfoRow" msprop:rel_Generator_RelationVarName="relationcurrenttestinfo_currenttestcategoryinfo" msprop:rel_Generator_UserParentTable="currenttestinfo">
+      <xs:selector xpath=".//mstns:currenttestcategoryinfo" />
+      <xs:field xpath="@mstns:currenttestinfo_Id" />
+    </xs:keyref>
+    <xs:keyref name="scorereport_candidateinfo" refer="Constraint1" msdata:IsNested="true" msprop:rel_Generator_UserChildTable="candidateinfo" msprop:rel_Generator_ChildPropName="GetcandidateinfoRows" msprop:rel_Generator_UserRelationName="scorereport_candidateinfo" msprop:rel_Generator_ParentPropName="scorereportRow" msprop:rel_Generator_RelationVarName="relationscorereport_candidateinfo" msprop:rel_Generator_UserParentTable="scorereport">
+      <xs:selector xpath=".//mstns:candidateinfo" />
+      <xs:field xpath="@mstns:scorereport_Id" />
+    </xs:keyref>
+  </xs:element>
+</xs:schema>

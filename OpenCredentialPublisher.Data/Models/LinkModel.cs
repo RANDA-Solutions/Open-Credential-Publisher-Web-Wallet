@@ -57,7 +57,7 @@ namespace OpenCredentialPublisher.Data.Models
         public CredentialRequestModel CredentialRequest { get; set; }
 
         public List<ShareModel> Shares { get; set; }
-
+        public bool IsDeleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? ModifiedAt { get; set; }
     }

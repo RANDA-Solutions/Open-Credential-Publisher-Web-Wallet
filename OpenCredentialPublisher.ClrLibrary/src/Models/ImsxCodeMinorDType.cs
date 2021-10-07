@@ -11,16 +11,18 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedMember.Global
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// This is the container for the set of code minor status codes reported in the responses from the Service Provider. 
     /// </summary>
+    [NotMapped]
     public class ImsxCodeMinorDType
     { 
         /// <summary>
@@ -38,7 +40,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

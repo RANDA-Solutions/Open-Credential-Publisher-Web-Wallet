@@ -12,7 +12,7 @@ namespace OpenCredentialPublisher.Wallet
 
     public static class ApiConstants
     {
-        public const string AccountRoutePattern = "api/account/[controller]";
+        public const string AccountRoutePattern = "public/account/[controller]";
         public const string CredentialsRoutePattern = "api/credentials/[controller]";
         public const string LinksRoutePattern = "api/links/[controller]";
     }

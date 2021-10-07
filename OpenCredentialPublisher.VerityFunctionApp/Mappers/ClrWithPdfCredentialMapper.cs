@@ -4,6 +4,7 @@ using OpenCredentialPublisher.ClrLibrary.Extensions;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Extensions;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using OpenCredentialPublisher.Services.Drawing;
@@ -23,27 +24,24 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Mappers
     public class ClrWithPdfCredentialMapper : BaseMapper, ICredentialMapper<CredentialMap, ClrWithPdfCredential>
     {
         private readonly LinkService _linkService;
+        private readonly CredentialService _credentialService;
         private readonly CredentialPublisherOptions _credentialPublisherOptions;
-        public ClrWithPdfCredentialMapper(LinkService linkService, IOptions<CredentialPublisherOptions> credentialPublisherOptions)
+        public ClrWithPdfCredentialMapper(CredentialService credentialService, LinkService linkService, IOptions<CredentialPublisherOptions> credentialPublisherOptions)
         {
+            _credentialService = credentialService;
             _linkService = linkService;
             _credentialPublisherOptions = credentialPublisherOptions?.Value ?? throw new ArgumentNullException($"{CredentialPublisherOptions.Section} is required. Is it missing from the configuration?");
         }
 
         public async Task<ClrWithPdfCredential> MapAsync(CredentialMap model)
         {
-
             var clrViewModel = ClrViewModel.FromClrModel(model.Clr);
             var clr = clrViewModel.RawClrDType;
 
-            var pdf = clrViewModel.Pdfs.FirstOrDefault(pdf => pdf.IsPdf);
-
-            var assertionVM = clrViewModel.AllAssertions.FirstOrDefault(a => a.Assertion.Id == pdf.AssertionId);
-            var evidence = assertionVM.Assertion.Evidence.FirstOrDefault(e => e.Name == pdf.EvidenceName);
-            var artifact = evidence.Artifacts.FirstOrDefault(a => a.ArtifactKey == pdf.ArtifactId);
+            var artifact = await _credentialService.CredentialPackagePdfArtifactAsync(model.Clr.CredentialPackageId);
             var pdfDataUrlParts = DataUrlUtility.ParseDataUrl(artifact.Url);
 
-            var link = new LinkModel { ClrForeignKey = model.Clr.Id, CredentialRequestId = model.CredentialRequestId, UserId = model.WalletRelationship.UserId, Nickname = $"SentToWallet-{model.WalletRelationship.WalletName}", RequiresAccessKey = true, CreatedAt = DateTimeOffset.UtcNow };
+            var link = new LinkModel { ClrForeignKey = model.Clr.ClrId, CredentialRequestId = model.CredentialRequestId, UserId = model.WalletRelationship.UserId, Nickname = $"SentToWallet-{model.WalletRelationship.WalletName}", RequiresAccessKey = true, CreatedAt = DateTimeOffset.UtcNow };
             await _linkService.AddAsync(link);
 
             var shareModel = new ShareModel
@@ -81,7 +79,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Mappers
                 {
                     MimeType = "application/pdf",
                     Extension = "pdf",
-                    Name = $"{evidence.Name}-{Guid.NewGuid().ToString().Replace("-", "")}.pdf",
+                    Name = $"{artifact.Name}-{Guid.NewGuid().ToString().Replace("-", "")}.pdf",
                     Data = new Base64Data
                     {
                         Base64 = Convert.ToBase64String(pdfBytes)

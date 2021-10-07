@@ -1,0 +1,83 @@
+<!-- <script *ngIf="linkDisplay.showData == true" type="application/ld+json">
+  "linkDisplay.clr.RawClrDType.ToJson()"
+</script> -->
+
+
+<div id="theTop" class="text-center mb-3 top">
+    <span class="h1 display-xs-2 display-sm-3 display-md-4">Comprehensive Learner Record</span>
+</div>
+
+<div *ngIf="showSpinner == true" class="row d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+
+<p *ngIf="linkDisplay.showData == true" class="text-center">
+    Welcome to the Open Credential Publisher.
+    You are viewing a <a (click)="onClickScroll('about-clr')">Comprehensive Learner Record</a>
+</p>
+<ng-container *ngIf="linkDisplay.showData != true && linkDisplay.requiresAccessKey == true">
+  <div class="row">
+    <div class="col">
+      <p class="lead">
+          Welcome to the Open Credential Publisher. This site allows individuals to exchange their transcripts and learner credentials with organizations including employers, colleges and military recruiters.
+      </p>
+      <p>
+          You likely arrived at this page by following a link from an email or one located at the bottom of a PDF.  Accompanying that link is an access key.
+          Please enter it below to view the information. If you are unable to locate an access key, please contact the individual who shared the credential
+          to request a new link and access key.
+      </p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center my-5">
+    <div class="col col-sm-6 col-md-5 col-lg-4 col-xl-4">
+      <section class="default-container p-5">
+        <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+          <span *ngFor="let msg of modelErrors">{{msg}}</span>
+        </div>
+        <form method="post">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend mr-3">
+                <span class="secure-icon"></span>
+            </div>
+            <input type="password" name="accessKey" [(ngModel)]="accessKey" placeholder="Access Key" class="form-control" />
+          </div>
+          <button type="button" class="btn btn-outline-primary btn-lg float-right" (click)="access()">Submit</button>
+        </form>
+      </section>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <p class="font-12">
+        <u>About ND Electronic Transcripts</u> <br />
+
+        North Dakota eTranscripts is a free high school transcript exchange system built through the Statewide Longitudinal Data System, allowing for high schools to exchange electronic records within the state as well as to out-of-state colleges. Since the inception of eTranscripts, over 40,000 high school transcripts have been sent, proving the state eTranscripts system saves significant time and cost, which increases efficiencies for both high school and college offices.  The Open Credential Publisher consumes this eTranscript, packages, and signs it as a verifiable credential in the widely accepted IMS Global CLR format for higher education institutions. The student also has the ability to push their Transcript to a cryptographically verifiable mobile wallet.
+      </p>
+    </div>
+  </div>
+</ng-container>
+<ng-container *ngIf="linkDisplay.showData == true">
+  <div class="row">
+    <div class="col mb-3">
+      <a *ngIf="appService.loggedIn == true" class="btn btn-outline-primary btn-lg" [routerLink]="['/credentials']">Your Credentials</a>
+    </div>
+  </div> <!-- Summary View -->
+  <div app-link-summary [link]="linkDisplay" class="row credential-row mb-3">
+  </div>
+
+  <hr class="my-5" />
+  <button (click)="topFunction()" id="topBtn" class="btn btn-outline-primary btn-sm" title="Go to top">Top</button>
+
+  <app-clr [clrId]="linkDisplay.clrId" [isShare]="true"></app-clr>
+
+  <div id="about-clr" class="row mb-2">
+    <div class="col">
+      <p class="font-16">
+        <u>About Comprehensive Learner Records (CLR)</u> <br />
+        The IMS Global Comprehensive Learner Record (CLR) is the new generation of secure and verifiable learning and employment records supporting all nature of academic and workplace recognition and achievements including courses, competencies and skills and employer-based achievements and milestones.
+      </p>
+    </div>
+  </div>
+</ng-container>

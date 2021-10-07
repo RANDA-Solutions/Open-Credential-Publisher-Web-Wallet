@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Contexts;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Services.Interfaces;
@@ -31,9 +32,9 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Handlers
                 //var leaseId = await AcquireLockAsync("create-credential-definition", command.CredentialDefinitionId.ToString(), TimeSpan.FromSeconds(60));
                 var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(command.CredentialDefinitionId);
 
-                if (credentialDefinition.StatusId == Data.Models.StatusEnum.Pending)
+                if (credentialDefinition.StatusId == StatusEnum.Pending)
                 {
-                    credentialDefinition.StatusId = Data.Models.StatusEnum.Sent;
+                    credentialDefinition.StatusId = StatusEnum.Sent;
                     credentialDefinition = await _credentialDefinitionService.UpdateCredentialDefinitionAsync(credentialDefinition);
                     try
                     {
@@ -41,7 +42,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Handlers
                     }
                     catch
                     {
-                        credentialDefinition.StatusId = Data.Models.StatusEnum.Pending;
+                        credentialDefinition.StatusId = StatusEnum.Pending;
                         await _credentialDefinitionService.UpdateCredentialDefinitionAsync(credentialDefinition);
                         throw;
                     }

@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -19,7 +20,8 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
     /// <summary>
     /// Based on schema.org Address object. 
     /// </summary>
-    public partial class AddressDType
+    [NotMapped]
+    public class AddressDType
     { 
         /// <summary>
         /// Unique IRI for the Address. Model Primitive Datatype = NormalizedString.
@@ -85,11 +87,11 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [Description("The street address. For example, 1600 Amphitheatre Pkwy. Model Primitive Datatype = String.")]
         public string StreetAddress { get; set; }
 
+        [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
         /// <summary>
         /// Additional properties of the object
         /// </summary>
         [JsonExtensionData]
-        [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
         public Dictionary<String, Object> AdditionalProperties { get; set; }
 
         /// <summary>
@@ -98,7 +100,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

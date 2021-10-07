@@ -3,9 +3,11 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
 {
+    [NotMapped]
     public class VerifiablePresentation
     {
         [JsonProperty("@context", Order = 1), JsonPropertyName("@context")]

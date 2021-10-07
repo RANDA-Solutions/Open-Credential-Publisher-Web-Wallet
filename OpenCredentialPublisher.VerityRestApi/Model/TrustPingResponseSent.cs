@@ -57,6 +57,9 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         [DataMember(Name="@id", EmitDefaultValue=false)]
         public Guid? Id { get; set; }
 
+        [DataMember(Name="relationship", EmitDefaultValue = false)]
+        public string Relationship { get; set; }
+
         /// <summary>
         /// Gets or Sets Thread
         /// </summary>
@@ -79,6 +82,7 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
             sb.Append("class TrustPingResponseSent {\n");
             sb.Append("  Type: ").Append(Type).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  Relationship: ").Append(Relationship).Append("\n");
             sb.Append("  Thread: ").Append(Thread).Append("\n");
             sb.Append("  ResponseSent: ").Append(ResponseSent).Append("\n");
             sb.Append("}\n");
@@ -129,7 +133,12 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
                     this.Thread == input.Thread ||
                     (this.Thread != null &&
                     this.Thread.Equals(input.Thread))
-                ) && 
+                ) &&
+                (
+                    this.Relationship == input.Relationship ||
+                    (this.Relationship != null &&
+                     this.Relationship.Equals(input.Relationship))
+                ) &&
                 (
                     this.ResponseSent == input.ResponseSent ||
                     (this.ResponseSent != null &&

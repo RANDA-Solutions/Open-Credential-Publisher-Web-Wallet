@@ -110,7 +110,7 @@ namespace OpenCredentialPublisher.ClrLibrary.OAuth
 
         public virtual string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

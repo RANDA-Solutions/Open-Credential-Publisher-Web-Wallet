@@ -12,16 +12,18 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// One or more artifacts that represent supporting evidence for the record. Examples include text, media, websites, etc. 
     /// </summary>
-    public partial class EvidenceDType
-    { 
+    [NotMapped]
+    public class EvidenceDType
+    {
         /// <summary>
         /// The URI of a webpage presenting evidence of achievement. Model Primitive Datatype = AnyURI.
         /// </summary>
@@ -29,7 +31,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("id"), Newtonsoft.Json.JsonProperty("id")]
         [Description("The URI of a webpage presenting evidence of achievement. Model Primitive Datatype = AnyURI.")]
         public string Id { get; set; }
-        
+
         /// <summary>
         /// The JSON-LD type of this entity. Normally 'Evidence'. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -37,7 +39,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("type"), Newtonsoft.Json.JsonProperty("type")]
         [Description("The JSON-LD type of this entity. Normally 'Evidence'. Model Primitive Datatype = NormalizedString.")]
         public string Type { get; set; }
-        
+
         /// <summary>
         /// Artifacts that are part of the evidence. 
         /// </summary>
@@ -45,7 +47,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("artifacts"), Newtonsoft.Json.JsonProperty("artifacts")]
         [Description("Artifacts that are part of the evidence. ")]
         public virtual List<ArtifactDType> Artifacts { get; set; }
-        
+
         /// <summary>
         /// A description of the intended audience for a piece of evidence. Model Primitive Datatype = String.
         /// </summary>
@@ -53,7 +55,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("audience"), Newtonsoft.Json.JsonProperty("audience")]
         [Description("A description of the intended audience for a piece of evidence. Model Primitive Datatype = String.")]
         public string Audience { get; set; }
-        
+
         /// <summary>
         /// A longer description of the evidence. Model Primitive Datatype = String.
         /// </summary>
@@ -61,7 +63,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("description"), Newtonsoft.Json.JsonProperty("description")]
         [Description("A longer description of the evidence. Model Primitive Datatype = String.")]
         public string Description { get; set; }
-        
+
         /// <summary>
         /// A string that describes the type of evidence. For example, Poetry, Prose, Film. Model Primitive Datatype = String.
         /// </summary>
@@ -69,7 +71,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("genre"), Newtonsoft.Json.JsonProperty("genre")]
         [Description("A string that describes the type of evidence. For example, Poetry, Prose, Film. Model Primitive Datatype = String.")]
         public string Genre { get; set; }
-        
+
         /// <summary>
         /// The name of the evidence. Model Primitive Datatype = String.
         /// </summary>
@@ -78,7 +80,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("name"), Newtonsoft.Json.JsonProperty("name")]
         [Description("The name of the evidence. Model Primitive Datatype = String.")]
         public string Name { get; set; }
-        
+
         /// <summary>
         /// A narrative that describes the evidence and process of achievement that led to an assertion. Markdown allowed. Model Primitive Datatype = String.
         /// </summary>
@@ -100,7 +102,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

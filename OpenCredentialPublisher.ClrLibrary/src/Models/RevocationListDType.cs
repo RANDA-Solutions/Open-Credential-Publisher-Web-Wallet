@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// The Revocation List is a document that describes Assertions and Endorsements an Issuer has revoked that used the signed verification method. If you find the Assertion or Endorsement in the revokedAssertions list, it has been revoked.
     /// </summary>
+    [NotMapped]
     public class RevocationListDType
     { 
         /// <summary>
@@ -59,7 +61,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

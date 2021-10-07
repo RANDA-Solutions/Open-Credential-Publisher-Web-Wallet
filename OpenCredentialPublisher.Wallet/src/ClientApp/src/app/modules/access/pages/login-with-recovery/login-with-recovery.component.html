@@ -1,0 +1,30 @@
+<section class="login-form">
+  <div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+    <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+  </div>
+</section>
+<ng-template #theContent>
+    <span class="h1">Recovery code verification</span>
+    <hr />
+<p>
+    You have requested to log in with a recovery code. This login will not be remembered until you provide
+    an authenticator app code at log in or disable 2FA and log in again.
+</p>
+
+<div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+  <span *ngFor="let msg of modelErrors">{{msg}}</span>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <form #f="ngForm" novalidate (ngSubmit)="login(f)">
+            <input for="rememberMe" type="hidden" />
+            <div class="form-group">
+                <label for="twoFactorCode"></label>
+                <input type="text" name="twoFactorCode" id="twoFactorCode" class="form-control" required [(ngModel)]="input.twoFactorCode" #twoFactorCode="ngModel"/>
+                <small [hidden]="twoFactorCode.valid || (twoFactorCode.pristine && !submitted)" class="text-danger">Please enter recovery code</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Log in</button>
+        </form>
+    </div>
+</div>
+</ng-template>

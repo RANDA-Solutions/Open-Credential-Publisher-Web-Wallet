@@ -1,0 +1,52 @@
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <section>
+      <div class="row my-4">
+        <span class="h1">Two-factor authentication (2FA)</span>
+      </div>
+      <div *ngIf="vm.statusMessage != null"
+        [ngClass]="{'alert alert-success alert-dismissible': !isError, 'alert alert-danger alert-dismissible': isError}">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          {{vm.statusMessage}}
+      </div>
+      <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+        <span *ngFor="let msg of modelErrors">{{msg}}</span>
+      </div>
+      <ng-container *ngIf="vm.is2faEnabled">
+        <div class="row justify-content-around">
+            <div *ngIf="vm.recoveryCodesLeft == 0" class="alert alert-danger">
+                <strong>You have no recovery codes left.</strong>
+                <p>You must <a [routerLink]="['/account/manage/generate-recovery-codes']">generate a new set of recovery codes</a> before you can log in with a recovery code.</p>
+            </div>
+            <div *ngIf="vm.recoveryCodesLeft == 1" class="alert alert-danger">
+                <strong>You have 1 recovery code left.</strong>
+                <p>You can <a [routerLink]="['/account/manage/generate-recovery-codes']">generate a new set of recovery codes</a>.</p>
+            </div>
+            <div *ngIf="vm.recoveryCodesLeft <= 3" class="alert alert-warning">
+                <strong>You have {{vm.recoveryCodesLeft}} recovery codes left.</strong>
+                <p>You should <a [routerLink]="['/account/manage/generate-recovery-codes']">generate a new set of recovery codes</a>.</p>
+            </div>
+        </div>
+        <div class="row justify-content-around">
+          <form *ngIf="vm.isMachineRemembered" method="post" style="display: inline-block">
+              <button type="submit" class="btn btn-outline-primary btn-lg">Forget this browser</button>
+          </form>
+          <a [routerLink]="['/account/manage/disable-twofa']" class="btn btn-outline-primary btn-lg">Disable 2FA</a>
+          <a [routerLink]="['/account/manage/generate-recovery-codes']" class="btn btn-outline-primary btn-lg">Reset recovery codes</a>
+        </div>
+      </ng-container>
+      <div class="row my-4 justify-content-around">
+        <span class="h3">Authenticator app</span>
+      </div>
+      <div class="row justify-content-around">
+        <a *ngIf="!vm.hasAuthenticator" id="add-authenticator" [routerLink]="['/account/manage/enable-authenticator']"  class="btn btn-outline-primary btn-lg">Add authenticator app</a>
+
+        <ng-container *ngIf="vm.hasAuthenticator">
+            <a id="enable-authenticator" [routerLink]="['/account/manage/enable-authenticator']" class="btn btn-outline-primary btn-lg">Setup authenticator app</a>
+            <a id="reset-authenticator" [routerLink]="['/account/manage/reset-authenticator']" class="btn btn-outline-secondary btn-lg">Reset authenticator app</a>
+        </ng-container>
+      </div>
+  </section>
+</ng-template>

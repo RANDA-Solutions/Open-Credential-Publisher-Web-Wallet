@@ -1,0 +1,50 @@
+<dt class="col-12 col-lg-3">Id</dt>
+<dd class="col-12 col-lg-9">{{profile.id}}</dd>
+<ng-container *ngIf="profile.name != null">
+  <dt class="col-12 col-lg-3">Name</dt>
+  <dd class="col-12 col-lg-9">{{profile.name}}</dd>
+</ng-container>
+<ng-container *ngIf="profile.email != null">
+  <dt class="col-12 col-lg-3">Email</dt>
+  <dd class="col-12 col-lg-9"><a href="mailto:{{profile.email}}">{{profile.email}}</a></dd>
+</ng-container>
+<ng-container *ngIf="profile.url != null">
+  <dt class="col-12 col-lg-3">URL</dt>
+  <dd class="col-12 col-lg-9"><a href="{{profile.url}}">{{profile.url}}</a></dd>
+</ng-container>
+<ng-container *ngIf="profile.address != null">
+  <ng-container *ngIf="profile.address.streetAddress != null || profile.address.addressRegion != null
+        || profile.address.addressLocality != null || profile.address.postalCode != null">
+    <dt class="col-12 col-lg-3">Address</dt>
+    <dd class="col-12 col-lg-9">
+      <div *ngIf="profile.address.streetAddress != null">{{profile.address.streetAddress}}</div>
+      <div>
+        <ng-container *ngIf="profile.address.addressRegion != null">
+            {{profile.address.addressRegion}},
+        </ng-container>
+        <ng-container *ngIf="profile.address.addressLocality != null">
+            {{profile.address.addressLocality}}
+        </ng-container>
+        {{profile.address.postalCode}}
+      </div>
+    </dd>
+  </ng-container>
+</ng-container>
+<ng-container *ngIf="profile.telephone != null">
+  <dt class="col-12 col-lg-3">Phone</dt>
+  <dd class="col-12 col-lg-9">{{profile.telephone}}</dd>
+</ng-container>
+<ng-container *ngIf="profile.studentId != null">
+  <dt class="col-12 col-lg-3">Student ID</dt>
+  <dd class="col-12 col-lg-9">{{profile.studentId}}</dd>
+</ng-container>
+<ng-container *ngIf="profile.sourcedId != null">
+  <dt class="col-12 col-lg-3">SourcedId</dt>
+  <dd class="col-12 col-lg-9">{{profile.sourcedId}}</dd>
+</ng-container>
+<ng-container *ngIf="profile.additionalProperties != null">
+  <ng-container *ngFor="let key of profile.additionalProperties.keys">
+    <dt class="col-12 col-lg-3">{{key}}</dt>
+    <dd class="col-12 col-lg-9"><pre>{{profile.additionalProperties[key]}}</pre></dd>
+  </ng-container>
+</ng-container>

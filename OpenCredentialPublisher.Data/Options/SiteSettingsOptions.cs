@@ -22,5 +22,8 @@ namespace OpenCredentialPublisher.Data.Options
         public string TestPortalName { get; set; }
         public string TestPortalCallbackUrl { get; set; }
         public string TestPortalClientKey { get; set; }
+
+        public string AllowedOrigins { get; set; }
+        public string SpaClientUrl { get; set; }
     }
 }

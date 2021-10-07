@@ -1,0 +1,15 @@
+<div *ngIf="showSpinner == true; else credentialContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #credentialContent>
+  <section>
+      <div [ngClass]="{ 'alert alert-danger mt-2': confirmationMessage.startsWith('Error') }" >
+        <span>{{message}}</span>
+      </div>
+      <p *ngIf="confirmationMessage.startsWith('Success')" >
+          Your email has been confirmed.
+      </p>
+
+      <a *ngIf="confirmationMessage.length > 0" id="login" class="text-right" [routerLink]="['/credentials']">Return to Login</a>
+  </section>
+  </ng-template>

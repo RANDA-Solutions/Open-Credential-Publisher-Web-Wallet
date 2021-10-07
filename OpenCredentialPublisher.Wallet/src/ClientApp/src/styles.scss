@@ -1,0 +1,136 @@
+@import "styles/variables.scss";
+@import 'styles/primeng.Custom/tw.primeng.theme.scss';
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+.tw-page-wrapper {
+  overflow: auto;
+  height: 100vh;
+  display: block;
+  margin: 0;
+  margin-top: 0px;
+  padding-top: 0;
+}
+.tw-layout-container {
+  /*min-height: 90vh;*/
+}
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #e01a76;
+}
+body.login-body {
+  background-color: #003b5c;
+  height: 100% !important;
+}
+.login-body section {
+  background-color: white;
+  padding: 50px 0px 50px 50px;
+  border-radius: 10px;
+  box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.2);
+  min-height: 357px; }
+
+.btn-secondary {
+  color: #fff;
+  background-color: #9206ea;
+  border-color: #9206ea;
+}
+
+.btn-tertiary {
+  color: #000;
+  background-color: #FF9E1B;
+  border-color: #FF9E1B;
+}
+
+.btn-tertiary:hover {
+  background-color: #FA780A;
+  border-color: #FF9E1B;
+}
+
+
+.btn-tertiary.disabled, .btn-tertiary:disabled {
+  color: #F9F7F2;
+  background-color: #FF9E1B;
+  border-color: #FF9E1B;
+}
+
+
+.btn-outline-tertiary {
+  color: #FF9E1B;
+  border-color: #FF9E1B;
+}
+
+.btn-outline-tertiary:hover {
+  color: #fff;
+  background-color: #FF9E1B;
+  border-color: #FF9E1B;
+}
+
+.btn-outline-tertiary:focus, .btn-outline-tertiary.focus {
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5);
+}
+
+.btn-outline-tertiary.disabled, .btn-outline-tertiary:disabled {
+  color: #6c757d;
+  background-color: transparent;
+}
+
+.text-black {
+  color: #000 !important;
+}
+.text-tertiary {
+  color: #FF9E1B !important;
+}
+
+a.text-tertiary:hover, a.text-tertiary:focus {
+  color: #FA780A !important;
+}
+
+.btn-outline-tertiary {
+  border-width: 2px !important;
+  border-radius: 10px !important; }
+
+.btn-outline-tertiary.text-secondary {
+  color: #FFF !important;
+}
+
+.tw-spinner-overlay {
+  position: absolute;
+  z-index: 5000;
+  background-color: rgba(255, 255, 255, 0.5);
+  width: 100%;
+  height: 100%;
+  filter: blur(4px);
+  -o-filter: blur(4px);
+  -ms-filter: blur(4px);
+  -moz-filter: blur(4px);
+  -webkit-filter: blur(4px);
+}
+
+#spinner-container {
+  position: absolute;
+  z-index: 5003;
+  top: 40%;
+  left: 45%;
+}
+
+#spinner {
+  text-align: center;
+}
+
+.tw-spinner-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 5001;
+}
+.spinner-grow-lg {
+  width: 4rem;
+  height: 4rem;
+}

@@ -10,7 +10,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
     /// </summary>
     public class AssertionViewModel 
     {
-        public AssertionDType Assertion { get; set; }
+        public AugmentedAssertionDType Assertion { get; set; }
         public BadgrAssertionModel BadgrAssertion { get; set; }
         public List<EndorsementDType> AllEndorsements { get; set; }
         public AchievementViewModel AchievementVM { get; set; }
@@ -19,7 +19,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
         {
             AllEndorsements = new List<EndorsementDType>();
         }
-        public static AssertionViewModel FromAssertionDType(AssertionDType assertion, bool isSigned, string signedAssertion = null)
+        public static AssertionViewModel FromAssertionDType(AugmentedAssertionDType assertion, bool isSigned, string signedAssertion = null)
         {
             assertion.IsSigned = isSigned;
             return new AssertionViewModel()

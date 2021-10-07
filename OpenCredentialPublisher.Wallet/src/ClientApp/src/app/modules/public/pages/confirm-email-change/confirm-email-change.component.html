@@ -1,0 +1,12 @@
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <section>
+      <span class="h1">Confirm Email Change</span>
+      <div *ngIf="statusMessage != null && statusMessage != ''" [ngClass]="{'alert alert-success alert-dismissible': !isError, 'alert alert-danger alert-dismissible': isError}">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          {{statusMessage}}
+      </div>
+  </section>
+</ng-template>

@@ -1,0 +1,11 @@
+.pg-info, .bg-info, .pg-info:hover, .bg-info:hover {
+    background-color: #9206EA !important;
+    border-color: #9206EA !important;
+}
+#topBtn {
+  background-color: white;
+  position: fixed;
+  bottom: 5px;
+  left: 50%;
+  z-index: 1000;
+}

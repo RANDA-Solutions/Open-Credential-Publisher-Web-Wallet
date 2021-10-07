@@ -34,10 +34,12 @@ namespace OpenCredentialPublisher.Services.Implementations
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ConnectService> _logger;
         private readonly LogHttpClientService _logHttpClientService;
+        private readonly ETLService _etlService;
         public ConnectService(WalletDbContext context, CredentialService credentialService, HostSettings hostSettings, IHttpClientFactory httpClientFactory
-            , LogHttpClientService logHttpClientService, ILogger<ConnectService> logger)
+            , ETLService etlService, LogHttpClientService logHttpClientService, ILogger<ConnectService> logger)
         {
             _context = context;
+            _etlService = etlService;
             _credentialService = credentialService;
             _hostSettings = hostSettings;
             _httpClientFactory = httpClientFactory;
@@ -45,21 +47,21 @@ namespace OpenCredentialPublisher.Services.Implementations
             _logHttpClientService = logHttpClientService;
         }
 
-        public async Task<CredentialResponse> ConnectAsync(PageModel page, ConnectGetModel model)
-        {
-            var source = await GetSourceAsync(model);
-            var authorization = await GetAuthorizationAsync(page.User.UserId(), source, model);
+        //public async Task<CredentialResponse> ConnectAsync(PageModel page, ConnectGetModel model)
+        //{
+        //    var source = await GetSourceAsync(model);
+        //    var authorization = await GetAuthorizationAsync(page.User.UserId(), source, model);
 
-            if (authorization.UserId == page.User.UserId())
-            {
-                return await GetCredentialAsync(page, source, authorization);
-            }
-            else
-            {
-                // trying to add an existing credential to another account
-                throw new Exception("This credential is not valid and will not be added to your account.");
-            }
-        }
+        //    if (authorization.UserId == page.User.UserId())
+        //    {
+        //        return await GetCredentialAsync(page, source, authorization);
+        //    }
+        //    else
+        //    {
+        //        // trying to add an existing credential to another account
+        //        throw new Exception("This credential is not valid and will not be added to your account.");
+        //    }
+        //}
 
         public async Task<CredentialResponse> ConnectAsync(ControllerBase controller, string userId, ConnectGetModel model)
         {
@@ -92,16 +94,16 @@ namespace OpenCredentialPublisher.Services.Implementations
             return token;
         }
 
-        public async Task<CredentialResponse> GetCredentialAsync(PageModel page, SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
-        {
-            var contentString = await GetContentStringAsync(source, authorization, discoveryDocument);
-            return await _credentialService.ProcessJson(page, contentString, authorization);
-        }
+        //public async Task<CredentialResponse> GetCredentialAsync(PageModel page, SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
+        //{
+        //    var contentString = await GetContentStringAsync(source, authorization, discoveryDocument);
+        //    return await _credentialService.ProcessJson(page, contentString, authorization);
+        //}
 
         public async Task<CredentialResponse> GetCredentialAsync(ControllerBase controller, string userId, SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
         {
             var contentString = await GetContentStringAsync(source, authorization, discoveryDocument);
-            return await _credentialService.ProcessJson(controller, userId, contentString, authorization);
+            return await _etlService.ProcessJson(controller, userId, contentString, authorization);
         }
 
         private async Task<string> GetContentStringAsync(SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
@@ -263,7 +265,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     Payload = model.Payload,
                     Method = model.Method,
                     Endpoint = model.Endpoint,
-                    Created = DateTimeOffset.UtcNow
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 await _context.Authorizations.AddAsync(authorization);

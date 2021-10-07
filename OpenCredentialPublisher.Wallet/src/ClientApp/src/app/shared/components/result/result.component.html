@@ -1,0 +1,73 @@
+<ng-container *ngIf="showIt else showLoading">
+    <!-- Result -->
+    <dt class="col-12 col-sm-4 col-md-3">Name</dt>
+    <dd class="col-12 col-sm-8 col-md-9">{{resultData.resultDescription.name}}</dd>
+    <ng-container *ngIf="resultData.resultDescription.rubricCriterionLevels != null && resultData.resultDescription.rubricCriterionLevels.length > 0">
+      <dt class="col-12 col-sm-4 col-md-3">Rubric Levels</dt>
+      <dd class="col-12 col-sm-8 col-md-9">
+        <ul class="list-group">
+          <li *ngFor="let level of resultData.resultDescription.rubricCriterionLevels" class="list-group-item">
+              <dl class="row">
+                  <dt class="col-12 col-sm-4 col-md-3">Name</dt>
+                  <dd class="col-12 col-sm-8 col-md-9">{{level.name}}</dd>
+              </dl>
+              <ng-container *ngIf="level.description != null">
+                  <dl class="row">
+                      <dt class="col-12 col-sm-4 col-md-3">Description</dt>
+                      <dd class="col-12 col-sm-8 col-md-9">{{level.description}}</dd>
+                  </dl>
+              </ng-container>
+              <ng-container *ngIf="level.level != null">
+                  <dl class="row">
+                      <dt class="col-12 col-sm-4 col-md-3">Level</dt>
+                      <dd class="col-12 col-sm-8 col-md-9">{{level.level}}</dd>
+                  </dl>
+              </ng-container>
+              <ng-container *ngIf="level.points != null">
+                  <dl class="row">
+                      <dt class="col-12 col-sm-4 col-md-3">Points</dt>
+                      <dd class="col-12 col-sm-8 col-md-9">{{level.points}}</dd>
+                  </dl>
+              </ng-container>
+          </li>
+        </ul>
+      </dd>
+    </ng-container>
+    <ng-container *ngIf="resultData.requiredLevel != null">
+        <dt class="col-12 col-sm-4 col-md-3">Required Level</dt>
+        <dd class="col-12 col-sm-8 col-md-9">{{resultData.requiredLevel.name}}</dd>
+    </ng-container>
+    <ng-container *ngIf="resultData.achievedLevel != null">
+        <dt class="col-12 col-sm-4 col-md-3">Achieved Level</dt>
+        <dd class="col-12 col-sm-8 col-md-9">{{resultData.achievedLevel.name}}</dd>
+    </ng-container>
+    <ng-container *ngIf="resultData.resultDescription.allowedValues != null && resultData.resultDescription.allowedValues.length > 0">
+        <dt class="col-12 col-sm-4 col-md-3">Allowed Values</dt>
+        <dd class="col-12 col-sm-8 col-md-9">{{resultData.resultDescription.allowedValues.join(', ')}}</dd>
+    </ng-container>
+    <ng-container *ngIf="resultData.resultDescription.valueMin != null">
+        <dt class="col-12 col-sm-4 col-md-3">Min Value</dt>
+        <dd class="col-12 col-sm-8 col-md-9">{{resultData.resultDescription.valueMin}}</dd>
+    </ng-container>
+    <ng-container *ngIf="resultData.resultDescription.valueMax != null">
+        <dt class="col-12 col-sm-4 col-md-3">Max Value</dt>
+        <dd class="col-12 col-sm-8 col-md-9">{{resultData.resultDescription.valueMax}}</dd>
+    </ng-container>
+    <ng-container *ngIf="resultData.resultDescription.requiredValue != null">
+        <dt class="col-12 col-sm-4 col-md-3">Required Value</dt>
+        <dd class="col-12 col-sm-8 col-md-9">{{resultData.resultDescription.requiredValue}}</dd>
+    </ng-container>
+    <ng-container *ngIf="result.value != null">
+        <dt class="col-12 col-sm-4 col-md-3">Achieved Value</dt>
+        <dd class="col-12 col-sm-8 col-md-9">{{result.value}}</dd>
+    </ng-container>
+</ng-container>
+  <ng-template #showLoading>
+    <div class="tw-spinner-overlay" [hidden]="!showSpinner">
+      <div class="tw-spinner-wrapper">
+      </div>
+    </div>
+    <div id="spinner-container" [hidden]="!showSpinner">
+      <app-spinner id="spinner"></app-spinner>
+    </div>
+  </ng-template>

@@ -1,0 +1,45 @@
+<div *ngIf="proof == null else showProof" class="row">
+  Verifiable Credential Proof is empty.
+</div>
+<ng-template #showProof>
+  <div class="row">
+      <div class="col">
+          <dl class="row">
+              <dt class="col-12 col-sm-4 col-md-3">Type</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                  {{proof.type}}
+              </dd>
+              <dt class="col-12 col-sm-4 col-md-3">Created</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                  {{proof.created | date: 'M/d/yyyy h:mm a'}}
+              </dd>
+              <dt class="col-12 col-sm-4 col-md-3">Purpose</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                  {{proof.proofPurpose}}
+              </dd>
+          </dl>
+      </div>
+      <div class="col">
+          <app-vc-verification [pkgId]="pkgId"></app-vc-verification>
+      </div>
+
+  </div>
+  <dl class="row">
+      <dt class="col-12 col-sm-4 col-md-3">Verification Method</dt>
+      <dd class="col-12 col-sm-8 col-md-9">
+          {{proof.verificationMethod}}
+      </dd>
+      <ng-container *ngIf="proof.challenge != null">
+        <dt class="col-12 col-sm-4 col-md-3">Challenge</dt>
+        <dd class="col-12 col-sm-8 col-md-9">{{proof.challenge}}</dd>
+      </ng-container>
+      <ng-container *ngIf="proof.domain != null">
+          <dt class="col-12 col-sm-4 col-md-3">Domain</dt>
+          <dd class="col-12 col-sm-8 col-md-9">{{proof.domain}}</dd>
+      </ng-container>
+      <dt class="col-12 col-sm-4 col-md-3">Signature</dt>
+      <dd class="col-12 col-sm-8 col-md-9">
+          {{proof.signature}}
+      </dd>
+  </dl>
+</ng-template>

@@ -1,0 +1,31 @@
+<section class="login-form">
+	<span class="h1">Login with Proof</span>
+	<hr />
+	<ng-container *ngIf="model">
+		<p>
+			Please scan the following QR Code with the SOVRIN compatible wallet of your choice and respond to the proof request to login to your account.
+			
+		</p>
+		<div class="alert alert-info">
+			If you do not already have a verified email credential, please get one here: <a class="btn btn-outline-primary" [routerLink]="['/access/email-verification']">Get Email Credential</a>
+		</div>
+		
+		<div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+		<span *ngFor="let msg of modelErrors">{{msg}}</span>
+		</div>
+		<div class="row">
+			<div class="col-12 text-center" *ngIf="showUrl">
+				<app-mobile-wallets [payload]="model.payload" [passportLink]="model.url"></app-mobile-wallets>
+			</div>
+			<div class="col-12 text-center">
+				<img [src]="model.image" />
+				<hr />
+			</div>
+		</div>
+	</ng-container>
+	<div *ngIf="showSpinner == true" class="d-flex flex-column">
+		<app-spinner id="profile-spinner" [message]="message"></app-spinner>
+	</div>
+</section>
+  
+  

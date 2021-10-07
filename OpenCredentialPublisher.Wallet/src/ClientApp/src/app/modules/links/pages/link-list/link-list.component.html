@@ -1,0 +1,89 @@
+<div class="row mt-5">
+  <div class="col">
+    <section class="default-container p-5">
+      <span class="h1">Share your credential</span>
+
+      <div class="alert alert-primary font-16">
+        You have three options to share your credential
+        <ol>
+            <li>
+                Below you will see a shareable link.  Copy and paste as needed.
+            </li>
+            <li>
+                Download a PDF copy of your shareable credential.
+            </li>
+            <li>
+                Generate an email.
+            </li>
+        </ol>
+      </div>
+      <a [routerLink]="['/links/create']">Share a credential</a>
+      <div *ngIf="showSpinner == true" class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th colspan="4">CLR</th>
+              <th colspan="4">Link</th>
+            </tr>
+            <tr>
+              <th>Nickname</th>
+              <th>Publisher</th>
+              <th>Published</th>
+              <th>Added</th>
+              <th>Shareable Link</th>
+              <th class="text-center">Display Count</th>
+              <th></th>
+            </tr>
+          </thead>
+        </table>
+        <div class="d-flex flex-column">
+          <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+        </div>
+      </div>
+      <div *ngIf="showSpinner == false" class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th colspan="4">CLR</th>
+              <th colspan="4">Link</th>
+            </tr>
+            <tr>
+              <th>Nickname</th>
+              <th>Publisher</th>
+              <th>Published</th>
+              <th>Added</th>
+              <th>Shareable Link</th>
+              <th class="text-center">Display Count</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let link of links">
+              <td>{{link.nickname}}</td>
+              <td>{{link.clrPublisherName}}</td>
+              <td>{{link.clrIssuedOn  | date: 'M/d/yyyy'}}</td>
+              <td>{{link.packageCreatedAt | date: 'M/d/yyyy'}} </td>
+              <td class="overflow-hidden" style="max-width: 20em;">
+                  <a [routerLink]="[getLink(link.url)]">{{link.url}}</a>
+              </td>
+              <td class="text-center">{{link.displayCount}}</td>
+
+              <td style="white-space: nowrap">
+                <form method="post" *ngFor="let pdf of link.pdfs">
+                    <button type="submit" class="btn text-primary btn-sm " title="View {{pdf.artifactName}}"
+                      (click)="showPdf(link.id, link.clrId, pdf.assertionId, pdf.evidenceName, pdf.artifactId, pdf.artifactName)">
+                      <i class="fal fa-file-pdf fa-2x"></i>
+                    </button>
+                </form>
+                <a [routerLink]="['/links/share', link.id]" title="Share Through Email"><i class="fal fa-upload fa-2x"></i></a>
+                <a [routerLink]="['/links/delete', link.id]" title="Delete Link"><i class="fal fa-trash fa-2x"></i></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a [routerLink]="['/credentials']">Back to Credentials</a>
+
+    </section>
+  </div>
+</div>

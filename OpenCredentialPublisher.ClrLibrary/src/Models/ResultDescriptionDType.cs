@@ -12,14 +12,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// Describes a possible achievement result. 
     /// </summary>
+    [NotMapped]
     public partial class ResultDescriptionDType
     { 
         /// <summary>
@@ -45,8 +47,8 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <value>The alignments between this result description and nodes in external frameworks. </value>
         [JsonPropertyName("alignments"), Newtonsoft.Json.JsonProperty("alignments")]
         [Description("The alignments between this result description and nodes in external frameworks. ")]
-        public virtual List<AlignmentDType> Alignments { get; set; }
-        
+        public List<AlignmentDType> Alignments { get; set; }
+
         /// <summary>
         /// The ordered from 'low' to 'high' set of allowed values. Model Primitive Datatype = String.
         /// </summary>
@@ -54,7 +56,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("allowedValues"), Newtonsoft.Json.JsonProperty("allowedValues")]
         [Description("The ordered from 'low' to 'high' set of allowed values. Model Primitive Datatype = String.")]
         public List<string> AllowedValues { get; set; }
-        
+
         /// <summary>
         /// The name of the result. Model Primitive Datatype = String.
         /// </summary>
@@ -96,7 +98,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("rubricCriterionLevels"), Newtonsoft.Json.JsonProperty("rubricCriterionLevels")]
         [Description("The ordered from 'low' to 'high' set of rubric criterion levels that may be asserted. ")]
         public virtual List<RubricCriterionLevelDType> RubricCriterionLevels { get; set; }
-        
+
         /// <summary>
         /// The maximum possible result that may be asserted. Model Primitive Datatype = String.
         /// </summary>
@@ -126,7 +128,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

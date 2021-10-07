@@ -1,0 +1,57 @@
+<section id="search-form" class="default-container mt-5">
+	<div *ngIf="loading; else searchform" class="d-flex flex-column">
+		<app-spinner id="proof-request-spinner" [message]="message"></app-spinner>
+	  </div>
+	
+	<ng-template #searchform>
+		<div class="col p-4" >
+		<h2>Credential Search</h2>
+		<hr />
+        <div *ngIf="modelErrors && modelErrors.length > 0">
+			<div class="alert alert-danger mt-2">
+				<div *ngFor="let msg of modelErrors">{{msg}}</div>
+			</div>
+		</div>
+        <fieldset class="form-inline">
+			<div class="form-group">
+			  <label for="typeahead-http">Search for a credential:</label>
+			  <input id="typeahead-http" type="text" class="form-control mx-sm-3" [class.is-invalid]="searchFailed" [(ngModel)]="searchTerm" [ngbTypeahead]="search" placeholder="Credential search" />
+			  <small *ngIf="searching" class="form-text text-muted">searching...</small>
+			  <div class="invalid-feedback" *ngIf="searchFailed">Sorry, credentials could not be loaded.</div>
+			</div>
+			<button type="button" class="btn btn-outline-primary" (click)="searchCredentials()" [disabled]="!searchTerm">Search</button>
+		</fieldset>
+		<ng-container *ngIf="model">
+			<hr />
+			{{model.records}} record(s) found.
+			<ng-container *ngIf="model.records > 0">
+				<table class="table table-striped" [formGroup]="credentialFormGroup">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Type</th>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let credential of model.credentials">
+							<td>
+								<input type="radio" formControlName="selection" [(ngModel)]="selected" [value]="credential.id">
+							</td>
+							<td>
+								{{credential.credentialType}}
+							</td>
+							<td>{{credential.credentialName}}</td>
+							<td>
+								{{credential.credentialDescription}}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<button type="button" class="btn btn-outline-primary" [hidden]="!selected">Request Proof</button>
+			</ng-container>
+		</ng-container>
+	</div>
+	</ng-template>
+</section>

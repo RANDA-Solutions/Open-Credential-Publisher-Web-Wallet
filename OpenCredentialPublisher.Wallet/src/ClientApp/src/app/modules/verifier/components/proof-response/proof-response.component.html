@@ -1,0 +1,63 @@
+<ng-container *ngIf="proof">
+  
+  <div class="card">
+    <div class="card-header bg-primary">
+      Proof Response
+    </div>
+    <div class="card-body">
+      <div class="row ">
+        <div class="col border-0">
+          <dl class="row">
+              <dt class="col-12 col-sm-4 col-md-3">Verification Result</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+               <span [ngClass]="{'text-success': isValidated()}">{{getVerificationResult()}}</span> 
+              </dd>
+              
+              <dt class="col-12 col-sm-4 col-md-3">Revealed Attributes</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                <ng-container *ngFor="let item of proof.revealedAttributes | keyvalue">
+                  <dl class="row">
+                    <dt class="col-12 col-sm-4 col-md-3">{{getItemName(item.key)}}</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">
+                      <ng-container *ngIf="instanceOfAttachmentType(item.value) == true; else defaultItem;">
+                        <dl class="row">
+                          <dt class="col-12 col-sm-4 col-md-3">Name</dt>
+                          <dd class="col-12 col-sm-8 col-md-9">{{getAttachmentName(item.value)}}</dd>
+                          <dt class="col-12 col-sm-4 col-md-3">Type</dt>
+                          <dd class="col-12 col-sm-8 col-md-9">{{getAttachmentExtension(item.value)}}</dd>
+                        </dl>
+                        <button type="button" class="btn btn-outline-primary" (click)="getAttachmentLink(item.value)">VIEW</button>
+                    </ng-container>
+                    <ng-template #defaultItem>
+                      <ng-container *ngIf="isLink(item.value); else codeTemplate;">
+                        <a [href]="item.value" target="_blank">{{item.value}}</a>
+                      </ng-container>
+                      <ng-template #codeTemplate>
+                      <code>{{item.value}}</code>
+                    </ng-template>
+                    </ng-template>
+                    </dd>
+                    
+                  </dl>
+
+                </ng-container>
+                </dd>
+                <dt class="col-12 col-sm-4 col-md-3">Identifiers</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                <ng-container *ngFor="let item of proof.identifiers">
+                  <dl class="row">
+                    <dt class="col-12 col-sm-4 col-md-3">Schema</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">{{item.schema_id}}</dd>
+                    <dt class="col-12 col-sm-4 col-md-3">Credential Definition</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">{{item.cred_def_id}}</dd>
+                  </dl>
+                </ng-container>
+              </dd>
+              
+          </dl>
+        </div>
+    </div>
+  </div>
+  </div>
+</ng-container>
+

@@ -1,0 +1,165 @@
+<div *ngIf="showSpinner == true; else achievementContent" class="row d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="'loading achievements'"></app-spinner>
+</div>
+<ng-template #achievementContent>
+  <ng-container>
+    <button class="card-header h5 text-left" [attr.id]="'achievementHeader-' + safeAchievementId" data-toggle="collapse" [attr.data-target]="'#achievementBody-' + safeAchievementId">
+      <ng-container *ngIf="achievement.humanCode != null">{{achievement.humanCode}}:{{achievement.name}}</ng-container>
+      <ng-container *ngIf="achievement.humanCode == null">{{achievement.name}}</ng-container>
+    </button>
+    <div [attr.id]="'achievementBody-' + safeAchievementId" class="collapse">
+      <div class="card-body card-deck">
+            <div *ngIf="achievement.image != null" class="card border-0" style="max-width: 100px">
+              <img src="{{achievement.image}}" style="max-width: 100px" />
+            </div>
+            <div class="card border-0">
+              <dl class="row">
+                <ng-container *ngIf="achievement.creditsAvailable != null">
+                  <dt class="col-sm-4">Credits Available</dt>
+                  <dd class="col-sm-8">{{achievement.creditsAvailable}}</dd>
+                </ng-container>
+                <ng-container *ngIf="achievement.description != null">
+                  <dt class="col-sm-4">Description</dt>
+                  <dd class="col-sm-8" [innerHtml]="achievement.description"></dd>
+                </ng-container>
+                <ng-container *ngIf="achievement.fieldOfStudy != null">
+                  <dt class="col-sm-4">Field of Study</dt>
+                  <dd class="col-sm-8">{{achievement.fieldOfStudy}}</dd>
+                </ng-container>
+                <ng-container *ngIf="achievement.humanCode != null">
+                  <dt class="col-sm-4">Human Code</dt>
+                  <dd class="col-sm-8">{{achievement.humanCode}}</dd>
+                </ng-container>
+                <ng-container *ngIf="achievement.level != null">
+                  <dt class="col-sm-4">Level</dt>
+                  <dd class="col-sm-8">{{achievement.level}}</dd>
+                </ng-container>
+                <ng-container *ngIf="achievement.requirement != null">
+                  <dt class="col-sm-4">Requirement</dt>
+                  <dd class="col-sm-8 markdown" [innerHtml]="achievement.requirement.narrative"></dd>
+                </ng-container>
+                <ng-container *ngIf="achievement.specialization != null">
+                  <dt class="col-sm-4">Specialization</dt>
+                  <dd class="col-sm-8">{{achievement.specialization}}</dd>
+                </ng-container>
+                <ng-container *ngIf="achievement.tags != null">
+                  <dt class="col-sm-4">Tags</dt>
+                  <dd class="col-sm-8">{{achievement.tags}}</dd>
+                </ng-container>
+                <dt class="col-sm-4">
+                  Type
+                  <img src="assets/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
+                    #ttimg="ngbTooltip" data-html="true" [ngbTooltip]="achievementTypes" />
+                </dt>
+                <dd class="col-sm-8">{{achievement.achievementType}}</dd>
+              </dl>
+          </div>
+      </div>
+      <ng-container *ngIf="achievement.issuer != null">
+        <div class="card">
+          <button
+            class="card-header" [attr.id]="'issuerHeader-' + safeAchievementId" data-toggle="collapse" [attr.data-target]="'#issuerBody-' + safeAchievementId">
+              Issuer
+          </button>
+          <div [attr.id]="'issuerBody-' + safeAchievementId" class="collapse">
+            <div class="card-body card-deck">
+                <div class="card border-0">
+                  <dl app-clr-profile profileType="issuer" [profile]="achievement.issuer" class="row">
+                  </dl>
+                </div>
+                <div class="card border-0">
+                  <app-public-key *ngIf="achievement.issuer.publicKey != null"
+                    [key]="achievement.issuer.publicKey"></app-public-key>
+                  <app-verification ancestors="clr" [ancestorKeys]="clrId.toString()" [clrId]="clrId" [clrIdentifier]="clrIdentifier" [verification]="achievement.issuer.verification"></app-verification>
+                </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <!-- Result Descriptions -->
+      <div *ngIf="achievement.resultDescriptions != null && achievement.resultDescriptions.length > 0" class="card">
+        <button class="card-header" [attr.id]="'resultDescriptionsHeader-' + safeAchievementId" data-toggle="collapse" [attr.data-target]="'#resultDescriptionBody-' + safeAchievementId">
+          Result Descriptions
+        </button>
+        <div [attr.id]="'resultDescriptionBody-' + safeAchievementId" class="collapse">
+          <div class="card-body card-deck">
+            <div class="card border-0">
+              <span class="h4">
+                  Result Descriptions
+              </span>
+              <ul class="list-group">
+                <li *ngFor="let rd of achievement.resultDescriptions" class="list-group-item">
+                  <dl class="row">
+                    <dt class="col-12 col-sm-4 col-md-3">Name</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">{{rd.name}}</dd>
+                    <dt class="col-12 col-sm-4 col-md-3">Type</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">{{rd.resultType}}</dd>
+                    <ng-container *ngIf="rd.allowedValues != null">
+                      <dt class="col-12 col-sm-4 col-md-3">Allowed</dt>
+                      <dd class="col-12 col-sm-8 col-md-9">{{rd.allowedValues.join(', ')}}</dd>
+                    </ng-container>
+                    <ng-container *ngIf="rd.valueMin != null">
+                      <dt class="col-12 col-sm-4 col-md-3">Min</dt>
+                      <dd class="col-12 col-sm-8 col-md-9">{{rd.valueMin}}</dd>
+                    </ng-container>
+                    <ng-container *ngIf="rd.valueMax != null">
+                      <dt class="col-12 col-sm-4 col-md-3">Max</dt>
+                      <dd class="col-12 col-sm-8 col-md-9">{{rd.valueMax}}</dd>
+                    </ng-container>
+                  </dl>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Endorsements -->
+      <div app-endorsements [ancestors]="lineage" [ancestorKeys]="lineageKeys" [clrId]="clrId" [clrIdentifier]="clrIdentifier"
+        [id]="id" class="card">
+      </div>
+
+      <!-- Alignments -->
+      <div app-alignments [clrId]="clrId" [id]="achievement.id" [ancestors]="lineage" [ancestorKeys]="lineageKeys" class="card mt-2">
+      </div>
+      <!-- Associations -->
+      <div app-associations [clrId]="clrId" [id]="achievement.id" [ancestors]="lineage" [ancestorKeys]="lineageKeys" class="card mt-2">
+      </div>
+      <!-- Additional Properties -->
+      <div *ngIf="achievement.additionalProperties != null && achievement.additionalProperties.length > 0" class="card">
+        <button class="card-header" [attr.id]="'achievementAdditionalPropertiesHeader-' + safeAchievementId" data-toggle="collapse" [attr.data-target]="'#achievementAdditionalPropertiesBody-' + safeAchievementId">
+            Additional Properties
+        </button>
+        <div [attr.id]="'achievementAdditionalPropertiesBody-' + safeAchievementId" class="collapse">
+          <div class="card-body card-deck">
+            <div class="card border-0">
+              <span class="h4">Additional Properties</span>
+              <dl class="row">
+                <ng-container *ngFor="let key of achievement.additionalProperties.keys">
+                  <dt class="col-12 col-sm-4 col-md-3">@key</dt>
+                  <dd class="col-12 col-sm-8 col-md-9">@Model.AdditionalProperties[key]</dd>
+                </ng-container>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #achievementTypes>
+    <div>Achievement</div>
+    <div>Assessment Result</div>
+    <div>Award</div>
+    <div>Badge</div>
+    <div>Certificate</div>
+    <div>Certification</div>
+    <div>Course</div>
+    <div>Community Service</div>
+    <div>Competency</div>
+    <div>Co-Curricular</div>
+    <div>Degree</div>
+    <div>Diploma</div>
+    <div>Fieldwork</div>
+    <div>License</div>
+    <div>Membership</div>
+  </ng-template>
+</ng-template>

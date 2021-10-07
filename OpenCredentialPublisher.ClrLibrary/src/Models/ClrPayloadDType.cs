@@ -10,15 +10,17 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// Payload for the 'postClr' operation. Only one format (signed or unsigned) is allowed. 
     /// </summary>
-    public partial class ClrPayloadDType
+    [NotMapped]
+    public class ClrPayloadDType
     { 
         /// <summary>
         /// URL to the JSON-LD context file.
@@ -50,7 +52,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

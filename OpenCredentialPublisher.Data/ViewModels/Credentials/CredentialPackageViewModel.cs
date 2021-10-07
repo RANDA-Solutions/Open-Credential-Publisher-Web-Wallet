@@ -1,5 +1,7 @@
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Models.Badgr;
+using OpenCredentialPublisher.Data.Models.Enums;
+using OpenCredentialPublisher.Data.ViewModels.nG;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -53,6 +55,13 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
                 pkgVM.Pdfs.AddRange(vcVM.Pdfs);
             }
             else if (pkgVM.CredentialPackage.TypeId == PackageTypeEnum.OpenBadge)
+            {
+                var vcVM = ClrViewModel.FromBackpack(pkg.BadgrBackpack);
+                pkgVM.ClrVM = vcVM;
+                pkgVM.AssertionsCount = vcVM.AllAssertions.Count;
+                pkgVM.Pdfs.AddRange(vcVM.Pdfs);
+            }
+            else if (pkgVM.CredentialPackage.TypeId == PackageTypeEnum.OpenBadgeConnect)
             {
                 var vcVM = ClrViewModel.FromBackpack(pkg.BadgrBackpack);
                 pkgVM.ClrVM = vcVM;

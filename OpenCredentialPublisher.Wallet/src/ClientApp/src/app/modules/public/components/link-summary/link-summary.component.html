@@ -1,0 +1,130 @@
+
+<div *ngIf="showSpinner == true; else theContent" class="row d-flex flex-column mx-auto">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <div class="col">
+    <p *ngIf="vm.clrIsRevoked" class="alert-danger alert">
+        This <b>{{vm.clrName || 'Comprehensive Learner Record'}}</b> has been revoked and is no longer valid.
+    </p>
+    <div class="card">
+        <div class="card-body">
+            <div class="h5 card-title">
+
+            </div>
+            <div class="card-text">
+                <dl class="row">
+                    <dt class="col-12 col-sm-5 col-md-4 col-lg-3">
+                        Learner
+                    </dt>
+                    <dd class="col-12 col-sm-7 col-md-8 col-lg-9">
+                        {{vm.learnerName}}
+                    </dd>
+                    <dt class="col-12 col-sm-5 col-md-4 col-lg-3">
+                        Document Type
+                    </dt>
+                    <dd class="col-12 col-sm-7 col-md-8 col-lg-9">
+                        {{vm.clrName || 'Comprehensive Learner Record'}}
+                    </dd>
+                    <dt class="col-12 col-sm-5 col-md-4 col-lg-3">
+                        Issuing Organization
+                    </dt>
+                    <dd class="col-12 col-sm-7 col-md-8 col-lg-9">
+                        {{vm.publisherName}}
+                    </dd>
+                    <dt class="col-12 col-sm-5 col-md-4 col-lg-3">
+                        Published date/time
+                    </dt>
+                    <dd class="col-12 col-sm-7 col-md-8 col-lg-9">
+                        {{vm.clrIssuedOn | date: 'M/d/yyyy h:mm a'}}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-xl-3 row-cols-sm-1 row-cols-md-2 mt-5">
+      <div *ngIf="vm.clrIsRevoked == false && vm.verification != null" class="col mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="card-title">
+              Please confirm the authenticity of the Comprehensive Learner Record (CLR)
+            </div>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <form>
+                <dl class="row">
+                  <dt class="col-4 col-sm-3">
+                    <input type="hidden" name="ClrEntityId" value="{{vm.clrId}}" />
+                    <input type="hidden" name="ClrId" value="{{vm.clrIdentifier}}" />
+                    <input type="submit" class="btn btn-outline-tertiary" value="Verify" />
+                  </dt>
+                  <dd class="col-8 col-sm-9">
+                    <div style="padding-top: 5px;">
+                        {{vm.verification.type}}
+                        <img src="assets/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
+                          #tt="ngbTooltip" [ngbTooltip]="labels" triggers="manual" (mouseover)="tt.open()" [closeDelay]="2500" />
+                    </div>
+                    <div class="mt-2">
+                        <span [attr.id]="'verification-result-' + vm.clrId.toString()"></span>
+                    </div>
+                    <div class="mt-2"><span [attr.id]="'revocationlist-result-' + vm.clrId.toString()"></span></div>
+                  </dd>
+                  <ng-container *ngIf="vm.verification.creator != null">
+                    <dt class="col-3">Creator</dt>
+                    <dd class="col-9">{{vm.verification.creator}}</dd>
+                  </ng-container>
+                </dl>
+              </form>
+
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div *ngIf="vm.pdfs.length > 0" class="col mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+              <div class="card-title">
+                  You may also download a document version of the student evidence.
+              </div>
+
+          </div>
+          <ul class="list-group list-group-flush">
+            <li *ngFor="let pdf of vm.pdfs" class="list-group-item">
+              <ng-container *ngIf="pdf.isPdf">
+                <span style="line-height: 46px;">
+                    {{pdf.artifactName}}
+                </span>
+                <form method="post" class="float-right">
+                    <button type="button" class="btn text-secondary btn-lg btn-outline-secondary" title="View {{pdf.artifactName}}" (click)="pdfView(pdf)"><i class="fas fa-file-pdf fa-2x"></i></button>
+                </form>
+              </ng-container>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div *ngIf="vm.showDownloadVCJsonButton" class="col mb-3">
+          <div class="card h-100">
+              <div class="card-body">
+                  <div class="card-title">
+                      If your system is capable of ingesting verifiable credentials, download the machine-readable version.
+                  </div>
+              </div>
+              <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                      <span style="line-height: 46px;">
+                          Verifiable Credential
+                      </span>
+                      <form method="post" class="float-right">
+                          <input type="hidden" name="AccessKey" value="{{vm.accessKey}}" />
+                          <input type="hidden" name="id" value="{{link.id}}" />
+                          <button type="button" (click)="downloadVCJson()" class="btn btn-lg btn-outline-secondary text-secondary" title="Download Verifiable Credential"><i class="fas fa-file-download fa-2x"></i></button>
+                      </form>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #labels><div>Hosted</div><div>Signed</div></ng-template>

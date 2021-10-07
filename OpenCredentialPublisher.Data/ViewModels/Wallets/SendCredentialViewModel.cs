@@ -1,4 +1,5 @@
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using System;
 using System.Collections.Generic;

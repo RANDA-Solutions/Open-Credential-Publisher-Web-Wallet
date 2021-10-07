@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using OpenCredentialPublisher.Services.Implementations;
@@ -29,7 +30,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Mappers
 
             var additionalProperties = GetAdditionalProperties(clr);
 
-            var link = new LinkModel { ClrForeignKey = model.Clr.Id, CredentialRequestId = model.CredentialRequestId, UserId = model.WalletRelationship.UserId, Nickname = $"SentToWallet-{model.WalletRelationship.WalletName}", RequiresAccessKey = true, CreatedAt = DateTimeOffset.UtcNow };
+            var link = new LinkModel { ClrForeignKey = model.Clr.ClrId, CredentialRequestId = model.CredentialRequestId, UserId = model.WalletRelationship.UserId, Nickname = $"SentToWallet-{model.WalletRelationship.WalletName}", RequiresAccessKey = true, CreatedAt = DateTimeOffset.UtcNow };
             await _linkService.AddAsync(link);
 
             var shareModel = new ShareModel

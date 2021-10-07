@@ -1,0 +1,42 @@
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+            <span class="h3 mb-3">Your Connection</span>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">Current Name</dt>
+                <dd class="col-sm-10">
+                    <ng-container *ngIf="vm.name != null">{{vm.name}}</ng-container>
+                </dd>
+                <dt class="col-sm-2"><abbr title="The decentralized identifier representing the relationship between your mobile wallet and this website.">Relationship DID</abbr></dt>
+                <dd class="col-sm-10">
+                    {{vm.relationshipDid}}
+                </dd>
+                <dt class="col-sm-2">Created</dt>
+                <dd class="col-sm-10">
+                    {{vm.dateCreated}}
+                </dd>
+            </dl>
+            <hr />
+            <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+              <span *ngFor="let msg of modelErrors">{{msg}}</span>
+            </div>
+            <form id="form-wallet-name" class="my-5" method="post">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend mr-3">
+                        <i class="fal fa-wallet fa-2x"></i>
+                    </div>
+                    <input name="name" placeholder="Nickname for this connection" class="form-control" [(ngModel)]="vm.name" />
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend mr-3">
+                        <span class="blank-icon"></span>
+                    </div>
+                    <button type="button" (click)="save()" id="btn-login-form" class="btn btn-outline-primary btn-lg">Save</button>
+                </div>
+            </form>
+            <br />
+            <a [routerLink]="['/wallets/wallet-list']">Back to Connected Wallets</a>
+        </section>
+    </div>
+</div>

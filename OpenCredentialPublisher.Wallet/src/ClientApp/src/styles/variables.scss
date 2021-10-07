@@ -1,0 +1,71 @@
+// https://coolors.co/
+//HSL
+
+
+// triadic wheel https://www.sessions.edu/color-calculator/
+$ocp-color-randaorange-bg: #dd8819;
+
+$ocp-color1: #264653;// #585858;
+$ocp-color2:#9206EA;
+$ocp-color3:#dd8819;
+$ocp-color4:#e3c567;
+$ocp-color5:#f46036;
+$ocp-color-link: #0078d7;
+
+$ocp-color1-darkest:#0F1C21;
+$ocp-color1-darker:#162A31;
+$ocp-color1-dark:#1E3842;
+$ocp-color2-darkest:#223A3E;
+$ocp-color2-darker:#33575D;
+$ocp-color2-dark:#44747C;
+$ocp-color3-darkest:#58360A;
+$ocp-color3-darker:#84510F;
+$ocp-color3-dark:#B06C14;
+$ocp-color4-darkest:#5A4E29;
+$ocp-color4-darker:#88753D;
+$ocp-color4-dark:#B59C52;
+$ocp-color5-darkest:#612615;
+$ocp-color5-darker:#923920;
+$ocp-color5-dark:#C34C2B;
+
+$ocp-color1-light:#677D86;
+$ocp-color1-lighter:#A8B5BA;
+$ocp-color1-lightest:#E9ECED;
+$ocp-color2-light:#88B2B9;
+$ocp-color2-lighter:#BBD3D7;
+$ocp-color2-lightest:#EEF4F5;
+$ocp-color3-light:#E7AB5E;
+$ocp-color3-lighter:#F1CFA3;
+$ocp-color3-lightest:#FBF3E8;
+$ocp-color4-light:#EBD594;
+$ocp-color4-lighter:#F3E7C2;
+$ocp-color4-lightest:#FCF9EF;
+$ocp-color5-light:#F78F72;
+$ocp-color5-lighter:#FABFAE;
+$ocp-color5-lightest:#FDEFEA;
+
+$ocp-color1-a1:#2d2653;
+$ocp-color1-a2: #265333;
+$ocp-color2-a1:#5a569b;
+$ocp-color2-a2:#569b5f;
+$ocp-color3-a1: #ddb919;
+$ocp-color3-a2: #dd5719;
+$ocp-color4-a1: #e1e367;
+$ocp-color4-a2: #e3a567;
+$ocp-color5-a1: #f48e36;
+$ocp-color5-a2: #f4363f;
+
+$ocp-color-page-bg: $ocp-color2-lightest;
+$ocp-color-input-bg: $ocp-color3-lightest;
+$ocp-color-primary-bg: #ffffff;
+$ocp-color-normal-text: $ocp-color1;
+$ocp-color-faded-text: $ocp-color1-lighter;
+$ocp-color-bright-text: $ocp-color1-darker;
+$ocp-color-hilight-text: rgba(66, 236, 245, 1);
+$ocp-color-error: rgba(255, 0, 0, 1);
+$ocp-color-success: rgba(0, 255, 0, 1);
+$ocp-color-randaorange-bg: #dd8819;
+$ocp-corner-radius: 5px;
+/*below confirmed 2021-05-21*/
+$ocp-color-link: #52E4EA;
+$ocp-color-link-hover: #1aced6;
