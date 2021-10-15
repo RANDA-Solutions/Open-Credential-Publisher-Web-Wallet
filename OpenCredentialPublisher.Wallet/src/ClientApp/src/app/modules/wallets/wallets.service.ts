@@ -27,7 +27,7 @@ export class WalletService {
   }
   getWallets(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}wallets/walletlist`;
-    console.log(`WalletService ${urlApi}`);
+    if (this.debug) console.log(`WalletService ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -36,7 +36,7 @@ export class WalletService {
   }
   getConnectionVM(id: number): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}wallets/Connection/${id}`;
-    console.log(`WalletService ${urlApi}`);
+    if (this.debug) console.log(`WalletService ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -45,7 +45,7 @@ export class WalletService {
   }
   getInvitationVM(id: number): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}wallets/Invitation/${id}`;
-    console.log(`WalletService ${urlApi}`);
+    if (this.debug) console.log(`WalletService ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -54,7 +54,7 @@ export class WalletService {
   }
   getSendWalletVM(id: number): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}wallets/WalletSendVM/${id}`;
-    console.log(`WalletService ${urlApi}`);
+    if (this.debug) console.log(`WalletService ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -63,7 +63,7 @@ export class WalletService {
   }
   getRelationshipVM(id: number): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}wallets/Relationship/${id}`;
-    console.log(`WalletService ${urlApi}`);
+    if (this.debug) console.log(`WalletService ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -72,7 +72,7 @@ export class WalletService {
   }
   delete(id: number): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}wallets/Delete/${id}`;
-    console.log(`WalletService ${urlApi}`);
+    if (this.debug) console.log(`WalletService ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, null)
     .pipe(
       catchError(err => this.utilsService
@@ -81,7 +81,7 @@ export class WalletService {
   }
   saveConnection(id: number, input: ConnectionViewModel): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}wallets/saveConnection/${id}`;
-    console.log(`WalletService ${urlApi}`);
+    if (this.debug) console.log(`WalletService ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, input)
     .pipe(
       catchError(err => this.utilsService.handleError(err))

@@ -68,4 +68,8 @@ export class NavMenuComponent implements OnInit {
       this.showNavMenu = this.showNavMenu;
     }
   }
+
+  logout() {
+    this.loginService.signOut();
+  }
 }

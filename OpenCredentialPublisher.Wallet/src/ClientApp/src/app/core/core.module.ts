@@ -1,7 +1,6 @@
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { ErrorHandler, NgModule, Optional, SkipSelf } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AuthInterceptor } from 'angular-auth-oidc-client';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { GlobalErrorHandler } from './error-handling/error.handler';
@@ -21,24 +20,18 @@ import { UtilsService } from './services/utils.service';
 		ToastModule
 	],
 	providers: [
-		// { provide: HTTP_INTERCEPTORS, useClass: HttpRequestInterceptor, multi: true },
 		AppService,
 		AuthorizationService,
 		AuthGuard,
 		ClrDetailService,
 		CredentialService,
-    LoginGuard,
+    	LoginGuard,
 		LogService,
 		MessageService,
 		UtilsService,
 		{
 			provide: ErrorHandler,
 			useClass: GlobalErrorHandler
-		},
-		{
-			provide: HTTP_INTERCEPTORS,
-			useClass: AuthInterceptor,
-			multi: true,
 		}
 	],
 	exports: [

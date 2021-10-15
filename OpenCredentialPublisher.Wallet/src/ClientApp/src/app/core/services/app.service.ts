@@ -156,7 +156,6 @@ export class AppService {
         .then(() => {
           if (this.debug) console.log("AppService SignalR Connected.");
           if (flow == this.proofFlow) {
-            console.log("proof stuff happening?");
             connection.invoke("JoinGroup", args).then(() => {
               connection.on(this.proofMethod, (status, finished) => {
                 if (this.debug) console.log(`${this.proofMethod}: `, status);

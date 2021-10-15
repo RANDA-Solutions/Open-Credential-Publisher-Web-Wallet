@@ -60,7 +60,7 @@ namespace OpenCredentialPublisher.ClrWallet
                     {
                         $"{SpaClientUrl}/callback",
                         $"{SpaClientUrl}/authentication/login-callback",
-                        //$"{SpaClientUrl}/silent-renew.html",
+                        $"{SpaClientUrl}/silent-renew.html",
                         $"{SpaClientUrl}/access/login",
                         $"{SpaClientUrl}/",
                         $"{SpaClientUrl}"
@@ -70,6 +70,8 @@ namespace OpenCredentialPublisher.ClrWallet
                     {
                         $"{SpaClientUrl}/unauthorized",
                         $"{SpaClientUrl}",
+                        $"{SpaClientUrl}/credentials",
+                        $"{SpaClientUrl}/access/login",
                         $"{SpaClientUrl}/access/logout"
                     },
                     AllowedCorsOrigins = new List<string>

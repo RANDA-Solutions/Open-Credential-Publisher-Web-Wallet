@@ -9,7 +9,7 @@ namespace OpenCredentialPublisher.Data.Models
     /// Represents a Resource Server that has implemented the CLR spec, and its
     /// Authorization Server.
     /// </summary>
-    public class SourceModel
+    public class SourceModel : IBaseEntity
     {
         /// <summary>
         /// All the authorizations tied to this resource server.

@@ -38,7 +38,7 @@ export class ProofService {
 	getProof(id: string) {
 		let urlApi = `${environment.apiEndPoint}Proof/${id}`;
 		return this.http.get<ProofResponse>(urlApi).pipe((tap((data) => {
-			console.log(data);
+			//console.log(data);
 		})));
 	}
 

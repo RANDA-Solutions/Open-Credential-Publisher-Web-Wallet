@@ -3,6 +3,7 @@ import { RegisterCallbackComponent } from './pages/callback/callback.component';
 import { SourceDeleteComponent } from './pages/delete/source-delete.component';
 import { SourceDetailComponent } from './pages/details/source-details.component';
 import { RegisterComponent } from './pages/register/register.component';
+import { SelectOpenBadgesComponent } from './pages/select-open-badges/select-open-badges.component';
 import { SourceListComponent } from './pages/source-list.component';
 
 export const sourceRoutes: Routes = [
@@ -29,6 +30,11 @@ export const sourceRoutes: Routes = [
     {
         path: 'delete/:id',
         component: SourceDeleteComponent,
+
+    },
+    {
+        path: 'select-open-badges/:id',
+        component: SelectOpenBadgesComponent,
 
     },
     {

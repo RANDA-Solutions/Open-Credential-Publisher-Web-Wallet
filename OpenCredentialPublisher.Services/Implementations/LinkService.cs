@@ -70,7 +70,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var link = await _context.Links.AsNoTracking()
                 .Include(l => l.Clr)
                 .ThenInclude(c => c.CredentialPackage)
-                .Where(l => l.UserId == userId && l.Id == id)
+                .Where(l => (l.UserId == userId || userId == null) && l.Id == id)
                 .FirstOrDefaultAsync();
 
                 var pdfs = await _context.Artifacts
@@ -139,7 +139,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .Include(l => l.Shares)
                 .Include(l => l.Clr)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId == userId && x.Id == id);
+                .FirstOrDefaultAsync(x => (x.UserId == userId || userId == null) && x.Id == id);
         }
 
         public async Task<LinkModel> GetAsync(string id)

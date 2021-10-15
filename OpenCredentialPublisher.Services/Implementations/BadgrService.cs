@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.Http;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Models.ClrEntities;
+using OpenCredentialPublisher.Data.ViewModels.nG;
 //2021-06-17 EF Tracking OK
 namespace OpenCredentialPublisher.Services.Implementations
 {
@@ -465,6 +466,104 @@ namespace OpenCredentialPublisher.Services.Implementations
                 modelState.AddModelError(string.Empty, response.ReasonPhrase);
             }
         }
+
+        public async Task<BackpackPackageVM> GetBackpackPackageForSelectionAsync(string userId, int id)
+        {
+            var pkg = await GetBackpackPackageAsync(userId, id);
+
+            var prev = await GetPreviousBackpackAsync(pkg.AuthorizationForeignKey);
+
+            var badgeName = string.Empty;
+            var badgeDescription = string.Empty;
+            var issuerName = string.Empty;
+
+            var vm = new BackpackPackageVM { Id = id, IsBadgr = pkg.BadgrBackpack.IsBadgr };
+            foreach (var ba in pkg.BadgrBackpack.BadgrAssertions)
+            {
+                if (ba.IsBadgr)
+                {
+                    dynamic badgeClass = JsonConvert.DeserializeObject<ExpandoObject>(ba.BadgeClassJson, new ExpandoObjectConverter());
+                    badgeName = ((IDictionary<string, object>)badgeClass)["name"].ToString();
+                    badgeDescription = ((IDictionary<string, object>)badgeClass)["description"].ToString();
+                    issuerName = "";
+                    if (!string.IsNullOrWhiteSpace(ba.IssuerJson))
+                    {
+                        dynamic issuer = JsonConvert.DeserializeObject<ExpandoObject>(ba.IssuerJson, new ExpandoObjectConverter());
+                        issuerName = ((IDictionary<string, object>)issuer)["name"].ToString();
+                    }
+                    else
+                    {
+                        issuerName = "Issuer information not available";
+                    }
+                }
+                else
+                {
+                    if (ba.IsValidJson)
+                    {
+                        badgeName = ba.Id;
+                    }
+                    else
+                    {
+                        badgeName = "Invalid Badge";
+                    }
+                    issuerName = "Issuer information not available";
+
+                }
+                var obVM = new OpenBadgeVM
+                {
+                    IdIsUrl = Uri.IsWellFormedUriString(ba.Id, UriKind.Absolute),
+                    Id = ba.BadgrAssertionId,
+                    BadgeName = badgeName,
+                    IssuerName = issuerName,
+                    BadgeDescription = badgeDescription,
+                    BadgrAssertionId = ba.Id,
+                    BadgeImage = ba.Image,
+                    IsSelected = false
+                };
+                PrePopulateSelectionFlags(obVM, prev);
+                vm.Badges.Add(obVM);
+            }
+
+            return vm;
+        }
+        public async Task<CredentialPackageModel> GetBackpackPackageAsync(string userId, int id)
+        {
+            var pkg = await _context.CredentialPackages
+                .AsNoTracking()
+                .Include(cp => cp.BadgrBackpack)
+                .ThenInclude(bp => bp.BadgrAssertions)
+                .Where(package => package.UserId == userId && package.Id == id)
+                .FirstOrDefaultAsync();
+
+            return pkg;
+        }
+        public async Task SelectBadgesAsync(string userId, int id, List<int> keepers)
+        {
+            var pkg = await GetBackpackPackageAsync(userId, id);
+
+            foreach (var ba in pkg.BadgrBackpack.BadgrAssertions)
+            {
+                if (!keepers.Contains(ba.BadgrAssertionId))
+                {
+                    ba.Delete();
+                    _context.Entry(ba).State = EntityState.Modified;
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
+        private async Task<BadgrBackpackModel> GetPreviousBackpackAsync(string id)
+        {
+            var backpack = await _context.BadgrBackpacks
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Include(bp => bp.ParentCredentialPackage)
+                .Include(bp => bp.BadgrAssertions)
+                .Where(bp => bp.ParentCredentialPackage.AuthorizationForeignKey == id)
+                .OrderByDescending(bp => bp.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            return backpack;
+        }
         private async Task SaveBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
         {
 
@@ -733,6 +832,32 @@ namespace OpenCredentialPublisher.Services.Implementations
             else
             {
                 return new Status { Success = false, Description = response.ReasonPhrase };
+            }
+        }
+
+        private void PrePopulateSelectionFlags(OpenBadgeVM badge, BadgrBackpackModel prev)
+        {
+            if (prev != null)
+            {
+                var prevBadge = prev.BadgrAssertions.
+                    Where(a => a.Id == badge.BadgrAssertionId)
+                    .FirstOrDefault();
+
+                if (prevBadge != null)
+                {
+                    badge.IsSelected = !prevBadge.IsDeleted;
+                    badge.IsNew = false;
+                }
+                else
+                {
+                    badge.IsSelected = true;
+                    badge.IsNew = true;
+                }
+            }
+            else
+            {
+                badge.IsSelected = true;
+                badge.IsNew = true;
             }
         }
         #endregion

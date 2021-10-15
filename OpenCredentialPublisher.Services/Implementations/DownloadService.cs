@@ -44,7 +44,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             return await GetFileContentResultAsync(request, artifact, dReq, userId, shareModel);
         }
-        public async Task<IActionResult> GetClrPdfAsync(HttpRequest request, PdfRequest dReq, string userId)
+        public async Task<IActionResult> GetClrPdfAsync(HttpRequest request, PdfRequest dReq, string userId = null)
         {
             var shareModel = new ShareModel();
 
@@ -79,7 +79,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             return await GetFileContentResultAsync(request, artifact, dReq, userId, shareModel);
         }
-        public async Task<IActionResult> GetLinkPdfAsync(HttpRequest request, PdfRequest dReq, string userId)
+        public async Task<IActionResult> GetLinkPdfAsync(HttpRequest request, PdfRequest dReq, string userId = null)
         {
 
             var link = await _linkService.GetAsync(userId, dReq.LinkId);

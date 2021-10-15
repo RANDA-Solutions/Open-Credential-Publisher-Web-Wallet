@@ -1,3 +1,4 @@
+import { ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { DownloadService } from '@core/services/download.service';
 import { environment } from '@environment/environment';
@@ -14,7 +15,8 @@ import { take } from 'rxjs/operators';
 @Component({
   selector: '[app-link-summary]',
   templateUrl: './link-summary.component.html',
-  styleUrls: ['./link-summary.component.scss']
+  styleUrls: ['./link-summary.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LinkSummaryComponent implements OnChanges, OnInit {
   @Input() link = new LinkDisplayVM();
@@ -24,7 +26,7 @@ export class LinkSummaryComponent implements OnChanges, OnInit {
   public vm = new LinkDisplayVMNew();
   private debug = false;
 
-  constructor(private linkService: LinksService, private downloads: DownloadService) { }
+  constructor(private linkService: LinksService, private downloads: DownloadService, private ref: ChangeDetectorRef) { }
 
   ngOnChanges() {
     if (this.debug) console.log('LinkSummaryComponent ngOnChanges');
@@ -46,7 +48,7 @@ export class LinkSummaryComponent implements OnChanges, OnInit {
   getData():any {
     this.showSpinner = true;
     if (this.debug) console.log('LinkSummaryComponent getData');
-    this.linkService.getLinkDisplayDetail(this.link.id)
+    this.linkService.getLinkDisplayDetail(this.link)
       .pipe(take(1)).subscribe(data => {
         if (data.statusCode == 200) {
           this.vm = (<ApiOkResponse>data).result as LinkDisplayVMNew;
@@ -54,6 +56,7 @@ export class LinkSummaryComponent implements OnChanges, OnInit {
           this.vm = new LinkDisplayVMNew;
         }
         this.showSpinner = false;
+        this.ref.markForCheck();
       });
   }
   pdfView(pdf: PdfShare){
@@ -75,6 +78,7 @@ export class LinkSummaryComponent implements OnChanges, OnInit {
           this.downloads.saveAs(resp.body, pdf.artifactName, 'Pdf');
           this.showSpinner = false;
           this.message = 'loading summary';
+          this.ref.markForCheck();
         });
 
   }
@@ -82,14 +86,15 @@ export class LinkSummaryComponent implements OnChanges, OnInit {
     this.message = 'downloading credential';
     this.showSpinner = true;
     if (this.debug) console.log('DisplayCredentialComponent downloadVCJson');
-    this.downloads.vcLinkJson(this.link.id)
+    this.downloads.vcLinkJson(this.link.id, this.link.accessKey)
       .pipe(take(1))
       .subscribe(resp => {
         var contentDispositionHeader = resp.headers.get('Content-Disposition');
         var filename = contentDispositionHeader.split(';')[1].trim().split('=')[1].replace(/"/g, '');
-        this.downloads.saveAs(resp.body, filename, 'Pdf');
+        this.downloads.saveAs(JSON.stringify(resp.body), filename, 'Pdf');
         this.showSpinner = false;
         this.message = 'loading summary';
+        this.ref.markForCheck();
       });
   }
 }

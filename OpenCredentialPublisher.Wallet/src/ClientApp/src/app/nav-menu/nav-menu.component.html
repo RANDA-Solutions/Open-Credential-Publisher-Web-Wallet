@@ -26,7 +26,7 @@
         </ul>
         <ul class="navbar-nav" *ngIf="isAuthenticated">
           <li class="nav-item">
-            <a class="nav-link text-light" [routerLink]="['/access/logout']" title="Logout">Logout</a>
+            <a class="nav-link text-light" (click)="logout()" title="Logout">Logout</a>
           </li>
         </ul>
         <ul class="navbar-nav" *ngIf="!(isAuthenticated)">

@@ -4,11 +4,9 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiResponse } from '@shared/models/apiResponse';
 import { BehaviorSubject } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { BaseService } from './base.service';
 import { ToastService } from './toast.service';
-import { UtilsService } from './utils.service';
 
 
 @Injectable({
@@ -67,7 +65,6 @@ export class AuthorizationService extends BaseService {
 
 	}
 	getUserName() {
-		console.log('getname');
 		let name = '';
 		const js = localStorage.getItem('oidc.user:teacherwallet');
 		if (js !== null) {
@@ -83,10 +80,7 @@ export class AuthorizationService extends BaseService {
 
 		return name;
 	}
-	getAccessToken() {
-		const token = sessionStorage.getItem('ocp-wallet-client_authnResult');
-		return (token === null) ? '' : token;
-	}
+	
 	logout() {
 		const apiUrl = `${this.baseUrl}account/logout`;
 

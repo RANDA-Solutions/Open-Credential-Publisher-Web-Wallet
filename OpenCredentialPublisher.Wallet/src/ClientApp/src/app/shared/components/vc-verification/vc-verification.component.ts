@@ -1,7 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { UtilsService } from '@core/services/utils.service';
 import { VerificationService } from '@core/services/verification.service';
-import { environment } from '@environment/environment';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { VerificationResult } from '@shared/models/verificationResult';
 import { take } from 'rxjs/operators';
@@ -39,7 +38,7 @@ export class VCVerificationComponent implements OnInit {
     this.showSpinner = true;
     this.verificationService.verifyVC(this.pkgId)
       .pipe(take(1)).subscribe(data => {
-        console.log(data);
+        if (this.debug) console.log(data);
         if (data.statusCode == 200) {
           this.proofResult = (<ApiOkResponse>data).result as VerificationResult;
         } else {

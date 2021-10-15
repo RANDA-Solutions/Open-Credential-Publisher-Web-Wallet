@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
 import { PdfRequestTypeEnum } from '@shared/models/enums/pdfRequestTypeEnum';
@@ -28,11 +28,13 @@ export class DownloadService {
       if (this.debug) console.log(`DownloadService service ${urlApi}`);
       return this.http.post(urlApi, null, {responseType: 'json', observe: 'response'});
     }
-    vcLinkJson(id: string) {
-
+    vcLinkJson(id: string, key: string = null) {
       const urlApi = `${environment.apiEndPoint}Public/Links/DownloadVCJson/${id}`;
       if (this.debug) console.log(`DownloadService service ${urlApi}`);
-      return this.http.post(urlApi, null, {responseType: 'json', observe: 'response'});
+      return this.http.post(urlApi, JSON.stringify(key), {
+        headers: new HttpHeaders({'Content-Type': 'application/json'})
+        , responseType: 'json', observe: 'response'
+      });
     }
 
     public saveAs(data: any, fileName: string, type: string) {

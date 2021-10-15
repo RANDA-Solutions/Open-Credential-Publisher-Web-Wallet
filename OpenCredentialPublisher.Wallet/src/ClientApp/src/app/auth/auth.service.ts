@@ -1,10 +1,12 @@
+import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '@environment/environment';
 import { AuthenticatedResult, LoginResponse, OidcSecurityService } from 'angular-auth-oidc-client';
 import { AuthStateResult } from 'angular-auth-oidc-client/lib/auth-state/auth-state';
-import { Observable, of, ReplaySubject } from 'rxjs';
-import { first, switchMap, tap } from 'rxjs/operators';
+import { Observable, of, ReplaySubject, throwError } from 'rxjs';
+import { catchError, first, switchMap, tap } from 'rxjs/operators';
+import { SecureRoutesService } from '../services/secureRoutes.service';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
@@ -12,7 +14,10 @@ export class LoginService {
   authStateChanged: EventEmitter<AuthStateResult> = new EventEmitter<AuthStateResult>();
   private checkAuthCompleted$ = new ReplaySubject(1);
 
-	constructor(private oidcSecurityService: OidcSecurityService, private router: Router) {}
+	constructor(private oidcSecurityService: OidcSecurityService
+		, private httpClient: HttpClient
+		, private secureRoutesService: SecureRoutesService
+		, private router: Router) {}
 
 	returnUrlKey = "originalReturnUrl";
 
@@ -21,7 +26,7 @@ export class LoginService {
 	}
 
 	get token() {
-		return this.oidcSecurityService.getAccessToken();
+		return this.oidcSecurityService.getAccessToken(environment.configId);
 	}
 
 	get userData() {
@@ -39,16 +44,27 @@ export class LoginService {
 	public get isAuthenticated$(): Observable<boolean | AuthenticatedResult> {
         return this.checkAuthCompleted$.pipe(
             first(),
-            switchMap((_) => this.oidcSecurityService.isAuthenticated$)
+            switchMap((_) => { 
+				console.log("inside switchMap");
+				return this.oidcSecurityService.isAuthenticated$; 
+			})
         );
     }
 
-    public checkAuth(): Observable<boolean | LoginResponse> {
-        return this.oidcSecurityService.checkAuth().pipe(tap((_) => this.checkAuthCompleted$.next()));
-    }
+    // public checkAuth(): Observable<boolean | LoginResponse> {
+    //     return this.oidcSecurityService.checkAuth().pipe(tap((_) => this.checkAuthCompleted$.next()));
+    // }
 
 	public checkAuthIncludingServer(): Observable<LoginResponse> {
-		return this.oidcSecurityService.checkAuthIncludingServer(environment.configId).pipe(tap((_) => this.checkAuthCompleted$.next()));
+		return this.oidcSecurityService.checkAuthIncludingServer(environment.configId)
+			.pipe(
+				catchError((error) => {
+					this.checkAuthCompleted$.next();
+					return throwError(error);
+				})
+				, tap((_) => {
+					this.checkAuthCompleted$.next(); 
+		}));
 	}
 
 	public authorize() {
@@ -68,8 +84,6 @@ export class LoginService {
 		localStorage.removeItem(this.returnUrlKey);
 	}
 
-
-
 	get returnUrl() {
 		return localStorage.getItem(this.returnUrlKey);
 	}
@@ -77,14 +91,20 @@ export class LoginService {
 	reportAuthState(authState: AuthStateResult)
 	{
 		this.authStateChanged.emit(authState);
+		// if (!authState.isAuthenticated) {
+		// 	if (environment.debug) {
+		// 		console.log("No auth: ", this.router.url);
+		// 	}
+		// 	if (!this.secureRoutesService.isInsecure(this.router.url)) {
+		// 		this.oidcSecurityService.authorize(environment.configId);
+		// 	}
+		// }
 	}
 
 
 	signOut() {
-		this.oidcSecurityService.logoffLocal();
-    //TODO clean up ui jump around this causes...
-		this.router.navigate(["/"]);
-    // const redirectUrl = `${window.location.origin}/credentials`;
-    // window.location.replace(redirectUrl);
+		let url = `${environment.apiEndPoint}logout`;
+		this.httpClient.post(url, null).subscribe((_) => this.router.navigate(["/access/logout"], { replaceUrl: true }));
 	}
 }
+

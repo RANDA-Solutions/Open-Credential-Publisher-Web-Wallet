@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from '@core/guards/auth.guard';
+import { AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
 import { LoginCallbackComponent } from './auth/login-callback.component';
 import { LoginCallbackResolver } from './auth/login-callback.resolver';
 import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
@@ -17,32 +17,38 @@ export const appRoutes: Routes = [
   {
    path: 'credentials',
    loadChildren: () => import('./modules/credentials/credentials.module').then(m =>m.CredentialsModule),
-   canActivate: [AuthGuard]
+   // canLoad: [AuthGuard],
+   canActivate: [AutoLoginPartialRoutesGuard]
   },
   {
    path: 'sources',
    loadChildren: () => import('./modules/sources/sources.module').then(m =>m.SourcesModule),
-   canActivate: [AuthGuard]
+   // canLoad: [AutoLoginPartialRoutesGuard],
+   canActivate: [AutoLoginPartialRoutesGuard]
   },
   {
     path: 'links',
     loadChildren: () => import('./modules/links/links.module').then(m =>m.LinksModule),
-    canActivate: [AuthGuard]
+    // canLoad: [AutoLoginPartialRoutesGuard],
+    canActivate: [AutoLoginPartialRoutesGuard]
   },
   {
     path: 'Links',
     loadChildren: () => import('./modules/links/links.module').then(m =>m.LinksModule),
-    canActivate: [AuthGuard]
+    // canLoad: [AutoLoginPartialRoutesGuard],
+    canActivate: [AutoLoginPartialRoutesGuard]
   },
   {
     path: 'wallets',
     loadChildren: () => import('./modules/wallets/wallets.module').then(m =>m.WalletsModule),
-    canActivate: [AuthGuard]
+    // canLoad: [AutoLoginPartialRoutesGuard],
+    canActivate: [AutoLoginPartialRoutesGuard]
   },
   {
     path: 'account',
     loadChildren: () => import('./modules/account/account.module').then(m =>m.AccountModule),
-    canActivate: [AuthGuard]
+    // canLoad: [AutoLoginPartialRoutesGuard],
+    canActivate: [AutoLoginPartialRoutesGuard]
   },
 
   /****************************************************

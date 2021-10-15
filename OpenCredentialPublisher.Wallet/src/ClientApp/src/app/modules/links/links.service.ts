@@ -4,6 +4,7 @@ import { UtilsService } from '@core/services/utils.service';
 import { environment } from '@environment/environment';
 import { ApiResponse } from '@shared/models/apiResponse';
 import { ClrLinkVM } from '@shared/models/clrLinkVM';
+import { LinkDisplayVM } from '@shared/models/linkDisplayVM';
 import { LinkShareVM } from '@shared/models/linkShareVM';
 import { RecipientModel } from '@shared/models/recipientModel';
 import { Observable } from 'rxjs';
@@ -90,9 +91,12 @@ export class LinksService {
       catchError(err => this.utilsService.handleError(err))
     );
   }
-  getLinkDisplayDetail(id: string): Observable<ApiResponse> {
+  getLinkDisplayDetail(link: LinkDisplayVM): Observable<ApiResponse> {
 
-    const urlApi = `${environment.apiEndPoint}Public/Links/DisplayDetail/${id}`;
+    let urlApi = `${environment.apiEndPoint}Public/Links/DisplayDetail/${link.id}`;
+    if (link.accessKey != '') {
+      urlApi = `${environment.apiEndPoint}Public/Links/DisplayDetail/${link.id}?key=${encodeURIComponent(link.accessKey)}`;
+    }
     console.log(`links service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
     .pipe(

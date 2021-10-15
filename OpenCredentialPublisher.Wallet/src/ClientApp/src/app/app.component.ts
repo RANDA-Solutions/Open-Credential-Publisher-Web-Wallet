@@ -4,7 +4,7 @@ import { AppService } from '@core/services/app.service';
 import { UtilsService } from '@core/services/utils.service';
 import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { AuthStateResult, EventTypes, OidcClientNotification, OidcSecurityService, PublicEventsService } from 'angular-auth-oidc-client';
 import { filter } from 'rxjs/operators';
 import { LoginService } from './auth/auth.service';
 
@@ -18,15 +18,23 @@ export class AppComponent implements OnInit, OnDestroy {
 	title = 'Open Credential Publisher';
 	envName = environment.name;
   	onLoginPage = false;
-  	 private debug = false;
+  	 private debug = true;
 
-	constructor(public appService: AppService, private loginService: LoginService, private oidcSecurityService: OidcSecurityService
-    , private router: Router,  private util: UtilsService) {
-    this.router.events
-    .pipe(filter(event => event instanceof NavigationEnd), untilDestroyed(this))
-    .subscribe((event: NavigationEnd) => {
-      this.onLoginPage = event.url.includes('/access/') || event.url.includes('/access/register');
-    });
+	constructor(
+		public appService: AppService
+		, private loginService: LoginService
+		, private readonly eventService: PublicEventsService
+		, private oidcSecurityService: OidcSecurityService
+    	, private router: Router
+		, private util: UtilsService
+		) {
+    	this.router.events
+    		.pipe(
+				filter(event => event instanceof NavigationEnd)
+				, untilDestroyed(this))
+			.subscribe((event: NavigationEnd) => {
+				this.onLoginPage = event.url.includes('/access/') || event.url.includes('/access/register');
+			});
 	}
 
 	ngOnInit() {
@@ -35,19 +43,29 @@ export class AppComponent implements OnInit, OnDestroy {
 			if (this.debug) {
 				console.log("Auth Result: ", result);
 			}
-			// if (!result.isAuthenticated && result.accessToken) {
-			// 	this.loginService.authorize();
-			// }
 		}, (error) => {
 			if (this.debug) {
 				console.log(error);
 			}
 		});
-		// this.oidcSecurityService.checkAuthIncludingServer().subscribe(c => {
-		// 	if (this.debug) console.log('Auth checked and was: ', c);
-		// }, (err) => {
-		// 	this.util.handleError(err);
-		// });
+
+		this.eventService
+			.registerForEvents()
+			.pipe(filter((notification) => notification.type === EventTypes.ConfigLoaded))
+			.subscribe((config) => {
+				// console.log('ConfigLoaded', config);
+			});
+
+		this.eventService
+			.registerForEvents()
+			.pipe(filter((notification) => notification.type === EventTypes.NewAuthenticationResult))
+			.subscribe((result: OidcClientNotification<AuthStateResult>) => {
+				if (this.debug) {
+					console.log(`Auth State (isAuthenticated: ${result.value?.isAuthenticated}) (isRenewProcess: ${result.value?.isRenewProcess})`);
+				}
+				
+				this.loginService.reportAuthState(result.value);
+			});
 	}
 
 	ngOnDestroy() {

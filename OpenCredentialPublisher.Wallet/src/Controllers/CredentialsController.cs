@@ -457,7 +457,8 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                          IssuerName = issuerName,
                          BadgeDescription = badgeDescription,
                          BadgrAssertionId = ba.Id,
-                         BadgeImage = ba.Image
+                         BadgeImage = ba.Image,
+                         IsSelected = false
                     };
                     vm.Badges.Add(obVM);
                 }           

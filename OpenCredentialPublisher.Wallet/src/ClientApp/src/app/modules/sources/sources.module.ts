@@ -9,6 +9,7 @@ import { SourceDetailComponent } from './pages/details/source-details.component'
 import { SourceDeleteComponent } from './pages/delete/source-delete.component';
 import { RegisterCallbackComponent } from './pages/callback/callback.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SelectOpenBadgesComponent } from './pages/select-open-badges/select-open-badges.component';
 @NgModule({
     imports: [
       sourceRouter,
@@ -17,6 +18,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
       ReactiveFormsModule
     ],
     declarations: [
+      SelectOpenBadgesComponent,
       SourceDetailComponent,
       SourceDeleteComponent,
       SourceListComponent,

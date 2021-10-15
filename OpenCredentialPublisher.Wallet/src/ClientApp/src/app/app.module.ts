@@ -1,23 +1,22 @@
 import { APP_BASE_HREF, CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { CoreModule } from '@core/core.module';
 import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
-import { AuthModule, EventTypes, LogLevel, OidcClientNotification, PublicEventsService } from 'angular-auth-oidc-client';
-import { AuthStateResult } from 'angular-auth-oidc-client/lib/auth-state/auth-state';
+import { AuthModule, LogLevel } from 'angular-auth-oidc-client';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 import { MessageService } from 'primeng/api';
-import { filter } from 'rxjs/operators';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginService } from './auth/auth.service';
 import { LoginCallbackComponent } from './auth/login-callback.component';
 import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
 import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
+import { SecureRoutesService } from './services/secureRoutes.service';
+import { TokenInterceptorService } from './services/token-interceptor.service';
 
 @NgModule({
 	declarations: [
@@ -42,22 +41,22 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 		AppRoutingModule,
 		AuthModule.forRoot({
 			config: {
-				configId: environment.configId,
 				authority: `${environment.baseUrl}`,
-				redirectUrl: `${window.location.origin}/callback`,
-				postLogoutRedirectUri: `${window.location.origin}/credentials`,
 				clientId: 'ocp-wallet-client',
-				scope: 'openid profile roles offline_access', // 'openid profile offline_access ' + your scopes
-				responseType: 'code',
-				silentRenew: true,
-				silentRenewUrl: `'${window.location.origin}/silent-renew.html`,
-				triggerAuthorizationResultEvent: true,
-				useRefreshToken: true,
-				renewTimeBeforeTokenExpiresInSeconds: 30,
+				configId: environment.configId,
+				historyCleanupOff: true,
 				logLevel: LogLevel.Error,
 				postLoginRoute: `/credentials`,
-				secureRoutes: environment.secureRoutes,
-				historyCleanupOff: true
+				postLogoutRedirectUri: `${window.location.origin}/credentials`,
+				renewTimeBeforeTokenExpiresInSeconds: 30,
+				redirectUrl: `${window.location.origin}/callback`,
+				responseType: 'code',
+				scope: 'openid profile roles offline_access', // 'openid profile offline_access ' + your scopes
+				silentRenew: true,
+				startCheckSession: true,
+				triggerAuthorizationResultEvent: true,
+				unauthorizedRoute: '/unauthorized',
+				useRefreshToken: true,
 			},
 		})
 	],
@@ -66,26 +65,20 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 		{ provide: APP_BASE_HREF, useValue: '/' }
 		, AppService
 		, MessageService
+		, SecureRoutesService
+		, {
+			provide: HTTP_INTERCEPTORS,
+			useClass: TokenInterceptorService,
+			multi: true,
+		}
 	],
 	bootstrap: [AppComponent]
 })
 export class AppModule {
-	private debug = false;
-	constructor(private readonly eventService: PublicEventsService, private loginService: LoginService) {
-		this.eventService
-			.registerForEvents()
-			.pipe(filter((notification) => notification.type === EventTypes.ConfigLoaded))
-			.subscribe((config) => {
-				// console.log('ConfigLoaded', config);
-			});
-
-		this.eventService
-			.registerForEvents()
-			.pipe(filter((notification) => notification.type === EventTypes.NewAuthenticationResult))
-			.subscribe((result: OidcClientNotification<AuthStateResult>) => {
-				console.log('isAuthenticated', result.value?.isAuthenticated);
-				this.loginService.reportAuthState(result.value);
-			});
+	private debug = environment.debug;
+	
+	constructor() {
+		
 	}
 
 }

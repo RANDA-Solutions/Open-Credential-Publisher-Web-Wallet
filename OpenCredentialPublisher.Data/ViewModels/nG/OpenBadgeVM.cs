@@ -16,5 +16,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
         public string BadgeDescription { get; set; }
         public string BadgeImage { get; set; }
         public bool IdIsUrl { get; set; }
+        public bool IsSelected { get; set; }
+        public bool IsNew { get; set; }
     }
 }

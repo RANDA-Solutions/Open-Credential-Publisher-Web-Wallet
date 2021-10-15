@@ -13,6 +13,7 @@ using ObcLibrary.OAuth;
 using OpenCredentialPublisher.ClrLibrary;
 using OpenCredentialPublisher.ClrWallet.Extensions;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Badgr;
 using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Data.ViewModels.nG;
@@ -43,12 +44,13 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         private readonly OpenBadge2dot1Service _openBadgeService;
         private readonly BadgrService _badgrService;
         private readonly ClrService _clrService;
-        private readonly LogHttpClientService _logHttpClientService; 
+        private readonly LogHttpClientService _logHttpClientService;
         private readonly RevocationService _revocationService;
         private readonly SiteSettingsOptions _siteSettings;
+        private readonly SourcesSettingsOptions _sourcesSettings;
 
         public SourcesController(UserManager<ApplicationUser> userManager, ILogger<SourcesController> logger, AuthorizationsService authorizationsService
-            , RevocationService revocationService, IOptions<SiteSettingsOptions> siteSettings, ClrService clrService
+            , RevocationService revocationService, IOptions<SiteSettingsOptions> siteSettings, ClrService clrService, IOptions<SourcesSettingsOptions> sourcesSettings
             , IConfiguration configuration, IHttpClientFactory factory, OpenBadge2dot1Service openBadgeService, BadgrService badgrService
             , LogHttpClientService logHttpClientService) : base(userManager, logger)
         {
@@ -60,6 +62,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             _authorizationsService = authorizationsService;
             _openBadgeService = openBadgeService;
             _badgrService = badgrService;
+            _sourcesSettings = sourcesSettings?.Value ?? throw new NullReferenceException("Badgr settings were not set.");
             _clrService = clrService;
             _logHttpClientService = logHttpClientService;
         }
@@ -139,7 +142,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                         break;
                 }
                 vm.SourceIsDeletable = auth.Source.IsDeletable;
-                foreach( var clr in auth.Clrs)
+                foreach (var clr in auth.Clrs)
                 {
                     var clrVM = new SourceClrVM();
                     clrVM.CredentialPackageId = clr.CredentialPackageId;
@@ -171,7 +174,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 var auth = await _authorizationsService.GetDeepAsync(id);
                 await _authorizationsService.DeleteSourceAsync(auth.Source.Id);
                 return ApiOk(null);
-           
+
             }
             catch (Exception ex)
             {
@@ -217,7 +220,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 {
                     //if (auth.Source.Url.Contains("badgr"))
                     //{
-                        await _badgrService.RefreshObcBackpackAsync(modelState, id);
+                    await _badgrService.RefreshObcBackpackAsync(modelState, id);
                     //}
                     //else // IMS Open Badge Badge Connect Reference Implementation
                     //{
@@ -241,6 +244,47 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "CredentialksController.PostRefresh", null);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns backpack to select which badges to include (keep)
+        /// POST api/Sources/Refresh/{id}
+        /// </summary>
+        /// <returns>Details vm for a source </returns>
+        [HttpGet("GetBadgesForSelect/{id}")]  /* success returns 200 - Ok */
+        public async Task<IActionResult> GetBadgesForSelect(int id)
+        {
+            try
+            {
+                var vm = await _badgrService.GetBackpackPackageForSelectionAsync(_userId, id);
+
+                return ApiOk(vm);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SourcesController.GetBadgesForSelect", null);
+                throw;
+            }
+        }
+        /// <summary>
+        /// Mark badges for keeping (unmarked are deleted)
+        /// POST api/Sources/Refresh/{id}
+        /// </summary>
+        /// <returns>Details vm for a source </returns>
+        [HttpPost("SelectBadges/{id}")]  /* success returns 200 - Ok */
+        public async Task<IActionResult> SelectBadges(int id, List<int> keepers)
+        {
+            try
+            {
+                await _badgrService.SelectBadgesAsync(_userId, id, keepers);
+
+                return ApiOk(null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SourcesController.SelectBadges", null);
                 throw;
             }
         }
@@ -334,11 +378,11 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     {
                         sourceModel = await GetResourceServerConfiguration((SourceTypeEnum)input.SourceTypeId, new Uri(input.SourceUrl));
                     }
-                    if (!ModelState.IsValid) return ApiModelInvalid(ModelState); 
+                    if (!ModelState.IsValid) return ApiModelInvalid(ModelState);
 
                     await RegisterWithResourceServer(sourceModel);
 
-                    if (!ModelState.IsValid) return ApiModelInvalid(ModelState); 
+                    if (!ModelState.IsValid) return ApiModelInvalid(ModelState);
                 }
                 else
                 {
@@ -391,9 +435,9 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 source.ClientId,
                 codeChallenge: codeChallenge,
                 codeChallengeMethod: OidcConstants.CodeChallengeMethods.Sha256,
-                redirectUri: HttpUtility.UrlEncode(GetUrl(Request, "/sources/callback")), //"https://teacher-wallet-uat.azurewebsites.net/Sources/Register",
+                redirectUri: GetUrl(Request, _sourcesSettings.CallbackUrl), //"https://teacher-wallet-uat.azurewebsites.net/Sources/Register",
                 responseType: OidcConstants.ResponseTypes.Code,
-                scope: HttpUtility.UrlEncode(source.Scope),
+                scope: source.Scope,
                 state: authorization.Id
             );
 
@@ -414,7 +458,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             {
                 {OidcConstants.TokenRequest.GrantType, OidcConstants.GrantTypes.AuthorizationCode},
                 {OidcConstants.TokenRequest.Code, authorization.AuthorizationCode},
-                {OidcConstants.TokenRequest.RedirectUri, GetUrl(Request, "/sources/callback")},
+                {OidcConstants.TokenRequest.RedirectUri, GetUrl(Request, _sourcesSettings.CallbackUrl)},
                 {OidcConstants.TokenRequest.Scope, authorization.Source.Scope},
                 {OidcConstants.TokenRequest.CodeVerifier, authorization.CodeVerifier}
             };
@@ -596,7 +640,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
                 source = new SourceModel
                 {
-                    IsDeletable = true,
+                    IsDeletable = false,
                     SourceTypeId = sourceTypeId,
                     DiscoveryDocument = discoveryDocument,
                     Name = discoveryDocument.Name,
@@ -712,7 +756,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
                 source = new SourceModel
                 {
-                    IsDeletable = true,
+                    IsDeletable = false,
                     SourceTypeId = SourceTypeEnum.Clr,
                     DiscoveryDocument = discoveryDocument,
                     Name = discoveryDocument.Name,
@@ -743,13 +787,13 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             else
             {
-                host = request.Host.ToUriComponent();
+                host = request.Host.ToString();
             }
             return string.Concat(
                 request.Scheme,
                 "://",
                 host,
-                request.PathBase.ToUriComponent(),
+                request.PathBase.ToString(),
                 document);
         }
         private async Task RegisterWithResourceServer(SourceModel source)
@@ -802,7 +846,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     LogoUri = GetUrl(Request, "/images/Logo_with_text.png", false),
                     PolicyUri = GetUrl(Request, "/public/privacy", false),
                     TosUri = GetUrl(Request, "/public/terms", false),
-                    RedirectUris = new[] { GetUrl(Request, "/sources/callback") },
+                    RedirectUris = new[] { GetUrl(Request, _sourcesSettings.CallbackUrl) },
                     ResponseTypes = new[] { OpenIdConnectResponseType.Code },
                     Scope = string.Join(' ', scopes),
                     SoftwareId = Guid.NewGuid().ToString(),

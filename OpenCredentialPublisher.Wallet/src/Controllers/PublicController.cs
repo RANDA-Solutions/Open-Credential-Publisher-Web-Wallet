@@ -375,11 +375,11 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     default:
                         if (dReq.LinkId != null)
                         {
-                            return await _downloadService.GetLinkPdfAsync(Request, dReq, _userId);
+                            return await _downloadService.GetLinkPdfAsync(Request, dReq);
                         }
                         else if (dReq.ClrId != null)
                         {
-                            return await _downloadService.GetClrPdfAsync(Request, dReq, _userId);
+                            return await _downloadService.GetClrPdfAsync(Request, dReq);
                         }
                         else
                         {
@@ -429,7 +429,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         }
         [HttpPost("Links/DownloadVCJson/{id}")]
         [ProducesResponseType(200, Type = typeof(ApiResponse))]  /* success returns 200 - Ok */
-        public async Task<IActionResult> DownloadVCJson(string id, string accessKey)
+        public async Task<IActionResult> DownloadVCJson(string id, [FromBody]string accessKey = null)
         {
             if (id == null) return NotFound();
 

@@ -2,10 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccessService } from '@modules/access/services/access.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { PostResponseModel } from '@shared/interfaces/post-response.interface';
 import { ResetPasswordModel } from '@shared/interfaces/reset-password.interface';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
-import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -38,7 +36,7 @@ export class ResetPasswordComponent implements OnInit {
       value.code = this.resetPasswordForm.code;
 			this.accessServices.resetPassword(value)
       .pipe(take(1)).subscribe(data => {
-        console.log(data);
+        //console.log(data);
         if (data.statusCode == 200) {
           this.router.navigate(['/access/reset-password-confirmation']);
         } else {

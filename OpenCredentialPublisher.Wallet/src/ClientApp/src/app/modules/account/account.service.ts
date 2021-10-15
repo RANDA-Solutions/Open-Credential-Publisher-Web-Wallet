@@ -21,7 +21,7 @@ export class AccountService {
 
   confirmEmailAccount(userId: string, code: string): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}account/confirmEmail/${userId}?code=${code}`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, null)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -30,7 +30,7 @@ export class AccountService {
   }
   confirmEmailChange(input: VerifyEmailVM): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}email/ConfirmEmailChange`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, input)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -39,7 +39,7 @@ export class AccountService {
   }
   getProfile(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}account/getProfile`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -49,7 +49,7 @@ export class AccountService {
 
   saveProfile(args: any): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}account/saveProfile`;
-    console.log(`links service ${urlApi}`);
+    if (this.debug) console.log(`links service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, args)
       .pipe(
         catchError(err => this.utilsService.handleError(err))
@@ -59,7 +59,7 @@ export class AccountService {
 
   getEmail(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}email/getEmail`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -69,7 +69,7 @@ export class AccountService {
 
   changeEmail(data: VerifyEmailVM): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}Public/Account/ChangeEmail`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, data)
       .pipe(
         catchError(err => this.utilsService.handleError(err))
@@ -78,7 +78,7 @@ export class AccountService {
   }
   saveEmail(args: any): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}email/saveEmail`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, args)
       .pipe(
         catchError(err => this.utilsService.handleError(err))
@@ -87,7 +87,7 @@ export class AccountService {
   }
   sendVerificationEmail(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}email/verificationEmail`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -103,7 +103,7 @@ export class AccountService {
 
   getProfileImage(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}account/getProfileImage`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -113,7 +113,7 @@ export class AccountService {
 
   registerAccount(input: RegisterAccountVM): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}account/register`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, input)
       .pipe(
         catchError(err => this.utilsService.handleError(err))
@@ -122,7 +122,7 @@ export class AccountService {
   }
   changePassword(data: ChangePasswordVM): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}account/changePassword`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, data)
       .pipe(
         catchError(err => this.utilsService.handleError(err))
@@ -132,8 +132,8 @@ export class AccountService {
 
   saveProfileImage(args: any): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}account/saveProfileImage`;
-    console.log(`links service ${urlApi}`);
-    console.log(args)
+    if (this.debug) console.log(`links service ${urlApi}`);
+    if (this.debug) console.log(args)
     return this.http.post<ApiResponse>(urlApi, args)
       .pipe(
         catchError(err => this.utilsService.handleError(err))
@@ -143,7 +143,7 @@ export class AccountService {
 
   getTwoFAVM(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}account/getTwoFAVM`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -153,7 +153,7 @@ export class AccountService {
 
   getTwoFAKeyNCode(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}TwoFactorAuthentication/KeyAndQRCode`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -162,7 +162,7 @@ export class AccountService {
   }
   generateRecoveryCodes(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}TwoFactorAuthentication/GenerateRecoveryCodes`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -171,7 +171,7 @@ export class AccountService {
   }
   login2FA(input: TwoFactorAuthenticationModelInput): Observable<any> {
     const urlApi = `${environment.publicEndPoint}account/Login/Login2FA`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<any>(urlApi, input)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -181,7 +181,7 @@ export class AccountService {
 
     loginRecovery(input: TwoFactorAuthenticationModelInput): Observable<any> {
       const urlApi = `${environment.publicEndPoint}account/Login/LoginRecovery`;
-      console.log(`account service ${urlApi}`);
+      if (this.debug) console.log(`account service ${urlApi}`);
       return this.http.post<any>(urlApi, input)
         .pipe(
           catchError(err => this.utilsService.handleError(err)
@@ -190,7 +190,7 @@ export class AccountService {
       }
   sendCode(code: string): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}TwoFactorAuthentication/SendCode/${encodeURIComponent(code)}`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, null)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -199,7 +199,7 @@ export class AccountService {
     }
   resetAuthenticator(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}TwoFactorAuthentication/ResetAuthenticator`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, null)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -208,7 +208,7 @@ export class AccountService {
     }
   disable2FA(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}TwoFactorAuthentication/Disable`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, null)
       .pipe(
         catchError(err => this.utilsService.handleError(err)
@@ -218,7 +218,7 @@ export class AccountService {
 
   getWallets(): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}wallets/walletlist`;
-    console.log(`account service ${urlApi}`);
+    if (this.debug) console.log(`account service ${urlApi}`);
     return this.http.get<ApiResponse>(urlApi)
       .pipe(
         catchError(err => this.utilsService.handleError(err)

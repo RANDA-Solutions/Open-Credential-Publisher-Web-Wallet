@@ -10,7 +10,6 @@ import { AuthenticationSchemeModel } from '@shared/interfaces/authentication-sch
 import { Credentials } from '@shared/interfaces/credentials.interface';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
-import { AuthorizationVM } from '@shared/models/authorization';
 import { TwoFactorAuthenticationResultEnum } from '@shared/models/enums/twoFactorAuthenticationResultEnum';
 import { TwoFactorAuthenticationModel } from '@shared/models/twoFactorAuthenticationModel';
 import { Subscription } from 'rxjs';
@@ -69,11 +68,11 @@ export class LoginFormComponent implements OnInit {
 			this.authorizationService.login(value.email, value.password, this.returnUrl)
 				.pipe(take(1)).subscribe(data => {
 					if (this.debug) console.log(`LoginFormComponent returned from api/Login result: ${this.resultModel.result}`);
-          if (data.statusCode == 200) {
-            this.resultModel = (<ApiOkResponse>data).result as TwoFactorAuthenticationModel;
-          } else {
-            this.modelErrors = (<ApiBadRequestResponse>data).errors;
-          }
+					if (data.statusCode == 200) {
+						this.resultModel = (<ApiOkResponse>data).result as TwoFactorAuthenticationModel;
+					} else {
+						this.modelErrors = (<ApiBadRequestResponse>data).errors;
+					}
 					if (this.resultModel.result == TwoFactorAuthenticationResultEnum.Success) {
 						this.loginService.doLogin().subscribe(resp => {
 							if (this.debug) console.log(`LoginFormComponent returned from OAuthService.doLogin()`);

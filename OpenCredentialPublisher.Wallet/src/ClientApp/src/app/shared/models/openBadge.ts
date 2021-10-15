@@ -6,6 +6,8 @@ export class OpenBadge {
   badgeDescription: string;
   badgeImage: string;
   idIsUrl: boolean;
+  isSelected: boolean;
+  isNew: boolean;
   constructor() {
     this.id = 0;
     this.badgrAssertionId = '';
@@ -14,5 +16,7 @@ export class OpenBadge {
     this.badgeDescription = '';
     this.badgeImage = '';
     this.idIsUrl = true;
+    this.isSelected = false;
+    this.isNew = false;
   }
 }
