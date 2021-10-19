@@ -38,7 +38,7 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         /// <param name="inviteURL">Invite URL which should be sent to invited party. (required).</param>
         /// <param name="shortInviteURL">Short invite URL which should be sent to invited party..</param>
         /// <param name="invitationId">id of invitation.</param>
-        public ProofInvite(string type = default(string), Guid? id = default(Guid?), Thread thread = default(Thread), string inviteURL = default(string), string shortInviteURL = default(string), Guid? invitationId = default(Guid?))
+        public ProofInvite(string type = default(string), Guid? id = default(Guid?), Thread thread = default(Thread), string inviteURL = default(string), string shortInviteURL = default(string), string invitationId = default(string))
         {
             // to ensure "type" is required (not null)
             if (type == null)
@@ -118,7 +118,7 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         /// </summary>
         /// <value>id of invitation</value>
         [DataMember(Name="invitationId", EmitDefaultValue=false)]
-        public Guid? InvitationId { get; set; }
+        public String InvitationId { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object

@@ -1,0 +1,185 @@
+<div *ngIf="showIt == true" [ngClass]="{'ml-5 mr-3' : isChild == true}" class="card">
+  <button *ngIf="showIt == true" class="card-header h5 text-left bg-info" [attr.id]="'assertionHeader-' + safeAssertionId"
+  (click)="toggleCollapse()" [attr.aria-expanded]="!isCollapsed" [attr.aria-controls]="'#assertionBody-' + safeAssertionId">
+    {{displayName}}
+  </button>
+  <div [attr.id]="'assertionBody-' + safeAssertionId" [ngbCollapse]="isCollapsed">
+    <div *ngIf="isLoaded == false; else theContent" class="d-flex flex-column">
+      <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+    </div>
+    <ng-template #theContent>
+      <div class="card-body card-deck">
+        <div *ngIf="assertion.image != null" class="card border-0" style="max-width: 100px">
+          <button *ngIf="assertion.image.startsWith('data:')" class="btn btn-link" (click)="exportToView(assertion.image)">View Image</button>
+          <img  *ngIf="!assertion.image.startsWith('data:')"src="{{assertion.image}}" alt="{{assertion.achievement.name}}" style="max-width: 100px" />
+        </div>
+        <div *ngIf="assertion.image == null && assertion.achievement.image != null" class="card border-0" style="max-width: 100px">
+          <img src="{{assertion.achievement.image}}" alt="{{assertion.achievement.name}}" style="max-width: 100px" />
+        </div>
+        <div class="card border-0">
+          <dl class="row">
+            <dt class="col-12 col-sm-4 col-md-3">Id</dt>
+            <dd *ngIf="!assertion.id.startsWith('urn')" class="col-12 col-sm-8 col-md-9"><a href="{{assertion.id}}">{{assertion.id}}</a></dd>
+            <dd *ngIf="assertion.id.startsWith('urn')" class="col-12 col-sm-8 col-md-9">{{assertion.id}}</dd>
+            <ng-container *ngIf="assertion.creditsEarned != null">
+              <dt class="col-12 col-sm-4 col-md-3">Credits Earned</dt>
+              <dd class="col-12 col-sm-8 col-md-9">{{assertion.creditsEarned}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.activityEndDate != null">
+              <dt class="col-12 col-sm-4 col-md-3">End Date</dt>
+              <dd class="col-12 col-sm-8 col-md-9">{{assertion.activityEndDate | date: 'M/d/yyyy'}}</dd>
+            </ng-container>
+            <dt class="col-12 col-sm-4 col-md-3">Issued</dt>
+            <dd class="col-12 col-sm-8 col-md-9">{{assertion.issuedOn | date: 'M/d/yyyy'}}</dd>
+            <ng-container *ngIf="assertion.licenseNumber != null">
+              <dt class="col-12 col-sm-4 col-md-3">License Number</dt>
+              <dd class="col-12 col-sm-8 col-md-9">{{assertion.licenseNumber}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.narrative != null">
+              <dt class="col-12 col-sm-4 col-md-3">Narrative</dt>
+              <dd class="col-12 col-sm-8 col-md-9 markdown" [innerHtml]="assertion.narrative"></dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.recipient != null">
+              <dt class="col-12 col-sm-4 col-md-3">Recipient</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                {{assertion.recipient.identity}}
+              </dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.revoked != null">
+            <ng-container *ngIf="assertion.revoked == true">
+              <dt class="col-12 col-sm-4 col-md-3 text-danger">Revoked</dt>
+              <dd class="col-12 col-sm-8 col-md-9 text-danger">Yes</dd>
+              </ng-container>
+              <ng-container *ngIf="assertion.revoked == false">
+              <dt class="col-12 col-sm-4 col-md-3">Revoked</dt>
+              <dd class="col-12 col-sm-8 col-md-9">No</dd>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="assertion.revocationReason != null">
+              <dt class="col-12 col-sm-4 col-md-3 text-danger">Revocation Reason</dt>
+              <dd class="col-12 col-sm-8 col-md-9 text-danger">{{assertion.revocationReason}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.role != null">
+              <dt class="col-12 col-sm-4 col-md-3">Role</dt>
+              <dd class="col-12 col-sm-8 col-md-9">{{assertion.role}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.term != null">
+              <dt class="col-12 col-sm-4 col-md-3">Term</dt>
+              <dd class="col-12 col-sm-8 col-md-9">{{assertion.term}}</dd>
+            </ng-container>
+          </dl>
+          <app-verification ancestors="lineage" [ancestorKeys]="lineageKeys" [clrId]="clrId" [clrIdentifier]="clrIdentifier" [assertionId]="assertion.id" [verification]="assertion.verification"></app-verification>
+        </div>
+        <div class="card border-0">
+          <dl class="row">
+            <ng-container *ngIf="assertion.achievement.creditsAvailable != null">
+              <dt class="col-sm-4">Credits Available</dt>
+              <dd class="col-sm-8">{{assertion.achievement.creditsAvailable}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.achievement.description != null">
+              <dt class="col-sm-4">Description</dt>
+              <dd class="col-sm-8" [innerHtml]="assertion.achievement.description"></dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.achievement.fieldOfStudy != null">
+              <dt class="col-sm-4">Field of Study</dt>
+              <dd class="col-sm-8">{{assertion.achievement.fieldOfStudy}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.achievement.humanCode != null">
+              <dt class="col-sm-4">Human Code</dt>
+              <dd class="col-sm-8">{{assertion.achievement.humanCode}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.achievement.level != null">
+              <dt class="col-sm-4">Level</dt>
+              <dd class="col-sm-8">{{assertion.achievement.level}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.achievement.requirement != null">
+              <dt class="col-sm-4">Requirement</dt>
+              <dd class="col-sm-8 markdown" [innerHtml]="assertion.achievement.requirement.narrative"></dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.achievement.specialization != null">
+              <dt class="col-sm-4">Specialization</dt>
+              <dd class="col-sm-8">{{assertion.achievement.specialization}}</dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.achievement.tags != null">
+              <dt class="col-sm-4">Tags</dt>
+              <dd class="col-sm-8">{{assertion.achievement.tags}}</dd>
+            </ng-container>
+            <dt class="col-sm-4">
+              Type
+              <img src="assets/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
+                #ttimg="ngbTooltip" data-html="true" [ngbTooltip]="achievementTypes" />
+            </dt>
+            <dd class="col-sm-8">{{assertion.achievement.achievementType}}</dd>
+          </dl>
+        </div>
+      </div>
+      <ng-container *ngIf="assertion.achievement.issuer != null">
+        <div class="card mt-2">
+          <button *ngIf="assertion.isSelfPublished == true"
+            class="card-header bg-warning" [attr.id]="'issuerHeader-' + safeAssertionId" data-toggle="collapse" [attr.data-target]="'#issuerBody-' + safeAssertionId">
+              Issuer (Self-Issued)
+          </button>
+          <button *ngIf="assertion.isSelfPublished == false"
+            class="card-header" [attr.id]="'issuerHeader-' + safeAssertionId" data-toggle="collapse" [attr.data-target]="'#issuerBody-' + safeAssertionId">
+              Issuer
+          </button>
+          <div [attr.id]="'issuerBody-' + safeAssertionId" class="collapse">
+            <div class="card-body card-deck">
+                <div class="card border-0">
+                  <dl app-clr-profile profileType="issuer" [profile]="assertion.achievement.issuer" class="row">
+                  </dl>
+                </div>
+                <div class="card border-0">
+                  <app-public-key *ngIf="assertion.achievement.issuer.publicKey != null"
+                    [key]="assertion.achievement.issuer.publicKey"></app-public-key>
+                  <app-verification [ancestors]="lineage + '.achievement.issuer'" [ancestorKeys]="lineageKeys + '.' + assertion.achievement.achievementId.toString() + '.' + assertion.achievement.issuer.id.toString()" [clrId]="clrId" [clrIdentifier]="clrIdentifier" [assertionId]="assertion.id" [verification]="assertion.achievement.issuer.verification"></app-verification>
+                </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-container>
+        <div app-results *ngIf="resultsExist" (doResultsExist)="onResultsExist($event)" [clrId]="clrId" [assertionId]="id" class="card mt-2">
+        </div>
+      </ng-container>
+      <!-- Endorsements -->
+      <div app-endorsements *ngIf="endorsementsExist" (doEndorsementsExist)="onEndorsementsExist($event)" [clrId]="clrId" [clrIdentifier]="clrIdentifier" [id]="assertion.id" [ancestors]="lineage" [ancestorKeys]="lineageKeys" class="card mt-2">
+      </div>
+      <!-- Evidence -->
+      <div app-evidence *ngIf="evidenceExists" (doesEvidenceExist)="onEvidenceExists($event)" [clrId]="clrId" [id]="assertion.id" [ancestors]="lineage" [ancestorKeys]="lineageKeys" class="card mt-2">
+      </div>
+      <!-- Alignments -->
+      <div *ngIf="assertion.achievement != null && alignmentsExist" (doAlignmentsExist)="onAlignmentsExist($event)" app-alignments [clrId]="clrId" [id]="assertion.achievement.id" [ancestors]="lineage + '.achievement'" [ancestorKeys]="lineageKeys + '.' + assertion.achievement.achievementId.toString()" class="card mt-2">
+      </div>
+      <!-- Associations -->
+      <div *ngIf="assertion.achievement != null && associationsExist" (doAssociationsExist)="onAssociationsExist($event)" app-associations [clrId]="clrId" [id]="assertion.achievement.id" [ancestors]="lineage + '.achievement'" [ancestorKeys]="lineageKeys + '.' + assertion.achievement.achievementId.toString()" class="card mt-2">
+      </div>
+      <!-- Additional Properties -->
+      <div app-addl-properties *ngIf="(assertion.additionalProperties != null && assertion.additionalProperties.length > 0) || (assertion.achievement.additionalProperties != null && assertion.achievement.additionalProperties.length > 0)"
+      [additionalProperties]="assertion.additionalProperties" [achievementAdditionalProperties]="assertion.achievement.additionalProperties"
+      [safeAssertionId]="safeAssertionId" class="card mt-2">
+      </div>
+      <!-- Child Assertions -->
+      <app-clr-assertions [clrId]="clrId" [assertionId]="assertion.assertionId" [clrIdentifier]="clrIdentifier" [isShare]="true" [isChild]="true"
+        [ancestors]="lineage" [ancestorKeys]="lineageKeys">
+      </app-clr-assertions>
+    </ng-template>
+  </div>
+</div>
+<ng-template #achievementTypes>
+  <div>Achievement</div>
+  <div>Assessment Result</div>
+  <div>Award</div>
+  <div>Badge</div>
+  <div>Certificate</div>
+  <div>Certification</div>
+  <div>Course</div>
+  <div>Community Service</div>
+  <div>Competency</div>
+  <div>Co-Curricular</div>
+  <div>Degree</div>
+  <div>Diploma</div>
+  <div>Fieldwork</div>
+  <div>License</div>
+  <div>Membership</div>
+</ng-template>

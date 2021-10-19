@@ -5,7 +5,7 @@ using System.Text;
 
 namespace OpenCredentialPublisher.Shared.Models
 {
-    [Schema("")]
+    [Schema("", "0.1")]
     public class ClrWithPdfAttachmentCredential: AbstractCredential
     {
     }

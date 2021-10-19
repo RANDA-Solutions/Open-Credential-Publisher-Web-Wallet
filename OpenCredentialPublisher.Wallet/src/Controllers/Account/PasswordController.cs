@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using OpenCredentialPublisher.Data.Dtos;
+using OpenCredentialPublisher.Data.Dtos.Account_Manage;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Services.Extensions;
 using OpenCredentialPublisher.Wallet.Models.Account;
 using System;
 using System.Collections.Generic;
@@ -21,66 +25,70 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
     public class PasswordController : ControllerBase
     {
 
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<PasswordController> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public PasswordController(SignInManager<ApplicationUser> signInManager,
+        public PasswordController(
             ILogger<PasswordController> logger,
             UserManager<ApplicationUser> userManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender) 
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-        }
-
-        [HttpGet, Route("forgot")]
-        public async Task<IActionResult> GetAsync(string returnUrl = null)
-        {
-            var registerModel = new 
-            {
-                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList(),
-                ReturnUrl = returnUrl
-
-            };
-            return new JsonResult(registerModel);
+            _userManager = userManager;
         }
 
         [HttpPost, Route("forgot")]
-        public async Task<IActionResult> PostAsync(ForgotPasswordModel.InputModel input)
+        public async Task<IActionResult> PostAsync([FromBody]ForgotPasswordModel.InputModel input)
         {
             var user = await _userManager.FindByEmailAsync(input.Email);
             if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
             {
                 // Don't reveal that the user does not exist or is not confirmed
-                return Ok();
+                return new OkObjectResult(new PostResponseModel());
             }
 
             // For more information on how to enable account confirmation and password reset please 
             // visit https://go.microsoft.com/fwlink/?LinkID=532713
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl = Url.Page(
-                "/Account/ResetPassword",
-                pageHandler: null,
-                values: new { code },
-                protocol: Request.Scheme);
+            _logger.LogInformation(Request.Host.Value);
+            var callbackUrl = $"{Request.Scheme}://{Request.Host.Value}/access/reset-password/{code}";
 
             await _emailSender.SendEmailAsync(
                 input.Email,
                 "Reset Password",
                 $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-            return Ok();
+            return new OkObjectResult(new PostResponseModel());
 
         }
 
-        [HttpPost, Route("reset")]
-        public async Task<IActionResult> PostResetAsync(PasswordResetModel.InputModel input)
+        [HttpPost("reset")]
+        public async Task<IActionResult> ResetAsync([FromBody]PasswordResetModel.InputModel input)
         {
-            throw new NotImplementedException();
+
+            var user = await _userManager.FindByEmailAsync(input.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return new OkObjectResult(new PostResponseModel());
+            }
+
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(input.Code));
+            var result = await _userManager.ResetPasswordAsync(user, code, input.Password);
+            if (result.Succeeded)
+            {
+                return new OkObjectResult(new PostResponseModel());
+            }
+
+            var errors = new List<string>();
+            foreach (var error in result.Errors)
+            {
+                errors.Add(error.Description);
+            }
+            return new OkObjectResult(new PostResponseModel { ErrorMessages = errors });
         }
+
     }
 }

@@ -2,9 +2,11 @@ using OpenCredentialPublisher.ClrLibrary.Converters;
 using Newtonsoft.Json;
 using System;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
 {
+    [NotMapped]
     public class Proof
     {
         [JsonProperty("type", Order = 1), JsonPropertyName("type")]

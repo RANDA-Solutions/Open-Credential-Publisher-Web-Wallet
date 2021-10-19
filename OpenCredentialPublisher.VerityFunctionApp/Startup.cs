@@ -2,15 +2,18 @@ using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using MediatR;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Options;
+using OpenCredentialPublisher.Data.Settings;
+using OpenCredentialPublisher.DependencyInjection;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Services.Interfaces;
 using OpenCredentialPublisher.Shared.Interfaces;
@@ -26,45 +29,21 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
-[assembly: WebJobsStartup(typeof(OpenCredentialPublisher.VerityFunctionApp.Startup))]
 
 namespace OpenCredentialPublisher.VerityFunctionApp
 {
-    public class Startup : IWebJobsStartup
+    public class Startup
     {
 
         public const string QueueTriggerStorageConfigurationSetting = "QueueStorageConnectionString";
 
-        public void Configure(IWebJobsBuilder builder)
+        public static void Configure(HostBuilderContext context, IServiceCollection services, IUrlHelper urlHelper)
         {
-            builder.Services.AddLogging();
+            services.AddLogging();
 
-            var configBuilder = new ConfigurationBuilder();
-            var config = configBuilder.AddEnvironmentVariables().Build();
+            var config = context.Configuration;
 
             var keyVaultName = config["KeyVaultName"];
-
-            if (!String.IsNullOrEmpty(keyVaultName))
-            {
-                var secretClient = new SecretClient(new Uri($"https://{keyVaultName}.vault.azure.net/"),
-                                                         new ManagedIdentityCredential());
-                config = configBuilder
-                    .AddAzureKeyVault(secretClient, new KeyVaultSecretManager())
-                    .SetBasePath(Environment.CurrentDirectory)
-                    .AddJsonFile("local.settings.json", true)
-                    .AddEnvironmentVariables()
-                    .Build();
-            }
-            else
-            {
-                config = configBuilder
-                   .SetBasePath(Environment.CurrentDirectory)
-                   .AddJsonFile("appsettings.json", true)
-                   .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true)
-                   .AddEnvironmentVariables()
-                   .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
-                   .Build();
-            }
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(config)
@@ -72,25 +51,26 @@ namespace OpenCredentialPublisher.VerityFunctionApp
                 .WriteTo.Console()
             .CreateLogger();
 
-            builder.Services.AddOptions();
+            services.AddOptions();
 
-            builder.Services.Configure<CredentialPublisherOptions>(config.GetSection(CredentialPublisherOptions.Section));
+            services.Configure<CredentialPublisherOptions>(config.GetSection(CredentialPublisherOptions.Section));
 
             var queueConfig = config.GetSection(AzureQueueOptions.Section);
-            builder.Services.Configure<AzureQueueOptions>(queueConfig);
+            services.Configure<AzureQueueOptions>(queueConfig);
 
             var queueOptions = queueConfig.Get<AzureQueueOptions>();
             config[QueueTriggerStorageConfigurationSetting] = queueOptions.StorageConnectionString;
-            builder.Services.AddSingleton<IConfiguration>(config);
+            services.AddSingleton<IConfiguration>(config);
 
+            //services.Configure<HostSettings>((o) => new HostSettings());
 
-            builder.Services.Configure<AzureBlobOptions>(config.GetSection(AzureBlobOptions.Section));
+            services.Configure<AzureBlobOptions>(config.GetSection(AzureBlobOptions.Section));
 
             var verityConfig = config.GetSection(VerityOptions.Section);
-            builder.Services.Configure<VerityOptions>(verityConfig);
+            services.Configure<VerityOptions>(verityConfig);
 
             string connectionString = config.GetConnectionString("DefaultConnection");
-            builder.Services.AddDbContext<WalletDbContext>(
+            services.AddDbContext<WalletDbContext>(
                 options => {
                     SqlServerDbContextOptionsExtensions.UseSqlServer(options, connectionString,
                         options => options.EnableRetryOnFailure(
@@ -100,31 +80,22 @@ namespace OpenCredentialPublisher.VerityFunctionApp
                         );
                 });
 
-            builder.Services.AddMediatR(typeof(Startup));
-            builder.Services.AddHttpClient(ClrHttpClient.Default);
-            builder.Services.AddCommandQueryHandlers(typeof(ICommandHandler<>));
-            builder.Services.AddCredentialMappingHandlers(typeof(ICredentialMapper<,>));
-            builder.Services.AddScoped<ICommandDispatcher, CommandDispatcher>();
-            builder.Services.AddScoped<ICredentialMapperDispatcher, CredentialDispatcher>();
-            builder.Services.AddScoped<CredentialService>();
-            builder.Services.AddTransient<AgentContextService>();
-            builder.Services.AddTransient<ConnectionRequestService>();
-            builder.Services.AddTransient<CredentialDefinitionService>();
-            builder.Services.AddTransient<CredentialPackageService>();
-            builder.Services.AddTransient<CredentialRequestService>();
-            
-            builder.Services.AddTransient<CredentialSchemaService>();
-            builder.Services.AddTransient<LinkService>();
-            builder.Services.AddTransient<IQueueService, AzureQueueService>();
-            builder.Services.AddTransient<RevocationDocumentService>();
-            builder.Services.AddTransient<SchemaService>();
-            builder.Services.AddTransient<WalletRelationshipService>();
+            services.AddMediatR(typeof(Startup));
+            services.AddHttpClient(ClrHttpClient.Default);
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddCommandQueryHandlers(typeof(ICommandHandler<>));
+            services.AddCredentialMappingHandlers(typeof(ICredentialMapper<,>));
+            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
+            services.AddScoped<ICredentialMapperDispatcher, CredentialDispatcher>();
+            services.AddSingleton(urlHelper);
+
+            RegisterServices.FunctionsAppRegistration(services);
 
             var verityOptions = verityConfig.Get<VerityOptions>();
             if (verityOptions.UseVerityApi)
             {
-                builder.Services.AddTransient<IVerityIntegrationService, VerityApiService>();
-                builder.Services.AddTransient<VerityRestApi.Client.Configuration>((services) => {
+                services.AddTransient<IVerityIntegrationService, VerityApiService>();
+                services.AddTransient<VerityRestApi.Client.Configuration>((services) => {
                     var agentContextModel = JsonSerializer.Deserialize<AgentContextModel>(verityOptions.Token);
                     return new VerityRestApi.Client.Configuration(
                         new Dictionary<string, string>(),
@@ -134,31 +105,35 @@ namespace OpenCredentialPublisher.VerityFunctionApp
                         );  
                 });
 
-                builder.Services.AddTransient<IIssueCredentialApi, IssueCredentialApi>((services) => {
+                services.AddTransient<IIssueCredentialApi, IssueCredentialApi>((services) => {
                     var configuration = services.GetService<VerityRestApi.Client.Configuration>();
                     return new IssueCredentialApi(configuration);
                 });
-                builder.Services.AddTransient<IIssuerSetupApi, IssuerSetupApi>((services) => {
+                services.AddTransient<IIssuerSetupApi, IssuerSetupApi>((services) => {
                     var configuration = services.GetService<VerityRestApi.Client.Configuration>();
                     return new IssuerSetupApi(configuration);
                 });
-                builder.Services.AddTransient<IRelationshipApi, RelationshipApi>((services) => {
+                services.AddTransient<IPresentProofApi, PresentProofApi>((services) => {
+                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
+                    return new PresentProofApi(configuration);
+                });
+                services.AddTransient<IRelationshipApi, RelationshipApi>((services) => {
                     var configuration = services.GetService<VerityRestApi.Client.Configuration>();
                     return new RelationshipApi(configuration);
                 });
-                builder.Services.AddTransient<IUpdateConfigsApi, UpdateConfigsApi>((services) => {
+                services.AddTransient<IUpdateConfigsApi, UpdateConfigsApi>((services) => {
                     var configuration = services.GetService<VerityRestApi.Client.Configuration>();
                     return new UpdateConfigsApi(configuration);
                 });
-                builder.Services.AddTransient<IUpdateEndpointApi, UpdateEndpointApi>((services) => {
+                services.AddTransient<IUpdateEndpointApi, UpdateEndpointApi>((services) => {
                     var configuration = services.GetService<VerityRestApi.Client.Configuration>();
                     return new UpdateEndpointApi(configuration);
                 });
-                builder.Services.AddTransient<IWriteCredDefApi, WriteCredDefApi>((services) => {
+                services.AddTransient<IWriteCredDefApi, WriteCredDefApi>((services) => {
                     var configuration = services.GetService<VerityRestApi.Client.Configuration>();
                     return new WriteCredDefApi(configuration);
                 });
-                builder.Services.AddTransient<IWriteSchemaApi, WriteSchemaApi>((services) => {
+                services.AddTransient<IWriteSchemaApi, WriteSchemaApi>((services) => {
                     var configuration = services.GetService<VerityRestApi.Client.Configuration>();
                     return new WriteSchemaApi(configuration);
                 });
@@ -166,7 +141,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp
             }
             else
             {
-                builder.Services.AddTransient<IVerityIntegrationService, VeritySdkService>();
+                services.AddTransient<IVerityIntegrationService, VeritySdkService>();
             }
         }
     }

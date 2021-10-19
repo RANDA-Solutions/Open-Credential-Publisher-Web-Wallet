@@ -11,16 +11,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// An artifact that is part of an evidence object. 
     /// </summary>
+    [NotMapped]
     public partial class ArtifactDType
-    { 
+    {
         /// <summary>
         /// The JSON-LD type of the object. Normally 'Artifact'. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -28,7 +30,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("type"), Newtonsoft.Json.JsonProperty("type")]
         [Description("The JSON-LD type of the object. Normally 'Artifact'. Model Primitive Datatype = NormalizedString.")]
         public string Type { get; set; }
-        
+
         /// <summary>
         /// A description of the artifact. Model Primitive Datatype = String.
         /// </summary>
@@ -36,7 +38,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("description"), Newtonsoft.Json.JsonProperty("description")]
         [Description("A description of the artifact. Model Primitive Datatype = String.")]
         public string Description { get; set; }
-        
+
         /// <summary>
         /// The name of the artifact. Model Primitive Datatype = String.
         /// </summary>
@@ -44,7 +46,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("name"), Newtonsoft.Json.JsonProperty("name")]
         [Description("The name of the artifact. Model Primitive Datatype = String.")]
         public string Name { get; set; }
-        
+
         /// <summary>
         /// IRI of the artifact. May be a Data URI or the URL where the artifact may be found. Model Primitive Datatype = AnyURI.
         /// </summary>
@@ -66,7 +68,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

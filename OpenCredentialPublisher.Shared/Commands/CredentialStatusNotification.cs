@@ -3,6 +3,7 @@ using OpenCredentialPublisher.Shared.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.Shared.Commands
 {
@@ -11,10 +12,14 @@ namespace OpenCredentialPublisher.Shared.Commands
         public const string FunctionName = "CredentialSentFunction";
         public const string QueueName = "credentialsentqueue";
         public const string MessageType = "credential-sent";
-        public string UserId { get; set; }
-        public int WalletRelationshipId { get; set; }
 
+        [JsonPropertyName("userId")]
+        public string UserId { get; set; }
+        [JsonPropertyName("walletRelationshipId")]
+        public int WalletRelationshipId { get; set; }
+        [JsonPropertyName("credentialPackageId")]
         public int CredentialPackageId { get; set; }
+        [JsonPropertyName("credentialRequestStep")]
         public int CredentialRequestStep { get; set; }
 
         public CredentialStatusNotification()

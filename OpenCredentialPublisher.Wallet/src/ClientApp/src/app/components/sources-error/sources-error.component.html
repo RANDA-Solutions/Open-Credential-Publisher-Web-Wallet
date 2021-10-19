@@ -1,0 +1,19 @@
+<div class="row mt-5">
+	<div class="col">
+		<section class="default-container p-5">
+			<span class="h1">Source Connection Error</span>
+			<div class="alert alert-primary mt-4">
+				<p>
+					There was a problem connecting to that source.  See the error below.
+				</p>
+			</div>
+			<div *ngIf="!!modelErrors && modelErrors.length > 0"
+				[ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }">
+				<span *ngFor="let msg of modelErrors">{{msg}}</span>
+			</div>
+			<div>
+				<a [routerLink]="['/sources/source-list']">Back to List of Sources</a>
+			</div>
+		</section>
+	</div>
+</div>

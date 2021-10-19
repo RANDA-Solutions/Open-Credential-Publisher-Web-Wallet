@@ -8,10 +8,12 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
 {
 
+    [NotMapped]
     public class VerifiableCredential
     {
         [JsonProperty("@context", Order = 1), JsonPropertyName("@context")]
@@ -75,7 +77,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
             var proof = Proof;
             Proof = null;
 
-            var json = System.Text.Json.JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            var json = System.Text.Json.JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
             json += proof.Challenge;
 
             Proof = proof;

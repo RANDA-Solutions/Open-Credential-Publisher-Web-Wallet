@@ -3,301 +3,230 @@ using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using OpenCredentialPublisher.ClrLibrary;
-using OpenCredentialPublisher.ClrLibrary.Models;
+using Newtonsoft.Json.Linq;
+using ClrLibrary = OpenCredentialPublisher.ClrLibrary;
+using ClrModels = OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Models.Badgr;
+using OpenCredentialPublisher.ObcLibrary;
+using OpenCredentialPublisher.ObcLibrary.Models;
 using OpenCredentialPublisher.Services.Extensions;
+using Schema.NET;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using OpenCredentialPublisher.ClrLibrary.Extensions;
+using System.Dynamic;
+using Newtonsoft.Json.Converters;
+using Microsoft.Extensions.Options;
+using OpenCredentialPublisher.Data.Options;
+using OpenCredentialPublisher.Data.Settings;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using OpenCredentialPublisher.ClrLibrary.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
+using OpenCredentialPublisher.Data.Models.ClrEntities;
+using OpenCredentialPublisher.Data.ViewModels.nG;
+//2021-06-17 EF Tracking OK
 namespace OpenCredentialPublisher.Services.Implementations
 {
     public class BadgrService
     {
         private readonly WalletDbContext _context;
+        private readonly SchemaService _schemaService;
         private readonly AuthorizationsService _authorizationsService;
         private readonly IHttpClientFactory _factory;
         private readonly LogHttpClientService _logHttpClientService;
+        private readonly SiteSettingsOptions _siteSettings;
+        private readonly HostSettings _hostSettings;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BadgrService(WalletDbContext context, AuthorizationsService authorizationsService, IHttpClientFactory factory, LogHttpClientService logHttpClientService)
+        public BadgrService(WalletDbContext context, SchemaService schemaService, AuthorizationsService authorizationsService, IHttpClientFactory factory
+            , LogHttpClientService logHttpClientService, IOptions<SiteSettingsOptions> siteSettings, IOptions<HostSettings> hostSettings
+            , IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _schemaService = schemaService;
             _authorizationsService = authorizationsService;
             _factory = factory;
             _logHttpClientService = logHttpClientService;
+            _siteSettings = siteSettings?.Value;
+            _hostSettings = hostSettings?.Value;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        #region BadgeConnect calls
+        /// <summary>
+        /// Get fresh copies of the Open Badges from the Badgr server.
+        /// </summary>
+        /// <param name="page">The PageModel calling this method.</param>
+        /// <param name="id">The authorization id for the resource server.</param>
+        public async Task ObcRefreshAssertionsAsync(ModelStateDictionary modelState, string id)
+        {
+            if (id == null)
+            {
+                modelState.AddModelError(string.Empty, "Missing authorization id.");
+                return;
+            }
+
+            var authorization = await _authorizationsService.GetDeepAsync(id);
+
+            if (authorization == null)
+            {
+                modelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
+                return;
+            }
+
+            if (authorization.AccessToken == null)
+            {
+                modelState.AddModelError(string.Empty, "No access token.");
+                return;
+            }
+
+            if (!await _authorizationsService.RefreshTokenAsync(modelState, authorization))
+            {
+                modelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
+                return;
+            }
+
+
+            var serviceUrl = string.Concat(authorization.Source.DiscoveryDocument.ApiBase.EnsureTrailingSlash(), "assertions");
+
+            var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
+            request.Headers.Accept.ParseAdd(ObcConstants.MediaTypes.JsonLdMediaType);
+            request.Headers.Accept.ParseAdd(ObcConstants.MediaTypes.JsonMediaType);
+            request.SetBearerToken(authorization.AccessToken);
+
+            var client = _factory.CreateClient("default");
+
+            var response = await client.SendAsync(request);
+            await _logHttpClientService.LogAsync(response);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                await _schemaService.ValidateSchemaAsync<AssertionsResponseDType>(_httpContextAccessor.HttpContext.Request, content);
+                if (!modelState.IsValid) return;
+
+                await ObcSaveBackpackDataAsync(modelState, content, authorization);
+            }
+            else
+            {
+                modelState.AddModelError(string.Empty, response.ReasonPhrase);
+            }
+        }
+        private async Task ObcSaveBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
+        {
+            try
+            {
+                //Turn EF Tracking on for untracked authorization
+                _context.Attach(authorization);
+
+                var badgrBackpackAssertionsResponse = JsonConvert.DeserializeObject<BadgrObcBackpackAssertionsResponse>(content);
+
+                var credentialPackage = await _context.CredentialPackages
+                        .Include(cp => cp.BadgrBackpack)
+                        .ThenInclude(bp => bp.BadgrAssertions)
+                        .FirstOrDefaultAsync(cp => cp.UserId == _httpContextAccessor.HttpContext.User.JwtUserId() && cp.AuthorizationForeignKey == authorization.Id);
+
+                if (credentialPackage == null)
+                {
+                    credentialPackage = new CredentialPackageModel
+                    {
+                        TypeId = PackageTypeEnum.OpenBadgeConnect,
+                        AuthorizationForeignKey = authorization.Id,
+                        UserId = _httpContextAccessor.HttpContext.User.JwtUserId(),
+                        CreatedAt = DateTime.UtcNow,
+                        BadgrBackpack = new BadgrBackpackModel
+                        {
+                            IsBadgr = true,
+                            ParentCredentialPackage = credentialPackage,
+                            Identifier = authorization.Id,
+                            Json = content,
+                            IssuedOn = DateTime.UtcNow,
+                            AssertionsCount = badgrBackpackAssertionsResponse.BadgrAssertions.Count,
+                            BadgrAssertions = new List<BadgrAssertionModel>()
+                        }
+                    };
+                    _context.CredentialPackages.Add(credentialPackage);
+                }
+                else
+                {
+                    credentialPackage.BadgrBackpack.Identifier = authorization.Id;
+                    credentialPackage.BadgrBackpack.Json = content;
+                    credentialPackage.BadgrBackpack.IssuedOn = DateTime.UtcNow;
+                    credentialPackage.BadgrBackpack.AssertionsCount = badgrBackpackAssertionsResponse.BadgrAssertions.Count;
+                    credentialPackage.BadgrBackpack.BadgrAssertions = new List<BadgrAssertionModel>();
+                }
+
+                // Save each Assertion
+
+                foreach (var assertion in badgrBackpackAssertionsResponse.BadgrAssertions)
+                {
+                    var currentAssertion = BadgrAssertionModel.FromBadgrAssertion(assertion.ToJson(), assertion);
+                    var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == currentAssertion.Id);
+
+                    if (savedAssertion != null)
+                    {
+                        currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
+                        currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
+                        _context.Entry(currentAssertion).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
+                    }
+                }
+                //TODO skip until later, Open Badges v2.0, 2.1 does not implement signed assertions
+                //foreach (var signedAssertion in badgrBackpackAssertionsResponse.SignedAssertions)
+                //{
+                //    var decoded = signedAssertion.DeserializePayload<AssertionDType>();
+                //    var currentAssertion = BadgrAssertionModel.FromObcAssertion(decoded);
+                //    var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == currentAssertion.Id);
+
+                //    if (savedAssertion != null)
+                //    {
+                //        currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
+                //        currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
+                //        _context.Entry(currentAssertion).State = EntityState.Modified;
+                //    }
+                //    else
+                //    {
+                //        credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
+                //    }                
+                //}
+
+                //debugging info
+                _context.ChangeTracker.DetectChanges();
+                var addedEntities = _context.ChangeTracker.Entries<IBaseEntity>().Where(E => E.State == EntityState.Added).ToList();
+                var editedEntities = _context.ChangeTracker.Entries<IBaseEntity>().Where(E => E.State == EntityState.Modified).ToList();
+                //
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, ex.Message);
+                modelState.AddModelError(string.Empty, ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region BadgrApi calls        
+        
         /// <summary>
         /// Request an access token using basic auth
         /// </summary>
-        public async Task<int> ConvertClrFromBadgeAsync(int id, string userId)
-        {
-            var badge = await GetBadgeAsync(id);
-
-            var newClr = new ClrDType
-            {
-                Context = "https://purl.imsglobal.org/spec/clr/v1p0/context",
-                Assertions = new List<AssertionDType>(),
-                Id = $"urn:uuid:{Guid.NewGuid():D}",
-                IssuedOn = DateTime.Now.ToLocalTime(),
-                SignedAssertions = new List<string>()
-            };
-            var emailAddress = (string)null;
-            var email = (BadgrUserEmailDType)null;
-            var badgrUserResponse = JsonConvert.DeserializeObject<BadgrUserResponse>(badge.RecipientJson);
-            var badgrUser = badgrUserResponse.BadgrBadgrUsers.FirstOrDefault();
-            if (badgrUser == null)
-            {
-                badgrUser = new BadgrUserDType();
-            }
-            if (badgrUser.Emails.Count > 0)
-            {
-                email = badgrUser.Emails.Where(e => e.Primary).FirstOrDefault();
-                if (email == null)
-                {
-                    email = badgrUser.Emails.Where(e => e.Primary).FirstOrDefault();
-                }
-                if (email != null)
-                {
-                    emailAddress = email.Email;
-                }
-            }
-
-            var tele = badgrUser.Telephone.FirstOrDefault();
-
-            newClr.Learner = new ProfileDType()
-            {
-                Type = "Profile",
-                Id = badgrUser.Id,
-                Email = emailAddress,
-                Name = badgrUser.FirstName + " " + badgrUser.LastName,
-                Telephone = badgrUser.Telephone.FirstOrDefault(),
-                SourcedId = badgrUser.Id,
-                Url = badgrUser.Url.FirstOrDefault()
-            };
-            var badgrIssuer = JsonConvert.DeserializeObject<BadgrIssuerDType>(badge.IssuerJson);
-            if (badgrIssuer == null)
-            {
-                badgrIssuer = new BadgrIssuerDType();
-            }
-            newClr.Publisher = new ProfileDType()
-            {
-                Type = "Profile",
-                Id = badgrIssuer.Id,
-                Email = badgrIssuer.Email,
-                Name = badgrIssuer.Name,
-                SourcedId = badgrIssuer.Id,
-                Url = badgrIssuer.Url,
-                Description = badgrIssuer.Description
-            };
-
-            newClr.Name = badgrIssuer.Name + " Issued Badges";
-
-            var addlProperties = new Dictionary<string, object>();
-
-            var badgeClass = JsonConvert.DeserializeObject<BadgrBadgeClassDType>(badge.BadgeClassJson);
-
-            var achievement = new AchievementDType()
-            {
-                Id = badgeClass.Id,
-                AchievementType = "Badge",
-                Description = badgeClass.Description,
-                Image = badgeClass.Image,
-                Issuer = newClr.Publisher,
-                Name = badgeClass.Name,
-                Alignments = badgeClass.Alignments,
-                Tags = badgeClass.Tags
-            };
-
-            var assertion = new AssertionDType()
-            {
-                Achievement = achievement,
-                Id = badge.Id,
-                Type =  "Assertion",
-                IssuedOn = badge.IssuedOn,
-                Recipient = badge.Recipient,
-                Narrative = badge.Narrative,
-                AdditionalProperties = badge.AdditionalProperties,
-                Revoked = badge.Revoked,
-                RevocationReason = badge.RevocationReason
-            };
-
-            newClr.Assertions.Add(assertion);
-
-            var credentialPackage = new CredentialPackageModel()
-            {
-                UserId = userId,
-                TypeId = PackageTypeEnum.Clr,
-                CreatedAt = DateTime.UtcNow,
-                ModifiedAt = DateTime.UtcNow,
-                Clr = new ClrModel
-                {
-                    AssertionsCount = newClr.Assertions.Count + newClr.SignedAssertions.Count,
-                    Identifier = newClr.Id,
-                    IssuedOn = newClr.IssuedOn,
-                    LearnerName = newClr.Learner.Name,
-                    Name = newClr.Name,
-                    PublisherName = newClr.Publisher.Name,
-                    RefreshedAt = newClr.IssuedOn,
-                    Json = System.Text.Json.JsonSerializer.Serialize(newClr,  new JsonSerializerOptions { IgnoreNullValues = true }),
-                }
-            };
-
-            await _context.CredentialPackages.AddAsync(credentialPackage);
-            await _context.SaveChangesAsync();
-
-            return newClr.ClrKey;
-        }
-
-        /// <summary>
-        /// Request an access token using basic auth
-        /// </summary>
-        public async Task<int> CreateClrFromBadgeAsync(int id, string userId)
-        {
-            var badge = await GetBadgeAsync(id);
-
-            var newClr = new ClrDType
-            {
-                Context = System.Text.Json.JsonSerializer.Serialize(new List<string> { "https://purl.imsglobal.org/spec/clr/v1p0/context", "https://w3id.org/openbadges/v2" }, new JsonSerializerOptions { IgnoreNullValues = true }),
-                Assertions = new List<AssertionDType>(),
-                Id = $"urn:uuid:{Guid.NewGuid():D}",
-                IssuedOn = DateTime.Now.ToLocalTime(),
-                SignedAssertions = new List<string>()
-            };
-            var emailAddress = (string)null;
-            var email = (BadgrUserEmailDType)null;
-            var badgrUserResponse = JsonConvert.DeserializeObject<BadgrUserResponse>(badge.RecipientJson);
-            var badgrUser = badgrUserResponse.BadgrBadgrUsers.FirstOrDefault();
-            if (badgrUser == null)
-            {
-                badgrUser = new BadgrUserDType();
-            }
-            if (badgrUser.Emails.Count > 0)
-            {
-                email = badgrUser.Emails.Where(e => e.Primary).FirstOrDefault();
-                if (email == null)
-                {
-                    email = badgrUser.Emails.Where(e => e.Primary).FirstOrDefault();
-                }
-                if (email != null)
-                {
-                    emailAddress = email.Email;
-                }
-            }
-
-            var tele = badgrUser.Telephone.FirstOrDefault();
-
-            newClr.Learner = new ProfileDType()
-            {
-                Type = "Profile",
-                Id = badgrUser.Id,
-                Email = emailAddress,
-                Name = badgrUser.FirstName + " " + badgrUser.LastName,
-                Telephone = badgrUser.Telephone.FirstOrDefault(),
-                SourcedId = badgrUser.Id,
-                Url = badgrUser.Url.FirstOrDefault()
-            };
-            var badgrIssuer = JsonConvert.DeserializeObject<BadgrIssuerDType>(badge.IssuerJson);
-            if (badgrIssuer == null)
-            {
-                badgrIssuer = new BadgrIssuerDType();
-            }
-            newClr.Publisher = new ProfileDType()
-            {
-                Type = "Profile",
-                Id = badgrIssuer.Id,
-                Email = badgrIssuer.Email,
-                Name = badgrIssuer.Name,
-                SourcedId = badgrIssuer.Id,
-                Url = badgrIssuer.Url,
-                Description = badgrIssuer.Description
-            };
-
-            newClr.Name = badgrIssuer.Name + " Issued Badges";
-
-            var addlProperties = new Dictionary<string, object>();
-
-            addlProperties.Add("obi:BadgeClass", badge.Badgeclass);
-            addlProperties.Add("obi:BadgeClassOpenBadgeId", badge.BadgeClassOpenBadgeId);
-            addlProperties.Add("obi:BadgrAssertionId", badge.BadgrAssertionId);
-            addlProperties.Add("obi:Expires", badge.Expires);
-            addlProperties.Add("obi:Image", badge.Image);
-            addlProperties.Add("obi:Id", badge.Id);
-            addlProperties.Add("obi:InternalIdentifier", badge.InternalIdentifier);
-            addlProperties.Add("obi:Issuer", badge.Issuer);
-            addlProperties.Add("obi:Narrative", badge.Narrative);
-            addlProperties.Add("obi:OpenBadgeId", badge.OpenBadgeId);
-            addlProperties.Add("obi:Pending", badge.Pending);
-            addlProperties.Add("obi:Recipient", badge.Recipient);
-            addlProperties.Add("obi:RevocationReason", badge.RevocationReason);
-            addlProperties.Add("obi:Revoked", badge.Revoked);
-            addlProperties.Add("obi:SignedAssertion", badge.SignedAssertion);
-            addlProperties.Add("obi:Type", badge.Type);
-            addlProperties.Add("obi:ValidationStatus", badge.ValidationStatus);
-
-
-            var assertion = new AssertionDType()
-            {
-                Id = badge.Id,
-                Type = @"[""Assertion"", ""obi:Assertion""]",
-                IssuedOn = badge.IssuedOn,
-                AdditionalProperties = addlProperties
-            };
-
-            newClr.Assertions.Add(assertion);
-
-            var credentialPackage = new CredentialPackageModel()
-            {
-                UserId = userId,
-                TypeId = PackageTypeEnum.Clr,
-                CreatedAt = DateTime.UtcNow,
-                ModifiedAt = DateTime.UtcNow,
-                Clr = new ClrModel
-                {
-                    AssertionsCount = newClr.Assertions.Count + newClr.SignedAssertions.Count,
-                    Identifier = newClr.Id,
-                    IssuedOn = newClr.IssuedOn,
-                    Json = System.Text.Json.JsonSerializer.Serialize(newClr, new JsonSerializerOptions { IgnoreNullValues = true }),
-                    LearnerName = newClr.Learner.Name,
-                    Name = newClr.Name,
-                    PublisherName = newClr.Publisher.Name,
-                    RefreshedAt = newClr.IssuedOn
-                }
-            };
-
-            await _context.CredentialPackages.AddAsync(credentialPackage);
-            await _context.SaveChangesAsync();
-
-            return newClr.ClrKey;
-        }
-        /// <summary>
-        /// Read a Badge from the database
-        /// </summary>
-        public async Task<BadgrAssertionModel> GetBadgeAsync(int id)
-        {
-            var assertion = await _context.BadgrAssertions.AsNoTracking()
-                .Include(a => a.BadgrBackpack)
-                .ThenInclude(bp => bp.CredentialPackage)
-                .ThenInclude(cp => cp.Authorization)
-                .ThenInclude(a => a.Source)
-                .Where(a => a.BadgrAssertionId == id)
-                .FirstOrDefaultAsync();           
-
-            return assertion;
-        }
-        /// <summary>
-        /// Request an access token using basic auth
-        /// </summary>
-        public async Task GetAccessTokenBasic(SourceModel source, string userName, string password, string userId)
+        public async Task<bool> GetAccessTokenBasic(SourceModel source, string userName, string password, string userId)
         {
             // Generate a code_verifier for PKCE
 
@@ -352,8 +281,9 @@ namespace OpenCredentialPublisher.Services.Implementations
                 authorization.AccessToken = tokenResponse.AccessToken;
                 authorization.RefreshToken = tokenResponse.RefreshToken;
                 authorization.Scopes = tokenResponse.Scope?.Replace(System.Environment.NewLine, " ").Split(' ').ToList();
-                authorization.ValidTo = DateTimeOffset.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
+                authorization.ValidTo = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
                 await _authorizationsService.UpdateAsync(authorization);
+                return true;
             }
             else
             {
@@ -363,20 +293,20 @@ namespace OpenCredentialPublisher.Services.Implementations
 
                 // Reload the known sources
 
-                throw new Exception($"Response Failure ({response.StatusCode})");
+                return false;
             }
         }
 
         /// <summary>
-        /// Get fresh copies of the Open Badges from the Badgr server.
+        /// Get fresh copies of the Open Badges from the Badgr server via Badgr Api.
         /// </summary>
         /// <param name="page">The PageModel calling this method.</param>
         /// <param name="id">The authorization id for the resource server.</param>
-        public async Task RefreshBackpackAsync(PageModel page, string id)
+        public async Task RefreshBackpackAsync(ModelStateDictionary modelState, string id)
         {
             if (id == null)
             {
-                page.ModelState.AddModelError(string.Empty, "Missing authorization id.");
+                modelState.AddModelError(string.Empty, "Missing authorization id.");
                 return;
             }
 
@@ -384,27 +314,27 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             if (authorization == null)
             {
-                page.ModelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
+                modelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
                 return;
             }
 
             if (authorization.AccessToken == null)
             {
-                page.ModelState.AddModelError(string.Empty, "No access token.");
+                modelState.AddModelError(string.Empty, "No access token.");
                 return;
             }
 
-            if (!await _authorizationsService.RefreshTokenAsync(page, authorization))
+            if (!await _authorizationsService.RefreshTokenAsync(modelState, authorization))
             {
-                page.ModelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
+                modelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
                 return;
             }
 
             var serviceUrl = string.Concat(authorization.Source.Url.EnsureTrailingSlash(), "v2/backpack/assertions");
 
             var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
-            request.Headers.Accept.ParseAdd(ClrConstants.MediaTypes.JsonLdMediaType);
-            request.Headers.Accept.ParseAdd(ClrConstants.MediaTypes.JsonMediaType);
+            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonLdMediaType);
+            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonMediaType);
             request.SetBearerToken(authorization.AccessToken);
 
             var client = _factory.CreateClient("default");
@@ -416,14 +346,225 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 var content = await response.Content.ReadAsStringAsync();
 
-                await SaveBackpackDataAsync(page, content, authorization);
+                await SaveBackpackDataAsync(modelState, content, authorization);
             }
             else
             {
-                page.ModelState.AddModelError(string.Empty, response.ReasonPhrase);
+                modelState.AddModelError(string.Empty, response.ReasonPhrase);
             }
         }
-        private async Task SaveBackpackDataAsync(PageModel page, string content, AuthorizationModel authorization)
+
+        /// <summary>
+        /// Get fresh copies of the Open Badges from the Badgr server via Badge Connect.
+        /// </summary>
+        /// <param name="page">The PageModel calling this method.</param>
+        /// <param name="id">The authorization id for the resource server.</param>
+        public async Task RefreshObcBackpackAsync(ModelStateDictionary modelState, string id)
+        {
+            if (id == null)
+            {
+                modelState.AddModelError(string.Empty, "Missing authorization id.");
+                return;
+            }
+
+            var authorization = await _authorizationsService.GetDeepAsync(id);
+
+            if (authorization == null)
+            {
+                modelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
+                return;
+            }
+
+            if (authorization.AccessToken == null)
+            {
+                modelState.AddModelError(string.Empty, "No access token.");
+                return;
+            }
+
+            if (!await _authorizationsService.RefreshTokenAsync(modelState, authorization))
+            {
+                modelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
+                return;
+            }
+
+            var serviceUrl = string.Concat(authorization.Source.DiscoveryDocument.ApiBase.EnsureTrailingSlash(), "assertions");
+
+            var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
+            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonLdMediaType);
+            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonMediaType);
+            request.SetBearerToken(authorization.AccessToken);
+
+            var client = _factory.CreateClient("default");
+
+            var response = await client.SendAsync(request);
+            await _logHttpClientService.LogAsync(response);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+                await SaveObcBackpackDataAsync(modelState, content, authorization);
+            }
+            else
+            {
+                modelState.AddModelError(string.Empty, response.ReasonPhrase);
+            }
+        }
+        /// <summary>
+        /// Get fresh copies of the Open Badges from the Badgr server.
+        /// </summary>
+        /// <param name="page">The PageModel calling this method.</param>
+        /// <param name="id">The authorization id for the resource server.</param>
+        public async Task RefreshBackpackConnectAsync(ModelStateDictionary modelState, string id)
+        {
+            if (id == null)
+            {
+                modelState.AddModelError(string.Empty, "Missing authorization id.");
+                return;
+            }
+
+            var authorization = await _authorizationsService.GetDeepAsync(id);
+
+            if (authorization == null)
+            {
+                modelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
+                return;
+            }
+
+            if (authorization.AccessToken == null)
+            {
+                modelState.AddModelError(string.Empty, "No access token.");
+                return;
+            }
+
+            if (!await _authorizationsService.RefreshTokenAsync(modelState, authorization))
+            {
+                modelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
+                return;
+            }
+
+            var serviceUrl = string.Concat(authorization.Source.Url.EnsureTrailingSlash(), "v2/backpack/assertions");
+
+            var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
+            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonLdMediaType);
+            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonMediaType);
+            request.SetBearerToken(authorization.AccessToken);
+
+            var client = _factory.CreateClient("default");
+
+            var response = await client.SendAsync(request);
+            await _logHttpClientService.LogAsync(response);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+                await SaveBackpackDataAsync(modelState, content, authorization);
+            }
+            else
+            {
+                modelState.AddModelError(string.Empty, response.ReasonPhrase);
+            }
+        }
+
+        public async Task<BackpackPackageVM> GetBackpackPackageForSelectionAsync(string userId, int id)
+        {
+            var pkg = await GetBackpackPackageAsync(userId, id);
+
+            var prev = await GetPreviousBackpackAsync(pkg.AuthorizationForeignKey);
+
+            var badgeName = string.Empty;
+            var badgeDescription = string.Empty;
+            var issuerName = string.Empty;
+
+            var vm = new BackpackPackageVM { Id = id, IsBadgr = pkg.BadgrBackpack.IsBadgr };
+            foreach (var ba in pkg.BadgrBackpack.BadgrAssertions)
+            {
+                if (ba.IsBadgr)
+                {
+                    dynamic badgeClass = JsonConvert.DeserializeObject<ExpandoObject>(ba.BadgeClassJson, new ExpandoObjectConverter());
+                    badgeName = ((IDictionary<string, object>)badgeClass)["name"].ToString();
+                    badgeDescription = ((IDictionary<string, object>)badgeClass)["description"].ToString();
+                    issuerName = "";
+                    if (!string.IsNullOrWhiteSpace(ba.IssuerJson))
+                    {
+                        dynamic issuer = JsonConvert.DeserializeObject<ExpandoObject>(ba.IssuerJson, new ExpandoObjectConverter());
+                        issuerName = ((IDictionary<string, object>)issuer)["name"].ToString();
+                    }
+                    else
+                    {
+                        issuerName = "Issuer information not available";
+                    }
+                }
+                else
+                {
+                    if (ba.IsValidJson)
+                    {
+                        badgeName = ba.Id;
+                    }
+                    else
+                    {
+                        badgeName = "Invalid Badge";
+                    }
+                    issuerName = "Issuer information not available";
+
+                }
+                var obVM = new OpenBadgeVM
+                {
+                    IdIsUrl = Uri.IsWellFormedUriString(ba.Id, UriKind.Absolute),
+                    Id = ba.BadgrAssertionId,
+                    BadgeName = badgeName,
+                    IssuerName = issuerName,
+                    BadgeDescription = badgeDescription,
+                    BadgrAssertionId = ba.Id,
+                    BadgeImage = ba.Image,
+                    IsSelected = false
+                };
+                PrePopulateSelectionFlags(obVM, prev);
+                vm.Badges.Add(obVM);
+            }
+
+            return vm;
+        }
+        public async Task<CredentialPackageModel> GetBackpackPackageAsync(string userId, int id)
+        {
+            var pkg = await _context.CredentialPackages
+                .AsNoTracking()
+                .Include(cp => cp.BadgrBackpack)
+                .ThenInclude(bp => bp.BadgrAssertions)
+                .Where(package => package.UserId == userId && package.Id == id)
+                .FirstOrDefaultAsync();
+
+            return pkg;
+        }
+        public async Task SelectBadgesAsync(string userId, int id, List<int> keepers)
+        {
+            var pkg = await GetBackpackPackageAsync(userId, id);
+
+            foreach (var ba in pkg.BadgrBackpack.BadgrAssertions)
+            {
+                if (!keepers.Contains(ba.BadgrAssertionId))
+                {
+                    ba.Delete();
+                    _context.Entry(ba).State = EntityState.Modified;
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
+        private async Task<BadgrBackpackModel> GetPreviousBackpackAsync(string id)
+        {
+            var backpack = await _context.BadgrBackpacks
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Include(bp => bp.ParentCredentialPackage)
+                .Include(bp => bp.BadgrAssertions)
+                .Where(bp => bp.ParentCredentialPackage.AuthorizationForeignKey == id)
+                .OrderByDescending(bp => bp.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            return backpack;
+        }
+        private async Task SaveBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
         {
 
             //Turn EF Tracking on for untracked authorization
@@ -434,7 +575,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var credentialPackage = await _context.CredentialPackages
                     .Include(cp => cp.BadgrBackpack)
                     .ThenInclude(bp => bp.BadgrAssertions)
-                    .FirstOrDefaultAsync(cp => cp.UserId == page.User.UserId() && cp.AuthorizationForeignKey == authorization.Id);
+                    .FirstOrDefaultAsync(cp => cp.UserId == _httpContextAccessor.HttpContext.User.JwtUserId() && cp.AuthorizationForeignKey == authorization.Id);
 
             if (credentialPackage == null)
             {
@@ -442,11 +583,12 @@ namespace OpenCredentialPublisher.Services.Implementations
                 {
                     TypeId = PackageTypeEnum.OpenBadge,
                     AuthorizationForeignKey = authorization.Id,
-                    UserId = page.User.UserId(),
+                    UserId = _httpContextAccessor.HttpContext.User.JwtUserId(),
                     CreatedAt = DateTime.UtcNow,
                     BadgrBackpack = new BadgrBackpackModel
                     {
-                        CredentialPackage = credentialPackage,
+                        IsBadgr = true,
+                        ParentCredentialPackage = credentialPackage,
                         Identifier = authorization.Id,
                         Json = content,
                         IssuedOn = DateTime.UtcNow,
@@ -456,6 +598,14 @@ namespace OpenCredentialPublisher.Services.Implementations
                 };
                 _context.CredentialPackages.Add(credentialPackage);
             }
+            else
+            {
+               credentialPackage.BadgrBackpack.Identifier = authorization.Id;
+               credentialPackage.BadgrBackpack.Json = content;
+               credentialPackage.BadgrBackpack.IssuedOn = DateTime.UtcNow;
+               credentialPackage.BadgrBackpack.AssertionsCount = badgrBackpackAssertionsResponse.BadgrAssertions.Count;
+               credentialPackage.BadgrBackpack.BadgrAssertions = new List<BadgrAssertionModel>();
+            }
 
             // Save each Assertion
 
@@ -464,60 +614,189 @@ namespace OpenCredentialPublisher.Services.Implementations
                 try
                 {                
                     var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == currentAssertion.Id);
-                
-                    if (await EnhanceAssertionResponseAsync(page, currentAssertion, authorization))
+
+                    await EnhanceAssertionResponseAsync(modelState, currentAssertion, authorization);
+                    if (savedAssertion != null)
                     {
-                        if (savedAssertion != null)
-                        {
-                            currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
-                            currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
-                            _context.Entry(currentAssertion).State = EntityState.Modified;
-                        }
-                        else
-                        {
-                            credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
-                        }
+                        currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
+                        currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
+                        _context.Entry(currentAssertion).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
+                    Log.Error(ex, ex.Message);
+                    modelState.AddModelError(string.Empty, ex.Message);
                 }
             }
 
+            credentialPackage.AssertionsCount = credentialPackage.BadgrBackpack.BadgrAssertions.Count;
             await _context.SaveChangesAsync();
         }
-        private async Task<bool> EnhanceAssertionResponseAsync(PageModel page, BadgrAssertionModel assertion, AuthorizationModel authorization)
+
+        private async Task SaveObcBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
+        {            
+            // Every refresh of packages will save the raw package in blob storage, but the database will contain only the most recent version
+
+            //Turn EF Tracking on for untracked authorization
+            _context.Attach(authorization);
+
+            var badgrObcBackpackAssertionsResponse = JsonConvert.DeserializeObject<BadgrObcBackpackAssertionsResponse>(content);
+
+            //var credentialPackage = await _context.CredentialPackages
+            //        .Include(cp => cp.BadgrBackpack)
+            //        .ThenInclude(bp => bp.BadgrAssertions)
+            //        .FirstOrDefaultAsync(cp => cp.UserId == _httpContextAccessor.HttpContext.User.JwtUserId() && cp.AuthorizationForeignKey == authorization.Id);
+            var credentialPackage = null as CredentialPackageModel;
+            if (credentialPackage == null)
+            {
+                credentialPackage = new CredentialPackageModel
+                {
+                    TypeId = PackageTypeEnum.OpenBadge,
+                    AuthorizationForeignKey = authorization.Id,
+                    UserId = _httpContextAccessor.HttpContext.User.JwtUserId(),
+                    CreatedAt = DateTime.UtcNow,
+                    BadgrBackpack = new BadgrBackpackModel
+                    {
+                        IsBadgr = true,
+                        ParentCredentialPackage = credentialPackage,
+                        Identifier = authorization.Id,
+                        Json = content,
+                        IssuedOn = DateTime.UtcNow,
+                        AssertionsCount = badgrObcBackpackAssertionsResponse.BadgrAssertions.Count,
+                        BadgrAssertions = new List<BadgrAssertionModel>()
+                    }
+                };
+                _context.CredentialPackages.Add(credentialPackage);
+            }
+            else
+            {
+                credentialPackage.BadgrBackpack.Identifier = authorization.Id;
+                credentialPackage.BadgrBackpack.Json = content;
+                credentialPackage.BadgrBackpack.IssuedOn = DateTime.UtcNow;
+                credentialPackage.BadgrBackpack.AssertionsCount = badgrObcBackpackAssertionsResponse.BadgrAssertions.Count;
+                credentialPackage.BadgrBackpack.BadgrAssertions = new List<BadgrAssertionModel>();
+            }
+
+            // Save each Assertion
+
+            foreach (var assertion in badgrObcBackpackAssertionsResponse.BadgrAssertions)
+            {
+                try
+                {
+                    //var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == assertion.Id);
+                    var savedAssertion = null as BadgrAssertionModel;
+                    var currentAssertion = await EnhanceConvertObcAssertionResponseAsync(modelState, assertion, authorization);
+                    if (savedAssertion != null)
+                    {
+                        currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
+                        currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
+                        _context.Entry(currentAssertion).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, ex.Message);
+                    modelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+
+            credentialPackage.AssertionsCount = badgrObcBackpackAssertionsResponse.BadgrAssertions.Count;
+            await _context.SaveChangesAsync();
+        }
+        private async Task<bool> EnhanceAssertionResponseAsync(ModelStateDictionary modelState, BadgrAssertionModel assertion, AuthorizationModel authorization)
         {
             var status = await GetBadgeDetailAsync(assertion.BadgeClassOpenBadgeId, authorization);
             assertion.BadgeClassJson = status.Success ? status.Description : string.Empty;
             if (!status.Success)
             {
-                page.ModelState.AddModelError(string.Empty, status.Description);
+                modelState.AddModelError(string.Empty, status.Description);
                 return false;
             }
             status = await GetBadgeDetailAsync(assertion.IssuerOpenBadgeId, authorization);
             assertion.IssuerJson = status.Success ? status.Description : string.Empty;
             if (!status.Success)
             {
-                page.ModelState.AddModelError(string.Empty, status.Description);
+                modelState.AddModelError(string.Empty, status.Description);
                 return false;
             }
             status = await GetBadgeDetailAsync(assertion.OpenBadgeId, authorization);
             assertion.BadgeJson = status.Success ? status.Description : string.Empty;
             if (!status.Success)
             {
-                page.ModelState.AddModelError(string.Empty, status.Description);
+                modelState.AddModelError(string.Empty, status.Description);
                 return false;
             }
             status = await GetBadgeDetailAsync(string.Concat(authorization.Source.Url.EnsureTrailingSlash(), $"v2/users/self"), authorization);
             assertion.RecipientJson = status.Success ? status.Description : string.Empty;
             if (!status.Success)
             {
-                page.ModelState.AddModelError(string.Empty, status.Description);
+                modelState.AddModelError(string.Empty, status.Description);
                 return false;
             }
             return true;
+
+        }
+        private async Task<BadgrAssertionModel> EnhanceConvertObcAssertionResponseAsync(ModelStateDictionary modelState, BadgrObcAssertionDType obcAssertion, AuthorizationModel authorization)
+        {
+
+            var assertion = BadgrAssertionModel.FromBadgrAssertion(obcAssertion.ToJson(), obcAssertion);
+
+
+            var status = await GetBadgeDetailAsync(assertion.BadgeClassOpenBadgeId, authorization);
+            assertion.BadgeClassJson = status.Success ? status.Description : string.Empty;
+            if (!status.Success)
+            {
+                modelState.AddModelError(string.Empty, status.Description);
+                return null;
+            }
+            if (!string.IsNullOrWhiteSpace(assertion.IssuerOpenBadgeId))
+            {
+                status = await GetBadgeDetailAsync(assertion.IssuerOpenBadgeId, authorization);
+                assertion.IssuerJson = status.Success ? status.Description : string.Empty;
+                if (!status.Success)
+                {
+                    modelState.AddModelError(string.Empty, status.Description);
+                    return null;
+                }
+            }
+            else
+            {
+                dynamic badgeClass = JsonConvert.DeserializeObject<ExpandoObject>(assertion.BadgeClassJson, new ExpandoObjectConverter());
+                var issuer = ((IDictionary<string, object>)badgeClass)["issuer"];
+                status = await GetBadgeDetailAsync(issuer.ToString(), authorization);
+                assertion.IssuerJson = status.Success ? status.Description : string.Empty;
+                if (!status.Success)
+                {
+                    modelState.AddModelError(string.Empty, status.Description);
+                    return null;
+                }
+            }
+            status = await GetBadgeDetailAsync(assertion.OpenBadgeId, authorization);
+            assertion.BadgeJson = status.Success ? status.Description : string.Empty;
+            if (!status.Success)
+            {
+                modelState.AddModelError(string.Empty, status.Description);
+                return null;
+            }
+
+            //status = await GetBadgeDetailAsync(string.Concat(authorization.Source.Url.EnsureTrailingSlash(), $"v2/users/self"), authorization);
+            //assertion.RecipientJson = status.Success ? status.Description : string.Empty;
+            //if (!status.Success)
+            //{
+            // modelState.AddModelError(string.Empty, status.Description);
+            // return null;
+            //}
+            assertion.RecipientJson = string.Empty;
+            return assertion;
 
         }
         private async Task<Status> GetBadgeDetailAsync(string url, AuthorizationModel authorization)
@@ -525,8 +804,8 @@ namespace OpenCredentialPublisher.Services.Implementations
             // Get the BadgeClass
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Accept.ParseAdd(ClrConstants.MediaTypes.JsonLdMediaType);
-            request.Headers.Accept.ParseAdd(ClrConstants.MediaTypes.JsonMediaType);
+            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonLdMediaType);
+            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonMediaType);
             request.SetBearerToken(authorization.AccessToken);
 
             var client = _factory.CreateClient();
@@ -539,10 +818,14 @@ namespace OpenCredentialPublisher.Services.Implementations
                 var content = await response.Content.ReadAsStringAsync();
 
                 // Validate the response data
+                // 2021-08-25 Where does this schema must = Clr come from ?
+                // 2021-08-25 var result = await _schemaService.ValidateSchemaAsync<ClrDType>(_httpContextAccessor.HttpContext.Request, content);
 
-                //await _schemaService.ValidateSchemaAsync<ClrDType>(page.Request, content);
-
-                //if (!page.ModelState.IsValid) return null;
+                // 2021-08-25 if (!result.IsValid)
+                // 2021-08-25 {
+                // 2021-08-25     Log.Error(string.Join(';', result.ErrorMessages), new Exception($"GetBadgeDetail Error { url }: ValidateSchemaAsync<ClrDType> { string.Join(';', result.ErrorMessages)}"));
+                // 2021-08-25     return new Status { Success = false, Description = $"Error {url}: ValidateSchemaAsync<ClrDType> {string.Join(';', result.ErrorMessages)}" };
+                // 2021-08-25 }
 
                 return new Status { Success = true, Description = content};
             }
@@ -551,5 +834,32 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return new Status { Success = false, Description = response.ReasonPhrase };
             }
         }
+
+        private void PrePopulateSelectionFlags(OpenBadgeVM badge, BadgrBackpackModel prev)
+        {
+            if (prev != null)
+            {
+                var prevBadge = prev.BadgrAssertions.
+                    Where(a => a.Id == badge.BadgrAssertionId)
+                    .FirstOrDefault();
+
+                if (prevBadge != null)
+                {
+                    badge.IsSelected = !prevBadge.IsDeleted;
+                    badge.IsNew = false;
+                }
+                else
+                {
+                    badge.IsSelected = true;
+                    badge.IsNew = true;
+                }
+            }
+            else
+            {
+                badge.IsSelected = true;
+                badge.IsNew = true;
+            }
+        }
+        #endregion
     }
 }

@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
+using OpenCredentialPublisher.Data.ViewModels.nG;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,35 +50,62 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<WalletRelationshipModel> UpdateRelationshipInviteUrlAsync(string threadId, string inviteUrl)
         {
             var walletRequest = await _connectionRequestService.GetConnectionRequestAsync(threadId);
-            var relationship = await _walletContext.WalletRelationships.FirstOrDefaultAsync(wr => wr.Id == walletRequest.WalletRelationshipId);
-            relationship.InviteUrl = inviteUrl;
-            relationship.ModifiedOn = DateTimeOffset.UtcNow;
-            await _walletContext.SaveChangesAsync();
-            _walletContext.Entry(relationship).State = EntityState.Detached;
-            return relationship;
+            if (walletRequest != null)
+            {
+                var relationship = await _walletContext.WalletRelationships.FirstOrDefaultAsync(wr => wr.Id == walletRequest.WalletRelationshipId);
+                if (relationship != null)
+                {
+                    relationship.InviteUrl = inviteUrl;
+                    relationship.ModifiedOn = DateTimeOffset.UtcNow;
+                    await _walletContext.SaveChangesAsync();
+                    _walletContext.Entry(relationship).State = EntityState.Detached;
+                }
+                return relationship;
+            }
+            return default;
         }
 
         public async Task<WalletRelationshipModel> UpdateRelationshipAsConnected(string relationshipDid)
         {
             var relationship = await _walletContext.WalletRelationships.FirstOrDefaultAsync(w => w.RelationshipDid == relationshipDid);
-            relationship.IsConnected = true;
-            relationship.ModifiedOn = DateTimeOffset.UtcNow;
+            if (relationship != null)
+            {
+                relationship.IsConnected = true;
+                relationship.ModifiedOn = DateTimeOffset.UtcNow;
 
-            var request = await _walletContext.ConnectionRequests.FirstOrDefaultAsync(w => w.WalletRelationshipId == relationship.Id);
-            request.ConnectionRequestStep = ConnectionRequestStepEnum.InvitationCompleted;
-            request.ModifiedOn = DateTimeOffset.UtcNow;
-            await _walletContext.SaveChangesAsync();
+                var request = await _walletContext.ConnectionRequests.FirstOrDefaultAsync(w => w.WalletRelationshipId == relationship.Id);
+                request.ConnectionRequestStep = ConnectionRequestStepEnum.InvitationCompleted;
+                request.ModifiedOn = DateTimeOffset.UtcNow;
+                await _walletContext.SaveChangesAsync();
+            }
+            return relationship;
+        }
 
+        public async Task<WalletRelationshipModel> UpdateRelationshipAsAccepted(string relationshipDid)
+        {
+            var relationship = await _walletContext.WalletRelationships.FirstOrDefaultAsync(w => w.RelationshipDid == relationshipDid);
+            if (relationship != null)
+            {
+                relationship.ModifiedOn = DateTimeOffset.UtcNow;
+
+                var request = await _walletContext.ConnectionRequests.FirstOrDefaultAsync(w => w.WalletRelationshipId == relationship.Id);
+                if (request.ConnectionRequestStep != ConnectionRequestStepEnum.InvitationCompleted)
+                    request.ConnectionRequestStep = ConnectionRequestStepEnum.InvitationAccepted;
+                request.ModifiedOn = DateTimeOffset.UtcNow;
+                await _walletContext.SaveChangesAsync();
+            }
             return relationship;
         }
 
         public async Task<WalletRelationshipModel> UpdateRelationshipNameAsync(string userId, int id, string name)
         {
             var relationship = await _walletContext.WalletRelationships.FirstOrDefaultAsync(w => w.UserId == userId && w.Id == id);
-            relationship.WalletName = name;
-            relationship.ModifiedOn = DateTimeOffset.UtcNow;
-            await _walletContext.SaveChangesAsync();
-
+            if (relationship != null)
+            {
+                relationship.WalletName = name;
+                relationship.ModifiedOn = DateTimeOffset.UtcNow;
+                await _walletContext.SaveChangesAsync();
+            }
             return relationship;
         }
 
@@ -95,6 +124,21 @@ namespace OpenCredentialPublisher.Services.Implementations
             return await _walletContext.WalletRelationships.AsNoTracking().FirstOrDefaultAsync(w => w.RelationshipDid == relationshipDid);
         }
 
+        public async Task<WalletRelationshipModel> GetWalletRelationshipByThreadIdAsync(string threadId)
+        {
+            return (await _walletContext.ConnectionRequests.Include(cr => cr.WalletRelationship).AsNoTracking().FirstOrDefaultAsync(cr => cr.ThreadId == threadId)).WalletRelationship;
+        }
+
+        public async Task<RelationshipVM> GetWalletRelationshipByIdAsync(int id)
+        {
+            var rel = await _walletContext.WalletRelationships.AsNoTracking().FirstOrDefaultAsync(w => w.Id == id);
+            return new RelationshipVM()
+            {
+                RelationshipDid = rel.RelationshipDid,
+                CreatedOn = rel.CreatedOn.UtcDateTime
+            };
+        }
+
         public async Task<WalletRelationshipModel> GetWalletRelationshipAsync(int id)
         {
             return await _walletContext.WalletRelationships.AsNoTracking().FirstOrDefaultAsync(w => w.Id == id);
@@ -105,8 +149,20 @@ namespace OpenCredentialPublisher.Services.Implementations
             var relationship = await _walletContext.WalletRelationships.FirstOrDefaultAsync(w => w.Id == id);
             var requests = _walletContext.ConnectionRequests.Where(w => w.WalletRelationshipId == id);
             var credentialRequests = _walletContext.CredentialRequests.Where(w => w.WalletRelationshipId == id);
-            _walletContext.RemoveRange(requests);
+
+            var links = _walletContext.Links
+                .Include(l => l.Shares)
+                .Include(l => l.CredentialRequest)
+                .Where(l => l.CredentialRequest.WalletRelationshipId == id);
+
+            foreach(var link in links)
+            {
+                _walletContext.RemoveRange(link.Shares);
+                _walletContext.Remove(link);
+            }
+
             _walletContext.RemoveRange(credentialRequests);
+            _walletContext.RemoveRange(requests);
             _walletContext.Remove(relationship);
             await _walletContext.SaveChangesAsync();
         }

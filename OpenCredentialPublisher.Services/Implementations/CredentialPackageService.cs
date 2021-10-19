@@ -3,12 +3,14 @@ using Microsoft.Extensions.Logging;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+//2021-06-17 EF Tracking OK
 namespace OpenCredentialPublisher.Services.Implementations
 {
     public class CredentialPackageService
@@ -23,6 +25,15 @@ namespace OpenCredentialPublisher.Services.Implementations
             _credentialService = credentialService;
             _context = context;
             _logger = logger;
+        }
+
+        public async Task<List<ArtifactModel>> GetPackagePdfArtifactsAsync(int id)
+        {
+            return await _context.Artifacts
+                .Where(a => a.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.ClrAssertion.Clr.CredentialPackage.Id == id
+                    && a.IsPdf)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<bool> UpdateCredentialPackageNameAsync(string userId, int credentialPackageId, string name)
@@ -83,6 +94,15 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .FirstOrDefaultAsync(cp => cp.Id == model.Id);
             }
             else if (model.TypeId == PackageTypeEnum.OpenBadge)
+            {
+                model = await _context.CredentialPackages.AsNoTracking()
+                .Include(cp => cp.BadgrBackpack)
+                .ThenInclude(bdgr => bdgr.BadgrAssertions)
+                .Include(cp => cp.Authorization)
+                .ThenInclude(au => au.Source)
+                .FirstOrDefaultAsync(cp => cp.Id == model.Id);
+            }
+            else if (model.TypeId == PackageTypeEnum.OpenBadgeConnect)
             {
                 model = await _context.CredentialPackages.AsNoTracking()
                 .Include(cp => cp.BadgrBackpack)

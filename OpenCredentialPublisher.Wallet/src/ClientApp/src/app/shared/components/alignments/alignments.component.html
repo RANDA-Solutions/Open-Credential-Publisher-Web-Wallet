@@ -1,0 +1,32 @@
+<div *ngIf="showSpinner == true; else alignmentsContent" class="row d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="'loading alignments'"></app-spinner>
+</div>
+<ng-template #alignmentsContent>
+  <ng-container *ngIf="alignments.length > 0">
+    <button class="card-header" [attr.id]="'alignmentsHeader-' + utils.safeId(id)" data-toggle="collapse" [attr.data-target]="'#alignmentsBody-' + utils.safeId(id)">
+      Alignments
+    </button>
+    <div [attr.id]="'alignmentsBody-' + utils.safeId(id)" class="collapse">
+      <div class="card-body">
+        <ul class="list-group">
+          <li *ngFor="let alignment of alignments" class="list-group-item">
+            <dl class="row">
+              <dt class="col-sm-2">Framework</dt>
+              <dd class="col-sm-10">{{alignment.educationalFramework}}</dd>
+              <ng-container *ngIf="alignment.targetType != null">
+                <dt class="col-sm-2">Type</dt>
+                <dd class="col-sm-10">{{alignment.targetType}}</dd>
+              </ng-container>
+              <dt class="col-sm-2">Name</dt>
+              <dd class="col-sm-10">
+                  <a target="_blank" href="{{alignment.targetUrl}}">{{alignment.targetName}}</a>
+              </dd>
+              <dt class="col-sm-2">Description</dt>
+              <dd class="col-sm-10">{{alignment.targetDescription}}</dd>
+            </dl>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</ng-template>

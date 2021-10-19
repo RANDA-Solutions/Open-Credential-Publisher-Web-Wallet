@@ -1,0 +1,63 @@
+<section class="login-form">
+  <form #f="ngForm" novalidate (ngSubmit)="login(f)">
+    <span class="h4">ENTER YOUR LOGIN INFORMATION</span>
+    <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+      <span *ngFor="let msg of modelErrors">{{msg}}</span>
+    </div>
+    <div class="input-group my-3">
+      <div class="input-group-prepend mr-3">
+          <span><i class="fal fa-user fa-2x icon-color"></i></span>
+      </div>
+      <input id="email" type="text" required name="email" class="form-control" placeholder="Email" [ngModel]="credentials.email" #email="ngModel" tmFocus validateEmail>
+      <small [hidden]="email.valid || (email.pristine && !submitted)" class="text-danger">Please enter a valid email</small>
+    </div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend mr-3">
+          <span><i class="fal fa-lock-alt fa-2x icon-color"></i></span>
+      </div>
+      <input type="password" class="form-control" id="password" required name="password" placeholder="Password" ngModel>
+    </div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend mr-3">
+          <span class="blank-icon"></span>
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="showSpinner">LOGIN</button>
+    </div>
+    <div class="input-group">
+      <div class="input-group-prepend mr-3">
+          <span class="blank-icon"></span>
+      </div>
+      <div class="form-control-plaintext">
+          <a id="forgot-password" [routerLink]="['/access/forgot-password']">Forgot your password?</a> <br />
+          <a [routerLink]="['/access/register']">Register as a new user</a>
+      </div>
+  </div>
+  </form>
+  <div *ngIf="!!externalProviders && externalProviders.length > 0">
+    <hr />
+    <span class="h4">OTHER WAYS TO LOGIN</span>
+    <div class="row">
+      <div class="col mt-2">
+        <span class="h4">Login using mobile wallet</span>
+        <br />
+        <a class="btn btn-tertiary" [routerLink]="['/access/login-with-proof']">Login with Proof</a>
+      </div>
+      <!-- <div class="col mt-2" *ngFor="let provider of externalProviders">
+        <span class="h4">{{provider.displayName}} users login here</span>
+        <br />
+        <a class="btn btn-tertiary" href="{{external(provider.name)}}">{{provider.displayName}}</a>
+      </div> -->
+    </div>
+  </div>
+    <hr />
+    <span class="h4">
+      DO YOU WANT TO VERIFY A CREDENTIAL ISSUED BY US?<br />
+      <small class="text-muted">Verifiers click the link below</small>
+    </span>
+    <div class="row">
+      <div class="col mt-2">
+        <a [routerLink]="['/verifier']">Credential Verification</a>
+      </div>
+    </div>
+
+</section>

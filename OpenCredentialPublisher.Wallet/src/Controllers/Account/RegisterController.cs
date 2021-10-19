@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.ViewModels.nG;
 using OpenCredentialPublisher.Wallet.Models.Account;
 using System;
 using System.Collections.Generic;
@@ -16,9 +18,7 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Wallet.Controllers.Account
 {
-    [Route(ApiConstants.AccountRoutePattern)]
-    [ApiController]
-    public class RegisterController : ControllerBase
+    public class RegisterController : ApiController<RegisterController>
     {
 
         private readonly UserManager<ApplicationUser> _userManager;
@@ -29,7 +29,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
         public RegisterController(SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterController> logger,
             UserManager<ApplicationUser> userManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender) : base(logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -50,21 +50,23 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
         }
 
         [HttpPost, Route("")]
-        public async Task<IActionResult> PostAsync(RegisterModel.InputModel input)
+        public async Task<IActionResult> PostAsync(RegisterAccountVM input)
         {
+            var modelState = new ModelStateDictionary();
+
             var errors = new List<string>();
             if (input.Password != input.ConfirmPassword)
             {
-                errors.Add("Passwords do not match.");
+                modelState.AddModelError("ConfirmPassword", "Passwords do not match.");
             }
             if (string.IsNullOrEmpty(input.Email))
             {
-                errors.Add("Email is required.");
+                modelState.AddModelError("Email", "Email is required.");
             }
 
             if (errors.Any())
             {
-                return new JsonResult(new RegisterModel { Result = RegisterResultEnum.Error, ErrorMessages = errors.ToArray() });
+                return ApiModelInvalid(modelState);
             }
 
             var user = new ApplicationUser { UserName = input.Email, Email = input.Email };
@@ -86,15 +88,21 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 {
-                    return new JsonResult(new RegisterModel { ReturnUrl = input.ReturnUrl, Result = RegisterResultEnum.ConfirmEmail });
+                    return ApiOk(RegisterResultEnum.ConfirmEmail);
                 }
                 else
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return new JsonResult(new RegisterModel { ReturnUrl = input.ReturnUrl, Result = RegisterResultEnum.Success });
+                    return ApiOk(RegisterResultEnum.Success);
                 }
             }
-            return new JsonResult(new RegisterModel { ReturnUrl = input.ReturnUrl, Result = RegisterResultEnum.Error, ErrorMessages = result.Errors.Select(err => err.Description).ToArray() });
+            var msgs = result.Errors.Select(err => err.Description);
+            foreach (var msg in msgs)
+            {
+                modelState.AddModelError("", msg);
+            }
+
+            return ApiModelInvalid(modelState);
         }
 
         [HttpGet, Route("confirmation")]

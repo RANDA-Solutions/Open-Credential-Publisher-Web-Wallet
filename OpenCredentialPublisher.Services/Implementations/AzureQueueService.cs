@@ -25,6 +25,8 @@ namespace OpenCredentialPublisher.Services.Implementations
             await queue.CreateIfNotExistsAsync();
 
             await queue.SendMessageAsync(Base64Encode(message), visibilityTimeout);
+            Console.WriteLine(queueName, message);
+
         }
 
         private static string Base64Encode(string plainText)

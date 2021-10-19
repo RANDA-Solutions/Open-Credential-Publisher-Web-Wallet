@@ -2,7 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OpenCredentialPublisher.Data.Dtos;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Constants;
 using OpenCredentialPublisher.Services.Extensions;
@@ -14,6 +17,7 @@ using OpenCredentialPublisher.VerityRestApi.Client;
 using OpenCredentialPublisher.VerityRestApi.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Json;
 using System.Linq;
@@ -33,14 +37,17 @@ namespace OpenCredentialPublisher.Services.Implementations
         private const string OKResponse = "OK";
         private readonly IIssueCredentialApi _issueCredentialApi;
         private readonly IIssuerSetupApi _issuerSetupApi;
+        private readonly IPresentProofApi _presentProofApi;
         private readonly IRelationshipApi _relationshipApi;
         private readonly IUpdateConfigsApi _updateConfigsApi;
         private readonly IUpdateEndpointApi _updateEndpointApi;
         private readonly IWriteCredDefApi _writeCredDefApi;
         private readonly IWriteSchemaApi _writeSchemaApi;
         private readonly ConnectionRequestService _connectionRequestService;
+        private readonly VerityThreadService _verityThreadService;
 
         public VerityApiService(IIssueCredentialApi issueCredentialApi, IIssuerSetupApi issuerSetupApi,
+            IPresentProofApi presentProofApi,
             IRelationshipApi relationshipApi, IUpdateConfigsApi updateConfigsApi,
             IUpdateEndpointApi updateEndpointApi, IWriteCredDefApi writeCredDefApi,
             IWriteSchemaApi writeSchemaApi, AgentContextService agentContextService,
@@ -48,19 +55,23 @@ namespace OpenCredentialPublisher.Services.Implementations
             CredentialDefinitionService credentialDefinitionService,
             CredentialRequestService credentialRequestService,
             CredentialSchemaService credentialSchemaService, CredentialService credentialService,
+            ProofService proofService,
             IQueueService queueService,
+            VerityThreadService verityThreadService,
             WalletRelationshipService walletRelationshipService,
             IOptions<VerityOptions> verityOptions, ILogger<VerityApiService> logger)
                 : base(agentContextService, credentialDefinitionService, credentialRequestService,
-                      credentialSchemaService, credentialService, queueService, walletRelationshipService,
+                      credentialSchemaService, credentialService, proofService, queueService, walletRelationshipService,
                       verityOptions, logger)
         {
             _connectionRequestService = connectionRequestService;
             _issueCredentialApi = issueCredentialApi;
             _issuerSetupApi = issuerSetupApi;
+            _presentProofApi = presentProofApi;
             _relationshipApi = relationshipApi;
             _updateConfigsApi = updateConfigsApi;
             _updateEndpointApi = updateEndpointApi;
+            _verityThreadService = verityThreadService;
             _writeCredDefApi = writeCredDefApi;
             _writeSchemaApi = writeSchemaApi;
         }
@@ -82,6 +93,42 @@ namespace OpenCredentialPublisher.Services.Implementations
             HandleResponse(response, credentialDefinition);
         }
 
+        public async Task CreateProofRequestInvitationAsync(ProofRequest proofRequest)
+        {
+            var agentContext = await GetAgentContextAsync();
+            var configuration = GetVerityApiConfiguration(agentContext);
+            var proofRequestApi = new PresentProofApi(configuration);
+            var schema = await _credentialSchemaService.GetCredentialSchemaAsync(proofRequest.CredentialSchemaId);
+            var attributes = JsonConvert.DeserializeObject<ProofAttribute[]>(proofRequest.ProofAttributes);
+            var restriction = new Restriction(schema.SchemaId, schemaName: schema.Name, schemaVersion: schema.Version);
+
+            var proofAttributes = new List<ProofAttr>();
+            foreach(var attribute in attributes)
+            {
+                proofAttributes.Add(new ProofAttr(attribute.Name, restrictions: new List<Restriction> { restriction }, selfAttestAllowed: true));
+            }
+
+            var presentProofRequest = new PresentProofRequest(
+                id: Guid.NewGuid(),
+                name: proofRequest.Name,
+                forRelationship: proofRequest.ForRelationship,
+                proofAttrs: proofAttributes,
+                byInvitation: true
+            );
+
+            if (!string.IsNullOrEmpty(proofRequest.ProofPredicates))
+            {
+                var predicates = JsonConvert.DeserializeObject<ProofPredicate[]>(proofRequest.ProofPredicates);
+                presentProofRequest.ProofPredicates = predicates.ToList();
+            }
+
+            var postResponse = await proofRequestApi.RequestProofAsync(agentContext.DomainDid, Guid.Parse(proofRequest.ThreadId), presentProofRequest);
+            HandleResponse(postResponse, proofRequest);
+            await _proofService.UpdateProofRequestStepAsync(proofRequest.Id, ProofRequestStepEnum.InvitationLinkRequested);
+            await _queueService.SendMessageAsync(RequestProofInvitationNotification.QueueName, JsonConvert.SerializeObject(new RequestProofInvitationNotification(proofRequest.PublicId, ProofRequestStepEnum.InvitationLinkRequested.ToString())));
+
+        }
+
         public async Task CreateRelationshipAsync(int requestId)
         {
             var connectionRequest = await _connectionRequestService.GetConnectionRequestAsync(requestId);
@@ -98,7 +145,19 @@ namespace OpenCredentialPublisher.Services.Implementations
             HandleResponse(response, connectionRequest);
             await _connectionRequestService.UpdateRequestStepAsync(connectionRequest, ConnectionRequestStepEnum.StartingInvitation);
             await _queueService.SendMessageAsync(InvitationGeneratedNotification.QueueName, JsonConvert.SerializeObject(new InvitationGeneratedNotification(connectionRequest.UserId, 0, (int)connectionRequest.ConnectionRequestStep)));
+        }
 
+        public async Task CreateRelationshipAsync(string threadId)
+        {
+            var agentContext = await GetAgentContextAsync();
+            var configuration = GetVerityApiConfiguration(agentContext);
+            var relationshipApi = new RelationshipApi(configuration);
+            var response = await relationshipApi.RelationshipAsync(agentContext.DomainDid, Guid.Parse(threadId), new VerityRestApi.Model.CreateRelationship
+            (
+                id: Guid.NewGuid(),
+                label: _verityOptions.InstitutionName,
+                logoUrl: _verityOptions.LogoUrl
+            ));
         }
 
         public override async Task<AgentContextModel> GetAgentContextAsync()
@@ -175,20 +234,26 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             var responseString = UTF8Encoding.UTF8.GetString(responseBytes);
             var responseJson = JsonObject.Parse(responseString) as JsonObject;
+
             var messageType = responseJson.GetString(VerityMessageAttributes.TypeAttribute);
             try
             {
                 dynamic messageObject = messageType switch
                 {
+                    VerityMessageFamilies.ConnectionTrustPing => JsonConvert.DeserializeObject<TrustPingResponseSent>(responseJson.AsString()),
                     VerityMessageFamilies.ConnectionRequestReceived => JsonConvert.DeserializeObject<ConnRequestReceived>(responseJson.AsString()),
                     VerityMessageFamilies.ConnectionResponseSent => JsonConvert.DeserializeObject<ConnResponseSent>(responseJson.AsString()),
                     VerityMessageFamilies.CreateIssuerCreated => JsonConvert.DeserializeObject<CreateIssuerCreated>(responseJson.AsString()),
                     VerityMessageFamilies.IssueCredentialAckReceived => JsonConvert.DeserializeObject<IssueCredentialAckReceived>(responseJson.AsString()),
                     VerityMessageFamilies.IssueCredentialStatusReport => JsonConvert.DeserializeObject<IssueCredentialStatusReport>(responseJson.AsString()),
                     VerityMessageFamilies.IssuerProblemReport => JsonConvert.DeserializeObject<SetupIssuerProblemReport>(responseJson.AsString()),
+                    VerityMessageFamilies.MoveProtocol => JsonConvert.DeserializeObject<MoveProtocol>(responseJson.AsString()),
+                    VerityMessageFamilies.ProofInvite => JsonConvert.DeserializeObject<ProofInvite>(responseJson.AsString()),
+                    VerityMessageFamilies.ProofResult => JsonConvert.DeserializeObject<ProofResult>(responseJson.AsString()),
                     VerityMessageFamilies.PublicIdentifier => JsonConvert.DeserializeObject<PublicIdentifier>(responseJson.AsString()),
                     VerityMessageFamilies.RelationshipCreated => JsonConvert.DeserializeObject<RelationshipCreated>(responseJson.AsString()),
                     VerityMessageFamilies.RelationshipInvitation => JsonConvert.DeserializeObject<RelationshipInvite>(responseJson.AsString()),
+                    VerityMessageFamilies.RelationshipReused => JsonConvert.DeserializeObject<RelationshipReused>(responseJson.AsString()),
                     VerityMessageFamilies.SentIssueCredentialMessage => JsonConvert.DeserializeObject<SentIssueCredMsg>(responseJson.AsString()),
                     VerityMessageFamilies.UpdateConfigsResponse => JsonConvert.DeserializeObject<UpdateConfigsResponse>(responseJson.AsString()),
                     VerityMessageFamilies.UpdateEndpointsResponse => JsonConvert.DeserializeObject<UpdateEndpointResult>(responseJson.AsString()),
@@ -209,15 +274,56 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         private async Task HandleMessage(ConnRequestReceived message)
         {
-            var relationship = await _walletRelationshipService.UpdateRelationshipAsConnected(message.MyDID);
-            _logger.LogInformation(message.Type, message, relationship);
-            await _queueService.SendMessageAsync(ConnectionStatusNotification.QueueName, JsonConvert.SerializeObject(new ConnectionStatusNotification(relationship.UserId, relationship.Id, (int)ConnectionRequestStepEnum.InvitationAccepted)));
+            
+            var verityThread = await _verityThreadService.GetVerityThreadAsync(message.Thread.Thid);
+            if (verityThread == null || verityThread.FlowTypeId == VerityFlowTypeEnum.ConnectionRequest)
+            {
+                var relationship = await _walletRelationshipService.UpdateRelationshipAsAccepted(message.MyDID);
+                _logger.LogInformation(message.Type, message, relationship);
+                if (relationship != null)
+                    await _queueService.SendMessageAsync(ConnectionStatusNotification.QueueName, JsonConvert.SerializeObject(new ConnectionStatusNotification(relationship.UserId, relationship.Id, (int)ConnectionRequestStepEnum.InvitationAccepted)));
+            }
+            else if (verityThread.FlowTypeId == VerityFlowTypeEnum.ProofRequest)
+            {
+                var proofRequest = await _proofService.GetProofRequestByThreadIdAsync(verityThread.ThreadId);
+                await _proofService.UpdateProofRequestStepAsync(proofRequest.Id, ProofRequestStepEnum.ReceivingProofResponse);
+                await _queueService.SendMessageAsync(RequestProofInvitationNotification.QueueName, JsonConvert.SerializeObject(new RequestProofInvitationNotification(proofRequest.PublicId, ProofRequestStepEnum.ReceivingProofResponse.ToString())));
+            }
+        }
+
+        private async Task HandleMessage(TrustPingResponseSent message)
+        {
+            var verityThread = await _verityThreadService.GetVerityThreadAsync(message.Thread.Thid);
+            if (verityThread == null || verityThread.FlowTypeId == VerityFlowTypeEnum.ConnectionRequest)
+            {
+                var relationship = await _walletRelationshipService.GetWalletRelationshipAsync(message.Relationship);
+                if (relationship != null)
+                    await _queueService.SendMessageAsync(ConnectionStatusNotification.QueueName, JsonConvert.SerializeObject(new ConnectionStatusNotification(relationship.UserId, relationship.Id, (int)ConnectionRequestStepEnum.InvitationCompleted)));
+            }
         }
 
         private async Task HandleMessage(ConnResponseSent message)
         {
-            var relationship = await _walletRelationshipService.GetWalletRelationshipAsync(message.MyDID);
-            await _queueService.SendMessageAsync(ConnectionStatusNotification.QueueName, JsonConvert.SerializeObject(new ConnectionStatusNotification(relationship.UserId, relationship.Id, (int)ConnectionRequestStepEnum.InvitationCompleted)));
+            var verityThread = await _verityThreadService.GetVerityThreadAsync(message.Thread.Thid);
+            if (verityThread == null || verityThread.FlowTypeId == VerityFlowTypeEnum.ConnectionRequest)
+            {
+                var relationship = await _walletRelationshipService.UpdateRelationshipAsConnected(message.MyDID);
+                _logger.LogInformation(message.Type, message, relationship);
+                if (relationship != null)
+                    await _queueService.SendMessageAsync(ConnectionStatusNotification.QueueName, JsonConvert.SerializeObject(new ConnectionStatusNotification(relationship.UserId, relationship.Id, (int)ConnectionRequestStepEnum.InvitationCompleted)));
+            }
+        }
+
+        private async Task HandleMessage(MoveProtocol message)
+        {
+            _logger.LogInformation(message.Type, message);
+        }
+
+        private async Task HandleMessage(RelationshipReused message)
+        {
+            var proofRequest = await _proofService.GetProofRequestByInvitationIdAsync(message.Thread.PThid);
+            await _proofService.UpdateProofRequestStepAsync(proofRequest.Id, ProofRequestStepEnum.ReceivingProofResponse);
+            await _queueService.SendMessageAsync(RequestProofInvitationNotification.QueueName, JsonConvert.SerializeObject(new RequestProofInvitationNotification(proofRequest.PublicId, ProofRequestStepEnum.ReceivingProofResponse.ToString())));
         }
 
         private async Task HandleMessage(CreateIssuerCreated message)
@@ -244,6 +350,50 @@ namespace OpenCredentialPublisher.Services.Implementations
             _logger.LogInformation(message.Result.Type, message, credentialRequest);
         }
 
+        private async Task HandleMessage(ProofInvite message)
+        {
+            _logger.LogInformation(message.Type, message);
+
+            var proofRequest = await _proofService.GetProofRequestByThreadIdAsync(message.Thread.Thid);
+            proofRequest.InvitationLink = message.InviteURL;
+            proofRequest.ShortInvitationLink = message.ShortInviteURL;
+            proofRequest.InvitationId = message.InvitationId;
+            proofRequest.StepId = ProofRequestStepEnum.InvitationLinkReceived;
+            await _proofService.SaveQRCodeInvitationToBlobAsync(proofRequest);
+            await _proofService.UpdateProofRequestAsync(proofRequest);
+            await _queueService.SendMessageAsync(RequestProofInvitationNotification.QueueName, JsonConvert.SerializeObject(new RequestProofInvitationNotification(proofRequest.PublicId, ProofRequestStepEnum.InvitationLinkReceived.ToString())));
+        }
+
+        private async Task HandleMessage(ProofResult message)
+        {
+            _logger.LogInformation(message.Type, message);
+            var proofResponse = new ProofResponse
+            {
+                CreatedOn = DateTimeOffset.UtcNow,
+                VerificationResult = message.VerificationResult
+            };
+            var presentation = message.RequestedPresentation;
+            var options = new JsonSerializerOptions
+            {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            if (presentation?.Identifiers != null)
+                proofResponse.Identifiers = System.Text.Json.JsonSerializer.Serialize(presentation.Identifiers, options);
+            if (presentation?.RevealedAttrs != null)
+                proofResponse.RevealedAttributes = System.Text.Json.JsonSerializer.Serialize(presentation.RevealedAttrs, options);
+            if (presentation?.Predicates != null)
+                proofResponse.Predicates = System.Text.Json.JsonSerializer.Serialize(presentation.Predicates, options);
+            if (presentation?.SelfAttestedAttrs != null)
+                proofResponse.SelfAttestedAttributes = System.Text.Json.JsonSerializer.Serialize(presentation.SelfAttestedAttrs, options);
+
+            var proofRequest = await _proofService.GetProofRequestByThreadIdAsync(message.Thread.Thid);
+            proofResponse.ProofRequestId = proofRequest.Id;
+
+            await _proofService.SaveProofResponseAsync(proofResponse);
+            await _proofService.UpdateProofRequestStepAsync(proofResponse.ProofRequestId, ProofRequestStepEnum.ProofReceived);
+            await _queueService.SendMessageAsync(RequestProofInvitationNotification.QueueName, JsonConvert.SerializeObject(new RequestProofInvitationNotification(proofRequest.PublicId, ProofRequestStepEnum.ProofReceived.ToString())));
+        }
+
         private async Task HandleMessage(PublicIdentifier message)
         {
             var agentContext = await _agentContextService.GetAgentContextByThreadIdAsync(message.Thread.Thid);
@@ -258,12 +408,25 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         private async Task HandleMessage(RelationshipCreated message)
         {
-            var connectionRequest = await _connectionRequestService.GetConnectionRequestAsync(message.Thread.Thid);
-            connectionRequest.ConnectionRequestStep = ConnectionRequestStepEnum.RequestingInvitation;
-            connectionRequest.WalletRelationship = await _walletRelationshipService.CreateWalletRelationshipAsync(connectionRequest, message.Did, message.VerKey);
-            await _queueService.SendMessageAsync(InvitationGeneratedNotification.QueueName, JsonConvert.SerializeObject(new InvitationGeneratedNotification(connectionRequest.UserId, connectionRequest.WalletRelationship.Id, (int)connectionRequest.ConnectionRequestStep)));
+            var verityThread = await _verityThreadService.GetVerityThreadAsync(message.Thread.Thid);
+            if (verityThread.FlowTypeId == VerityFlowTypeEnum.ConnectionRequest)
+            {
+                var connectionRequest = await _connectionRequestService.GetConnectionRequestAsync(message.Thread.Thid);
+                connectionRequest.ConnectionRequestStep = ConnectionRequestStepEnum.RequestingInvitation;
+                connectionRequest.WalletRelationship = await _walletRelationshipService.CreateWalletRelationshipAsync(connectionRequest, message.Did, message.VerKey);
+                await _queueService.SendMessageAsync(InvitationGeneratedNotification.QueueName, JsonConvert.SerializeObject(new InvitationGeneratedNotification(connectionRequest.UserId, connectionRequest.WalletRelationship.Id, (int)connectionRequest.ConnectionRequestStep)));
 
-            await RequestInvitationUrlAsync(connectionRequest);
+                await RequestInvitationUrlAsync(connectionRequest);
+            }
+            else if (verityThread.FlowTypeId == VerityFlowTypeEnum.ProofRequest)
+            {
+                var proofRequest = await _proofService.GetProofRequestByThreadIdAsync(message.Thread.Thid);
+                proofRequest.ForRelationship = message.Did;
+                proofRequest.StepId = ProofRequestStepEnum.CreatedRelationship;
+                await _proofService.UpdateProofRequestAsync(proofRequest);
+                await _queueService.SendMessageAsync(RequestProofInvitationNotification.QueueName, JsonConvert.SerializeObject(new RequestProofInvitationNotification(proofRequest.PublicId, ProofRequestStepEnum.CreatedRelationship.ToString())));
+                await CreateProofRequestInvitationAsync(proofRequest);
+            }
         }
 
         private async Task HandleMessage(RelationshipInvite message)
@@ -386,6 +549,15 @@ namespace OpenCredentialPublisher.Services.Implementations
                 await _credentialRequestService.UpdateCredentialRequestsAsync(credentialRequests);
                 await _queueService.SendMessageAsync(CreateCredentialDefinitionCommand.QueueName, JsonConvert.SerializeObject(new CreateCredentialDefinitionCommand(credentialDefinition.Id)));
             }
+        }
+
+        public async Task ProofRequestAynsc(ProofRequest proofRequest)
+        {
+            var agentContext = await GetAgentContextAsync();
+            var response = await _presentProofApi.RequestProofAsync(agentContext.DomainDid, Guid.Parse(proofRequest.ThreadId), new PresentProofRequest()
+            {
+
+            });
         }
 
         public async Task RegisterSchemaAsync(CredentialSchema credentialSchema)

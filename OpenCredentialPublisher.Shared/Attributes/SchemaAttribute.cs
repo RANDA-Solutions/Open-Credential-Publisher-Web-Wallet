@@ -7,9 +7,12 @@ namespace OpenCredentialPublisher.Shared.Attributes
     public class SchemaAttribute: Attribute
     {
         public string Name { get; set; }
-        public SchemaAttribute(string name)
+        public string Version { get; set; }
+
+        public SchemaAttribute(string name, string version)
         {
             Name = name;
+            Version = version;
         }
     }
 }

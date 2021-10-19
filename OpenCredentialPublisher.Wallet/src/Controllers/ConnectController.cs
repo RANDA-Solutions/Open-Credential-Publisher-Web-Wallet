@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OpenCredentialPublisher.Data.Dtos;
+using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Wallet.Models.Shared;
 using System;
@@ -12,11 +14,10 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Wallet.Controllers
 {
-    [Route("api/[controller]")]
-    public class ConnectController : ApiControllerBase<ConnectController>
+    public class ConnectController : SecureApiController<ConnectController>
     {
         private readonly ConnectService _connectService;
-        public ConnectController(ConnectService connectService, ILogger<ConnectController> logger) : base(logger)
+        public ConnectController(ConnectService connectService, UserManager<ApplicationUser> userManager, ILogger<ConnectController> logger) : base(userManager, logger)
         {
             _connectService = connectService;
         }
@@ -26,15 +27,14 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         {
             try
             {
-                var result = await _connectService.ConnectAsync(this, this.UserId, model);
+                var result = await _connectService.ConnectAsync(this, _userId, model);
                 return new JsonResult(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "There was a problem processing this request.", model);
-                
+                return new JsonResult(new PostModel { ErrorMessages = new List<string> { ex.Message } });
             }
-            return new JsonResult(new PostModel { ErrorMessages = new List<string> { "There was a problem processing this request." } });
         }
     }
 }

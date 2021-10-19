@@ -1,0 +1,27 @@
+.login-background {
+  background: linear-gradient(to right, #00b5f8, #2b85f9 17%, #9058fb 57%, #9206ea 100%);
+}
+:host ::ng-deep .tw-toast .p-toast {
+  margin-top: 80px;
+  min-width: 80% !important;
+  width: 80% !important;
+}
+:host ::ng-deep .p-toast{position:fixed;width:25rem}
+:host ::ng-deep .p-toast-message{overflow:hidden}
+:host ::ng-deep .p-toast-message-content{align-items:flex-start;display:flex}
+:host ::ng-deep .p-toast-message-text{flex:1 1 auto}
+:host ::ng-deep .p-toast-top-right{right:20px;top:20px}
+:host ::ng-deep .p-toast-top-left{left:20px;top:20px}
+:host ::ng-deep .p-toast-bottom-left{bottom:20px;left:20px}
+:host ::ng-deep .p-toast-bottom-right{bottom:20px;right:20px}
+:host ::ng-deep .p-toast-top-center{left:50%;margin-left:-10em;top:20px}
+:host ::ng-deep .p-toast-bottom-center{
+  bottom:20px;
+  margin-left: auto;
+  margin-right:auto;
+  left:50%;
+
+}
+:host ::ng-deep .p-toast-center{left:50%;min-width:20vw;top:50%;transform:translate(-50%,-50%)}
+:host ::ng-deep .p-toast-icon-close{align-items:center;display:flex;justify-content:center;overflow:hidden;position:relative}
+:host ::ng-deep .p-toast-icon-close.p-link{cursor:pointer}

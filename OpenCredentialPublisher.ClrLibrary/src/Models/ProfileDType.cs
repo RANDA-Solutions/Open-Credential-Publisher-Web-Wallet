@@ -12,15 +12,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// A Profile is a collection of information that describes the person or organization using Comprehensive Learner Record (CLR). Publishers, learners, and issuers must be represented as profiles. Recipients, endorsers, or other entities may also be represented using this vocabulary. 
     /// </summary>
-    public partial class ProfileDType
+    [NotMapped]
+    public class ProfileDType : ICommonProfileDType
     { 
         /// <summary>
         /// Unique IRI for the Learner, Publisher, and Issuer Profile document. The Assertion Recipient is identified by reference to the Learner's Profile via the id, email, url, telephone, sourcedId, or studentId property. Model Primitive Datatype = NormalizedString.
@@ -176,7 +178,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("verification"), Newtonsoft.Json.JsonProperty("verification")]
         [Description("Verification")]
         public virtual VerificationDType Verification { get; set; }
-        
+
         /// <summary>
         /// Additional properties of the object
         /// </summary>
@@ -190,7 +192,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

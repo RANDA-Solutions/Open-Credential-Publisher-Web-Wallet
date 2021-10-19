@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,11 @@ namespace OpenCredentialPublisher.Services.Implementations
     {
         private readonly WalletDbContext _walletContext;
         private readonly ILogger<ConnectionRequestService> _logger;
-        public ConnectionRequestService(WalletDbContext walletContext, ILogger<ConnectionRequestService> logger)
+        private readonly VerityThreadService _verityThreadService;
+        public ConnectionRequestService(WalletDbContext walletContext, VerityThreadService verityThreadService, ILogger<ConnectionRequestService> logger)
         {
             _walletContext = walletContext;
+            _verityThreadService = verityThreadService;
             _logger = logger;
         }
 
@@ -61,6 +64,9 @@ namespace OpenCredentialPublisher.Services.Implementations
             await _walletContext.AddAsync(request);
             await _walletContext.SaveChangesAsync();
             _walletContext.Entry(request).State = EntityState.Detached;
+
+            await _verityThreadService.CreateVerityThreadAsync(request.ThreadId, VerityFlowTypeEnum.ConnectionRequest);
+
             return request;
         }
 

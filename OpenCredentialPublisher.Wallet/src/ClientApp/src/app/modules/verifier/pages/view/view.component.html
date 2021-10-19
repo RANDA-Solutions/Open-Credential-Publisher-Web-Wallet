@@ -1,0 +1,50 @@
+<section id="view-proof-request-form" class="default-container mt-5 p-5">
+	<h2>Proof Request</h2>
+	<ng-container *ngIf="isCreator && proofRequest">
+		<hr />
+
+		<dl class="row">
+			<dt class="col-12 col-sm-4 col-md-3">Credential Name</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                <code>{{proofRequest.credentialName}}</code>
+              </dd>
+			  <dt class="col-12 col-sm-4 col-md-3">Proof Title</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                <code>{{proofRequest.proofRequestName}}</code>
+              </dd>
+			  <dt class="col-12 col-sm-4 col-md-3">Notification Email</dt>
+              <dd class="col-12 col-sm-8 col-md-9">
+                <code>{{proofRequest.notificationAddress}}</code>
+              </dd>
+		</dl>
+	</ng-container>
+    <hr />
+    <div *ngIf="showSpinner" class="d-flex flex-column">
+		<app-spinner id="proof-request-spinner" [message]="getStatus(status)"></app-spinner>
+	  </div>
+
+	  <div *ngIf="displayInvitation" >
+		  <ng-container *ngIf="isCreator">
+			<p>
+				Copy the link below and share it with the person whose credential you want to verify.
+			</p>
+			<div class="input-group mb-4">
+				<input type="text" class="form-control" #urlinput placeholder="url" value="{{this.url}}">
+				<div class="input-group-append">
+					<button class="btn btn-secondary" type="button" (click)="copyUrlInput(urlinput)" *ngIf="!copied"><i class="fas fa-copy"></i></button>
+					<button class="btn btn-secondary" *ngIf="copied">
+						copied
+					</button>
+				</div>
+				
+			</div>
+			<hr />
+		  </ng-container>
+		  <app-proof-invitation  [invitation]="invitation"></app-proof-invitation>
+		  
+	  </div>
+
+	  <div *ngIf="displayProof">
+		<app-proof-response [proof]="proof"></app-proof-response>
+	  </div>
+</section>

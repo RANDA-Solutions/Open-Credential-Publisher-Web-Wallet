@@ -14,5 +14,12 @@ namespace OpenCredentialPublisher.Services.Extensions
                 .Replace("/", string.Empty)
                 .Replace(".", string.Empty);
         }
+
+        public static string ToCamelCase(this string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return value;
+            return char.ToLowerInvariant(value[0]) + (value.Length > 1 ? value.Substring(1) : string.Empty);
+        }
     }
 }

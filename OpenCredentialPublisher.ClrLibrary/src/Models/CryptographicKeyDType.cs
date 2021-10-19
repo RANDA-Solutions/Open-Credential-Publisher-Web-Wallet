@@ -11,15 +11,17 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// Based on the Key class from the W3C Web Payments Community Group Security Vocabulary. A CryptographicKey document identifies and describes a public key used to verify signed Assertions. 
     /// </summary>
-    public partial class CryptographicKeyDType
+    [NotMapped]
+    public class CryptographicKeyDType
     { 
         /// <summary>
         /// URL to the JSON-LD context file.
@@ -68,7 +70,13 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// </summary>
         [JsonExtensionData]
         [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
-        public Dictionary<string, object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+        private string _AdditionalProperties { get; set; }
+        [NotMapped]
+        public Dictionary<string, object> AdditionalProperties
+        {
+            get { return TWJson.Deserialize<Dictionary<string, object>>(_AdditionalProperties); }
+            set { _AdditionalProperties = JsonSerializer.Serialize(value); }
+        }
 
 
         /// <summary>
@@ -77,7 +85,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

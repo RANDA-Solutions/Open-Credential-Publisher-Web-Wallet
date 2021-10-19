@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -19,10 +20,11 @@ using OpenCredentialPublisher.ClrLibrary.Converters;
 // ReSharper disable UnusedMember.Global
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// Association is based on the CASE AssociationLink object. An Association associates (relates) one Achievement with another Achievement. 
     /// </summary>
+    [NotMapped]
     public partial class AssociationDType
     { 
         /// <summary>
@@ -128,8 +130,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// </summary>
         [JsonExtensionData]
         [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
-        public Dictionary<String, Object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
-
+        public Dictionary<String, Object> AdditionalProperties { get; set; }
 
         /// <summary>
         /// Returns the JSON string presentation of the object
@@ -137,7 +138,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

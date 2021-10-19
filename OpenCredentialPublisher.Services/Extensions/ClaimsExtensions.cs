@@ -13,5 +13,9 @@ namespace OpenCredentialPublisher.Services.Extensions
         {
             return claimsPrincipal?.FindFirstValue(UserIdClaimType);
         }
+        public static string JwtUserId(this ClaimsPrincipal claimsPrincipal)
+        {
+            return claimsPrincipal?.FindFirstValue(UserIdClaimType);
+        }
     }
 }

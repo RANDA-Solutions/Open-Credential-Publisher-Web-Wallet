@@ -8,7 +8,10 @@ namespace OpenCredentialPublisher.Services.Interfaces
     public interface IVerityIntegrationService
     {
         Task CreateCredentialDefinitionAsync(CredentialDefinition credentialDefinition);
+        Task CreateProofRequestInvitationAsync(ProofRequest proofRequest);
         Task CreateRelationshipAsync(int requestId);
+        Task CreateRelationshipAsync(string threadId);
+
         Task<AgentContextModel> GetAgentContextAsync();
         Task<Context> GetContextAsync(AgentContextModel agentContext = null);
         Task GetIssuerAsync(Context context);

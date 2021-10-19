@@ -1,0 +1,74 @@
+<div class="row mt-5">
+  <div class="col">
+    <section class="default-container p-5">
+      <span class="h1">Email your credential</span>
+      <ng-container *ngIf="vm.linkId != null">
+        <!--var dict = new Dictionary<string, string> { { "linkId", Model.Link.Id } };-->
+        <div>
+          <div class="row">
+            <div class="col">
+              <span class="h5">Credential shared: <b>{{vm.linkNickname}}</b></span>
+            </div>
+          </div>
+          <hr />
+          <form #shareForm="ngForm" (ngSubmit)="onSubmit()">
+            <ng-container *ngIf="vm.recipients != null && vm.recipients.length > 0">
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" [routerLink]="['/links/recipients/create']">Create new recipient</a>
+                  </div>
+                  <div class="form-group">
+                    <label for="recipient" class="">Send to:</label>
+                    <select class="form-control" id="recipient" [(ngModel)]="vm.recipientId" required name="recipient">
+                      <option selected value="">- Select Recipient -</option>
+                      <option *ngFor="let option of vm.recipients"  [value]="option.id">
+                        {{option.name}}
+                      </option>
+                    </select>
+                    <!--div [hidden]="recipient.valid || recipient.pristine" class="alert alert-danger">
+                    </div-->
+                  </div>
+                  <div class="form-group">
+                    <input type="submit" [disabled]="!shareForm.form.valid"
+                      class="btn btn-outline-primary btn-lg float-right" value="Send"/>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <hr />
+                  <a [routerLink]="['/links']">Back to shared credentials</a>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="vm.recipients == null || vm.recipients.length == 0">
+              <dl class="row">
+                <dd class="col">
+                  <div class="alert alert-warning">
+                    <p>
+                        You haven't created any recipients. Click this to
+                        <a class="btn btn-outline-primary btn-lg" [routerLink]="['/links/recipients/create']">
+                        Create a recipient</a>
+                    </p>
+                  </div>
+                  <a [routerLink]="['/links']">Back to shared credentials</a>
+                </dd>
+              </dl>
+            </ng-container>
+          </form>
+        </div>
+      </ng-container>
+      <a *ngIf="vm.linkId == null" [routerLink]="['/credentials']">Back to shared credentials</a>
+    </section>
+  </div>
+  <ng-template #showLoading>
+    <div class="tw-spinner-overlay" [hidden]="!showSpinner">
+      <div class="tw-spinner-wrapper">
+      </div>
+    </div>
+    <div id="spinner-container" [hidden]="!showSpinner">
+      <app-spinner id="spinner"></app-spinner>
+    </div>
+  </ng-template>
+</div>

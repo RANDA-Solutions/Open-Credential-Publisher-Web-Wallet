@@ -1,4 +1,6 @@
+using Newtonsoft.Json.Linq;
 using OpenCredentialPublisher.ClrLibrary.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -45,7 +47,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
 
 
         [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image")]
-        public string Image { get; set; }
+        public Object Image { get; set; }
 
         /// <summary>
         /// URI or embedded criteria document describing how to earn the achievement. Model Primitive Datatype = NormalizedString.
@@ -54,7 +56,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         [Required]
         [JsonPropertyName("criteria"), Newtonsoft.Json.JsonProperty("criteria")]
         [Description("URI or embedded criteria document describing how to earn the achievement. Model Primitive Datatype = NormalizedString.")]
-        public CriteriaDType Criteria { get; set; }
+        public Object Criteria { get; set; }
 
         /// <summary>
         /// IRI or document describing the individual, entity, or organization that issued the badge.
@@ -63,7 +65,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         [JsonPropertyName("issuer"), Newtonsoft.Json.JsonProperty("issuer")]
         [Description("IRI or document describing the individual, entity, or organization that issued the badge.")]
         // public virtual ProfileDType Issuer { get; set; }
-        public string Issuer { get; set; }
+        public Object Issuer { get; set; }
 
         /// <summary>
         /// Alignment objects describe an alignment between this BadgeClass and a node in an educational framework. 

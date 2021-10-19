@@ -9,12 +9,8 @@ namespace OpenCredentialPublisher.Wallet.Models.Account
 {
     public class TwoFactorAuthenticationModel : PostModel
     {
-        public class InputModel
-        {
-            public string TwoFactorCode { get; set; }
-            public bool RememberMachine { get; set; }
-            public bool RememberMe { get; set; }
-        }
+        public string Email { get; set; }
+        public TwoFactorAuthInput InputModel { get; set; }
 
         public TwoFactorAuthenticationResultEnum? Result { get; set; }
 
@@ -25,6 +21,6 @@ namespace OpenCredentialPublisher.Wallet.Models.Account
 
     public enum TwoFactorAuthenticationResultEnum
     {
-        Success, Lockout, Error
+        Success, Lockout, Error, Required
     }
 }

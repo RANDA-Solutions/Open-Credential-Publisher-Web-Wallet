@@ -1,0 +1,27 @@
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <section>
+      <span class="h1">Personal Data</span>
+      <div class="row">
+          <div class="col-md-6">
+              <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
+              <p>
+                  <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+              </p>
+              <div *ngIf="showSpinner == true; else credentialContent" class="d-flex flex-column">
+                <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+              </div>
+              <ng-template #credentialContent>
+                <form id="download-data" asp-page="DownloadPersonalData" method="post" class="form-group">
+                    <button class="btn btn-outline-primary btn-lg" type="button" (click)="downloadUserJson()">Download</button>
+                </form>
+                <p>
+                    <a id="delete" asp-page="DeletePersonalData" class="btn btn-outline-danger btn-lg">Delete</a>
+                </p>
+              </ng-template>
+          </div>
+      </div>
+  </section>
+</ng-template>

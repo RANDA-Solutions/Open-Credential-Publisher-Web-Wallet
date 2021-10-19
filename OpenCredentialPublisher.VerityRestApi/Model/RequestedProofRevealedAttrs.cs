@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
 using SwaggerDateConverter = OpenCredentialPublisher.VerityRestApi.Client.SwaggerDateConverter;
+using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.VerityRestApi.Model
 {
@@ -43,14 +44,14 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         /// <summary>
         /// Gets or Sets IdentifierIndex
         /// </summary>
-        [DataMember(Name="identifier_index", EmitDefaultValue=false)]
+        [DataMember(Name="identifier_index", EmitDefaultValue=false), JsonPropertyName("identifer_index")]
         public int? IdentifierIndex { get; set; }
 
         /// <summary>
         /// Gets or Sets Value
         /// </summary>
-        [DataMember(Name="value", EmitDefaultValue=false)]
-        public string Value { get; set; }
+        [DataMember(Name="value", EmitDefaultValue=false), JsonPropertyName("value")]
+        public object Value { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object

@@ -15,6 +15,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using OpenCredentialPublisher.Data.Dtos;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
+using OpenCredentialPublisher.Data.ViewModels.nG;
+using Microsoft.AspNetCore.Http;
+using OpenCredentialPublisher.Data.Models.Enums;
 
 namespace OpenCredentialPublisher.Services.Implementations
 {
@@ -39,7 +42,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         }
         public bool IsEntityRevoked(string userId, int sourceId, string entityId)
         {
-            return _context.Revocations.Where(r => r.SourceId == sourceId && r.UserId == userId && r.RevokedId == entityId).Any();
+            return _context.Revocations.AsNoTracking().Where(r => r.SourceId == sourceId && r.UserId == userId && r.RevokedId == entityId).Any();
         }
         public async Task MarkPackageViewModelRevocationsAsync(string userId, CredentialPackageViewModel packageVM)
         {
@@ -61,7 +64,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             switch (packageVM.CredentialPackage.TypeId)
             {
                 case PackageTypeEnum.Clr:
-                    if (revocations.Contains(packageVM.ClrVM.Clr.Identifier))
+                    if (revocations.Contains(packageVM.ClrVM.Clr.Id))
                     {
                         packageVM.ClrVM.Clr.IsRevoked = true;
                         await MarkClrViewModelRevocationsAsync(userId, packageVM.ClrVM, revocations);
@@ -99,6 +102,11 @@ namespace OpenCredentialPublisher.Services.Implementations
                     break;
             }
 
+        }
+        public async Task MarkPackageRevocationsAsync(string userId, PackageVM packageVM)
+        {
+            //TODO nG Revocation
+            return;
         }
         public async Task MarkAssertionDTypeRevocationsAsync(string userId, int sourceId, AssertionDType assertion, string[] revocationListIds = null)
         {
@@ -246,7 +254,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return;
             }
             
-            if (revocations.Contains(clrVM.Clr.Identifier))
+            if (revocations.Contains(clrVM.Clr.Id))
             {
                 clrVM.Clr.IsRevoked = true;
             }
@@ -301,7 +309,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         /// </summary>
         /// <param name="id">The authorization id for the resource server.</param>
         /// <param name="rlId">The revocationlist id (uri) the resource server.</param>
-        public async Task<RevocationListModel> GetRevocationListAsync(PageModel page, int? clrEntityId)
+        public async Task<RevocationListModel> GetRevocationListAsync(HttpRequest pageRequest, string userId, int? clrEntityId)
         {
             if (clrEntityId == null)
             {
@@ -340,7 +348,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     return new RevocationListModel(null, error: "No access token.");
                 }
 
-                if (!await _authorizationsService.RefreshTokenAsync(page: null, authorization))
+                if (!await _authorizationsService.RefreshTokenAsync(modelState: null, authorization))
                 {
                     return new RevocationListModel(null, error: "The access token has expired and cannot be refreshed.");
                 }
@@ -364,20 +372,20 @@ namespace OpenCredentialPublisher.Services.Implementations
 
                 // Validate the response data
 
-                await _schemaService.ValidateSchemaAsync<RevocationListDType>(page.Request, content);
+                await _schemaService.ValidateSchemaAsync<RevocationListDType>(pageRequest, content);
 
                 var revocationListDType = JsonSerializer.Deserialize<RevocationListDType>(content);
 
                 List<RevocationModel> priorRevocations;
                 if (authorization != null)
                 {
-                    priorRevocations = await GetSavedRevocationListAsync(page.User.UserId(), authorization.SourceForeignKey);
-                    revocations = await SaveRevocationListAsync(page.User.UserId(), authorization.SourceForeignKey, revocationListDType);
+                    priorRevocations = await GetSavedRevocationListAsync(userId, authorization.SourceForeignKey);
+                    revocations = await SaveRevocationListAsync(userId, authorization.SourceForeignKey, revocationListDType);
                 }
                 else
                 {
-                    priorRevocations = await GetSavedRevocationListAsync(page.User.UserId(), rlId);
-                    revocations = await SaveRevocationListAsync(page.User.UserId(), rlId, revocationListDType);
+                    priorRevocations = await GetSavedRevocationListAsync(userId, rlId);
+                    revocations = await SaveRevocationListAsync(userId, rlId, revocationListDType);
                 }
 
                 if (string.Join("|", revocations.Select(r => r.RevokedId).ToArray()) != string.Join("|", priorRevocations.Select(r => r.RevokedId).ToArray()))
@@ -394,12 +402,12 @@ namespace OpenCredentialPublisher.Services.Implementations
         
         public async Task<List<RevocationModel>> GetSavedRevocationListAsync(string userId, int sourceId)
         {
-            return await _context.Revocations.Where(r => r.SourceId == sourceId && r.UserId == userId).OrderBy(r => r.Id).ToListAsync();
+            return await _context.Revocations.AsNoTracking().Where(r => r.SourceId == sourceId && r.UserId == userId).OrderBy(r => r.Id).ToListAsync();
         }
 
         public async Task<List<RevocationModel>> GetSavedRevocationListAsync(string userId, string revocationListId)
         {
-            return await _context.Revocations.Where(r => r.RevocationListId == revocationListId && r.UserId == userId).OrderBy(r => r.Id).ToListAsync();
+            return await _context.Revocations.AsNoTracking().Where(r => r.RevocationListId == revocationListId && r.UserId == userId).OrderBy(r => r.Id).ToListAsync();
         }
 
         private async Task<List<RevocationModel>> SaveRevocationListAsync(string userId, int sourceId, RevocationListDType revocationListDType)

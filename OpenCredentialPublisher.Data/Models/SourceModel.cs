@@ -1,3 +1,5 @@
+using OpenCredentialPublisher.Data.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,7 +9,7 @@ namespace OpenCredentialPublisher.Data.Models
     /// Represents a Resource Server that has implemented the CLR spec, and its
     /// Authorization Server.
     /// </summary>
-    public class SourceModel
+    public class SourceModel : IBaseEntity
     {
         /// <summary>
         /// All the authorizations tied to this resource server.
@@ -58,6 +60,16 @@ namespace OpenCredentialPublisher.Data.Models
         /// <summary>
         /// BitMap of entitytypes the source provides
         /// </summary>
-        public SourceTypeEnum SourceTypeId { get; set; } 
+        public SourceTypeEnum SourceTypeId { get; set; }
+        public bool IsDeletable { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
     }
 }

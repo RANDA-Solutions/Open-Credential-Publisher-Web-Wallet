@@ -1,0 +1,37 @@
+<div *ngIf="showSpinner == true; else resultsContent" class="row d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="'loading clrs'"></app-spinner>
+</div>
+<ng-template #resultsContent>
+  <ng-container *ngIf="endorsements.length > 0">
+    <button class="card-header" [attr.id]="'endorsementHeader-' + utils.safeId(id)" data-toggle="collapse" [attr.data-target]="'#endorsementBody-' + utils.safeId(id)">
+      Endorsements
+    </button>
+    <div [attr.id]="'endorsementBody-' + utils.safeId(id)" class="collapse">
+      <div class="card-body">
+        <ul class="list-group">
+          <li *ngFor="let endorsement of endorsements" class="list-group-item">
+            <div class="card-deck">
+              <div class="card border-0 thin-corners">
+                <dl class="row">
+                  <dt class="col-12 col-sm-4 col-md-3">Issued On</dt>
+                  <dd class="col-12 col-sm-8 col-md-9">{{endorsement.issuedOn | date: 'MM.dd.yyyy'}}</dd>
+                  <ng-container *ngIf="endorsement.endorsementClaim != null">
+                    <dt class="col-12 col-sm-4 col-md-3">Claim</dt>
+                    <dd class="col-12 col-sm-8 col-md-9">{{endorsement.endorsementClaim.endorsementComment}}</dd>
+                  </ng-container>
+                </dl>
+                <app-verification [ancestors]="lineage + '.endorsement'" [ancestorKeys]="lineageKeys + '.' + + endorsement.endorsementId.toString()"
+                  [clrId]="clrId" [clrIdentifier]="clrIdentifier" [endorsementId]="endorsement.id" [verification]="endorsement.verification"></app-verification>
+              </div>
+              <div *ngIf="endorsement.issuer != null" class="card border-0 thin-corners">
+                <dl app-endorsement-profile [endorsementProfile]="endorsement.issuer" class="row"
+                  [ancestors]="lineage + '.endorsement'" [ancestorKeys]="lineageKeys + '.' + + endorsement.endorsementId.toString()">
+                </dl>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</ng-template>

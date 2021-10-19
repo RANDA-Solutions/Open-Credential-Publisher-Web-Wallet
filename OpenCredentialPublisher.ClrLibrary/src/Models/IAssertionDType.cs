@@ -17,8 +17,6 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
     {
         AchievementDType Achievement { get; set; }
         Dictionary<string, object> AdditionalProperties { get; set; }
-        IList<AssertionClr> AssertionClrs { get; set; }
-        int AssertionKey { get; set; }
         string Context { get; set; }
         float? CreditsEarned { get; set; }
         DateTime? ActivityEndDate { get; set; }

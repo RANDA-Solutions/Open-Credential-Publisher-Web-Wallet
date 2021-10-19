@@ -61,6 +61,9 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         [DataMember(Name="~thread", EmitDefaultValue=false)]
         public Thread Thread { get; set; }
 
+        [DataMember(Name="relationship", EmitDefaultValue=false)]
+        public string Relationship { get; set; }
+
         /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
@@ -70,6 +73,7 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
             var sb = new StringBuilder();
             sb.Append("class RelationshipReused {\n");
             sb.Append("  Type: ").Append(Type).Append("\n");
+            sb.Append("  Relationship: ").Append(Relationship).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
             sb.Append("  Thread: ").Append(Thread).Append("\n");
             sb.Append("}\n");

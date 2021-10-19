@@ -1,11 +1,13 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
 {
+    [NotMapped]
     public class RevocationDocument
     {
         [JsonProperty("statuses"), JsonPropertyName("statuses")]
@@ -15,6 +17,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         public List<Revocation> Revocations { get; set; }
     }
 
+    [NotMapped]
     public class Revocation
     {
         [JsonProperty("id"), JsonPropertyName("id")]

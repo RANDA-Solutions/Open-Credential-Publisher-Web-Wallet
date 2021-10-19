@@ -12,16 +12,18 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// A Profile is a collection of information that describes the person or organization using Comprehensive Learner Record (CLR). Publishers, learners, and issuers must be represented as profiles. Recipients, endorsers, or other entities may also be represented using this vocabulary. An EndorsementProfile cannot have endorsements. 
     /// </summary>
-    public partial class EndorsementProfileDType
-    { 
+    [NotMapped]
+    public partial class EndorsementProfileDType : ICommonProfileDType
+    {
         /// <summary>
         /// Unique IRI for the Profile. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -30,7 +32,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("id"), Newtonsoft.Json.JsonProperty("id")]
         [Description("Unique IRI for the Profile. Model Primitive Datatype = NormalizedString.")]
         public string Id { get; set; }
-        
+
         /// <summary>
         /// The JSON-LD type of this entity. Normally 'EndorsementProfile'. Unlike Profile, EndorsementProfile cannot have endorsements. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -49,7 +51,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("address"), Newtonsoft.Json.JsonProperty("address")]
         [Description("Address")]
         public virtual AddressDType Address { get; set; }
-        
+
         /// <summary>
         /// A short description of the individual or organization. Model Primitive Datatype = String.
         /// </summary>
@@ -57,7 +59,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("description"), Newtonsoft.Json.JsonProperty("description")]
         [Description("A short description of the individual or organization. Model Primitive Datatype = String.")]
         public string Description { get; set; }
-        
+
         /// <summary>
         /// A contact email address for the individual or organization. Model Primitive Datatype = String.
         /// </summary>
@@ -77,7 +79,6 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("identifiers"), Newtonsoft.Json.JsonProperty("identifiers")]
         [Description("A set of System Identifiers that represent other identifiers for this Profile.")]
         public List<SystemIdentifierDType> Identifiers { get; set; }
-
         /// <summary>
         /// Image representing the individual or organization. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -85,7 +86,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image")]
         [Description("Image representing the individual or organization. Model Primitive Datatype = NormalizedString.")]
         public string Image { get; set; }
-        
+
         /// <summary>
         /// The name of the individual or organization. Model Primitive Datatype = String.
         /// </summary>
@@ -105,7 +106,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("publicKey"), Newtonsoft.Json.JsonProperty("publicKey")]
         [Description("PublicKey")]
         public virtual CryptographicKeyDType PublicKey { get; set; }
-        
+
         /// <summary>
         /// The URL of the Revocation List document used for marking revocation of signed Assertions, CLRs, and Endorsements. Required for issuer profiles. Model Primitive Datatype = AnyURI.
         /// </summary>
@@ -113,7 +114,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("revocationList"), Newtonsoft.Json.JsonProperty("revocationList")]
         [Description("The URL of the Revocation List document used for marking revocation of signed Assertions, CLRs, and Endorsements. Required for issuer profiles. Model Primitive Datatype = AnyURI.")]
         public string RevocationList { get; set; }
-        
+
         /// <summary>
         /// The individual's unique 'sourcedId' value, which is used for providing interoperability with IMS Learning Information Services (LIS). Model Primitive Datatype = String.
         /// </summary>
@@ -121,7 +122,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("sourcedId"), Newtonsoft.Json.JsonProperty("sourcedId")]
         [Description("The individual's unique 'sourcedId' value, which is used for providing interoperability with IMS Learning Information Services (LIS). Model Primitive Datatype = String.")]
         public string SourcedId { get; set; }
-        
+
         /// <summary>
         /// An institution's student identifier for the person. This is frequently issued through a Student Information System. Model Primitive Datatype = String.
         /// </summary>
@@ -129,7 +130,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("studentId"), Newtonsoft.Json.JsonProperty("studentId")]
         [Description("An institution's student identifier for the person. This is frequently issued through a Student Information System. Model Primitive Datatype = String.")]
         public string StudentId { get; set; }
-        
+
         /// <summary>
         /// Primary phone number for the individual or organization. Model Primitive Datatype = String.
         /// </summary>
@@ -137,7 +138,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("telephone"), Newtonsoft.Json.JsonProperty("telephone")]
         [Description("Primary phone number for the individual or organization. Model Primitive Datatype = String.")]
         public string Telephone { get; set; }
-        
+
         /// <summary>
         /// Web resource that uniquely represents or belongs to the individual. This may be a resource about the individual, hosting provided by the institution to the individual, or an web resource independently controlled by the individual. Model Primitive Datatype = AnyURI.
         /// </summary>
@@ -145,14 +146,14 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("url"), Newtonsoft.Json.JsonProperty("url")]
         [Description("Web resource that uniquely represents or belongs to the individual. This may be a resource about the individual, hosting provided by the instution to the individual, or an web resource independently controlled by the individual. Model Primitive Datatype = AnyURI.")]
         public string Url { get; set; }
-        
+
         /// <summary>
         /// Gets or Sets Verification
-        /// </summary>
+        /// </summary>Address
         [JsonPropertyName("verification"), Newtonsoft.Json.JsonProperty("verification")]
         [Description("Verification")]
         public virtual VerificationDType Verification { get; set; }
-        
+
         /// <summary>
         /// Additional properties of the object
         /// </summary>
@@ -166,7 +167,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

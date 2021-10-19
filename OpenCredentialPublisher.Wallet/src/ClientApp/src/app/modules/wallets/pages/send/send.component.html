@@ -1,0 +1,107 @@
+<div class="row mt-5">
+    <div *ngIf="showSpinner == false" class="col">
+        <section class="default-container p-5">
+            <span class="h3 mb-3">Your Wallet</span>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">Name</dt>
+                <dd class="col-sm-10">
+                    {{vm.connection.name}}
+                </dd>
+                <dt class="col-sm-2"><abbr title="The decentralized identifier representing the relationship between your mobile wallet and this website.">Relationship DID</abbr></dt>
+                <dd class="col-sm-10">
+                    {{vm.connection.relationshipDid}}
+                </dd>
+                <dt class="col-sm-2">Created</dt>
+                <dd class="col-sm-10">
+                    {{vm.connection.dateCreated}}
+                </dd>
+            </dl>
+            <hr />
+            <span class="h4 my-3">Send a credential</span>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+
+                        <tr>
+                            <th>Name</th>
+                            <th><abbr title="The total number of times this credential has been sent to this wallet."></abbr>Count</th>
+                            <th>Added</th>
+                            <th class="text-right"><button type="button" id="refresh_button" class="btn btn-outline-tertiary" (click)="refresh()" title="Refresh"><i class="fas fa-sync"></i></button></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <tr *ngFor="let cred of vm.credentials">
+                                <td>
+                                    {{cred.title}}
+                                </td>
+                                <td>
+                                    {{cred.timesSent}}
+                                </td>
+                                <td>
+                                    {{cred.dateAdded}}
+                                </td>
+                                <td style="white-space: nowrap" class="text-right">
+                                    <button type="button" class="btn btn-outline-primary" name="btn-send-credential" (click)="send(statusModal, cred.id)">
+                                        Send
+                                        <span name="wallet-loader" class="spinner-border spinner-border-sm" style="display:none;"
+                                            role="status" aria-hidden="true">
+                                        </span>
+                                    </button>
+                                </td>
+                            </tr>
+                    </tbody>
+                </table>
+            </div>
+            <a [routerLink]="['/wallets/wallet-list']">Back to Wallets</a>
+        </section>
+    </div>
+    <section id="spinnerSection" *ngIf="showSpinner == true"class="col default-container p-5 col-flex">
+      <span class="h3 mb-3">Your Wallet</span>
+      <hr />
+      <app-spinner [message]="'loading wallet'"></app-spinner>
+    </section>
+</div>
+<ng-template #statusModal let-modal>
+    <div class="modal-header">
+        <span class="h5 modal-title" id="staticBackdropLabel">Sending Credential</span>
+        <button type="button" class="btn-close" style="display:none;" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <ul id="status-list" class="list-group list-group-plain text-center">
+            <li class="static-status list-group-item text-bold" *ngFor="let status of statuses">
+              {{status.status}}
+              <div id="spinner" *ngIf="currStatus.status == status.status" class="spinner-grow spinner-grow-sm" role="status"></div>
+            </li>
+        </ul>
+    </div>
+</ng-template>
+<ng-template #errorModal let-modal>
+    <div class="modal-header">
+        <span class="h5 modal-title" id="staticBackdropLabel">Error Sending Credential</span>
+        <button type="button" class="btn-close" style="display:none;" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <ul id="status-list" class="list-group list-group-plain text-center">
+            There was an error sending your credential.  Please try again later.  If this issue continues, please contact support.
+        </ul>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary btn-lg" data-dismiss="modal">CLOSE</button>
+    </div>
+</ng-template>
+<ng-template #revokedModal let-modal>
+    <div class="modal-header">
+        <span class="h5 modal-title" id="staticBackdropLabel">Credential Revoked</span>
+        <button type="button" class="btn-close" style="display:none;" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <ul id="status-list" class="list-group list-group-plain text-center">
+            That credential has been revoked by the issuer and may not be sent to your wallet at this time.
+        </ul>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary btn-lg" data-dismiss="modal">CLOSE</button>
+    </div>
+</ng-template>
+

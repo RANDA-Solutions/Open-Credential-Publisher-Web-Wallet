@@ -1,0 +1,23 @@
+<div *ngIf="showSpinner == true; else resultsContent" class="row d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="'loading clrs'"></app-spinner>
+</div>
+<ng-template #resultsContent>
+  <!-- Results -->
+  <ng-container *ngIf="results.length > 0">
+    <button class="card-header" [attr.id]="'resultsHeader-' + utils.safeId(this.assertionId)" data-toggle="collapse" [attr.data-target]="'#resultsBody-' + utils.safeId(this.assertionId)">
+      Results
+    </button>
+    <div [attr.id]="'resultsBody-' + utils.safeId(this.assertionId)" class="collapse">
+      <div class="card-body card-deck">
+        <div class="card border-0">
+          <ul class="list-group">
+            <li *ngFor="let result of results" class="list-group-item">
+              <dl app-result [result]="result" [resultDescriptions]="resultDescriptions" class="row">
+              </dl>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</ng-template>

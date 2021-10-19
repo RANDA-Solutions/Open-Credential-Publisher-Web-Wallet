@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -20,7 +21,8 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
     /// <summary>
     /// Assertions are representations of an Achievement awarded to a Learner.  It is used to share information about the Achievement Assertion, such as a result and verification method. Assertions are packaged for transmission as JSON objects with a set of mandatory and optional properties. 
     /// </summary>
-    public partial class AssertionDType : IAssertionDType
+    [NotMapped]
+    public class AssertionDType //: IAssertionDType
     {
         /// <summary>
         /// Globally unique IRI for the Assertion. If this Assertion will be verified using Hosted verification, the value should be the URL to the hosted version of this Assertion. Model Primitive Datatype = NormalizedString.
@@ -195,7 +197,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// </summary>
         [JsonExtensionData]
         [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
-        public Dictionary<String, Object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+        public Dictionary<String, Object> AdditionalProperties { get; set; }
 
         /// <summary>
         /// Returns the JSON string presentation of the object
@@ -203,7 +205,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

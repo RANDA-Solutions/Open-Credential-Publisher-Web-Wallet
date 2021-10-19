@@ -14,26 +14,9 @@ namespace OpenCredentialPublisher.ClrWallet.Utilities
 {
     public class FileHelpers
     {
-        public static async Task<string> ProcessFormFile(PageModel page, IFormFile formFile, 
+        public static async Task<string> ProcessFormFile(string fieldDisplayName, IFormFile formFile, 
             ModelStateDictionary modelState)
         {
-            var fieldDisplayName = string.Empty;
-
-            // Use reflection to obtain the display name for the model 
-            // property associated with this IFormFile. If a display
-            // name isn't found, error messages simply won't show
-            // a display name.
-            MemberInfo property = 
-                page.GetType().GetProperty(
-                    formFile.Name.Substring(formFile.Name.IndexOf(".", StringComparison.Ordinal) + 1));
-
-            if (property != null)
-            {
-                if (property.GetCustomAttribute(typeof(DisplayAttribute)) is DisplayAttribute displayAttribute)
-                {
-                    fieldDisplayName = $"{displayAttribute.Name} ";
-                }
-            }
 
             // Use Path.GetFileName to obtain the file name, which will
             // strip any path information passed as part of the
@@ -59,10 +42,10 @@ namespace OpenCredentialPublisher.ClrWallet.Utilities
                 modelState.AddModelError(formFile.Name, 
                     $"The {fieldDisplayName}file ({fileName}) is empty.");
             }
-            else if (formFile.Length > 1048576)
+            else if (formFile.Length > 2097152)
             {
                 modelState.AddModelError(formFile.Name, 
-                    $"The {fieldDisplayName}file ({fileName}) exceeds 1 MB.");
+                    $"The {fieldDisplayName}file ({fileName}) exceeds 2 MB.");
             }
             else
             {

@@ -1,0 +1,89 @@
+<div class="row mt-5">
+  <div class="col">
+    <section class="default-container p-5">
+      <span class="h1">Create a shareable credential</span>
+
+      <div class="alert alert-primary font-16">
+        To share your credential:
+        <ol>
+          <li>
+              Give your credential a Nickname to remember where it is being sent
+          </li>
+          <li>
+              The Create button will generate a shareable link that can be shared with interested parties.
+          </li>
+        </ol>
+      </div>
+
+      <form #f="ngForm" novalidate method="post">
+        <div class="row justify-content-start">
+          <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+            <span *ngFor="let msg of modelErrors">{{msg}}</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table *ngIf="showSpinner == false" class="table">
+            <thead>
+                <tr>
+                    <th colspan="4">Credential</th>
+                    <th colspan="2">Link</th>
+                </tr>
+                <tr>
+                    <th>Publisher</th>
+                    <th>Name</th>
+                    <th>Published</th>
+                    <th>Added</th>
+                    <th>Nickname</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let link of clrLinks; let i = index;">
+                <td>
+                  {{link.publisherName}}
+                </td>
+                <td>
+                  {{link.name}}
+                </td>
+                <td>
+                  {{link.createdAt | date: 'M/d/yyyy'}}
+                </td>
+                <td>
+                  {{link.addedOn | date: 'M/d/yyyy'}}
+                </td>
+                <td class="form-group">
+                  <input type="text" required name="name" class="form-control" placeholder="Nickname" [(ngModel)]="link.nickname" />
+                </td>
+                <td class="form-group">
+                  <button type="button" class="btn btn-primary" (click)="create(link)"
+                    [disabled]="f.invalid || showSpinner">Create</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table *ngIf="showSpinner == true" class="table">
+            <thead>
+                <tr>
+                    <th colspan="4">Credential</th>
+                    <th colspan="2">Link</th>
+                </tr>
+                <tr>
+                    <th>Publisher</th>
+                    <th>Name</th>
+                    <th>Published</th>
+                    <th>Added</th>
+                    <th>Nickname</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody><tbody>
+          </table>
+          <div *ngIf="showSpinner == true" class="d-flex flex-column">
+            <app-spinner id="profile-spinner" [message]="'loading links, this can take a while'"></app-spinner>
+          </div>
+        </div>
+      </form>
+      <a [routerLink]="['/links']">Back to shared credentials</a>
+    </section>
+  </div>
+</div>

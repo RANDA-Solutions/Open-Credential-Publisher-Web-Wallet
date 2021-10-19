@@ -12,14 +12,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// Descriptive metadata about the achievements necessary to be recognized with an Assertion of a particular AchievementType. This data is added to the AchievementType so that it may be rendered when that AchievementType is displayed, instead of simply a link to human-readable criteria external to the Achievement Assertion. Embedding criteria allows either enhancement of an external criteria page or increased portability and ease of use by allowing issuers to skip hosting the formerly-required external criteria page altogether. 
     /// </summary>
+    [NotMapped]
     public partial class CriteriaDType
     { 
         /// <summary>
@@ -46,7 +48,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         [JsonPropertyName("narrative"), Newtonsoft.Json.JsonProperty("narrative")]
         [Description("A narrative of what is needed to earn the achievement. Markdown allowed. Model Primitive Datatype = String.")]
         public string Narrative { get; set; }
-        
+
         /// <summary>
         /// Additional properties of the object
         /// </summary>
@@ -60,7 +62,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

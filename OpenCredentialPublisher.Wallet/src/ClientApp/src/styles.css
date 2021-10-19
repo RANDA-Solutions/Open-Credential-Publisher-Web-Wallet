@@ -6,7 +6,7 @@ code {
 }
 
 .text-waiting-status {
-  color: #FF9E1B; 
+  color: #FF9E1B;
 }
 
 .text-sky-blue {
@@ -109,4 +109,25 @@ code {
 
 .margin-bottom-40 {
     margin-bottom: 40px;
+}
+
+a {
+  color: #52E4EA;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+a:hover {
+  color: #1aced6;
+  text-decoration: underline;
+}
+
+a:not([href]):not([class]) {
+  color: #52E4EA !important;
+  text-decoration: none !important;
+}
+
+a:not([href]):not([class]):hover {
+  color: #1aced6 !important;
+  text-decoration: underline !important;
 }

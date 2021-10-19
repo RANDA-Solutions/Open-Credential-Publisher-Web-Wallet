@@ -39,10 +39,10 @@ namespace OpenCredentialPublisher.Services.Drawing
             switch (faceName)
             {
                 case "Verdana#":
-                    return LoadFontData($"{ResourceLocation}.verdana.ttf"); ;
+                    return LoadFontData($"{ResourceLocation}.verdana.ttf");
 
                 case "Verdana#b":
-                    return LoadFontData($"{ResourceLocation}.verdanab.ttf"); ;
+                    return LoadFontData($"{ResourceLocation}.verdanab.ttf");
 
                 case "Verdana#i":
                     return LoadFontData($"{ResourceLocation}.verdanai.ttf");

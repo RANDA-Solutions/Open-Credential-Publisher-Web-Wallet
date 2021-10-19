@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Constants;
 using OpenCredentialPublisher.Services.Interfaces;
@@ -30,6 +31,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         protected readonly CredentialRequestService _credentialRequestService;
         protected readonly CredentialSchemaService _credentialSchemaService;
         protected readonly CredentialService _credentialService;
+        protected readonly ProofService _proofService;
         protected readonly IQueueService _queueService;
         protected readonly WalletRelationshipService _walletRelationshipService;
         protected readonly VerityOptions _verityOptions;
@@ -37,6 +39,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         public VerityService(AgentContextService agentContextService, CredentialDefinitionService credentialDefinitionService,
             CredentialRequestService credentialRequestService,
             CredentialSchemaService credentialSchemaService, CredentialService credentialService,
+            ProofService proofService,
             IQueueService queueService,
             WalletRelationshipService walletRelationshipService,
             IOptions<VerityOptions> verityOptions, ILogger<VerityService> logger)
@@ -46,6 +49,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             _credentialRequestService = credentialRequestService;
             _credentialSchemaService = credentialSchemaService;
             _credentialService = credentialService;
+            _proofService = proofService;
             _queueService = queueService;
             _walletRelationshipService = walletRelationshipService;
             _verityOptions = verityOptions.Value;

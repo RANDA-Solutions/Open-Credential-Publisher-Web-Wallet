@@ -1,0 +1,6 @@
+<div class="maindiv">
+  <div>Loading...</div>
+  <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+    <span *ngFor="let msg of modelErrors">{{msg}}</span>
+  </div>
+</div>

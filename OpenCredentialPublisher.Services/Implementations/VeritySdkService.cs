@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Constants;
 using OpenCredentialPublisher.Services.Extensions;
@@ -50,11 +51,12 @@ namespace OpenCredentialPublisher.Services.Implementations
             CredentialDefinitionService credentialDefinitionService,
             CredentialRequestService credentialRequestService,
             CredentialSchemaService credentialSchemaService, CredentialService credentialService,
+            ProofService proofService,
             IQueueService queueService,
             WalletRelationshipService walletRelationshipService,
             IOptions<VerityOptions> verityOptions, ILogger<VeritySdkService> logger)
                 : base(agentContextService, credentialDefinitionService, credentialRequestService,
-                      credentialSchemaService, credentialService, queueService, walletRelationshipService,
+                      credentialSchemaService, credentialService, proofService, queueService, walletRelationshipService,
                       verityOptions, logger)
         {
             _connectionRequestService = connectionRequestService;
@@ -565,6 +567,16 @@ namespace OpenCredentialPublisher.Services.Implementations
                 if (!context.WalletIsClosed())
                     context.CloseWallet();
             }
+        }
+
+        public Task CreateProofRequestInvitationAsync(ProofRequest proofRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task CreateRelationshipAsync(string threadId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

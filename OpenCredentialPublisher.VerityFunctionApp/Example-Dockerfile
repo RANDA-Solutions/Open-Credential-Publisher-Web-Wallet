@@ -1,0 +1,110 @@
+#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/azure-functions/dotnet:3.0-dotnet3-appservice AS base
+WORKDIR /home/site/wwwroot
+EXPOSE 80
+
+ENV HOME="/home"
+WORKDIR $HOME
+RUN mkdir -p .local/bin .local/etc .local/lib
+
+# Install environment
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+        automake \
+        bison \
+        build-essential \
+        ca-certificates \
+        cmake \
+        curl \
+        flex \
+        gettext \
+        git \
+        libbz2-dev \
+        libffi-dev \
+        libgflags-dev \
+        libgmp-dev \
+        liblz4-dev \
+        liblzma-dev \
+        libncurses5-dev \
+        libncursesw5-dev \
+        libreadline-gplv2-dev \
+        libsecp256k1-dev \
+        libsnappy-dev \
+        libsqlite3-dev \
+        libssl-dev \
+        libtool \
+        libzmq3-dev \
+        pkg-config \
+        zlib1g-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN echo "deb http://security.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    libssl1.0.0
+
+WORKDIR /home/src/
+ARG nacl_lib_ver=1.0.16
+RUN curl -o libsodium-${nacl_lib_ver}.tar.gz \
+        "https://download.libsodium.org/libsodium/releases/old/libsodium-${nacl_lib_ver}.tar.gz" && \
+    tar xzvf libsodium-${nacl_lib_ver}.tar.gz && \
+    cd libsodium-${nacl_lib_ver} && \
+    CFLAGS="-Os" ./configure && \
+    make install && \
+    cd .. && \
+    cp -a /usr/local/lib/libsodium.so* "$HOME/.local/lib" && \
+    rm -rf libsodium-${nacl_lib_ver}*
+
+ENV LIBRARY_PATH="$HOME/.local/lib:$LIBRARY_PATH"
+
+ARG rust_version=1.50.0
+
+RUN curl -o rustup https://sh.rustup.rs && \
+    chmod +x rustup && \
+    ./rustup --default-toolchain "${rust_version}" -y
+ENV PATH="$HOME/.cargo/bin:$PATH"
+
+WORKDIR /home/src/
+RUN git clone https://github.com/hyperledger/indy-sdk.git && \
+    cd ./indy-sdk/libindy && \
+    cargo build --release --features sodium_static && \
+    cp target/*/libindy.so "/usr/lib" && \
+    cargo clean && \
+    cd ..
+
+ENV PATH="$HOME/.local/lib:$PATH"
+
+COPY ["OpenCredentialPublisher.VerityFunctionApp/Wallet", "/wallets/"]
+
+#uncomment the following to debug library loading issues
+#ENV LD_DEBUG="libs"
+
+#The following will not work due to unmet dependencies
+#RUN apt-get update && apt-get install -my aptitude wget gnupg software-properties-common
+#RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 
+#RUN add-apt-repository "deb https://repo.sovrin.org/sdk/deb xenial stable" 
+#RUN apt-get update 
+#RUN aptitude install -y libindy
+
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+WORKDIR /src
+COPY ["OpenCredentialPublisher.VerityFunctionApp/OpenCredentialPublisher.VerityFunctionApp.csproj", "OpenCredentialPublisher.VerityFunctionApp/"]
+COPY ["OpenCredentialPublisher.Services/OpenCredentialPublisher.Services.csproj", "OpenCredentialPublisher.Services/"]
+COPY ["OpenCredentialPublisher.Data/OpenCredentialPublisher.Data.csproj", "OpenCredentialPublisher.Data/"]
+COPY ["OpenCredentialPublisher.ClrLibrary/src/OpenCredentialPublisher.ClrLibrary.csproj", "OpenCredentialPublisher.ClrLibrary/src/"]
+COPY ["OpenCredentialPublisher.Cryptography/OpenCredentialPublisher.Cryptography.csproj", "OpenCredentialPublisher.Cryptography/"]
+COPY ["OpenCredentialPublisher.Shared/OpenCredentialPublisher.Shared.csproj", "OpenCredentialPublisher.Shared/"]
+RUN dotnet restore "OpenCredentialPublisher.VerityFunctionApp/OpenCredentialPublisher.VerityFunctionApp.csproj"
+COPY . .
+WORKDIR "/src/OpenCredentialPublisher.VerityFunctionApp"
+RUN dotnet build "OpenCredentialPublisher.VerityFunctionApp.csproj" -c Debug -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "OpenCredentialPublisher.VerityFunctionApp.csproj" -c Debug -o /app/publish
+
+FROM base AS final
+WORKDIR /home/site/wwwroot
+COPY --from=publish /app/publish .
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+

@@ -1,0 +1,10 @@
+<dl class="row">
+  <dt class="col-12 col-sm-4 col-md-3">Public Key</dt>
+  <dd class="col-12 col-sm-8 col-md-9">
+    <a href="{{key.id}}">{{key.id}}</a>
+  </dd>
+  <ng-container *ngIf="key.owner != null">
+    <dt class="col-12 col-sm-4 col-md-3">Owner</dt>
+    <dd class="col-12 col-sm-8 col-md-9">{{key.owner}}</dd>
+  </ng-container>
+</dl>

@@ -1,0 +1,32 @@
+<section class="login-form">
+	<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+	  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+	</div>
+  </section>
+  <ng-template #theContent>
+	  <span class="h1">Email verification</span>
+	  <hr />
+  <p>
+	  Before you can login using your mobile wallet, you must first verify your email and be issued a verified email credential.  Enter your email address below.
+  </p>
+  
+  <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+	<span *ngFor="let msg of modelErrors">{{msg}}</span>
+  </div>
+  <div class="row">
+	  <div class="col">
+		  <form #f="ngForm" novalidate (ngSubmit)="verify(f)" *ngIf="!complete">
+			  <div class="form-group">
+				  <label for="emailAddress"></label>
+				  <input type="text" name="emailAddress" placeholder="Email Address" id="emailAddress" class="form-control" required [(ngModel)]="input.emailAddress" #emailAddress="ngModel"/>
+				  <small [hidden]="emailAddress.valid || (emailAddress.pristine && !submitted)" class="text-danger">Please enter your email address</small>
+			  </div>
+			   <button type="submit" class="btn btn-primary float-right">Verify</button> <a class="btn btn-secondary float-right mr-2 font-16" [routerLink]="['/access/login']">Cancel</a>
+		  </form>
+		  <p *ngIf="complete">
+			Please check your email for a verification link
+		  </p>
+	  </div>
+  </div>
+  </ng-template>
+  

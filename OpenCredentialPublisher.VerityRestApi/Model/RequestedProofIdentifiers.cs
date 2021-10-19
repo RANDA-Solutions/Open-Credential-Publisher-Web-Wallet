@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
 using SwaggerDateConverter = OpenCredentialPublisher.VerityRestApi.Client.SwaggerDateConverter;
+using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.VerityRestApi.Model
 {
@@ -64,24 +65,28 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         /// Gets or Sets SchemaId
         /// </summary>
         [DataMember(Name="schema_id", EmitDefaultValue=false)]
+        [JsonPropertyName("schema_id")]
         public string SchemaId { get; set; }
 
         /// <summary>
         /// Gets or Sets CredDefId
         /// </summary>
         [DataMember(Name="cred_def_id", EmitDefaultValue=false)]
+        [JsonPropertyName("cred_def_id")]
         public string CredDefId { get; set; }
 
         /// <summary>
         /// Gets or Sets RevRegId
         /// </summary>
         [DataMember(Name="rev_reg_id", EmitDefaultValue=false)]
+        [JsonPropertyName("rev_reg_id")]
         public string RevRegId { get; set; }
 
         /// <summary>
         /// Gets or Sets Timestamp
         /// </summary>
         [DataMember(Name="timestamp", EmitDefaultValue=false)]
+        [JsonPropertyName("timestamp")]
         public int? Timestamp { get; set; }
 
         /// <summary>

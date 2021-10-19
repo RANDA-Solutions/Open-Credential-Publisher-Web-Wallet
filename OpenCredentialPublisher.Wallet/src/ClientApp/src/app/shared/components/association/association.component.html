@@ -1,0 +1,11 @@
+<ng-container>
+  This achievement
+  <span style="font-style: italic">
+      {{AssociationTypeEnum[association.associationType]}}
+  </span>
+  <span *ngIf="assocVM.targetAchievementName != null" style="font-weight: bold">{{assocVM.targetAchievementName}}</span>
+  <span style="font-weight: bold" *ngIf="assocVM.targetAchievementName == null">
+      <a *ngIf="assocVM.uri != null" href="{{assocVM.uri}}" target="_blank">{{assocVM.uri}}</a>
+      <span *ngIf="assocVM.targetId != null">{{assocVM.targetId}}</span>
+  </span>
+</ng-container>

@@ -1,0 +1,50 @@
+<div *ngIf="showSpinner == true; else evidenceContent" class="row d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #evidenceContent>
+  <ng-container *ngIf="evidences.length > 0">
+    <button class="card-header" [attr.id]="'evidenceHeader-' + utils.safeId(id)" data-toggle="collapse" [attr.data-target]="'#evidenceBody-' + utils.safeId(id)">
+      Evidence
+    </button>
+    <div [attr.id]="'evidenceBody-' + utils.safeId(id)" class="collapse">
+      <div class="card-body">
+        <ul class="list-group">
+          <li *ngFor="let evidence of evidences" class="list-group-item">
+            <dl class="row">
+              <dt class="col-sm-2">Name</dt>
+              <dd class="col-sm-10">
+                <a *ngIf="evidence.id != null" href="{{evidence.id}}" target="_blank">{{evidence.name}}</a>
+                <span *ngIf="evidence.id == null" >{{evidence.name}}</span>
+              </dd>
+              <ng-container *ngIf="evidence.description != null">
+                <dt class="col-sm-2">Description</dt>
+                <dd class="col-sm-10"[innerHtml]="evidence.description"></dd>
+              </ng-container>
+              <ng-container *ngIf="evidence.narrative != null">
+                <dt class="col-sm-2">Narrative</dt>
+                <dd class="col-sm-10 markdown" [innerHtml]="evidence.narrative"></dd>
+              </ng-container>
+              <ng-container *ngIf="evidence.genre != null">
+                <dt class="col-sm-2">Genre</dt>
+                <dd class="col-sm-10">{{evidence.genre}}</dd>
+              </ng-container>
+              <ng-container *ngIf="evidence.artifacts != null">
+                <dt class="col-sm-2">Artifacts</dt>
+                <dd class="col-sm-10">
+                  <ng-container *ngFor="let artifact of evidence.artifacts">
+                    <ng-container *ngIf="artifact.url != null">
+                        <button *ngIf="artifact.url.startsWith('data:')" class="btn btn-link" (click)="showPdf(evidence, artifact)">
+                            {{artifact.name || 'View Data'}}
+                        </button>
+                        <a *ngIf="!artifact.url.startsWith('data:')" href="{{artifact.url}}" target="_blank">{{artifact.name || 'View Data'}}</a>
+                    </ng-container>
+                  </ng-container>
+                </dd>
+              </ng-container>
+            </dl>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</ng-template>

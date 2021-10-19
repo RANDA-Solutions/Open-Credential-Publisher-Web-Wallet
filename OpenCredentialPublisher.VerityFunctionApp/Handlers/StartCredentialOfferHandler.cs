@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Extensions;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using OpenCredentialPublisher.Services.Implementations;
@@ -88,12 +89,16 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Handlers
                     }
                 }
 
-                var viewModel = CredentialPackageViewModel.FromCredentialPackageModel(package);
-                if (viewModel.Pdfs.Any())
+                if (await _credentialService.CredentialPackageHasPdfAsync(command.CredentialPackageId))
                 {
                     await _verityService.SendCredentialOfferAsync<ClrWithPdfCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
+                    //await _verityService.SendCredentialOfferAsync<ClrAttachmentLinkCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
+                    await _verityService.SendCredentialOfferAsync<ClrAttachmentCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
                 }
-                await _verityService.SendCredentialOfferAsync<ClrAttachmentCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
+                else
+                {
+                    await _verityService.SendCredentialOfferAsync<ClrAttachmentCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
+                }
             }
             catch (Exception ex)
             {

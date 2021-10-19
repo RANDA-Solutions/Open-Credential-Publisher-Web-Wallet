@@ -8,7 +8,7 @@ namespace OpenCredentialPublisher.Data.Models
     /// <summary>
     /// OAuth 2.0 data for an application user and resource server.
     /// </summary>
-    public class AuthorizationModel
+    public class AuthorizationModel : IBaseEntity
     {
         /// <summary>
         /// Access token.
@@ -66,13 +66,19 @@ namespace OpenCredentialPublisher.Data.Models
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
 
-        public DateTimeOffset Created { get; set; }
-        public DateTimeOffset? Modified { get; set; }
-        public DateTimeOffset ValidTo { get; set; }
-        public bool IsDeleted { get; set; }
+        public DateTime ValidTo { get; set; }
         /// <summary>
         /// All the CredentialPackages tied to this authorization.
         /// </summary>
         public List<CredentialPackageModel> CredentialPackages { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
     }
 }

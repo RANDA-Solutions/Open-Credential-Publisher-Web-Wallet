@@ -2,6 +2,7 @@ using OpenCredentialPublisher.ClrLibrary.Extensions;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Models.Badgr;
+using OpenCredentialPublisher.Data.ViewModels.nG;
 using OpenCredentialPublisher.Shared.Utilities;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,13 +61,13 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
             {
                 AncestorCredentialPackage = Clr.CredentialPackage;
             }
-            else if (Clr.ClrSet != null)
+            else if (Clr.ParentClrSet != null)
             {
-                AncestorCredentialPackage = Clr.ClrSet.CredentialPackage;
+                AncestorCredentialPackage = Clr.ParentClrSet.ParentCredentialPackage;
             }
-            else if (Clr.VerifiableCredential != null)
+            else if (Clr.ParentVerifiableCredential != null)
             {
-                AncestorCredentialPackage = Clr.VerifiableCredential.CredentialPackage;
+                AncestorCredentialPackage = Clr.ParentVerifiableCredential.ParentCredentialPackage;
             }
         }
         private void BuildAssertionsTree()
@@ -76,12 +77,16 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
 
             if (RawClrDType.SignedAssertions != null)
             {
-                AllAssertions.AddRange(RawClrDType.SignedAssertions.Select(a => AssertionViewModel.FromAssertionDType(a.DeserializePayload<AssertionDType>(), true, a)));
+                AllAssertions.AddRange(RawClrDType.SignedAssertions.Select(a => AssertionViewModel.FromAssertionDType(a.DeserializePayload<AugmentedAssertionDType>(), true, a)));
             }
 
             if (RawClrDType.Assertions != null)
             {
-                AllAssertions.AddRange(RawClrDType.Assertions.ConvertAll(a => AssertionViewModel.FromAssertionDType(a, true)));
+                AllAssertions.AddRange(RawClrDType.Assertions.ConvertAll(a => {
+                    if (a is AugmentedAssertionDType augmentedAssertion)
+                        return AssertionViewModel.FromAssertionDType(augmentedAssertion, false);
+                    return AssertionViewModel.FromAssertionDType(AugmentedAssertionDType.FromAssertionDType(a), false);
+                }));
             }
             foreach (var assertionVM in AllAssertions)
             {
@@ -109,7 +114,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
             }
             // Sort the assertions by issue date (oldest to newest)
 
-            // AllAssertions = AllAssertions.OrderBy(a => a.IssuedOn).ToList();
+            AllAssertions = AllAssertions.OrderBy(a => a.Assertion.IssuedOn).ToList();
 
             // Add associations to each assertion
 
@@ -137,9 +142,11 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
                             {
                                 var model = new PdfShareViewModel
                                 {
-                                    ClrVM = this,
-                                    ClrId = Clr.Id,
-                                    ArtifactId = artifact.ArtifactKey,
+                                    ClrId = Clr.ClrId,
+                                    ClrName = Clr.Name,
+                                    ClrEvidenceName = evidence.Name,
+                                    ClrIssuedOn = Clr.IssuedOn,                                      
+                                    //ArtifactId = artifact.ArtifactKey, //fixme
                                     AssertionId = associatedAssertion.Id,
                                     EvidenceName = evidence.Name,
                                     ArtifactName = artifact.Name ?? artifact.Description,
@@ -205,6 +212,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
                     }
                 }
             }
+
 
             // Create the list of parent assertions
 

@@ -1,0 +1,12 @@
+<ng-container *ngIf="assertionHeaderVMs.length > 0">
+  <div class="row justify-content-center">
+      <span class="h1 col mt-3 text-center">Assertions<br /><small class="text-muted">The information and achievements contained in the credential</small></span>
+  </div>
+  <div *ngIf="showSpinner == true" class="d-flex flex-column">
+    <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+  </div>
+    <div [hidden]="showSpinner == true" app-clr-assertion *ngFor="let ah of assertionHeaderVMs"
+      [isChild]="isChild" [clrId]="clrId" [clrIdentifier]="clrIdentifier"
+      [ancestors]="ancestors" [ancestorKeys]="ancestors" [id]="ah.id" [displayName]="ah.displayName" class="mt-3 mb-3">
+    </div>
+</ng-container>

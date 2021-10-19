@@ -1,0 +1,31 @@
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+
+            <span class="h2">
+                Manage your account <br/>
+                <small class="text-muted">Change your account settings</small>
+            </span>
+            <hr />
+            <div class="row">
+                <div class="col-md-3">
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item"><a class="nav-link" id="profile" [routerLinkActive]="['active']" [routerLink]="['/account/manage/profile']">Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" id="profile-image" [routerLinkActive]="['active']" [routerLink]="['/account/manage/profile-image']">Picture</a></li>
+                        <li class="nav-item"><a class="nav-link" id="email" [routerLinkActive]="['active']" [routerLink]="['/account/manage/email']">Email</a></li>
+                        <li class="nav-item"><a class="nav-link" id="change-password" [routerLinkActive]="['active']" [routerLink]="['/account/manage/password']">Password</a></li>
+                        <!-- @if (hasExternalLogins)
+                        {
+                            <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
+                        } -->
+                        <li class="nav-item"><a class="nav-link" id="two-factor" [routerLinkActive]="['active']" [routerLink]="['/account/manage/two-factor-auth']">Two-factor authentication</a></li>
+                        <li class="nav-item"><a class="nav-link" id="personal-data" [routerLinkActive]="['active']" [routerLink]="['/account/manage/personal-data']">Personal data</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-9">
+                    <router-outlet ></router-outlet>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

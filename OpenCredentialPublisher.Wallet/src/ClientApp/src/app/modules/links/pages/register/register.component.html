@@ -1,0 +1,93 @@
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+            <span class="h1">Connect to Credential Source</span>
+
+            <div asp-validation-summary="All"  [ngClass]="{ 'alert alert-danger mt-2': modelIsValid == false }"></div>
+
+            <div class="alert alert-primary">
+                <p>
+                    A credential source is a platform which has one or more of your CLRs or Open Badges. This application connects to the source to
+                    get your CLRs or Open Badges.
+                </p>
+            </div>
+
+            <form [formGroup]="connectForm" (ngSubmit)="onSubmit()">
+                <button style="visibility:hidden;" id="btnSubmit" type="submit" class="btn btn-primary">Submit</button>
+                <div class="form-group">
+                    <label asp-for="SelectedSource">Select a known source</label>
+                    <select class="optionClass" (change)="selectSource($event)" [value]="sourceId">
+                        <option selected value="">- Select Source -</option>
+                        <option *ngFor="let option of sources"  [value]="option.id">
+                            {{option.name}}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Or enter the URL for a new source</label>
+                </div>
+                <div class="form-row align-items-center mb-2">
+                    <div class="col-3">
+                        <div class="row justify-content-around align-items-end">
+                            <div><input type="radio" name='sourceTypeId' formControlName='sourceTypeId' value="1" /> <label>CLRs</label></div>
+                            <div>Badges <input type="radio" name='sourceTypeId' formControlName='sourceTypeId'  value="3" /> <label class="mr-1">v2.0</label><input type="radio" asp-for="SourceTypeId" id="radType_OBC" value="4" /> <label>v2.1</label></div>
+                        </div>
+                    </div>
+                    <div class="col-9">
+                        <input type="url" id="sourceUrl" name="sourceUrl" formControlName='sourceUrl' placeholder="Enter the source platform URL" />
+                    </div>
+                    <div class="col-12">
+                        <span class="text-danger"></span>
+                    </div>
+                </div>
+                <button id="btnConnect" type="button" class="btn btn-primary" (click)="onSubmit()">Connect</button>
+            </form>
+
+            <div class="mt-2">
+                <a [routerLink]="['/sources/source-list']">Back to List of Sources</a>
+            </div>
+        </section>
+    </div>
+    <div id="modal-connect-provider" class="modal" role="dialog" style="font-size:13px;">
+        <div class="modal-dialog">
+            <div class="modal-content" style="padding-bottom:60px;">
+                <div class="modal-header" style="border-bottom:none;">
+                    <div class="col-12">
+                    <span class="h4">Use your Badgr Login to connect to Badgr.</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input id="hidSelectedSource" type="hidden" name="SelectedSourceBasic" />
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend mr-3">
+                                <span><i class="fal fa-user fa-2x icon-color"></i></span>
+                            </div>
+                            <input name="username" [(ngModel)]='userName' placeholder="Username or Email" class="form-control" />
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend mr-3">
+                                <span><i class="fal fa-lock-alt fa-2x icon-color"></i></span>
+                            </div>
+                            <input name="password" [(ngModel)]='password' placeholder="Password" class="form-control" type="password"/>
+                        </div>
+                    <p>This information is sent directly to Badgr and for your protection is never saved by Open Credential Publisher.</p>
+                        <div class="row mt-5 justify-content-around">
+                                <button type="submit" id="btn-login-form" class="btn btn-outline-primary btn-lg">LOGIN</button>
+                                <button type="button" id="btn-login-cancel" class="btn btn-outline-primary btn-lg"  data-dismiss="modal">CANCEL</button>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <div class="tw-spinner-overlay" [hidden]="!showSpinner">
+    <div class="tw-spinner-wrapper">
+    </div>
+  </div>
+  <div id="spinner-container" [hidden]="!showSpinner">
+    <app-spinner id="spinner"></app-spinner>
+  </div>
+</div>
+

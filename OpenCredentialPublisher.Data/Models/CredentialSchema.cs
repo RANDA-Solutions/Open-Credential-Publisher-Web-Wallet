@@ -1,3 +1,4 @@
+using OpenCredentialPublisher.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +14,7 @@ namespace OpenCredentialPublisher.Data.Models
         public int Id { get; set; }
         public string SchemaId { get; set; }
         public string ThreadId { get; set; }
+        public string NetworkId { get; set; }
         
         public string TypeName { get; set; }
         public string Name { get; set; }

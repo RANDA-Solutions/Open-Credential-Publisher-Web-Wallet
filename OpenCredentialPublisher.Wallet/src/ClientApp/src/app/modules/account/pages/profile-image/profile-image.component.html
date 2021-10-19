@@ -1,0 +1,37 @@
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <section>
+      <span class="h1">Change Profile Picture</span>
+      <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label">Current Picture</label>
+                <div class="">
+                    <img [src]="currentImage" alt="Profile Picture" />
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="row">
+          <div class="col-md-6">
+              <form>
+                  <div class="form-group">
+                      <label class="control-label">Profile Picture</label>
+                      <div class="input-group mb-3">
+                          <div class="custom-file">
+                              <input type="file" #imageInput (change)="onFileSelected($event)"  class="custom-file-input" aria-describedby="inputGroupFileAddon01">
+                              <label class="custom-file-label" for="inputGroupFile01">{{fileName}}</label>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="form-group">
+                      <button type="button" (click)="fileUpload()" class="btn btn-outline-primary btn-lg" >Save</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </section>
+</ng-template>

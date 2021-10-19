@@ -1,36 +1,16 @@
-using OpenCredentialPublisher.ClrLibrary.Models;
+using OpenCredentialPublisher.ObcLibrary.Models;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using ClrModels = OpenCredentialPublisher.ClrLibrary.Models;
 
 namespace OpenCredentialPublisher.Data.Models.Badgr
 {
     /// <summary>
     /// Assertion payload for the GET /backpack/assertions endpoint.
     /// </summary>
-    public partial class BadgrAssertionDType
+    public partial class BadgrAssertionDType: AssertionDTypeBadgr
     {
-        /// <summary>
-        /// Globally unique IRI for the Assertion. If this Assertion will be verified using Hosted verification, the value should be the URL to the hosted version of this Assertion. Model Primitive Datatype = NormalizedString.
-        /// </summary>
-        /// <value>Globally unique IRI for the Assertion. If this Assertion will be verified using Hosted verification, the value should be the URL to the hosted version of this Assertion. Model Primitive Datatype = NormalizedString.</value>
-        [JsonPropertyName("entityId"), Newtonsoft.Json.JsonProperty("entityId")]
-        [Description("Globally unique IRI for the Assertion. If this Assertion will be verified using Hosted verification, the value should be the URL to the hosted version of this Assertion. Model Primitive Datatype = NormalizedString.")]
-        public string Id { get; set; }
-
-        /// <summary>
-        /// The JSON-LD type of this object. Normally 'Assertion'. Model Primitive Datatype = NormalizedString.
-        /// </summary>
-        /// <value>The JSON-LD type of this object. Normally 'Assertion'. Model Primitive Datatype = NormalizedString.</value>
-        [JsonPropertyName("entityType"), Newtonsoft.Json.JsonProperty("entityType")]
-        [Description("The JSON-LD type of this object. Normally 'Assertion'. Model Primitive Datatype = NormalizedString.")]
-        public string Type { get; set; }
-
         /// <summary>
         /// The JSON-LD acceptance of this object. Normally 'Assertion'. Model Primitive Datatype = NormalizedString.
         /// </summary>
@@ -92,7 +72,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         /// </summary>
         [JsonPropertyName("recipient"), Newtonsoft.Json.JsonProperty("recipient")]
         [Description("Recipient")]
-        public virtual IdentityDType Recipient { get; set; }
+        public virtual ClrModels.IdentityDType Recipient { get; set; }
 
         /// <summary>
         /// Timestamp of when the achievement was awarded. Required unless the assertion is revoked. Model Primitive Datatype = DateTime.
@@ -133,7 +113,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         /// measured in UTC until the date/time of expiration.
         /// </summary>
         [JsonPropertyName("expires")]
-        public long? Expires { get; set; }
+        public DateTime? Expires { get; set; }
 
 
         /// <summary>
@@ -160,12 +140,12 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         [Description("Validation status for the badge. Model Primitive Datatype = String.")]
         public string ValidationStatus { get; set; }
 
-        /// <summary>
-        /// Additional properties of the object
-        /// </summary>
-        [JsonExtensionData]
-        [JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
-        public Dictionary<String, Object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+        ///// <summary>
+        ///// Additional properties of the object
+        ///// </summary>
+        //[JsonExtensionData]
+        //[JsonPropertyName("additionalProperties"), Newtonsoft.Json.JsonProperty("additionalProperties")]
+        //public Dictionary<String, Object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Internal Identifier (_id) Model Primitive Datatype = String.
@@ -181,13 +161,23 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         [JsonPropertyName("signedAssertion"), Newtonsoft.Json.JsonProperty("signedAssertion")]
         [Description("Signed assertion when applicable. Model Primitive Datatype = NormalizedString.")]
         public string SignedAssertion { get; set; }
-        /// <summary>
-        /// Returns the JSON string presentation of the object
-        /// </summary>
-        /// <returns>JSON string presentation of the object</returns>
-        public string ToJson()
+
+        public static BadgrAssertionDType FromBadgrObcAssertionDType(BadgrObcAssertionDType badgrObcAssertionDType)
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return new BadgrAssertionDType
+            {
+                Acceptance = null,
+                AdditionalProperties = badgrObcAssertionDType.AdditionalProperties,
+                Expires = badgrObcAssertionDType.Expires,
+                Image = badgrObcAssertionDType.Image,
+                IssuedOn = badgrObcAssertionDType.IssuedOn,
+                Narrative = badgrObcAssertionDType.Narrative,
+                OpenBadgeId = badgrObcAssertionDType.Id,
+                Revoked = badgrObcAssertionDType.Revoked,
+                RevocationReason = badgrObcAssertionDType.RevocationReason,
+                Recipient = badgrObcAssertionDType.Recipient,
+                Type = badgrObcAssertionDType.Type
+            };
         }
     }
 }

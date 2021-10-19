@@ -1,0 +1,87 @@
+<div class="row mt-5">
+  <div class="col">
+    <section class="default-container p-5">
+      <span class="h1">Source Details</span>
+      <div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+        <app-spinner id="source-details-spinner" [message]="message"></app-spinner>
+      </div>
+      <ng-template #theContent>
+        <div class="alert alert-primary">
+            <p>
+                A {{sourceDetail.sourceType}} source is a platform which has one or more of your {{sourceDetail.sourceType}}s. This application will connect to the source and
+                get your {{sourceDetail.sourceType}}s.
+            </p>
+            <p>
+                The table below shows the {{sourceDetail.sourceType}}s this application received from this source.
+            </p>
+        </div>
+        <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+          <span *ngFor="let msg of modelErrors">{{msg}}</span>
+        </div>
+
+        <form method="post">
+          <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">{{sourceDetail.name}}</dd>
+            <dt class="col-sm-2">URL</dt>
+            <dd class="col-sm-10">
+              <a href="{{sourceDetail.sourceUrl}}">
+                {{sourceDetail.sourceUrl}}
+              </a>
+            </dd>
+            <dt class="col-sm-2">
+                CLRs
+
+            </dt>
+            <dd class="col-sm-10">
+              <div *ngIf="sourceDetail.clrs.length == 0">
+                Click
+                <a style="vertical-align: baseline" title="Refresh" (click)="refreshClrs()"><i class="icon-color fas fa-sync fa-2x"></i></a>
+                to get your {{sourceDetail.sourceType}}s from <span class="font-weight-bold">{{sourceDetail.name}}</span>.
+              </div>
+              <div *ngIf="sourceDetail.clrs.length > 0" class="mt-2">
+                Click
+                <a style="vertical-align: baseline" title="Refresh" (click)="refreshClrs()"><i class="icon-color fas fa-sync fa-2x"></i></a>
+                to refresh your {{sourceDetail.sourceType}}s from <span class="font-weight-bold">{{sourceDetail.name}}</span>.
+              </div>
+              <div *ngIf="sourceDetail.clrs.length > 0" class="table-responsive">
+                  <table class="table">
+                      <thead>
+                          <tr>
+                              <th>Publisher</th>
+                              <th>Published</th>
+                              <th>Retrieved</th>
+                              <th></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let clr of sourceDetail.clrs">
+                            <td>
+                                {{clr.publisherName}}
+                            </td>
+                            <td>
+                                {{clr.publishDate | date: 'M/d/yyyy'}}
+                            </td>
+                            <td>
+                                {{clr.refreshDate | date: 'M/d/yyyy h:mm a'}}
+                            </td>
+                            <td>
+                                <a [routerLink]="['/credentials/display', clr.credentialPackageId]">Details</a> |
+                                <a [routerLink]="['/credentials/delete', clr.credentialPackageId]">Delete</a>
+                            </td>
+                        </tr>
+                      </tbody>
+                  </table>
+              </div>
+            </dd>
+          </dl>
+        </form>
+
+        <div>
+            <a [routerLink]="['/sources/delete', id]">Delete</a> |
+            <a [routerLink]="['/sources/source-list']">Back to List of Sources</a>
+        </div>
+      </ng-template>
+    </section>
+  </div>
+</div>

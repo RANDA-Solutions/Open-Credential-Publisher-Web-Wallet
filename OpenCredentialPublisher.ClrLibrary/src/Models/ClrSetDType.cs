@@ -10,14 +10,16 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenCredentialPublisher.ClrLibrary.Models
-{ 
+{
     /// <summary>
     /// A set of CLRs. 
     /// </summary>
+    [NotMapped]
     public partial class ClrSetDType
     { 
         /// <summary>
@@ -50,8 +52,8 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <value>A set of Clrs </value>
         [JsonPropertyName("clrs"), Newtonsoft.Json.JsonProperty("clrs")]
         [Description("A set of Clrs ")]
-        public virtual List<ClrDType> Clrs { get; set; }
-        
+        public List<ClrDType> Clrs { get; set; }
+
         /// <summary>
         /// A set of Clrs in JWS Compact Serialization format. Model Primitive Datatype = String. 
         /// </summary>
@@ -66,7 +68,7 @@ namespace OpenCredentialPublisher.ClrLibrary.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { IgnoreNullValues = true });
+            return JsonSerializer.Serialize(this, TWJson.IgnoreNulls);
         }
     }
 }

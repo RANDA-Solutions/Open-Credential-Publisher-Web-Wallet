@@ -1,0 +1,50 @@
+<div class="row mt-5">
+    <div class="col">
+        <section class="default-container p-5">
+            
+            <div class="h1 mb-5">Connect your mobile wallet
+              <a id="refresh_button" (click)="refresh()" class="float-right btn btn-outline-tertiary" title="Reload this page"><i class="fas fa-sync"></i></a>
+            </div>
+            <div *ngIf="showSpinner == true; else invitationTemplate" class="d-flex flex-column">
+                <app-spinner [message]="'Loading'"></app-spinner>
+            </div>
+            <ng-template #invitationTemplate>
+
+            <div *ngIf="vm.hideQRCode == false" class="alert alert-primary my-3">
+                Open your mobile wallet and scan the QR Code below
+            </div>
+            <div *ngIf="vm.hideQRCode == false && showUrl" class="alert alert-info my-3">
+                <app-mobile-wallets [payload]="vm.payload"></app-mobile-wallets>
+            </div>
+            <div *ngIf="showNameInput" id="connection-completed" class="alert alert-info">
+                The connection to your wallet is complete! Now, please provide a name for this connection in the form below.
+            </div>
+            <div *ngIf="vm.hideQRCode == false" class="text-center position-relative" id="qr-code-container">
+                <div id="connecting-banner" class="position-absolute" *ngIf="showConnecting">
+                    Connecting <div id="spinner" class="spinner-grow spinner-grow-sm" role="status"></div>
+                </div>
+                <img class="connection-qr-code" [src]="imageTransform()" />
+            </div>
+            <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+              <span *ngFor="let msg of modelErrors">{{msg}}</span>
+            </div>
+            <form *ngIf="showNameInput">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend mr-3">
+                        <i class="fal fa-wallet fa-2x"></i>
+                    </div>
+                    <input name="nickname" [(ngModel)]="vm.nickname" placeholder="Nickname for this connection" class="form-control" />
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend mr-3">
+                        <span class="blank-icon"></span>
+                    </div>
+                    <button type="button" id="btn-login-form" (click)="save()" class="btn btn-outline-primary btn-lg">Save</button>
+                </div>
+            </form>
+            <br />
+            <a [routerLink]="['/wallets/wallet-list']">Back to List of Wallets</a>
+        </ng-template>
+        </section>
+    </div>
+</div>

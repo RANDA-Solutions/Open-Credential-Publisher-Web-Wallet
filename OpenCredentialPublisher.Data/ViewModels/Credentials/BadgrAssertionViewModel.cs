@@ -17,7 +17,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
         {
             AllEndorsements = new List<EndorsementDType>();
         }
-        public static AssertionViewModel FromAssertionDType(AssertionDType assertion, bool isSigned)
+        public static AssertionViewModel FromAssertionDType(AugmentedAssertionDType assertion, bool isSigned)
         {
             assertion.IsSigned = isSigned;
             return new AssertionViewModel()

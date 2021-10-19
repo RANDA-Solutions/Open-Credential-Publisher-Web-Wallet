@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using OpenCredentialPublisher.Data.Models;
 using System.Linq;
+using OpenCredentialPublisher.Data.ViewModels.nG;
 
 namespace OpenCredentialPublisher.Data.ViewModels.Credentials
 {
@@ -41,7 +42,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.Credentials
         {
             var vcVM = new VerifiableCredentialViewModel();
             //vcVM.CredentialPackageVM = CredentialPackageViewModel.FromCredentialPackageModel(vc.CredentialPackage);
-            vcVM.CredentialPackageId = vc.CredentialPackageId;
+            vcVM.ParentCredentialPackageId = vc.ParentCredentialPackageId;
             vcVM.Identifier = vc.Identifier;
             vcVM.Issuer = vc.Issuer;
             vcVM.IssuedOn = vc.IssuedOn;

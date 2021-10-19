@@ -1,80 +1,84 @@
+import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { ApiAuthorizationModule } from 'src/api-authorization/api-authorization.module';
-import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
-import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
+import { CoreModule } from '@core/core.module';
+import { AppService } from '@core/services/app.service';
+import { environment } from '@environment/environment';
+import { AuthModule, LogLevel } from 'angular-auth-oidc-client';
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { MessageService } from 'primeng/api';
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ListCandidateComponent, PortfolioCandidateComponent, PortfolioComponent } from './components';
-import { CodeflowComponent } from './components/codeflow/codeflow.component';
-import { HomeComponent } from './components/home/home.component';
-import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
-import { CandidateProfileComponent } from './components/portfolio/candidate-profile.component';
-import { PortfolioDeleteModalComponent } from './components/portfolio/portfolio-delete-modal.component';
-import { PortfolioVerificationModalComponent } from './components/portfolio/portfolio-verification-modal.component';
-import { VerificationComponent } from './components/verification/verification.component';
-import { DirectivesModule } from './modules/directives/directives.module';
-import { PayflowModule } from './modules/payflow/payflow.module';
-import { SafeUrlPipe } from './pipes/safe-url.pipe';
-import { VerifyResolver } from './resolvers/verify.resolver';
-import {
-  CandidateService,
-  CodeFlowService,
-  HomeService,
-  PortfolioService,
-  VerificationService
-} from './services/';
+import { LoginCallbackComponent } from './auth/login-callback.component';
+import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
+import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
+import { NavMenuComponent } from './nav-menu/nav-menu.component';
+import { SecureRoutesService } from './services/secureRoutes.service';
+import { TokenInterceptorService } from './services/token-interceptor.service';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NavMenuComponent,
-    HomeComponent,
-    ListCandidateComponent,
-    PortfolioCandidateComponent,
-    PortfolioComponent,
-    CodeflowComponent,
-    SafeUrlPipe,
-    PortfolioVerificationModalComponent,
-    PortfolioDeleteModalComponent,
-    CandidateProfileComponent
-  ],
-  imports: [
-    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ApiAuthorizationModule,
-    RouterModule.forRoot([
-      { path: '', component: PortfolioComponent, pathMatch: 'full', canActivate: [AuthorizeGuard]  },
-      { path: 'candidate', component: ListCandidateComponent, canActivate: [AuthorizeGuard] },
-      { path: 'codeflow', component: CodeflowComponent, canActivate: [AuthorizeGuard] },
-      { path: 'folio', canActivate: [AuthorizeGuard], loadChildren: () => import('./modules/folio/folio.module').then(m => m.FolioModule)},
-      { path: 'transactions', canActivate: [AuthorizeGuard], loadChildren: () => import('./modules/transactions/transactions.module').then(m => m.TransactionsModule)},
-      { path: 'portfolio', component: PortfolioComponent, canActivate: [AuthorizeGuard] },
-      { path: 'verify', component: VerificationComponent, canActivate: [AuthorizeGuard], resolve: [VerifyResolver]}
-    ]),
-    FontAwesomeModule,
-    DirectivesModule,
-    PayflowModule    
-  ],
-  providers: [
-    CandidateService,
-    CodeFlowService,
-    HomeService,
-    PortfolioService,
-    VerificationService,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }
-  ],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		LoginCallbackComponent,
+		SourcesCallbackComponent,
+		SourcesErrorComponent,
+		NavMenuComponent
+	],
+	imports: [
+		CommonModule,
+		CoreModule,
+		BrowserModule,
+		FormsModule,
+		ReactiveFormsModule,
+		HttpClientModule,
+		LoggerModule.forRoot({
+			serverLoggingUrl: '/api/clientlog/ngxlogger',
+			level: NgxLoggerLevel.DEBUG,
+			serverLogLevel: NgxLoggerLevel.ERROR
+		}),
+		AppRoutingModule,
+		AuthModule.forRoot({
+			config: {
+				authority: `${environment.baseUrl}`,
+				clientId: 'ocp-wallet-client',
+				configId: environment.configId,
+				historyCleanupOff: true,
+				logLevel: LogLevel.Error,
+				postLoginRoute: `/credentials`,
+				postLogoutRedirectUri: `${window.location.origin}/credentials`,
+				renewTimeBeforeTokenExpiresInSeconds: 30,
+				redirectUrl: `${window.location.origin}/callback`,
+				responseType: 'code',
+				scope: 'openid profile roles offline_access', // 'openid profile offline_access ' + your scopes
+				silentRenew: true,
+				startCheckSession: true,
+				triggerAuthorizationResultEvent: true,
+				unauthorizedRoute: '/unauthorized',
+				useRefreshToken: true,
+			},
+		})
+	],
+	providers: [
+
+		{ provide: APP_BASE_HREF, useValue: '/' }
+		, AppService
+		, MessageService
+		, SecureRoutesService
+		, {
+			provide: HTTP_INTERCEPTORS,
+			useClass: TokenInterceptorService,
+			multi: true,
+		}
+	],
+	bootstrap: [AppComponent]
 })
-export class AppModule { 
-  constructor(library: FaIconLibrary) {
-    // Add an icon to the library for convenient access in other components
-    library.addIconPacks(fas);
-  }
+export class AppModule {
+	private debug = environment.debug;
+	
+	constructor() {
+		
+	}
+
 }

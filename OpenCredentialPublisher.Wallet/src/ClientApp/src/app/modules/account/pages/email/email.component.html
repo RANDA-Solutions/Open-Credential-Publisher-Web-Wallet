@@ -1,0 +1,38 @@
+<span class="h2 mb-4">Email</span>
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <div *ngIf="statusMessage != ''" role="alert"
+    [ngClass]="{'alert alert-success alert-dismissible': !statusMessage.startsWith('Error'), 'alert alert-danger alert-dismissible': statusMessage.startsWith('Error')}">
+      <button type="button" class="close" (click)="statusMessage = '';" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      {{statusMessage}}
+  </div>
+  <div *ngIf="showSpinner == false" class="row">
+      <div class="col-md-6">
+          <form #f="ngForm" novalidate (ngSubmit)="change(f)">
+              <div class="form-group">
+                  <div *ngIf="changeEmailVM.emailConfirmed">
+                      <label for="email">Email address</label>
+                      <div class="input-group">
+                          <input id="email" name="email" [ngModel]="changeEmailVM.email" placeholder="Email" class="form-control" disabled/>
+                          <div class="input-group-append">
+                              <span class="input-group-text text-success font-weight-bold">✓</span>
+                          </div>
+                      </div>
+                  </div>
+                  <div *ngIf="!changeEmailVM.emailConfirmed">
+                      {{changeEmailVM.newEmail}} <br>
+                      <button id="email-verification" type="button" (click)="SendVerificationEmail()" class="btn btn-link">Send verification email</button>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label for="newEmail">New Email address</label>
+                  <input name="newEmail" id="newEmail" required placeholder="New Email" [(ngModel)]="changeEmailVM.newEmail" class="form-control" #newEmail="ngModel"/>
+                  <small [hidden]="newEmail.valid || (newEmail.pristine && !submitted)" class="text-danger">Please enter a valid email</small>
+              </div>
+              <button id="change-email-button" type="submit" class="btn btn-outline-primary btn-lg">Change email</button>
+          </form>
+      </div>
+  </div>
+</ng-template>

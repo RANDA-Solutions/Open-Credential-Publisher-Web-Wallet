@@ -1,4 +1,4 @@
-using Microsoft.Azure.EventGrid.Models;
+using Azure.Messaging.EventGrid;
 using Microsoft.Azure.Relay;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -94,9 +94,9 @@ namespace OpenCredentialPublisher.Services.Implementations
         private async Task ProcessEventGridEventsAsync(RelayedHttpListenerContext context)
         {
             var content = new StreamReader(context.Request.InputStream).ReadToEnd();
-            EventGridEvent[] eventGridEvents = JsonConvert.DeserializeObject<EventGridEvent[]>(content);
+            var eventGridEvents = EventGridEvent.ParseMany(BinaryData.FromString(content));
 
-            foreach (EventGridEvent eventGridEvent in eventGridEvents)
+            foreach (var eventGridEvent in eventGridEvents)
             {
                 Console.WriteLine($"Received event {eventGridEvent.Id} with type:{eventGridEvent.EventType}");
                 await _asyncHandler(eventGridEvent.EventType, eventGridEvent.Data.ToString());
@@ -107,9 +107,9 @@ namespace OpenCredentialPublisher.Services.Implementations
         private void ProcessEventGridEvents(RelayedHttpListenerContext context)
         {
             var content = new StreamReader(context.Request.InputStream).ReadToEnd();
-            EventGridEvent[] eventGridEvents = JsonConvert.DeserializeObject<EventGridEvent[]>(content);
+            var eventGridEvents = EventGridEvent.ParseMany(BinaryData.FromString(content));
 
-            foreach (EventGridEvent eventGridEvent in eventGridEvents)
+            foreach (var eventGridEvent in eventGridEvents)
             {
                 Console.WriteLine($"Received event {eventGridEvent.Id} with type:{eventGridEvent.EventType}");
                 _handler(eventGridEvent.EventType, eventGridEvent.Data.ToString());

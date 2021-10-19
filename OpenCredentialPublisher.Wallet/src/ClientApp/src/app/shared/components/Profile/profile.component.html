@@ -1,0 +1,38 @@
+<div class="profile-container">
+  <div class="profile-picture-container">
+    <div class="profile-picture-circle text-center">
+      <img *ngIf="profile.hasProfileImage == true" [src]="profile.profileImageUrl" alt="Profile Picture" />
+      <div *ngIf="profile.hasProfileImage == false" class="profile-picture-link-container">
+        <a [routerLink]="['/account/manage/profile-image']">
+          SET<br />
+          PICTURE
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showSpinner == false" class="profile-body d-flex flex-column justify-items-middle">
+    <div class="pencil-container"><a [routerLink]="['/account/manage/profile']"><i class="far fa-pencil fa-2x icon-color"></i></a></div>
+    <div *ngIf="profile.missingDisplayName == true" class="profile-name h1 text-center">
+      <a router-link="/Account/Manage/Index">Set Display Name</a>
+    </div>
+    <div *ngIf="profile.missingDisplayName == false" class="profile-name h1 text-wrap"><abbr>{{profile.displayName}}</abbr></div>
+    <div class="profile-stats-container d-flex flex-column justify-content-between">
+      <div class="row row-cols-1">
+        <div class="h1 profile-stats">{{profile.achievements}}</div>
+        <div class="h4 stats-label">ACHIEVEMENTS</div>
+      </div>
+      <div class="row row-cols-1">
+        <div class="h1 profile-stats">{{profile.credentials}}</div>
+        <div class="h4 stats-label">CREDENTIALS</div>
+      </div>
+      <div class="row row-cols-1">
+        <div class="h1 profile-stats">{{profile.activeLinks}}</div>
+        <div class="h4 stats-label">LINKS</div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="showSpinner == true" class="profile-body d-flex flex-column">
+    <app-spinner id="profile-spinner" [message]="'loading your profile'"></app-spinner>
+  </div>
+</div>

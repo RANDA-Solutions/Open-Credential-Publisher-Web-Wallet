@@ -1,0 +1,57 @@
+<div class="row mt-5">
+  <div class="col">
+    <section class="default-container p-5">
+      <span class="h1">Your CLR Sources</span>
+
+      <div class="alert alert-primary">
+        <p>
+          A Comprehensive Learner Record (CLR) is a record of your curricular and non-curricular learning achievements.
+          Each CLR comes from a single publisher (such as your school) and contains one or more of your achievements.
+        </p>
+        <p>
+          A CLR source is a platform which has one or more of your CLRs. This application connects to the source to
+          get your CLRs.
+        </p>
+      </div>
+      <p>
+        <a [routerLink]="['/sources/register']">Connect to a source</a>
+      </p>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>URL</th>
+              <th class="text-center">CLRs</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of authorizations">
+              <td>{{item.name}}</td>
+              <td>{{item.type}}</td>
+              <td>{{item.sourceUrl}}</td>
+              <td class="text-center">{{item.clrCount}}</td>
+              <td style="white-space: nowrap;">
+                <a [routerLink]="['/sources/details', item.id]">Details</a> |
+                <a [routerLink]="['/sources/delete', item.id]">Delete</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+        <a [routerLink]="['/credentials']">Back to Dashboard</a>
+    </section>
+  </div>
+
+  <div class="tw-spinner-overlay" [hidden]="!showSpinner">
+    <div class="tw-spinner-wrapper">
+    </div>
+  </div>
+  <div id="spinner-container" [hidden]="!showSpinner">
+    <app-spinner id="spinner"></app-spinner>
+  </div>
+</div>
+
+
