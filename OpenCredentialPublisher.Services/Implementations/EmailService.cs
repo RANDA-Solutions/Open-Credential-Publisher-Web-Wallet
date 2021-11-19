@@ -66,7 +66,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 message.From = new MailAddress(_mailSettings.From);
                 message.Sender = new MailAddress(_mailSettings.From);
 
-                using var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port) { Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password) };
+                using var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port) { EnableSsl = _mailSettings.UseSSL, Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password) };
 
                 await client.SendMailAsync(message);
             }
@@ -117,7 +117,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 message.From = new MailAddress(_mailSettings.From);
                 message.Sender = new MailAddress(_mailSettings.From);
 
-                using var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port) { Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password) };
+                using var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port) { EnableSsl = _mailSettings.UseSSL, Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password) };
 
                 await client.SendMailAsync(message);
             }

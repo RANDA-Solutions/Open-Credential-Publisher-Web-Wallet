@@ -14,5 +14,6 @@ namespace OpenCredentialPublisher.Data.Settings
         public string From { get; set; }
         public bool RedirectToInternal { get; set; }
         public string RedirectAddress { get; set; }
+        public bool UseSSL { get; set; }
     }
 }
