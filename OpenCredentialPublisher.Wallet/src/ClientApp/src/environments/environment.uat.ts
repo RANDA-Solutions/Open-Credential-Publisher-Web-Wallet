@@ -1,5 +1,5 @@
 
-const baseUrl = 'https://ocp-wallet-uat.azurewebsites.net';
+const baseUrl = window.location.origin;
 export const environment = {
 	name: '[default]',
 	production: true,
