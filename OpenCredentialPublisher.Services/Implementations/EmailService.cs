@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenCredentialPublisher.Data.Settings;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Services.Implementations
@@ -17,10 +19,12 @@ namespace OpenCredentialPublisher.Services.Implementations
     {
         private readonly MailSettings _mailSettings;
         private readonly HostSettings _hostSettings;
-        public EmailService(IConfiguration configuration)
+        private readonly ILogger<EmailService> _logger;
+        public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
         {
             _mailSettings = configuration.GetSection(nameof(MailSettings)).Get<MailSettings>();
             _hostSettings = configuration.GetSection(nameof(HostSettings)).Get<HostSettings>();
+            _logger = logger;
         }
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
@@ -63,12 +67,31 @@ namespace OpenCredentialPublisher.Services.Implementations
                     message.To.Add(_mailSettings.RedirectAddress);
                 }
 
-                message.From = new MailAddress(_mailSettings.From);
-                message.Sender = new MailAddress(_mailSettings.From);
+                message.From = new MailAddress(_mailSettings.From, _mailSettings.From);
+                
+                using (var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port))
+                {
+                    client.Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password);
+                    client.EnableSsl = _mailSettings.UseSSL;
 
-                using var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port) { EnableSsl = _mailSettings.UseSSL, Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password) };
+                    try
+                    {
+                        await client.SendMailAsync(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        var builder = new StringBuilder();
 
-                await client.SendMailAsync(message);
+                        builder.AppendLine(ex.Message);
+                        builder.AppendLine($"Server: {_mailSettings.Server}");
+                        builder.AppendLine($"Port: {_mailSettings.Port}");
+                        builder.AppendLine($"User: {_mailSettings.User}");
+                        builder.AppendLine($"From: {_mailSettings.From}");
+                        builder.AppendLine($"Enable SSL: {_mailSettings.UseSSL}");
+                        builder.AppendLine($"To: {email}");
+                        _logger.LogError(ex, builder.ToString());
+                    }
+                }
             }
         }
 
