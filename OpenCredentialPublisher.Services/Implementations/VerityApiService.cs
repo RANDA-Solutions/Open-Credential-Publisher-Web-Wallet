@@ -265,14 +265,14 @@ namespace OpenCredentialPublisher.Services.Implementations
                     VerityMessageFamilies.WriteCredentialDefinitionResponse => JsonConvert.DeserializeObject<WriteCredDefResponse>(responseJson.AsString()),
                     VerityMessageFamilies.WriteSchemaProblem => JsonConvert.DeserializeObject<WriteSchemaProblem>(responseJson.AsString()),
                     VerityMessageFamilies.WriteSchemaResponse => JsonConvert.DeserializeObject<WriteSchemaResponse>(responseJson.AsString()),
-                    _ => throw new NotImplementedException()
+                    _ => throw new NotImplementedException(responseJson)
                 };
                 await HandleMessage(messageObject);
             }
             catch (NotImplementedException ex)
             {
-                await _azureBlobStoreService.StoreAsync(Guid.NewGuid().ToString(), responseBytes, "failedveritycallbackmessages");
-                _logger.LogError("Response not matched to Verity API Type", responseJson);
+                await _azureBlobStoreService.StoreAsync($"{Guid.NewGuid()}.json", responseBytes, "failedveritycallbackmessages");
+                _logger.LogError(ex, "Response not matched to Verity API Type", responseJson);
                 throw;
             }
         }
