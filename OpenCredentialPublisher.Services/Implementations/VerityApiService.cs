@@ -46,11 +46,14 @@ namespace OpenCredentialPublisher.Services.Implementations
         private readonly ConnectionRequestService _connectionRequestService;
         private readonly VerityThreadService _verityThreadService;
 
+        private readonly AzureBlobStoreService _azureBlobStoreService;
+
         public VerityApiService(IIssueCredentialApi issueCredentialApi, IIssuerSetupApi issuerSetupApi,
             IPresentProofApi presentProofApi,
             IRelationshipApi relationshipApi, IUpdateConfigsApi updateConfigsApi,
             IUpdateEndpointApi updateEndpointApi, IWriteCredDefApi writeCredDefApi,
             IWriteSchemaApi writeSchemaApi, AgentContextService agentContextService,
+            AzureBlobStoreService azureBlobStoreService,
             ConnectionRequestService connectionRequestService,
             CredentialDefinitionService credentialDefinitionService,
             CredentialRequestService credentialRequestService,
@@ -74,6 +77,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             _verityThreadService = verityThreadService;
             _writeCredDefApi = writeCredDefApi;
             _writeSchemaApi = writeSchemaApi;
+            _azureBlobStoreService = azureBlobStoreService;
         }
 
         public async Task CreateCredentialDefinitionAsync(CredentialDefinition credentialDefinition)
@@ -261,13 +265,14 @@ namespace OpenCredentialPublisher.Services.Implementations
                     VerityMessageFamilies.WriteCredentialDefinitionResponse => JsonConvert.DeserializeObject<WriteCredDefResponse>(responseJson.AsString()),
                     VerityMessageFamilies.WriteSchemaProblem => JsonConvert.DeserializeObject<WriteSchemaProblem>(responseJson.AsString()),
                     VerityMessageFamilies.WriteSchemaResponse => JsonConvert.DeserializeObject<WriteSchemaResponse>(responseJson.AsString()),
-                    _ => throw new NotImplementedException()
+                    _ => throw new NotImplementedException(responseJson)
                 };
                 await HandleMessage(messageObject);
             }
             catch (NotImplementedException ex)
             {
-                _logger.LogError("Response not matched to Verity API Type", responseJson);
+                await _azureBlobStoreService.StoreAsync($"{Guid.NewGuid()}.json", responseBytes, "failedveritycallbackmessages");
+                _logger.LogError(ex, "Response not matched to Verity API Type", responseJson);
                 throw;
             }
         }
