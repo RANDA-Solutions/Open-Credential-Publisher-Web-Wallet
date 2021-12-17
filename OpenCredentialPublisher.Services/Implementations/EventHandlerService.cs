@@ -46,6 +46,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                 ConnectionStatusNotification.MessageType => eventGridEvent.Data.ToObjectFromJson<ConnectionStatusNotification>(),
                 CredentialStatusNotification.MessageType => eventGridEvent.Data.ToObjectFromJson<CredentialStatusNotification>(),
                 RequestProofInvitationNotification.MessageType => eventGridEvent.Data.ToObjectFromJson<RequestProofInvitationNotification>(),
+                CredentialDefinitionNeedsEndorsementNotification.MessageType => eventGridEvent.Data.ToObjectFromJson<CredentialDefinitionNeedsEndorsementNotification>(),
+                SchemaNeedsEndorsementNotification.MessageType => eventGridEvent.Data.ToObjectFromJson<SchemaNeedsEndorsementNotification>(),
                 _ => throw new NotImplementedException(eventGridEvent.EventType)
             };
             await HandlerAsync(notification);
@@ -67,6 +69,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                 ConnectionStatusNotification.MessageType => JsonSerializer.Deserialize<ConnectionStatusNotification>(message, options),
                 CredentialStatusNotification.MessageType => JsonSerializer.Deserialize<CredentialStatusNotification>(message, options),
                 RequestProofInvitationNotification.MessageType => JsonSerializer.Deserialize<RequestProofInvitationNotification>(message, options),
+                CredentialDefinitionNeedsEndorsementNotification.MessageType => JsonSerializer.Deserialize<CredentialDefinitionNeedsEndorsementNotification>(message, options),
+                SchemaNeedsEndorsementNotification.MessageType => JsonSerializer.Deserialize<SchemaNeedsEndorsementNotification>(message, options),
                 _ => throw new NotImplementedException(messageType)
             };
             await HandlerAsync(notification);
@@ -132,7 +136,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                             Subject = $"Response Received to Proof Request - {proof.Name} ({proof.PublicId})",
                             SendAttempts = 0,
                             StatusId = StatusEnum.Created,
-                            CreatedOn = DateTimeOffset.UtcNow,
+                            CreatedAt = DateTime.UtcNow,
                             ProofRequestId = proof.Id
                         };
                         await emailHelperService.AddMessageAsync(proofMessage);
@@ -141,6 +145,64 @@ namespace OpenCredentialPublisher.Services.Implementations
                         break;
 
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message, notification);
+            }
+        }
+
+        private async Task HandlerAsync(CredentialDefinitionNeedsEndorsementNotification notification)
+        {
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var emailHelperService = scope.ServiceProvider.GetRequiredService<EmailHelperService>();
+                var defMessage = new MessageModel
+                {
+                    Body = new StringBuilder($"A credential definition requires endorsement by Evernym.  Please send the following values to support@evernym.com<br />")
+                                .Append($"IssuerDID: {notification.IssuerDid}<br />")
+                                .Append($"Verkey: {notification.IssuerVerkey}<br />")
+                                .Append($"CredDefId: {notification.CredentialDefinitionId}<br />")
+                                .Append($"CredDefJson: {notification.CredDefJson}<br />")
+                                .Append($"ThreadId: {notification.ThreadId}<br />").ToString(),
+                    Recipient = _siteSettings.AdminEmailAddress,
+                    Subject = $"Credential Definition Endorsement Required",
+                    SendAttempts = 0,
+                    StatusId = StatusEnum.Created,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await emailHelperService.AddMessageAsync(defMessage);
+                await _emailService.SendEmailAsync(defMessage.Recipient, defMessage.Subject, defMessage.Body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message, notification);
+            }
+        }
+
+        private async Task HandlerAsync(SchemaNeedsEndorsementNotification notification)
+        {
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var emailHelperService = scope.ServiceProvider.GetRequiredService<EmailHelperService>();
+                var schemaMessage = new MessageModel
+                {
+                    Body = new StringBuilder($"A schema requires endorsement by Evernym.  Please send the following values to support@evernym.com<br />")
+                                .Append($"IssuerDID: {notification.IssuerDid}<br />")
+                                .Append($"Verkey: {notification.IssuerVerkey}<br />")
+                                .Append($"SchemaId: {notification.SchemaId}<br />")
+                                .Append($"SchemaJson: {notification.SchemaJson}<br />")
+                                .Append($"ThreadId: {notification.ThreadId}<br />").ToString(),
+                    Recipient = _siteSettings.AdminEmailAddress,
+                    Subject = $"Schema Endorsement Required",
+                    SendAttempts = 0,
+                    StatusId = StatusEnum.Created,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await emailHelperService.AddMessageAsync(schemaMessage);
+                await _emailService.SendEmailAsync(schemaMessage.Recipient, schemaMessage.Subject, schemaMessage.Body, true);
             }
             catch (Exception ex)
             {

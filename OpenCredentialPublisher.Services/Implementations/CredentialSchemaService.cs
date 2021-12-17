@@ -80,7 +80,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 Attributes = jsonAttributes,
                 ThreadId = Guid.NewGuid().ToString().ToLower(),
                 StatusId = StatusEnum.Pending,
-                CreatedOn = DateTimeOffset.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
 
             await _walletContext.CredentialSchemas.AddAsync(credentialSchema);
@@ -89,12 +89,12 @@ namespace OpenCredentialPublisher.Services.Implementations
             return await GetCredentialSchemaAsync(name, schemaHash);
         }
 
-        public async Task<CredentialSchema> UpdateCredentialSchemaAsync(string threadId, string schemaId)
+        public async Task<CredentialSchema> UpdateCredentialSchemaAsync(string threadId, string schemaId, StatusEnum statusId = StatusEnum.Created)
         {
             var schema = await GetCredentialSchemaAsync(threadId);
             schema.SchemaId = schemaId;
-            schema.StatusId = StatusEnum.Created;
-            schema.ModifiedOn = DateTimeOffset.UtcNow;
+            schema.StatusId = statusId;
+            schema.ModifiedAt = DateTime.UtcNow;
             _walletContext.Update(schema);
             await _walletContext.SaveChangesAsync();
             _walletContext.Entry(schema).State = EntityState.Detached;
@@ -103,7 +103,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public async Task<CredentialSchema> UpdateCredentialSchemaAsync(CredentialSchema credentialSchema)
         {
-            credentialSchema.ModifiedOn = DateTimeOffset.UtcNow;
+            credentialSchema.ModifiedAt = DateTime.UtcNow;
             _walletContext.Update(credentialSchema);
             await _walletContext.SaveChangesAsync();
             _walletContext.Entry(credentialSchema).State = EntityState.Detached;
@@ -117,7 +117,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 credentialRequest.ErrorMessage = "There was a problem writing the schema for your credential to the chain.  Please try again later.";
                 credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.ErrorWritingSchema;
-                credentialRequest.ModifiedOn = DateTime.UtcNow;
+                credentialRequest.ModifiedAt = DateTime.UtcNow;
 
                 await _queueService.SendMessageAsync(
                         CredentialStatusNotification.QueueName,

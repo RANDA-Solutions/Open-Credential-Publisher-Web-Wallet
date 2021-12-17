@@ -122,10 +122,21 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             return clrLinkVMs;
         }
-        private string GetLinkUrl(HttpRequest request, string id)
+        public static string GetLinkUrl(HttpRequest request, string id)
         {
             //var Request = model.Request;
-            if (Uri.TryCreate($"{request.Scheme}://{request.Host}{request.PathBase}/Public/Links/Display/{id}", UriKind.Absolute, out var url))
+            if (Uri.TryCreate($"{request.Scheme}://{request.Host}{request.PathBase}/s/{id}", UriKind.Absolute, out var url))
+            {
+                return url.AbsoluteUri;
+            }
+
+            return string.Empty;
+        }
+
+        public static string GetLinkUrl(Uri baseUri, string id)
+        {
+            //var Request = model.Request;
+            if (Uri.TryCreate($"{baseUri.Scheme}://{baseUri.Authority}/s/{id}", UriKind.Absolute, out var url))
             {
                 return url.AbsoluteUri;
             }
@@ -212,10 +223,10 @@ namespace OpenCredentialPublisher.Services.Implementations
             var item = await _context.Links
                     .Include(l => l.Shares)
                     .ThenInclude(s => s.Messages)
-                    .AsNoTracking()
                     .SingleAsync(x => x.Id == id);
 
-            _context.Links.Remove(item);
+            item.Delete();
+            //_context.Links.Remove(item);
 
             await _context.SaveChangesAsync();
         }
