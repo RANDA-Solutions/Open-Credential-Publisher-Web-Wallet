@@ -25,48 +25,50 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
 {
 
     /// <summary>
-    /// WriteCredDefResponse
+    /// UpdateCredentialDefinitionMessage
     /// </summary>
     [DataContract]
-        public partial class WriteCredDefResponse :  IEquatable<WriteCredDefResponse>, IValidatableObject
+        public partial class UpdateCredentialDefinitionMessage :  IEquatable<UpdateCredentialDefinitionMessage>, IValidatableObject
     {
 
-        public WriteCredDefResponse() { }
+        public UpdateCredentialDefinitionMessage() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WriteCredDefResponse" /> class.
+        /// Initializes a new instance of the <see cref="UpdateCredentialDefinitionMessage" /> class.
         /// </summary>
         /// <param name="type">type (required).</param>
-        /// <param name="thread">thread (required).</param>
         /// <param name="credDefId">credDefId (required).</param>
-        public WriteCredDefResponse(string type = default(string), Thread thread = default(Thread), string credDefId = default(string))
+        /// <param name="threadId">threadId (required).</param>"
+        public UpdateCredentialDefinitionMessage(string type = default(string), string credDefId = default(string), string threadId = default(string))
         {
             // to ensure "type" is required (not null)
             if (type == null)
             {
-                throw new InvalidDataException("type is a required property for WriteCredDefResponse and cannot be null");
+                throw new InvalidDataException("type is a required property for UpdateCredentialDefinitionMessage and cannot be null");
             }
             else
             {
                 this.Type = type;
             }
-            // to ensure "thread" is required (not null)
-            if (thread == null)
-            {
-                throw new InvalidDataException("thread is a required property for WriteCredDefResponse and cannot be null");
-            }
-            else
-            {
-                this.Thread = thread;
-            }
+           
             // to ensure "credDefId" is required (not null)
             if (credDefId == null)
             {
-                throw new InvalidDataException("credDefId is a required property for WriteCredDefResponse and cannot be null");
+                throw new InvalidDataException("credDefId is a required property for UpdateCredentialDefinitionMessage and cannot be null");
             }
             else
             {
                 this.CredDefId = credDefId;
+            }
+
+            // to ensure "threadId" is required (not null)
+            if (threadId == null)
+            {
+                throw new InvalidDataException("threadId is a required property for UpdateCredentialDefinitionMessage and cannot be null");
+            }
+            else
+            {
+                this.ThreadId = threadId;
             }
         }
         
@@ -77,16 +79,16 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         public string Type { get; set; }
 
         /// <summary>
-        /// Gets or Sets Thread
-        /// </summary>
-        [DataMember(Name="~thread", EmitDefaultValue=false)]
-        public Thread Thread { get; set; }
-
-        /// <summary>
         /// Gets or Sets CredDefId
         /// </summary>
         [DataMember(Name="credDefId", EmitDefaultValue=false)]
         public string CredDefId { get; set; }
+
+        /// <summary>
+        /// Gets or Sets ThreadId
+        /// </summary>
+        [DataMember(Name = "threadId", EmitDefaultValue = false)]
+        public string ThreadId { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -95,10 +97,10 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class WriteCredDefResponse {\n");
+            sb.Append("class UpdateCredentialDefinitionMessage {\n");
             sb.Append("  Type: ").Append(Type).Append("\n");
-            sb.Append("  Thread: ").Append(Thread).Append("\n");
             sb.Append("  CredDefId: ").Append(CredDefId).Append("\n");
+            sb.Append("  ThreadId: ").Append(ThreadId).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -119,15 +121,15 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
         /// <returns>Boolean</returns>
         public override bool Equals(object input)
         {
-            return this.Equals(input as WriteCredDefResponse);
+            return this.Equals(input as UpdateCredentialDefinitionMessage);
         }
 
         /// <summary>
-        /// Returns true if WriteCredDefResponse instances are equal
+        /// Returns true if UpdateCredentialDefinitionMessage instances are equal
         /// </summary>
-        /// <param name="input">Instance of WriteCredDefResponse to be compared</param>
+        /// <param name="input">Instance of UpdateCredentialDefinitionMessage to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(WriteCredDefResponse input)
+        public bool Equals(UpdateCredentialDefinitionMessage input)
         {
             if (input == null)
                 return false;
@@ -139,14 +141,14 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
                     this.Type.Equals(input.Type))
                 ) && 
                 (
-                    this.Thread == input.Thread ||
-                    (this.Thread != null &&
-                    this.Thread.Equals(input.Thread))
-                ) && 
-                (
                     this.CredDefId == input.CredDefId ||
                     (this.CredDefId != null &&
                     this.CredDefId.Equals(input.CredDefId))
+                ) &&
+                (
+                    this.ThreadId == input.ThreadId ||
+                    (this.ThreadId != null &&
+                    this.ThreadId.Equals(input.ThreadId))
                 );
         }
 
@@ -161,10 +163,10 @@ namespace OpenCredentialPublisher.VerityRestApi.Model
                 int hashCode = 41;
                 if (this.Type != null)
                     hashCode = hashCode * 59 + this.Type.GetHashCode();
-                if (this.Thread != null)
-                    hashCode = hashCode * 59 + this.Thread.GetHashCode();
                 if (this.CredDefId != null)
                     hashCode = hashCode * 59 + this.CredDefId.GetHashCode();
+                if (this.ThreadId != null)
+                    hashCode = hashCode * 59 + this.ThreadId.GetHashCode();
                 return hashCode;
             }
         }

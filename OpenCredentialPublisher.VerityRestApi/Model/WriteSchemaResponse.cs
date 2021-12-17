@@ -23,6 +23,7 @@ using SwaggerDateConverter = OpenCredentialPublisher.VerityRestApi.Client.Swagge
 
 namespace OpenCredentialPublisher.VerityRestApi.Model
 {
+
     /// <summary>
     /// WriteSchemaResponse
     /// </summary>

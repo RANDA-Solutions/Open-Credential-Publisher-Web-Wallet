@@ -91,7 +91,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Handlers
 
                 if (await _credentialService.CredentialPackageHasPdfAsync(command.CredentialPackageId))
                 {
-                    await _verityService.SendCredentialOfferAsync<ClrWithPdfCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
+                    await _verityService.SendCredentialOfferAsync<ClrShareCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
                     //await _verityService.SendCredentialOfferAsync<ClrAttachmentLinkCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
                     await _verityService.SendCredentialOfferAsync<ClrAttachmentCredential>(command.UserId, command.WalletRelationshipId, command.CredentialPackageId);
                 }

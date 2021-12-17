@@ -46,7 +46,15 @@ namespace OpenCredentialPublisher.Services.Constants
         public const string UpdateEndpointsResponse = "did:sov:123456789abcdefghi1234;spec/configs/0.6/COM_METHOD_UPDATED";
         public const string WriteCredentialDefinitionProblem = "did:sov:123456789abcdefghi1234;spec/write-cred-def/0.6/problem-report";
         public const string WriteCredentialDefinitionResponse = "did:sov:123456789abcdefghi1234;spec/write-cred-def/0.6/status-report";
+        public const string WriteCredentialDefintionNeedEndorsement = "did:sov:123456789abcdefghi1234;spec/write-cred-def/0.6/needs-endorsement";
         public const string WriteSchemaProblem = "did:sov:123456789abcdefghi1234;spec/write-schema/0.6/problem-report";
         public const string WriteSchemaResponse = "did:sov:123456789abcdefghi1234;spec/write-schema/0.6/status-report";
+        public const string WriteSchemaNeedEndorsement = "did:sov:123456789abcdefghi1234;spec/write-schema/0.6/needs-endorsement";
+    }
+
+    public static class AdminMessageFamilies
+    {
+        public const string UpdateCredentialDefinitionMessage = "randa:admin:spec/cred-def/1.0/update";
+        public const string UpdateCredentialSchemaMessage = "randa:admin:spec/cred-schema/1.0/update";
     }
 }

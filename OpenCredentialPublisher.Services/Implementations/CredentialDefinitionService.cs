@@ -55,7 +55,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 Name = name,
                 Tag = tag,
                 ThreadId = Guid.NewGuid().ToString().ToLower(),
-                CreatedOn = DateTimeOffset.UtcNow,
+                CreatedAt = DateTime.UtcNow,
                 StatusId = StatusEnum.Pending
             };
 
@@ -65,12 +65,12 @@ namespace OpenCredentialPublisher.Services.Implementations
             return await _walletContext.CredentialDefinitions.AsNoTracking().FirstOrDefaultAsync(cd => cd.CredentialSchemaId == credentialSchemaId && cd.Tag == tag);
         }
 
-        public async Task<CredentialDefinition> UpdateCredentialDefinitionAsync(string threadId, string credentialDefinitionId)
+        public async Task<CredentialDefinition> UpdateCredentialDefinitionAsync(string threadId, string credentialDefinitionId, StatusEnum statusId = StatusEnum.Created)
         {
             var definition = await GetCredentialDefinitionAsync(threadId);
             definition.CredentialDefinitionId = credentialDefinitionId;
-            definition.StatusId = StatusEnum.Created;
-            definition.ModifiedOn = DateTimeOffset.UtcNow;
+            definition.StatusId = statusId;
+            definition.ModifiedAt = DateTime.UtcNow;
             _walletContext.Update(definition);
             await _walletContext.SaveChangesAsync();
             _walletContext.Entry(definition).State = EntityState.Detached;
@@ -79,7 +79,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public async Task<CredentialDefinition> UpdateCredentialDefinitionAsync(CredentialDefinition definition)
         {
-            definition.ModifiedOn = DateTimeOffset.UtcNow;
+            definition.ModifiedAt = DateTime.UtcNow;
             _walletContext.Update(definition);
             await _walletContext.SaveChangesAsync();
             _walletContext.Entry(definition).State = EntityState.Detached;
@@ -93,7 +93,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 credentialRequest.ErrorMessage = "There was a problem writing the definition for your credential to the chain.  Please try again later.";
                 credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.ErrorWritingCredentialDefinition;
-                credentialRequest.ModifiedOn = DateTime.UtcNow;
+                credentialRequest.ModifiedAt = DateTime.UtcNow;
 
                 await _queueService.SendMessageAsync(
                         CredentialStatusNotification.QueueName,

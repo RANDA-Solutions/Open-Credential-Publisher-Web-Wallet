@@ -35,6 +35,8 @@ namespace OpenCredentialPublisher.Services.Implementations
     {
         private const string AcceptedResponse = "Accepted";
         private const string OKResponse = "OK";
+        private readonly AzureBlobStoreService _blobStoreService;
+        private readonly AzureBlobOptions _blobOptions;
         private readonly IIssueCredentialApi _issueCredentialApi;
         private readonly IIssuerSetupApi _issuerSetupApi;
         private readonly IPresentProofApi _presentProofApi;
@@ -48,25 +50,36 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         private readonly AzureBlobStoreService _azureBlobStoreService;
 
-        public VerityApiService(IIssueCredentialApi issueCredentialApi, IIssuerSetupApi issuerSetupApi,
+        public VerityApiService(
+            AzureBlobStoreService blobStoreService,
+            IIssueCredentialApi issueCredentialApi,
+            IIssuerSetupApi issuerSetupApi,
             IPresentProofApi presentProofApi,
-            IRelationshipApi relationshipApi, IUpdateConfigsApi updateConfigsApi,
-            IUpdateEndpointApi updateEndpointApi, IWriteCredDefApi writeCredDefApi,
-            IWriteSchemaApi writeSchemaApi, AgentContextService agentContextService,
+            IRelationshipApi relationshipApi,
+            IUpdateConfigsApi updateConfigsApi,
+            IUpdateEndpointApi updateEndpointApi,
+            IWriteCredDefApi writeCredDefApi,
+            IWriteSchemaApi writeSchemaApi,
             AzureBlobStoreService azureBlobStoreService,
+            AgentContextService agentContextService,
             ConnectionRequestService connectionRequestService,
             CredentialDefinitionService credentialDefinitionService,
             CredentialRequestService credentialRequestService,
-            CredentialSchemaService credentialSchemaService, CredentialService credentialService,
+            CredentialSchemaService credentialSchemaService,
+            CredentialService credentialService,
             ProofService proofService,
             IQueueService queueService,
             VerityThreadService verityThreadService,
             WalletRelationshipService walletRelationshipService,
-            IOptions<VerityOptions> verityOptions, ILogger<VerityApiService> logger)
+            IOptions<AzureBlobOptions> blobOptions,
+            IOptions<VerityOptions> verityOptions,
+            ILogger<VerityApiService> logger)
                 : base(agentContextService, credentialDefinitionService, credentialRequestService,
                       credentialSchemaService, credentialService, proofService, queueService, walletRelationshipService,
                       verityOptions, logger)
         {
+            _blobOptions = blobOptions?.Value;
+            _blobStoreService = blobStoreService;
             _connectionRequestService = connectionRequestService;
             _issueCredentialApi = issueCredentialApi;
             _issuerSetupApi = issuerSetupApi;
@@ -219,7 +232,11 @@ namespace OpenCredentialPublisher.Services.Implementations
                 byInvitation: false
             );
             var serializerSettings = new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.Objects, TypeNameHandling = TypeNameHandling.Objects, NullValueHandling = NullValueHandling.Ignore };
-            var json = JsonConvert.SerializeObject(offer, serializerSettings);
+            if (_blobOptions.StoreCredentialJson)
+            {
+                var json = JsonConvert.SerializeObject(offer, serializerSettings);
+                await _blobStoreService.StoreAsync($"{request.Id}-{credential.CredentialTitle.Replace(" ", String.Empty)}-{request.ThreadId}.json", json, "issuecredential");
+            }
             var response = await issueCredentialApi.IssueCredentialAsync(agentContext.DomainDid, Guid.Parse(request.ThreadId), offer);
 
             HandleResponse(response, request, credential);
@@ -263,8 +280,12 @@ namespace OpenCredentialPublisher.Services.Implementations
                     VerityMessageFamilies.UpdateEndpointsResponse => JsonConvert.DeserializeObject<UpdateEndpointResult>(responseJson.AsString()),
                     VerityMessageFamilies.WriteCredentialDefinitionProblem => JsonConvert.DeserializeObject<WriteCredDefProblem>(responseJson.AsString()),
                     VerityMessageFamilies.WriteCredentialDefinitionResponse => JsonConvert.DeserializeObject<WriteCredDefResponse>(responseJson.AsString()),
+                    VerityMessageFamilies.WriteCredentialDefintionNeedEndorsement => JsonConvert.DeserializeObject<WriteCredDefNeedsEndorsementResponse>(responseJson.AsString()),
                     VerityMessageFamilies.WriteSchemaProblem => JsonConvert.DeserializeObject<WriteSchemaProblem>(responseJson.AsString()),
                     VerityMessageFamilies.WriteSchemaResponse => JsonConvert.DeserializeObject<WriteSchemaResponse>(responseJson.AsString()),
+                    VerityMessageFamilies.WriteSchemaNeedEndorsement => JsonConvert.DeserializeObject<WriteSchemaNeedsEndorsementResponse>(responseJson.AsString()),
+                    AdminMessageFamilies.UpdateCredentialDefinitionMessage => JsonConvert.DeserializeObject<UpdateCredentialDefinitionMessage>(responseJson.AsString()),
+                    AdminMessageFamilies.UpdateCredentialSchemaMessage => JsonConvert.DeserializeObject<UpdateCredentialSchemaMessage>(responseJson.AsString()),
                     _ => throw new NotImplementedException(responseJson.ToString())
                 };
                 await HandleMessage(messageObject);
@@ -374,7 +395,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             _logger.LogInformation(message.Type, message);
             var proofResponse = new ProofResponse
             {
-                CreatedOn = DateTimeOffset.UtcNow,
+                CreatedAt = DateTime.UtcNow,
                 VerificationResult = message.VerificationResult
             };
             var presentation = message.RequestedPresentation;
@@ -499,7 +520,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             foreach (var credentialRequest in credentialRequests)
             {
                 credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.ReadyToSend;
-                credentialRequest.ModifiedOn = DateTime.UtcNow;
+                credentialRequest.ModifiedAt = DateTime.UtcNow;
                 commands.Add(new SendCredentialOfferCommand(credentialRequest.Id));
                 await _queueService.SendMessageAsync(
                 CredentialStatusNotification.QueueName,
@@ -516,6 +537,32 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 await _queueService.SendMessageAsync(SendCredentialOfferCommand.QueueName, JsonConvert.SerializeObject(command));
             }
+        }
+
+        private async Task HandleMessage(WriteCredDefNeedsEndorsementResponse message)
+        {
+            var credentialDefinition = await _credentialDefinitionService.UpdateCredentialDefinitionAsync(message.Thread.Thid, message.CredDefId, StatusEnum.NeedsEndorsement);
+            var credentialRequests = _credentialRequestService.GetCredentialRequests(CredentialRequestStepEnum.PendingCredentialDefinition).Where(cr => cr.CredentialDefinitionId == credentialDefinition.Id).ToList();
+            foreach (var credentialRequest in credentialRequests)
+            {
+                await _queueService.SendMessageAsync(
+                CredentialStatusNotification.QueueName,
+                JsonConvert.SerializeObject(
+                    new CredentialStatusNotification(
+                        credentialRequest.UserId,
+                        credentialRequest.WalletRelationshipId,
+                        credentialRequest.CredentialPackageId,
+                        (int)CredentialRequestStepEnum.PendingCredentialDefinitionEndorsement)));
+            }
+
+            var agentContext = await GetAgentContextAsync();
+            var notification = new CredentialDefinitionNeedsEndorsementNotification(agentContext.IssuerDid, agentContext.IssuerVerKey, message.Thread.Thid, message.CredDefId, message.CredDefJson);
+            await _queueService.SendMessageAsync(CredentialDefinitionNeedsEndorsementNotification.QueueName, JsonConvert.SerializeObject(notification));
+        }
+
+        private async Task HandleMessage(UpdateCredentialDefinitionMessage message)
+        {
+            await HandleMessage(new WriteCredDefResponse { CredDefId = message.ThreadId, Thread = new Thread { Thid = message.ThreadId } });
         }
 
         private async Task HandleMessage(WriteSchemaProblem message)
@@ -541,7 +588,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 {
                     credentialRequest.CredentialDefinitionId = credentialDefinition.Id;
                     credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.PendingCredentialDefinition;
-                    credentialRequest.ModifiedOn = DateTime.UtcNow;
+                    credentialRequest.ModifiedAt = DateTime.UtcNow;
                     await _queueService.SendMessageAsync(
                         CredentialStatusNotification.QueueName,
                         JsonConvert.SerializeObject(
@@ -554,6 +601,41 @@ namespace OpenCredentialPublisher.Services.Implementations
                 await _credentialRequestService.UpdateCredentialRequestsAsync(credentialRequests);
                 await _queueService.SendMessageAsync(CreateCredentialDefinitionCommand.QueueName, JsonConvert.SerializeObject(new CreateCredentialDefinitionCommand(credentialDefinition.Id)));
             }
+        }
+
+        private async Task HandleMessage(WriteSchemaNeedsEndorsementResponse message)
+        {
+            var schema = await _credentialSchemaService.UpdateCredentialSchemaAsync(message.Thread.Thid, message.SchemaId, StatusEnum.NeedsEndorsement);
+            var agentContext = await GetAgentContextAsync();
+            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(schema.Id, schema.Name);
+            if (credentialDefinition == null)
+            {
+                credentialDefinition = await _credentialDefinitionService.CreateCredentialDefinitionAsync(agentContext.Id, schema.Id, schema.Name, Guid.NewGuid().ToString());
+                var credentialRequests = await _credentialRequestService.GetCredentialRequests(CredentialRequestStepEnum.PendingSchema).Where(cr => cr.CredentialSchemaId == schema.Id).ToListAsync();
+                foreach (var credentialRequest in credentialRequests)
+                {
+                    credentialRequest.CredentialDefinitionId = credentialDefinition.Id;
+                    credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.PendingCredentialDefinition;
+                    credentialRequest.ModifiedAt = DateTime.UtcNow;
+                    await _queueService.SendMessageAsync(
+                        CredentialStatusNotification.QueueName,
+                        JsonConvert.SerializeObject(
+                            new CredentialStatusNotification(
+                                credentialRequest.UserId,
+                                credentialRequest.WalletRelationshipId,
+                                credentialRequest.CredentialPackageId,
+                                (int)credentialRequest.CredentialRequestStep)));
+                }
+                await _credentialRequestService.UpdateCredentialRequestsAsync(credentialRequests);
+                await _queueService.SendMessageAsync(CreateCredentialDefinitionCommand.QueueName, JsonConvert.SerializeObject(new CreateCredentialDefinitionCommand(credentialDefinition.Id)));
+            }
+            var notification = new SchemaNeedsEndorsementNotification(agentContext.IssuerDid, agentContext.IssuerVerKey, message.Thread.Thid, message.SchemaId, message.SchemaJson);
+            await _queueService.SendMessageAsync(SchemaNeedsEndorsementNotification.QueueName, JsonConvert.SerializeObject(notification));
+        }
+
+        private async Task HandleMessage(UpdateCredentialSchemaMessage message)
+        {
+            await _credentialSchemaService.UpdateCredentialSchemaAsync(message.ThreadId, message.SchemaId);
         }
 
         public async Task ProofRequestAynsc(ProofRequest proofRequest)

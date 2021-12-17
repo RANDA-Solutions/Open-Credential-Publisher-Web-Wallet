@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using OpenCredentialPublisher.Services.Drawing;
+using OpenCredentialPublisher.Services.Implementations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,20 @@ namespace OpenCredentialPublisher.Tests
 {
     class PdfTests
     {
+
+        [Test]
+        public void LinkUrl()
+        {
+            const string host = "https://ocp-wallet-qa.azurewebsites.net";
+            Uri baseUri = null;
+            string url = null;
+            if (Uri.TryCreate(host, UriKind.Absolute, out baseUri))
+            {
+                url = LinkService.GetLinkUrl(baseUri, Guid.NewGuid().ToString());
+            }
+            Assert.IsNotNull(url);
+            Assert.IsNotEmpty(url);
+        }
 
         [Test]
         public void AddQRCodeToPdf()

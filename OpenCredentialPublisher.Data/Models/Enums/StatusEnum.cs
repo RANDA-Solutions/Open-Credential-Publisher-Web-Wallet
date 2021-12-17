@@ -19,6 +19,7 @@ namespace OpenCredentialPublisher.Data.Models.Enums
         ReadyForVerification = 15,
         Verified = 16,
         Unused = 17,
-        Success = 18
+        Success = 18,
+        NeedsEndorsement = 19
     }
 }

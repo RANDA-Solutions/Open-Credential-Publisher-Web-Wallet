@@ -30,7 +30,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Mappers
 
             var additionalProperties = GetAdditionalProperties(clr);
 
-            var link = new LinkModel { ClrForeignKey = model.Clr.ClrId, CredentialRequestId = model.CredentialRequestId, UserId = model.WalletRelationship.UserId, Nickname = $"SentToWallet-{model.WalletRelationship.WalletName}", RequiresAccessKey = true, CreatedAt = DateTimeOffset.UtcNow };
+            var link = new LinkModel { ClrForeignKey = model.Clr.ClrId, CredentialRequestId = model.CredentialRequestId, UserId = model.WalletRelationship.UserId, Nickname = $"SentToWallet-{model.WalletRelationship.WalletName}", RequiresAccessKey = true, CreatedAt = DateTime.UtcNow };
             await _linkService.AddAsync(link);
 
             var shareModel = new ShareModel
@@ -39,34 +39,30 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Mappers
                 ShareTypeId = ShareTypeEnum.Wallet,
                 AccessKey = Crypto.CreateRandomString(16),
                 UseCount = 0,
-                CreatedOn = DateTimeOffset.UtcNow,
+                CreatedAt = DateTime.UtcNow,
                 StatusId = StatusEnum.Active
             };
 
             await _linkService.AddShareAsync(shareModel);
+
             string url = null;
-            if (Uri.TryCreate($"{_credentialPublisherOptions.HostUrl}/Links/Display/{link.Id}?key={shareModel.AccessKey}", UriKind.Absolute, out var uri))
+            if (Uri.TryCreate(_credentialPublisherOptions.HostUrl, UriKind.Absolute, out var baseUri))
             {
-                url = uri.ToString();
+                url = LinkService.GetLinkUrl(baseUri, link.Id);
             }
 
             var credential = new ClrShareCredential
             {
-                Clr_Id = clr.Id,
                 Clr_Issue_Date = clr.IssuedOn.ToString(),
                 Clr_Name = clr.Name,
                 Learner_Address = AddressToString(clr.Learner.Address),
                 Learner_Name = clr.Learner.Name,
-                Learner_Id = clr.Learner.Id,
                 Learner_StudentId = clr.Learner.StudentId,
-                Learner_SourceId = clr.Learner.SourcedId,
                 Publisher_Address = AddressToString(clr.Publisher.Address),
-                Publisher_Id = clr.Publisher.Id,
                 Publisher_Name = clr.Publisher.Name,
-                Learner_Identifiers = additionalProperties.studentIdentifiers,
                 Publisher_ParentOrg = additionalProperties.parentOrg,
-                Publisher_Identifiers = additionalProperties.parentIdentifiers,
                 Publisher_Official = additionalProperties.official,
+                AccessKey = shareModel.AccessKey,
                 Url = url
             };
             return credential;
