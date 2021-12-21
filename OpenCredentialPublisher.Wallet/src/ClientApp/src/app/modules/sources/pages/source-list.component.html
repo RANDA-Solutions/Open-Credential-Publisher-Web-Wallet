@@ -1,56 +1,64 @@
 <div class="row mt-5">
   <div class="col">
     <section class="default-container p-5">
-      <span class="h1">Your CLR Sources</span>
+      <span class="h1">How do I get my credentials?</span>
 
       <div class="alert alert-primary">
         <p>
-          A Comprehensive Learner Record (CLR) is a record of your curricular and non-curricular learning achievements.
-          Each CLR comes from a single publisher (such as your school) and contains one or more of your achievements.
+          Open Credential Publisher collects two different types of credentials.
         </p>
+        <ul>
+          <li class="mb-2">A Comprehensive Learner Record (CLR) is a record of your academic and extracurricular learning achievements.
+            Each CLR is published by a single organization (such as your school) and contains one or more of your achievements.
+          <br/>
+          </li>
+          <li>
+            An Open Badge is earned by demonstrating skills and accomplishments, often by submitting evidence.
+            Badges from several sources can be published to your wallet by connecting to a badge service like Badgr.
+          </li>
+        </ul>
         <p>
-          A CLR source is a platform which has one or more of your CLRs. This application connects to the source to
-          get your CLRs.
+          To obtain your credential you must connect with either the organization or badge service responsible
+          for publishing your learning achievement(s).  Open Credential Publisher is an application that creates
+          a secure connection with these sources to retrieve your credentials and publish them to your wallet.
         </p>
       </div>
       <p>
         <a [routerLink]="['/sources/register']">Connect to a source</a>
       </p>
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>URL</th>
-              <th class="text-center">CLRs</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of authorizations">
-              <td>{{item.name}}</td>
-              <td>{{item.type}}</td>
-              <td>{{item.sourceUrl}}</td>
-              <td class="text-center">{{item.clrCount}}</td>
-              <td style="white-space: nowrap;">
-                <a [routerLink]="['/sources/details', item.id]">Details</a> |
-                <a [routerLink]="['/sources/delete', item.id]">Delete</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+        <app-spinner id="source-details-spinner" [message]="message"></app-spinner>
       </div>
+      <ng-template #theContent>
+        <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+          <span *ngFor="let msg of modelErrors">{{msg}}</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>URL</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of authorizations">
+                <td>{{item.name}}</td>
+                <td>{{item.type}}</td>
+                <td>{{item.sourceUrl}}</td>
+                <td style="white-space: nowrap;">
+                  <a href="javascript:void(0)" (click)="refreshClrs(item.id)">Refresh</a> |
+                  <a [routerLink]="['/sources/delete', item.id]">Delete</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+      </ng-template>
         <a [routerLink]="['/credentials']">Back to Dashboard</a>
     </section>
-  </div>
-
-  <div class="tw-spinner-overlay" [hidden]="!showSpinner">
-    <div class="tw-spinner-wrapper">
-    </div>
-  </div>
-  <div id="spinner-container" [hidden]="!showSpinner">
-    <app-spinner id="spinner"></app-spinner>
   </div>
 </div>
 

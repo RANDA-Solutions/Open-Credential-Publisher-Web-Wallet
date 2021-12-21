@@ -17,6 +17,11 @@ export const publicRoutes: Routes = [
   {path: 'privacy', component: PrivacyComponent},
   {path: 'terms', component: TermsComponent},
   {path: 'lockout', component: LockoutComponent},
+  {
+    path: ':id',
+    component: LinkDisplayComponent,
+    data: {hideNavBar: true}
+  },
 ];
 
 export const publicRouter = RouterModule.forChild(publicRoutes);

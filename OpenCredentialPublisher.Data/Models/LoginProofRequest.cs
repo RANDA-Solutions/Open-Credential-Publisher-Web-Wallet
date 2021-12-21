@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("LoginProofRequests")]
-    public class LoginProofRequest
+    public class LoginProofRequest: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -26,7 +26,15 @@ namespace OpenCredentialPublisher.Data.Models
 
         public IdRampProofRequestStatusEnum ProofRequestStatus { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+        public bool IsDeleted { get; set; }
+
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
         public DateTimeOffset ValidUntil { get; set; }
         public ApplicationUser User { get; set; }
     }

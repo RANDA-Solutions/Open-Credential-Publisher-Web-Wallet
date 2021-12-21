@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("CredentialRequests")]
-    public class CredentialRequestModel
+    public class CredentialRequestModel: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -25,8 +25,8 @@ namespace OpenCredentialPublisher.Data.Models
         public int? CredentialDefinitionId { get; set; }
         public int? CredentialSchemaId { get; set; }
 
-        public DateTimeOffset CreatedOn { get; set; }
-        public DateTimeOffset? ModifiedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
 
         [ForeignKey("WalletRelationshipId")]
         public WalletRelationshipModel WalletRelationship { get; set; }
@@ -41,5 +41,11 @@ namespace OpenCredentialPublisher.Data.Models
         public CredentialSchema CredentialSchema { get; set; }
         [ForeignKey("CredentialDefinitionId")]
         public CredentialDefinition CredentialDefinition { get; set; }
+        public bool IsDeleted { get; set; }
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
     }
 }

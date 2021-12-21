@@ -1,9 +1,13 @@
 <section class="login-form">
+  <div *ngIf="infoMessage" class="alert alert-info mt-2">
+    {{infoMessage}}
+  </div>
   <form #f="ngForm" novalidate (ngSubmit)="login(f)">
     <span class="h4">ENTER YOUR LOGIN INFORMATION</span>
     <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
       <span *ngFor="let msg of modelErrors">{{msg}}</span>
     </div>
+    
     <div class="input-group my-3">
       <div class="input-group-prepend mr-3">
           <span><i class="fal fa-user fa-2x icon-color"></i></span>
@@ -33,7 +37,7 @@
       </div>
   </div>
   </form>
-  <div *ngIf="!!externalProviders && externalProviders.length > 0">
+  <ng-container>
     <hr />
     <span class="h4">OTHER WAYS TO LOGIN</span>
     <div class="row">
@@ -48,7 +52,7 @@
         <a class="btn btn-tertiary" href="{{external(provider.name)}}">{{provider.displayName}}</a>
       </div> -->
     </div>
-  </div>
+  </ng-container>
     <hr />
     <span class="h4">
       DO YOU WANT TO VERIFY A CREDENTIAL ISSUED BY US?<br />

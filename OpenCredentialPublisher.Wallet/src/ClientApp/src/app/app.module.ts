@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { CoreModule } from '@core/core.module';
 import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
+import { NgIdleModule } from '@ng-idle/core';
 import { AuthModule, LogLevel } from 'angular-auth-oidc-client';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 import { MessageService } from 'primeng/api';
@@ -16,6 +17,7 @@ import { SourcesCallbackComponent } from './components/sources-callback/sources-
 import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { SecureRoutesService } from './services/secureRoutes.service';
+import { TimeoutService } from './services/timeout.service';
 import { TokenInterceptorService } from './services/token-interceptor.service';
 
 @NgModule({
@@ -38,6 +40,7 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 			level: NgxLoggerLevel.DEBUG,
 			serverLogLevel: NgxLoggerLevel.ERROR
 		}),
+		NgIdleModule.forRoot(),
 		AppRoutingModule,
 		AuthModule.forRoot({
 			config: {
@@ -53,6 +56,7 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 				responseType: 'code',
 				scope: 'openid profile roles offline_access', // 'openid profile offline_access ' + your scopes
 				silentRenew: true,
+				silentRenewUrl: `${window.location.origin}/silent-renew.html`,
 				startCheckSession: true,
 				triggerAuthorizationResultEvent: true,
 				unauthorizedRoute: '/unauthorized',
@@ -66,6 +70,7 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 		, AppService
 		, MessageService
 		, SecureRoutesService
+		, TimeoutService
 		, {
 			provide: HTTP_INTERCEPTORS,
 			useClass: TokenInterceptorService,

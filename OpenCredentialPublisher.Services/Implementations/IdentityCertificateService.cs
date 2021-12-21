@@ -82,7 +82,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<X509Certificate2> GetCertificateAsync()
         {
             var hostSettings = _configuration.GetSection(nameof(HostSettings)).Get<HostSettings>();
-            var time = DateTimeOffset.UtcNow;
+            var time = DateTime.UtcNow;
 
             using var scope = _serviceScopeFactory.CreateScope();
             var walletDbContext = scope.ServiceProvider.GetRequiredService<WalletDbContext>();
@@ -110,7 +110,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             var hostSettings = _configuration.GetSection(nameof(HostSettings)).Get<HostSettings>();
 
-            var time = DateTimeOffset.UtcNow;
+            var time = DateTime.UtcNow;
 
             using var scope = _serviceScopeFactory.CreateScope();
             var walletDbContext = scope.ServiceProvider.GetRequiredService<WalletDbContext>();

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,9 @@ namespace OpenCredentialPublisher.ClrWallet
             services.Configure<SiteSettingsOptions>(siteSettingsSection);
             var siteSettingsOptions = siteSettingsSection.Get<SiteSettingsOptions>();
             Config.SpaClientUrl = siteSettingsOptions.SpaClientUrl;
+            Config.AccessTokenLifetime = siteSettingsOptions.AccessTokenLifetime;
+            Config.UseSlidingSessionExpiration = siteSettingsOptions.SlidingSessionExpiration;
+            Config.SessionTimeout = siteSettingsOptions.SessionTimeout;
 
             services.Configure<VerityOptions>(Configuration.GetSection(VerityOptions.Section));
             services.Configure<HostSettings>(Configuration.GetSection(nameof(HostSettings)));
@@ -79,16 +83,16 @@ namespace OpenCredentialPublisher.ClrWallet
             services.Configure<KeyVaultOptions>(keyVaultSection);
             var keyVaultOptions = keyVaultSection.Get<KeyVaultOptions>();
 
-
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
-                .MinimumLevel.Error()
+                .MinimumLevel.Information()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Error)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Literate)
                 .CreateLogger();
+            
             services.AddControllers()
                 .ConfigureApiBehaviorOptions(options =>
                 { 
@@ -173,14 +177,16 @@ namespace OpenCredentialPublisher.ClrWallet
 
             var builder = services.AddIdentityServer(options =>
             {
-                options.UserInteraction.LoginUrl = "/access/login";
-                options.UserInteraction.LogoutUrl = "/access/logout";
-                options.UserInteraction.ErrorUrl = "/error";
-
+                //options.UserInteraction.LoginUrl = $"{siteSettingsOptions.SpaClientUrl}/access/login";
+                //options.UserInteraction.LogoutUrl = $"{siteSettingsOptions.SpaClientUrl}/access/logout";
+                //options.UserInteraction.ErrorUrl = $"{siteSettingsOptions.SpaClientUrl}/error";
                 options.Events.RaiseErrorEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseSuccessEvents = true;
+            })
+            .AddApiAuthorization<ApplicationUser, WalletDbContext>(options =>
+            {
             })
             .AddConfigurationStore(options =>
             {
@@ -207,47 +213,13 @@ namespace OpenCredentialPublisher.ClrWallet
                 builder.AddSigningCredential(azureResponse.Value);
             }
 
-            builder.AddApiAuthorization<ApplicationUser, WalletDbContext>(options =>
-             {
-                 options.IdentityResources.AddRange(Config.IdentityResources.ToArray());
-                 options.Clients.AddRange(Config.Clients.ToArray());
-             });
 
             var authenticationBuilder =
                 services.AddAuthentication()
                     .AddIdentityServerJwt();
             
-            // https://damienbod.com/2017/10/16/securing-an-angular-signalr-client-using-jwt-tokens-with-asp-net-core-and-identityserver4/
-            //// Get options from app settings
-            //var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions)).Get<JwtIssuerOptions>();
 
-            //// Configure JwtIssuerOptions
-            //services.Configure<JwtIssuerOptions>(options =>
-            //{
-            //    options.Issuer = jwtAppSettingOptions.Issuer;
-            //    options.Audience = jwtAppSettingOptions.Audience;
-            //    options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
-            //});
-
-            //var tokenValidationParameters = new TokenValidationParameters
-            //{
-            //    ValidateIssuer = true,
-            //    ValidIssuer = jwtAppSettingOptions.Issuer,
-
-            //    ValidateAudience = true,
-            //    ValidAudience = jwtAppSettingOptions.Audience,
-
-            //    ValidateIssuerSigningKey = true,
-            //    IssuerSigningKey = _signingKey,
-
-            //    RequireExpirationTime = false,
-            //    ValidateLifetime = true,
-            //    ClockSkew = TimeSpan.Zero
-            //};
             services.Configure<JwtBearerOptions>(IdentityServerJwtConstants.IdentityServerJwtBearerScheme, options => {
-                //options.ClaimsIssuer = jwtAppSettingOptions.Issuer;
-                //options.TokenValidationParameters = tokenValidationParameters;
-                //options.SaveToken = true;
                 options.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = context =>
@@ -272,8 +244,13 @@ namespace OpenCredentialPublisher.ClrWallet
             );
             services.ConfigureApplicationCookie(options =>
             {
+                options.SlidingExpiration = true;
+                options.ExpireTimeSpan = TimeSpan.FromSeconds(siteSettingsOptions.SessionTimeout);
                 options.Cookie.IsEssential = true;
                 options.Cookie.SameSite = SameSiteMode.Unspecified;
+                options.LoginPath = "/access/login";
+                options.LogoutPath = "/access/logout";
+                options.AccessDeniedPath = "/error";
             });
 
             var externalProvidersOptions = Configuration.GetSection(ExternalProvidersOptions.Section).Get<ExternalProvidersOptions>();
@@ -379,21 +356,19 @@ namespace OpenCredentialPublisher.ClrWallet
             }
             else
             {
-                // app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            //if (!Environment.IsDevelopmentOrLocalhost())
-            //{
-            //    app.UseSpaStaticFiles();
-            //}
-            app.UseRouting();
-            app.UseCors(CorsConfig.PolicyName);
-            app.UseIdentityServer();
-            app.UseAuthentication();
-            app.UseAuthorization();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseRouting();
+            app.UseCors(CorsConfig.PolicyName);
+
+            app.UseAuthentication();
+            app.UseIdentityServer();
+            app.UseAuthorization();
+
             if (!Environment.IsDevelopment())
                 app.UseSpaStaticFiles();
 
@@ -407,23 +382,11 @@ namespace OpenCredentialPublisher.ClrWallet
             app.UseWhen(x => !x.Request.Path.Value.Contains("/api/") && !x.Request.Path.Value.Contains("/hubs/"), app1 =>
              app1.UseSpa(spa =>
              {
-                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                 // see https://go.microsoft.com/fwlink/?linkid=864501
-
                  spa.Options.SourcePath = "ClientApp";
                  if (Environment.IsDevelopment())
                      spa.UseProxyToSpaDevelopmentServer("https://localhost:4200");
              })
             );
-            //app.UseSpa(spa =>
-            //{
-            //    // To learn more about options for serving an Angular SPA from ASP.NET Core,
-            //    // see https://go.microsoft.com/fwlink/?linkid=864501
-
-            //    spa.Options.SourcePath = "ClientApp";
-            //    if (Environment.IsDevelopment())
-            //        spa.UseProxyToSpaDevelopmentServer("https://localhost:4200");
-            //});
         }
 
         private void InitializeDatabase(IApplicationBuilder app)
@@ -441,7 +404,7 @@ namespace OpenCredentialPublisher.ClrWallet
                 {
                     foreach (var client in Config.Clients)
                     {
-                        context.Clients.Add(client.ToEntity());
+                        context.Clients.Add(client.ClientToEntity());
                     }
                     context.SaveChanges();
                 }
@@ -453,6 +416,15 @@ namespace OpenCredentialPublisher.ClrWallet
                         context.IdentityResources.Add(resource.ToEntity());
                     }
                     context.SaveChanges();
+                }
+
+                if (!context.ApiScopes.Any())
+                {
+                    foreach (var scope in Config.ApiScopes)
+                    {
+                        context.ApiScopes.Add(scope.ToEntity());
+                        context.SaveChanges();
+                    }
                 }
 
                 if (!context.ApiResources.Any())

@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppService } from '@core/services/app.service';
-import { AuthorizationService } from '@core/services/authorization.service';
 import { SourcesService } from '@modules/sources/sources.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
@@ -20,7 +18,7 @@ export class RegisterCallbackComponent implements OnInit {
   private sub: Subscription;
   sourceCallback = new SourceCallback();
   private debug = false;
-  constructor(private appService: AppService, private authService: AuthorizationService,
+  constructor(
     private router: Router, private route: ActivatedRoute, private sourcesService: SourcesService ) {
   }
 
@@ -41,7 +39,7 @@ export class RegisterCallbackComponent implements OnInit {
       .pipe(take(1)).subscribe(data => {
         console.log(data);
         if (data.statusCode == 200) {
-          this.router.navigate(['/sources/details', (<ApiOkResponse>data).result as number]);
+          this.router.navigate(['/sources/source-list', (<ApiOkResponse>data).result as number]);
         } else {
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
         }

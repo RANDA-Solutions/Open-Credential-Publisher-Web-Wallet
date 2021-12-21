@@ -23,10 +23,10 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task DeleteAsync(int id)
         {
             var item = await _context.Recipients
-                    .AsNoTracking()
                     .SingleAsync(x => x.Id == id);
 
-            _context.Recipients.Remove(item);
+            item.Delete();
+           // _context.Recipients.Remove(item);
 
             await _context.SaveChangesAsync();
         }

@@ -359,12 +359,13 @@ namespace OpenCredentialPublisher.Services.Implementations
         /// </summary>
         /// <param name="page">The PageModel calling this method.</param>
         /// <param name="id">The authorization id for the resource server.</param>
-        public async Task RefreshObcBackpackAsync(ModelStateDictionary modelState, string id)
+        public async Task<int> RefreshObcBackpackAsync(ModelStateDictionary modelState, string id)
         {
+            var packageId = -1;
             if (id == null)
             {
                 modelState.AddModelError(string.Empty, "Missing authorization id.");
-                return;
+                return packageId;
             }
 
             var authorization = await _authorizationsService.GetDeepAsync(id);
@@ -372,19 +373,19 @@ namespace OpenCredentialPublisher.Services.Implementations
             if (authorization == null)
             {
                 modelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
-                return;
+                return packageId;
             }
 
             if (authorization.AccessToken == null)
             {
                 modelState.AddModelError(string.Empty, "No access token.");
-                return;
+                return packageId;
             }
 
             if (!await _authorizationsService.RefreshTokenAsync(modelState, authorization))
             {
                 modelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
-                return;
+                return packageId;
             }
 
             var serviceUrl = string.Concat(authorization.Source.DiscoveryDocument.ApiBase.EnsureTrailingSlash(), "assertions");
@@ -403,12 +404,13 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 var content = await response.Content.ReadAsStringAsync();
 
-                await SaveObcBackpackDataAsync(modelState, content, authorization);
+                packageId = await SaveObcBackpackDataAsync(modelState, content, authorization);
             }
             else
             {
                 modelState.AddModelError(string.Empty, response.ReasonPhrase);
             }
+            return packageId;
         }
         /// <summary>
         /// Get fresh copies of the Open Badges from the Badgr server.
@@ -638,7 +640,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             await _context.SaveChangesAsync();
         }
 
-        private async Task SaveObcBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
+        private async Task<int> SaveObcBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
         {            
             // Every refresh of packages will save the raw package in blob storage, but the database will contain only the most recent version
 
@@ -711,6 +713,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             credentialPackage.AssertionsCount = badgrObcBackpackAssertionsResponse.BadgrAssertions.Count;
             await _context.SaveChangesAsync();
+            return credentialPackage.Id;
         }
         private async Task<bool> EnhanceAssertionResponseAsync(ModelStateDictionary modelState, BadgrAssertionModel assertion, AuthorizationModel authorization)
         {

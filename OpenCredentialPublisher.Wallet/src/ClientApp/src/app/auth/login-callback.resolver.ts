@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import { environment } from '@environment/environment';
 import { LoginService } from '@root/app/auth/auth.service';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
@@ -10,7 +11,6 @@ import { mergeMap, take } from 'rxjs/operators';
 })
 export class LoginCallbackResolver implements Resolve<any> {
 	error: boolean;
-
 	constructor(
 		private loginService: LoginService,
 		private router: Router,
@@ -22,17 +22,18 @@ export class LoginCallbackResolver implements Resolve<any> {
 		var returnUrl = this.loginService.returnUrl;
 
 		return this.loginService.authStateChanged.pipe(take(1), mergeMap(authState => {
-			this.logger.info('AuthStateChanged: ', authState);
-			
+			if (environment.debug) console.log("LoginCallbackResolver: ", authState);
 			if (!!authState && authState.isAuthenticated && !authState.isRenewProcess) {
 				if (returnUrl) {
 					this.loginService.clearReturnUrl();
-					this.logger.info("LoginCallbackComponent Return Url: ", returnUrl);
-					//returnUrl = decodeURI(returnUrl);
+					if (environment.debug) console.log(returnUrl);
+					if (returnUrl.includes(environment.baseUrl)) {
+						returnUrl = returnUrl.replace(environment.baseUrl, '');
+						if (environment.debug) console.log(returnUrl);
+					}
 					return this.router.navigateByUrl(returnUrl, { replaceUrl: true });
 				}
 				else {
-					this.logger.info("No return url.");
 					return this.router.navigate(["/credentials"], { replaceUrl: true });
 				}
 			}

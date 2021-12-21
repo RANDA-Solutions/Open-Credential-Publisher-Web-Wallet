@@ -1,0 +1,12 @@
+@media (min-width: 565px) {
+	:host ::ng-deep section {
+	  //margin-top: 120px;
+	}
+  }
+  
+  @media (max-width: 564px) {
+	:host ::ng-deep section {
+	  padding: 50px;
+	  width: 100%;
+	}
+  }

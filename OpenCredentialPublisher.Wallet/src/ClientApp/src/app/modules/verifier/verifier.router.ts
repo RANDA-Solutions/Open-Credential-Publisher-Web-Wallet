@@ -8,13 +8,20 @@ export const verifierRoutes: Routes = [
 
     path: '',
 	component: VerifierComponent,
+
 	children: [{
 		path: '',
-		component: CreateRequestComponent
+		component: CreateRequestComponent,
+		data: {
+			hideNavBar: true
+		}
 	},
 	{
 		path: ':id', 
-		component: ViewComponent
+		component: ViewComponent,
+		data: {
+			hideNavBar: true
+		}
 	}]
   },
   

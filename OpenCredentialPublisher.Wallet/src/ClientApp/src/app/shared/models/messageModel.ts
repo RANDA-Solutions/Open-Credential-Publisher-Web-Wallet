@@ -7,7 +7,9 @@ export class MessageModel {
   subject: string;
   sendAttempts: number;
   statusId: any;
-  createdOn: Date;
+  createdAt: Date;
+  modifiedAt: Date;
+  isDeleted: boolean;
   shareId?: number;
   share: ShareModel;
 }

@@ -25,6 +25,11 @@ export class NavMenuComponent implements OnInit {
 				val => {
 					this._authResult = val;
 				});
+    router.events
+      .pipe(filter(event => event instanceof NavigationEnd), untilDestroyed(this))
+      .subscribe((val) => {
+        this.isExpanded = false;
+      });
 	}
 
 	ngOnInit() {

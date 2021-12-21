@@ -17,8 +17,8 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
         public bool IsConnected { get; set; }
         public Guid AgentContextId { get; set; }
         public string UserId { get; set; }
-        public DateTimeOffset CreatedOn { get; set; }
-        public DateTimeOffset? ModifiedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
         public int CredentialsSent { get; set; }
 
         public static WalletVM FromWalletRelationship(WalletRelationshipModel wallet)
@@ -33,8 +33,8 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
                 IsConnected = wallet.IsConnected,
                 AgentContextId = wallet.AgentContextId,
                 UserId = wallet.UserId,
-                CreatedOn = wallet.CreatedOn,
-                ModifiedOn = wallet.ModifiedOn,
+                CreatedAt = wallet.CreatedAt,
+                ModifiedAt = wallet.ModifiedAt,
                 CredentialsSent = wallet.CredentialsSent
             };
         }

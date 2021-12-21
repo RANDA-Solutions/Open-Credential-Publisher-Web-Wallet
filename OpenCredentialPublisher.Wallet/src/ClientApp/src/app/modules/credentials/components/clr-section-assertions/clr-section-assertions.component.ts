@@ -1,8 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CredentialService } from '@core/services/credentials.service';
-import { environment } from '@environment/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { AssertionHeaderVM } from '@shared/models/assertionHeaderVM';
 import { take } from 'rxjs/operators';
 import { AssertionPopupComponent } from '../assertion-popup/assertion-popup';
@@ -40,7 +38,7 @@ export class ClrSectionAssertionsComponent implements OnInit {
         if (this.debug) console.log(' ClrSectionAssertionsComponent data follows');
         if (this.debug) console.log(data);
         if (data.statusCode == 200) {
-          this.clrAssertions = (<ApiOkResponse>data).result as Array<AssertionHeaderVM>;
+          this.clrAssertions = data.result;
           if (this.debug) console.log(this.clrAssertions.length);
         } else {
           this.clrAssertions = new Array<AssertionHeaderVM>();

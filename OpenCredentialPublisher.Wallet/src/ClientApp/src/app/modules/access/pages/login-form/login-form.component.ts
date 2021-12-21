@@ -6,7 +6,6 @@ import { environment } from '@environment/environment';
 import { AccessService } from '@modules/access/services/access.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { LoginService } from '@root/app/auth/auth.service';
-import { AuthenticationSchemeModel } from '@shared/interfaces/authentication-schemes.interface';
 import { Credentials } from '@shared/interfaces/credentials.interface';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
@@ -31,7 +30,8 @@ export class LoginFormComponent implements OnInit {
 	showSpinner = false;
 	submitted = false;
 	credentials: Credentials = { email: '', password: '' };
-	externalProviders: AuthenticationSchemeModel[];
+	infoMessage?: string;
+	//externalProviders: AuthenticationSchemeModel[];
 
 	private sub: Subscription;
 	private returnUrl: string | null;
@@ -50,13 +50,21 @@ export class LoginFormComponent implements OnInit {
 		// subscribe to router event
 		this.sub = this.route.queryParams.pipe(untilDestroyed(this)).subscribe(
 			(param: any) => {
+				this.infoMessage = param['infoMessage'];
 				this.brandNew = param['brandNew'];
 				this.credentials.email = param['email'];
-				this.returnUrl = param['returnUrl'] ?? param['ReturnUrl'];
-				this.loginService.storeReturnUrl(this.returnUrl);
+				if (this.returnUrl?.startsWith("/connect/authorize/callback") == false)
+				{
+					this.loginService.storeReturnUrl(this.returnUrl);
+				}
+				else 
+				{
+					this.returnUrl = '';
+					history.pushState({ }, null, `${window.location.origin}/access/login`);
+				}
 			});
 
-		this.accessService.externalProviders().subscribe((providers: AuthenticationSchemeModel[]) => this.externalProviders = providers);
+		//this.accessService.externalProviders().subscribe((providers: AuthenticationSchemeModel[]) => this.externalProviders = providers);
 	}
 
 	login({ value, valid }: { value: Credentials; valid: boolean }) {
@@ -77,11 +85,7 @@ export class LoginFormComponent implements OnInit {
 						this.loginService.doLogin().subscribe(resp => {
 							if (this.debug) console.log(`LoginFormComponent returned from OAuthService.doLogin()`);
 						});
-						//this.router.navigate([this.returnUrl]);
 					} else if (this.resultModel.result == TwoFactorAuthenticationResultEnum.Required) {
-						// this.loginService.doLogin().subscribe(resp => {
-						//   if (this.debug) console.log(`LoginFormComponent returned from OAuthService.doLogin()`);
-						// });
 						this.router.navigate(['/access/login-with2fa']);
 					} else if (this.resultModel.result == TwoFactorAuthenticationResultEnum.Lockout) {
 						this.router.navigate(['/public/lockout']);

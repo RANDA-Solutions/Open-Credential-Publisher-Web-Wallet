@@ -31,14 +31,14 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public async Task<WalletRelationshipModel> CreateWalletRelationshipAsync(ConnectionRequestModel connectionRequest, string relationshipDid, string relationshipVerKey)
         {
-            connectionRequest.ModifiedOn = DateTimeOffset.UtcNow;
+            connectionRequest.ModifiedAt = DateTime.UtcNow;
             connectionRequest.WalletRelationship = new WalletRelationshipModel
             {
                 AgentContextId = connectionRequest.AgentContextId.Value,
                 RelationshipDid = relationshipDid,
                 RelationshipVerKey = relationshipVerKey,
                 UserId = connectionRequest.UserId,
-                CreatedOn = DateTimeOffset.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
 
             _walletContext.Update(connectionRequest);
@@ -56,7 +56,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 if (relationship != null)
                 {
                     relationship.InviteUrl = inviteUrl;
-                    relationship.ModifiedOn = DateTimeOffset.UtcNow;
+                    relationship.ModifiedAt= DateTime.UtcNow;
                     await _walletContext.SaveChangesAsync();
                     _walletContext.Entry(relationship).State = EntityState.Detached;
                 }
@@ -71,11 +71,11 @@ namespace OpenCredentialPublisher.Services.Implementations
             if (relationship != null)
             {
                 relationship.IsConnected = true;
-                relationship.ModifiedOn = DateTimeOffset.UtcNow;
+                relationship.ModifiedAt = DateTime.UtcNow;
 
                 var request = await _walletContext.ConnectionRequests.FirstOrDefaultAsync(w => w.WalletRelationshipId == relationship.Id);
                 request.ConnectionRequestStep = ConnectionRequestStepEnum.InvitationCompleted;
-                request.ModifiedOn = DateTimeOffset.UtcNow;
+                request.ModifiedAt = DateTime.UtcNow;
                 await _walletContext.SaveChangesAsync();
             }
             return relationship;
@@ -86,12 +86,12 @@ namespace OpenCredentialPublisher.Services.Implementations
             var relationship = await _walletContext.WalletRelationships.FirstOrDefaultAsync(w => w.RelationshipDid == relationshipDid);
             if (relationship != null)
             {
-                relationship.ModifiedOn = DateTimeOffset.UtcNow;
+                relationship.ModifiedAt = DateTime.UtcNow;
 
                 var request = await _walletContext.ConnectionRequests.FirstOrDefaultAsync(w => w.WalletRelationshipId == relationship.Id);
                 if (request.ConnectionRequestStep != ConnectionRequestStepEnum.InvitationCompleted)
                     request.ConnectionRequestStep = ConnectionRequestStepEnum.InvitationAccepted;
-                request.ModifiedOn = DateTimeOffset.UtcNow;
+                request.ModifiedAt = DateTime.UtcNow;
                 await _walletContext.SaveChangesAsync();
             }
             return relationship;
@@ -103,7 +103,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             if (relationship != null)
             {
                 relationship.WalletName = name;
-                relationship.ModifiedOn = DateTimeOffset.UtcNow;
+                relationship.ModifiedAt = DateTime.UtcNow;
                 await _walletContext.SaveChangesAsync();
             }
             return relationship;
@@ -135,7 +135,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             return new RelationshipVM()
             {
                 RelationshipDid = rel.RelationshipDid,
-                CreatedOn = rel.CreatedOn.UtcDateTime
+                CreatedAt = rel.CreatedAt
             };
         }
 
@@ -157,13 +157,17 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             foreach(var link in links)
             {
-                _walletContext.RemoveRange(link.Shares);
-                _walletContext.Remove(link);
+                link.Shares.ForEach(s => s.Delete());
+                //_walletContext.RemoveRange(link.Shares);
+                link.Delete();
+                //_walletContext.Remove(link);
             }
-
-            _walletContext.RemoveRange(credentialRequests);
-            _walletContext.RemoveRange(requests);
-            _walletContext.Remove(relationship);
+            await credentialRequests.ForEachAsync(cr => cr.Delete());
+            //_walletContext.RemoveRange(credentialRequests);
+            await requests.ForEachAsync(r => r.Delete());
+            //_walletContext.RemoveRange(requests);
+            relationship.Delete();
+            //_walletContext.Remove(relationship);
             await _walletContext.SaveChangesAsync();
         }
 

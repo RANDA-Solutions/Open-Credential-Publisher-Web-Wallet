@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("ProofRequests")]
-    public class ProofRequest
+    public class ProofRequest: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -28,8 +28,14 @@ namespace OpenCredentialPublisher.Data.Models
         public string InvitationQrCode { get; set; }
 
         public ProofRequestStepEnum StepId { get; set; }
-        public DateTimeOffset CreatedOn { get; set; }
-        public DateTimeOffset? ModifiedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
 
         public ApplicationUser User { get; set; }
 
@@ -41,7 +47,7 @@ namespace OpenCredentialPublisher.Data.Models
     }
 
     [Table("ProofResponses")]
-    public class ProofResponse
+    public class ProofResponse: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -56,7 +62,14 @@ namespace OpenCredentialPublisher.Data.Models
         public string UnrevealedAttributes { get; set; }
         public string Identifiers { get; set; }
 
-        public DateTimeOffset CreatedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
 
         public ProofRequest ProofRequest { get; set; }
     }

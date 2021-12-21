@@ -10,7 +10,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
     public class RelationshipVM
     {
         public string RelationshipDid { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
         
     }
 }

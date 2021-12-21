@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { AuthorizationVM } from '@shared/models/authorization';
+import { SourceDetail } from '@shared/models/sourceDetail';
 import { take } from 'rxjs/operators';
 import { SourcesService } from '../sources.service';
 
@@ -12,9 +14,10 @@ import { SourcesService } from '../sources.service';
 export class SourceListComponent {
   modelErrors = new Array<string>();
   public authorizations = new Array<AuthorizationVM>();
+  message = 'loading source list';
   showSpinner = false;
   private debug = false;
-  constructor(private sourcesService: SourcesService) {
+  constructor(private route: ActivatedRoute, private router: Router, private sourcesService: SourcesService) {
   }
 
   ngOnInit() {
@@ -38,6 +41,23 @@ export class SourceListComponent {
           this.authorizations = new Array<AuthorizationVM>();
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
         }
+        this.message = 'loading source list';
+        this.showSpinner = false;
+      });
+  }
+  refreshClrs(id: string):any {
+    this.message = 'refreshing source credential';
+    this.showSpinner = true;
+    if (this.debug) console.log('SourceDetailComponent refreshClrs');
+    this.sourcesService.refreshClrs(id)
+      .pipe(take(1)).subscribe(data => {
+        console.log(data);
+        if (data.statusCode == 200) {
+            this.router.navigate([(<ApiOkResponse>data).redirectUrl]);
+        } else {
+          this.modelErrors = (<ApiBadRequestResponse>data).errors;
+        }
+        this.message = 'loading details';
         this.showSpinner = false;
       });
   }

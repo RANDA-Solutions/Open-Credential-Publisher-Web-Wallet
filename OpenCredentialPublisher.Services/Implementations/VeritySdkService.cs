@@ -117,7 +117,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     Active = true,
                     AgentName = _verityOptions.AgentName,
                     ContextJson = context.toJson().ToString(),
-                    CreatedOn = DateTimeOffset.UtcNow
+                    CreatedAt = DateTime.UtcNow
                 };
                 agentContext = await _agentContextService.CreateAgentContextAsync(agentContext);
 
@@ -223,7 +223,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                         {
                             agentContext.IssuerDid = issuerDID;
                             agentContext.IssuerVerKey = issuerVerkey;
-                            agentContext.ModifiedOn = DateTimeOffset.UtcNow;
+                            agentContext.ModifiedAt = DateTime.UtcNow;
                             if (agentContext.IssuerRegistered)
                                 agentContext.IssuerRegistered = false;
 
@@ -242,7 +242,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                         var issuerVerkey = json_identifier["verKey"];
                         agentContext.IssuerDid = issuerDID;
                         agentContext.IssuerVerKey = issuerVerkey;
-                        agentContext.ModifiedOn = DateTimeOffset.UtcNow;
+                        agentContext.ModifiedAt = DateTime.UtcNow;
                         agentContext = await _agentContextService.UpdateAgentContextAsync(agentContext);
 
                         await RegisterIssuerAsync(agentContext);
@@ -309,7 +309,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                             {
                                 credentialRequest.CredentialDefinitionId = credentialDefinition.Id;
                                 credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.PendingCredentialDefinition;
-                                credentialRequest.ModifiedOn = DateTime.UtcNow;
+                                credentialRequest.ModifiedAt = DateTime.UtcNow;
                             }
                             await _credentialRequestService.UpdateCredentialRequestsAsync(credentialRequests);
                             await _queueService.SendMessageAsync(CreateCredentialDefinitionCommand.QueueName, JsonSerializer.Serialize(new CreateCredentialDefinitionCommand(credentialDefinition.Id)));
@@ -333,7 +333,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                         foreach (var credentialRequest in credentialRequestsQuery)
                         {
                             credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.ReadyToSend;
-                            credentialRequest.ModifiedOn = DateTime.UtcNow;
+                            credentialRequest.ModifiedAt = DateTime.UtcNow;
                             commands.Add(new SendCredentialOfferCommand(credentialRequest.Id));
                         }
                         await _credentialRequestService.UpdateCredentialRequestsAsync(credentialRequestsQuery);

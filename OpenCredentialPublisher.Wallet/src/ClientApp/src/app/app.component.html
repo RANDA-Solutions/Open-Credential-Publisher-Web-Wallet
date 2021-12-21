@@ -1,19 +1,19 @@
-<div class="tw-page-wrapper d-flex flex-column" [ngClass]="{ 'login-background': onLoginPage == true }" >
-  <app-nav-menu *ngIf="appService.loggedIn == true && appService.disconnectedPage == false"></app-nav-menu>
-  <div class="parent-spacer" *ngIf="appService.loggedIn != true || appService.disconnectedPage == true">&nbsp;</div>
-  <div class="tw-layout-container d-flex flex-column flex-fill container">
+<div class="tw-page-wrapper d-flex flex-column" [ngClass]="{ 'login-background': (onLoginPage$ | async) == true }" >
+  <app-nav-menu *ngIf="appService.disconnectedPage == false"></app-nav-menu>
+  <div class="parent-spacer" *ngIf="(onLoginPage$ | async) == true || appService.disconnectedPage == true">&nbsp;</div>
+  <div class="tw-layout-container flex-column flex-fill container" [ngClass]="{ 'd-flex': (onLoginPage$ | async) == false }">
     <router-outlet></router-outlet>
     <div class="flex-fill">&nbsp;</div>
     <div class="row justify-content-center">
       <p-toast class="tw-toast" position="bottom-center" key="main" [baseZIndex]="5000"></p-toast>
     </div>
 
-    <footer class="border-top footer text-muted  mt-0 mt-sm-3">
+    <footer *ngIf="footerSettingsVM.showFooter == true" class="border-top footer text-muted  mt-0 mt-sm-3">
       <div class="container py-3">
           <div class="row text-center font-12">
-              <div class="col"><a [routerLink]="['/public/contactus']">Contact Us</a></div>
-              <div class="col"><a [routerLink]="['/public/terms']">Terms of Use</a></div>
-              <div class="col"><a [routerLink]="['/public/privacy']">Privacy Policy</a></div>
+              <div class="col"><a href="{{footerSettingsVM.contactUsUrl}}">Contact Us</a></div>
+              <div class="col"><a href="{{footerSettingsVM.termsOfServiceUrl}}">Terms of Use</a></div>
+              <div class="col"><a href="{{footerSettingsVM.privacyPolicyUrl}}">Privacy Policy</a></div>
           </div>
       </div>
     </footer>

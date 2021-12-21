@@ -412,7 +412,8 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         private async Task<List<RevocationModel>> SaveRevocationListAsync(string userId, int sourceId, RevocationListDType revocationListDType)
         {
-            _context.Revocations.RemoveRange(_context.Revocations.Where(r => r.SourceId == sourceId && r.UserId == userId));
+            var revokes = _context.Revocations.Where(r => r.SourceId == sourceId && r.UserId == userId);
+            await revokes.ForEachAsync(r => r.Delete());
             await _context.SaveChangesAsync();
 
             if (revocationListDType.RevokedAssertions.Count > 0)
@@ -421,7 +422,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 {
                     var revoked = new RevocationModel()
                     {
-                        DateCreated = DateTime.UtcNow,
+                        CreatedAt = DateTime.UtcNow,
                         IssuerId = revocationListDType.Issuer,
                         SourceId = sourceId,
                         RevokedId = id,
@@ -439,7 +440,8 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         private async Task<List<RevocationModel>> SaveRevocationListAsync(string userId, string revocationListId, RevocationListDType revocationListDType)
         {
-            _context.Revocations.RemoveRange(_context.Revocations.Where(r => r.RevocationListId == revocationListId && r.UserId == userId));
+            var revokes = _context.Revocations.Where(r => r.RevocationListId == revocationListId && r.UserId == userId);
+            await revokes.ForEachAsync(r => r.Delete());
             await _context.SaveChangesAsync();
 
             if (revocationListDType.RevokedAssertions.Count > 0)
@@ -448,7 +450,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 {
                     var revoked = new RevocationModel()
                     {
-                        DateCreated = DateTime.UtcNow,
+                        CreatedAt = DateTime.UtcNow,
                         IssuerId = revocationListDType.Issuer,
                         RevocationListId = revocationListId,
                         RevokedId = id,

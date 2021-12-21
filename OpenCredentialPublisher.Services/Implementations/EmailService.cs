@@ -68,7 +68,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 }
 
                 message.From = new MailAddress(_mailSettings.From, _mailSettings.From);
-                
+
                 using (var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port))
                 {
                     client.Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password);
@@ -137,12 +137,31 @@ namespace OpenCredentialPublisher.Services.Implementations
                     message.To.Add(_mailSettings.RedirectAddress);
                 }
 
-                message.From = new MailAddress(_mailSettings.From);
-                message.Sender = new MailAddress(_mailSettings.From);
+                message.From = new MailAddress(_mailSettings.From, _mailSettings.From);
 
-                using var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port) { EnableSsl = _mailSettings.UseSSL, Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password) };
+                using (var client = new SmtpClient(_mailSettings.Server, _mailSettings.Port))
+                {
+                    client.Credentials = new NetworkCredential(_mailSettings.User, _mailSettings.Password);
+                    client.EnableSsl = _mailSettings.UseSSL;
 
-                await client.SendMailAsync(message);
+                    try
+                    {
+                        await client.SendMailAsync(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        var builder = new StringBuilder();
+
+                        builder.AppendLine(ex.Message);
+                        builder.AppendLine($"Server: {_mailSettings.Server}");
+                        builder.AppendLine($"Port: {_mailSettings.Port}");
+                        builder.AppendLine($"User: {_mailSettings.User}");
+                        builder.AppendLine($"From: {_mailSettings.From}");
+                        builder.AppendLine($"Enable SSL: {_mailSettings.UseSSL}");
+                        builder.AppendLine($"To: {email}");
+                        _logger.LogError(ex, builder.ToString());
+                    }
+                }
             }
         }
     }

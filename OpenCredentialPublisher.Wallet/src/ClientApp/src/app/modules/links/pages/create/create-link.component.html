@@ -3,42 +3,74 @@
     <section class="default-container p-5">
       <span class="h1">Create a shareable credential</span>
 
-      <div class="alert alert-primary font-16">
+      <div class="alert alert-primary font-16 my-4">
         To share your credential:
         <ol>
           <li>
-              Give your credential a Nickname to remember where it is being sent
+            Give your credential a Nickname to remember where it is being sent
           </li>
           <li>
-              The Create button will generate a shareable link that can be shared with interested parties.
+            The Create button will generate a shareable link that can be shared with interested parties.
           </li>
         </ol>
       </div>
+      <ng-container *ngIf="showSpinner == true; else createForm">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Publisher</th>
+                <th>Name</th>
+                <th>Published</th>
+                <th>Added</th>
+              </tr>
+            </thead>
+            <tbody>
+            <tbody>
+          </table>
 
-      <form #f="ngForm" novalidate method="post">
+          <div class="d-flex flex-column">
+            <app-spinner id="profile-spinner" [message]="'loading links, this can take a while'"></app-spinner>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="row mt-3">
+        <div class="col">
+          <a [routerLink]="['/links']">Back to shared credentials</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<ng-template #createForm>
+  <div class="row">
+    <div class="col">
+      <form #f="ngForm" [formGroup]="form" novalidate method="post">
         <div class="row justify-content-start">
-          <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+          <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }">
             <span *ngFor="let msg of modelErrors">{{msg}}</span>
           </div>
         </div>
-        <div class="table-responsive">
-          <table *ngIf="showSpinner == false" class="table">
+
+        <label for="clrId">Choose a credential</label>
+        <div class="table-credentials">
+          <table class="table table-responsive-sm table-striped">
             <thead>
-                <tr>
-                    <th colspan="4">Credential</th>
-                    <th colspan="2">Link</th>
-                </tr>
-                <tr>
-                    <th>Publisher</th>
-                    <th>Name</th>
-                    <th>Published</th>
-                    <th>Added</th>
-                    <th>Nickname</th>
-                    <th></th>
-                </tr>
+              <tr>
+                <th></th>
+                <th>Publisher</th>
+                <th>Name</th>
+                <th>Published</th>
+                <th>Added</th>
+              </tr>
             </thead>
             <tbody>
               <tr *ngFor="let link of clrLinks; let i = index;">
+                <td>
+                  <input name="clrId" required type="radio" class="" formControlName="clrId" [value]="link.clrId" />
+                </td>
                 <td>
                   {{link.publisherName}}
                 </td>
@@ -51,39 +83,22 @@
                 <td>
                   {{link.addedOn | date: 'M/d/yyyy'}}
                 </td>
-                <td class="form-group">
-                  <input type="text" required name="name" class="form-control" placeholder="Nickname" [(ngModel)]="link.nickname" />
-                </td>
-                <td class="form-group">
-                  <button type="button" class="btn btn-primary" (click)="create(link)"
-                    [disabled]="f.invalid || showSpinner">Create</button>
-                </td>
               </tr>
             </tbody>
           </table>
-          <table *ngIf="showSpinner == true" class="table">
-            <thead>
-                <tr>
-                    <th colspan="4">Credential</th>
-                    <th colspan="2">Link</th>
-                </tr>
-                <tr>
-                    <th>Publisher</th>
-                    <th>Name</th>
-                    <th>Published</th>
-                    <th>Added</th>
-                    <th>Nickname</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody><tbody>
-          </table>
-          <div *ngIf="showSpinner == true" class="d-flex flex-column">
-            <app-spinner id="profile-spinner" [message]="'loading links, this can take a while'"></app-spinner>
-          </div>
+        </div>
+        <div class="form-group">
+          <label for="nickname">Choose a nickname</label>
+          <input type="text" required name="nickname" class="form-control" placeholder="Nickname"
+            formControlName="nickname" />
+          <small id="nicknameHelp" class="form-text text-muted">Choose a nickname to help you remember why, or with
+            whom, you are sharing this credential.</small>
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-primary float-right" (click)="create()"
+            [disabled]="f.invalid || showSpinner">Create</button>
         </div>
       </form>
-      <a [routerLink]="['/links']">Back to shared credentials</a>
-    </section>
+    </div>
   </div>
-</div>
+</ng-template>

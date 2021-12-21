@@ -5,5 +5,5 @@ export class InvitationVM {
   qrCodeString: string;
   nickname: string;
   relationshipDid: string;
-  createdOn: Date
+  createdAt: Date
 }

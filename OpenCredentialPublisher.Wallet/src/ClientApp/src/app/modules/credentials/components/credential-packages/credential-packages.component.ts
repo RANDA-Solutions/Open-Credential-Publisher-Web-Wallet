@@ -40,6 +40,10 @@ export class PackagesComponent implements OnDestroy, OnInit {
     }
   }
 
+  refresh() {
+    this.getData();
+  }
+
   ngOnDestroy(): void {
   }
   // cardSectionHeaderClicked (event){

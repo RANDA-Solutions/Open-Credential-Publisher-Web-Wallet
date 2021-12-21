@@ -63,6 +63,10 @@ export const appRoutes: Routes = [
     loadChildren: () => import('./modules/public/public.module').then(m =>m.PublicModule)
   },
   {
+    path: 's',
+    loadChildren: () => import('./modules/public/public.module').then(m =>m.PublicModule)
+  },
+  {
     path: 'access',
     loadChildren: () => import('./modules/access/access.module').then(m =>m.AccessModule)
   },

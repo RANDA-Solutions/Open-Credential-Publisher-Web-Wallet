@@ -106,7 +106,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CredentialksController.GetPackageClrs", null);
+                _logger.LogError(ex, "CredentialsController.GetPackageClrs", null);
                 throw;
             }
         }
@@ -210,7 +210,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             {
                 var clrAssertionVMs = new List<AssertionHeaderVM>();
                 var assertions = await _credentialService.GetClrAssertionsAsync(id);
-                clrAssertionVMs.AddRange(assertions.Select(ca => new AssertionHeaderVM { Id = ca.Id, DisplayName = ca.Achievement?.Name, IssuedOn = ca.IssuedOn }));
+                clrAssertionVMs.AddRange(assertions.Select(ca => new AssertionHeaderVM { Id = ca.Id, DisplayName = ca.Achievement?.Name, IssuedOn = ca.IssuedOn == DateTime.MinValue || ca.IssuedOn == null ? null : ca.IssuedOn }));
 
                 return ApiOk(clrAssertionVMs);
             }

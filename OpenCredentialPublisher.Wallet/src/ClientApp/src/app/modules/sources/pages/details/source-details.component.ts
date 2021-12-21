@@ -61,11 +61,7 @@ export class SourceDetailComponent {
       .pipe(take(1)).subscribe(data => {
         console.log(data);
         if (data.statusCode == 200) {
-          if (this.sourceDetail.sourceType == 'Open Badge') {
-            this.router.navigate(['/sources/select-open-badges', this.id]);
-          } else {
-            this.router.navigate(['/credentials/']);
-          }
+            this.router.navigate([(<ApiOkResponse>data).redirectUrl]);
         } else {
           this.sourceDetail = new SourceDetail();
           this.modelErrors = (<ApiBadRequestResponse>data).errors;

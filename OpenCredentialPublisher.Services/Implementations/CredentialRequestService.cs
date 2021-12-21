@@ -56,7 +56,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 CredentialPackageId = credentialPackageId,
                 CredentialRequestStep = step,
                 ThreadId = Guid.NewGuid().ToString().ToLower(),
-                CreatedOn = DateTimeOffset.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
 
             await _walletContext.CredentialRequests.AddAsync(credentialRequest);
@@ -71,7 +71,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<CredentialRequestModel> UpdateCredentialRequestAsync(CredentialRequestModel request)
         {
             _walletContext.Update(request);
-            request.ModifiedOn = DateTimeOffset.UtcNow;
+            request.ModifiedAt = DateTime.UtcNow;
             await _walletContext.SaveChangesAsync();
             _walletContext.Entry(request).State = EntityState.Detached;
             return await GetCredentialRequestAsync(request.Id);
@@ -86,7 +86,8 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task DeleteCredentialRequestAsync(int id)
         {
             var request = await GetCredentialRequestAsync(id);
-            _walletContext.Remove(request);
+            request.Delete();
+            //_walletContext.Remove(request);
             await _walletContext.SaveChangesAsync();
         }
 

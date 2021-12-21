@@ -31,7 +31,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
              var request = await _walletContext.ConnectionRequests
                 .Where(wr => wr.ConnectionRequestStep == ConnectionRequestStepEnum.StartingInvitation)
-                .OrderBy(wr => wr.CreatedOn)
+                .OrderBy(wr => wr.CreatedAt)
                 .FirstOrDefaultAsync();
             return request;
         }
@@ -59,7 +59,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 AgentContextId = agentContextId,
                 ConnectionRequestStep = connectionRequestStep,
                 ThreadId = Guid.NewGuid().ToString().ToLower(),
-                CreatedOn = DateTimeOffset.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
             await _walletContext.AddAsync(request);
             await _walletContext.SaveChangesAsync();
@@ -73,7 +73,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task UpdateRequestStepAsync(ConnectionRequestModel request, ConnectionRequestStepEnum step)
         {
             request.ConnectionRequestStep = step;
-            request.ModifiedOn = DateTimeOffset.UtcNow;
+            request.ModifiedAt = DateTime.UtcNow;
             await _walletContext.SaveChangesAsync();
             _walletContext.Entry(request).State = EntityState.Detached;
         }

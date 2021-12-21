@@ -1,20 +1,24 @@
+import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { LoginService } from '@root/app/auth/auth.service';
+import { ApiResponse } from '@shared/models/apiResponse';
 import { CredentialSendStatus } from '@shared/models/credentialSendStatus';
 import { WalletConnectionStatus } from '@shared/models/walletConnectionStatus';
 import { AuthenticatedResult } from 'angular-auth-oidc-client/lib/auth-state/auth-result';
-import { of, Subscription, throwError } from 'rxjs';
-import { filter, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, Subscription, throwError } from 'rxjs';
+import { catchError, filter, tap } from 'rxjs/operators';
+import { UtilsService } from './utils.service';
 
 @UntilDestroy()
 @Injectable()
 export class AppService {
+  private _loggedInBehavior = new BehaviorSubject<boolean>(false);
+  public loggedIn$ = this._loggedInBehavior.asObservable();
 
-  public get loggedIn(): boolean { return this._authResult?.isAuthenticated ?? false; };
   public disconnectedPage = false;
   public currentUrl = '';
   public previousUrl = '';
@@ -27,6 +31,10 @@ export class AppService {
   public proofMethod: string = 'ProofRequestStatus';
   public credentialStatusFlow: string = 'credential-status';
   public credentialStatusMethod: string = 'CredentialStatus';
+
+  get IsLoggedIn() {
+    return this._authResult.isAuthenticated;
+  }
 
   private _authResult: AuthenticatedResult;
   private _hubs: { [name: string]: HubConnection } = {};
@@ -42,29 +50,38 @@ export class AppService {
   proofFinished = new EventEmitter<boolean>();
   proofStatusChanged = new EventEmitter<string>();
 
-  constructor(public loginService: LoginService, private router: Router) {
+  constructor(private http: HttpClient, private utilsService: UtilsService, public loginService: LoginService, private router: Router) {
     this.loginService.isLoggedIn
-      .pipe(untilDestroyed(this), tap((val: AuthenticatedResult) => this._authResult = val))
-      .subscribe(val => {
-        if (val) {
-          this._authResult = val;
+      .pipe(untilDestroyed(this), tap((val: AuthenticatedResult) => {
+        if (val?.isAuthenticated != this._authResult?.isAuthenticated) {
+          this._loggedInBehavior.next(val.isAuthenticated);
         }
-      });
+        this._authResult = val;
+      }))
+      .subscribe();
 
     this.routerSubscription = this.router.events
-    .pipe(filter(event => event instanceof NavigationEnd), untilDestroyed(this))
-    .subscribe((event: NavigationEnd) => {
-      this.previousUrl = this.currentUrl;
-      this.currentUrl = event.url;
-      if (this.currentUrl.includes('/Public/Links/Display')){
-        this.disconnectedPage = true;
-      } else {
-        this.disconnectedPage = false;
-      }
-    });
+      .pipe(filter(event => event instanceof NavigationEnd), untilDestroyed(this))
+      .subscribe((event: NavigationEnd) => {
+        this.previousUrl = this.currentUrl;
+        this.currentUrl = event.url;
+        if (this.currentUrl.includes('/Public/Links/Display') || this.currentUrl.includes('/s/')) {
+          this.disconnectedPage = true;
+        } else {
+          this.disconnectedPage = false;
+        }
+      });
   }
 
-
+  getFooterSettings(): Observable<ApiResponse> {
+    const urlApi = `${environment.apiEndPoint}Public/FooterSettings`;
+    if (this.debug) console.log(`AppService ${urlApi}`);
+    return this.http.get<ApiResponse>(urlApi)
+      .pipe(
+        catchError(err => this.utilsService.handleError(err)
+        )
+      );
+  }
 
   // Notification functionality
   // https://damienbod.com/2017/10/16/securing-an-angular-signalr-client-using-jwt-tokens-with-asp-net-core-and-identityserver4/
@@ -102,7 +119,7 @@ export class AppService {
     this.startSignalR(flow, args);
   }
 
-  private buildHubConnection(flow: string) : HubConnection {
+  private buildHubConnection(flow: string): HubConnection {
     if (!this._hubs[flow]) {
       if (flow == this.proofFlow) {
         this._hubs[flow] = new HubConnectionBuilder()
@@ -111,7 +128,7 @@ export class AppService {
       }
       else if (flow == this.generateInvitationFlow) {
         this._hubs[flow] = new HubConnectionBuilder()
-          .withUrl(environment.hubConnectionStatusEndpoint, { accessTokenFactory: () => { return of(this.loginService.token).toPromise(); } }  )
+          .withUrl(environment.hubConnectionStatusEndpoint, { accessTokenFactory: () => { return of(this.loginService.token).toPromise(); } })
           .build();
       }
       else if (flow == this.completeInvitationFlow) {

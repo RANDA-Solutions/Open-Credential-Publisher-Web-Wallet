@@ -70,7 +70,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     StepId = ProofRequestStepEnum.Created,
                     ProofAttributes = System.Text.Json.JsonSerializer.Serialize(proofAttributes),
                     ProofPredicates = null,
-                    CreatedOn = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
                 };
 
                 await _context.ProofRequests.AddAsync(proofRequest);
@@ -119,7 +119,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             if (proofRequest != null)
             {
                 proofRequest.StepId = step;
-                proofRequest.ModifiedOn = DateTimeOffset.UtcNow;
+                proofRequest.ModifiedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
         }
@@ -128,7 +128,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             if (_context.Entry(proofRequest).State == EntityState.Detached)
                 _context.Update(proofRequest);
-            proofRequest.ModifiedOn = DateTimeOffset.UtcNow;
+            proofRequest.ModifiedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
         }
 
@@ -150,7 +150,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var credentialSchemas = new List<CredentialSchema>();
             foreach(var schemaName in schemaNames)
             {
-                var credentialSchema = await _context.CredentialSchemas.AsNoTracking().Where(cs => cs.TypeName == schemaName && cs.StatusId == Data.Models.Enums.StatusEnum.Created).OrderByDescending(cs => cs.ModifiedOn).FirstAsync();
+                var credentialSchema = await _context.CredentialSchemas.AsNoTracking().Where(cs => cs.TypeName == schemaName && cs.StatusId == Data.Models.Enums.StatusEnum.Created).OrderByDescending(cs => cs.ModifiedAt).FirstAsync();
                 credentialSchemas.Add(credentialSchema);
             }
 

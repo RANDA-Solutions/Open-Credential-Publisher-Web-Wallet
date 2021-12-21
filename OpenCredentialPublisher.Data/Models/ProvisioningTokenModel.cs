@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("ProvisioningToken")]
-    public class ProvisioningTokenModel
+    public class ProvisioningTokenModel: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [JsonIgnore]
@@ -26,9 +26,16 @@ namespace OpenCredentialPublisher.Data.Models
         public string SponsorVerKey { get; set; }
 
         [JsonIgnore]
-        public DateTimeOffset CreatedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? ModifiedOn { get; set; }
+        public DateTime ModifiedAt { get; set; }
+        [JsonIgnore]
+        public bool IsDeleted { get; set; }
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
 
         [Required, JsonIgnore]
         public Guid AgentContextId { get; set; }

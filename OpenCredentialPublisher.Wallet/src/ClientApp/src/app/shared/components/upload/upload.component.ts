@@ -1,5 +1,5 @@
 import { HttpClient, HttpEventType } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CredentialService } from '@core/services/credentials.service';
 import { UtilsService } from '@core/services/utils.service';
@@ -14,10 +14,13 @@ import { ApiResponse } from '@shared/models/apiResponse';
   styleUrls: ['./upload.component.scss']
 })
 export class UploadComponent implements OnInit {
+  @Output() fileUploaded = new EventEmitter<any>();
   fileName = 'Choose CLR';
   file: File;
+  isCollapsed = true;
   showSpinner = false;
   modelErrors = new Array<string>();
+  message = "uploading";
   private debug = false;
   constructor(private route: ActivatedRoute, private router: Router, private credentialService: CredentialService
     , private http: HttpClient, private utilsService: UtilsService) { }
@@ -40,8 +43,7 @@ export class UploadComponent implements OnInit {
             if (this.debug) console.log(`UploadComponent upload progress: ${Math.round(100 * event.loaded / event.total)}`) ;
           } else if (event.type === HttpEventType.Response) {
             if ((event.body as ApiResponse).statusCode == 200) {
-              const redirectUrl = `${window.location.origin}/credentials`;
-              window.location.replace(redirectUrl);
+              this.fileUploaded.emit(true);
             } else {
               this.modelErrors = (<ApiBadRequestResponse>event.body).errors;
             }
@@ -53,5 +55,9 @@ export class UploadComponent implements OnInit {
     } else {
       this.fileName = 'Choose CLR';
     }
+  }
+  collapseToggle(event: any){
+    if (event.target.tagName == 'A') return;
+    this.isCollapsed = !this.isCollapsed;
   }
 }

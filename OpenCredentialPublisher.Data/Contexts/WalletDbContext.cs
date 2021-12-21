@@ -733,6 +733,20 @@ namespace OpenCredentialPublisher.Data.Contexts
             modelBuilder.Entity<VerifiableCredentialModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<BadgrBackpackModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<BadgrAssertionModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<ShareModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<CredentialRequestModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<ConnectionRequestModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<WalletRelationshipModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<RecipientModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<ProvisioningTokenModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<ProofResponse>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<ProofRequest>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<MessageModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<CredentialSchema>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<CredentialDefinition>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<AgentContextModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<RevocationModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<EmailVerification>().HasQueryFilter(x => !x.IsDeleted);
 
 
             // Views

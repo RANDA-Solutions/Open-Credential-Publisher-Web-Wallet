@@ -61,7 +61,7 @@
 <ng-container *ngIf="linkDisplay.showData == true">
   <div class="row">
     <div class="col mb-3">
-      <a *ngIf="appService.loggedIn == true" class="btn btn-outline-primary btn-lg" [routerLink]="['/credentials']">Your Credentials</a>
+      <a *ngIf="(appService.loggedIn$ | async) == true" class="btn btn-outline-primary btn-lg" [routerLink]="['/credentials']">Your Credentials</a>
     </div>
   </div> <!-- Summary View -->
   <div app-link-summary [link]="linkDisplay" class="row credential-row mb-3">

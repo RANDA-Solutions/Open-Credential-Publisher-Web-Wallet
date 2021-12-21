@@ -1,5 +1,6 @@
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { LoginService } from '@root/app/auth/auth.service';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
@@ -30,13 +31,16 @@ export class LoginCallbackComponent implements OnInit, OnDestroy {
 	async ngOnInit() {
 		var returnUrl = this.loginService.returnUrl;
 		this.loginService.authStateChanged.pipe(untilDestroyed(this)).subscribe((authState) => {
-			this.logger.info('AuthStateChanged: ', authState);
+			this.logger.info('LoginCallbackComponent: ', authState);
 			
 			if (!!authState && authState.isAuthenticated && !authState.isRenewProcess) {
 				this.ngZone.run((returnUrl) => { 
 					if (returnUrl) {
 						this.loginService.clearReturnUrl();
-						this.logger.info("LoginCallbackComponent Return Url: ", returnUrl);
+						if (environment.debug) console.log(returnUrl);
+						if (returnUrl.includes(environment.baseUrl)) {
+							returnUrl = returnUrl.replace(environment.baseUrl, '');
+						}
 						//returnUrl = decodeURI(returnUrl);
 						this.router.navigateByUrl(returnUrl);
 					}

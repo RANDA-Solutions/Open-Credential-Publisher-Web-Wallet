@@ -7,7 +7,7 @@ export class WalletVM {
   isConnected: boolean;
   agentContextId: string;
   userId: string;
-  createdOn: Date;
-  modifiedOn?: Date;
+  createdAt: Date;
+  modifiedAt: Date;
   credentialsSent: number;
 }

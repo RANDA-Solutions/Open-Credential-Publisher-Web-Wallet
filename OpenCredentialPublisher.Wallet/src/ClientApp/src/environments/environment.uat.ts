@@ -13,6 +13,7 @@ export const environment = {
   hubConnectionStatusEndpoint: `${baseUrl}/hubs/connection`,
   hubCredentialsStatusEndpoint: `${baseUrl}/hubs/credentials`,
   hubProofStatusEndpoint: `${baseUrl}/hubs/proofrequests`,
-  configId: '0-ocp-wallet-client'
+  configId: '0-ocp-wallet-client',
+  logoutTimer: 10// in minutes
 
 };

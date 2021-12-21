@@ -15,7 +15,7 @@ import { take } from 'rxjs/operators';
 export class RegisterComponent implements OnInit {
   modelErrors = new Array<string>();
   sources = new Array<SourceVM>();
-  sourceId = -1;
+  sourceId = null;
   redirectUrl = '';
   userName = -1;
   password = '';
@@ -40,7 +40,7 @@ export class RegisterComponent implements OnInit {
     if (this.debug) console.log('RegisterComponent connect');
     const formModel = this.connectForm.value;
     const input = {
-      selectedSource: this.connectForm.get('sourceId').value,
+      selectedSource: this.sourceId,
       sourceUrl: this.connectForm.get('sourceUrl').value,
       sourceTypeId: this.connectForm.get('sourceTypeId').value
     } as SourceConnectInput;
@@ -81,8 +81,7 @@ export class RegisterComponent implements OnInit {
       });
   }
   selectSource(e) {
-    this.connectForm.get('sourceId').setValue(e.target.value, {
-      onlySelf: true
-    })
+    if (this.debug) console.log(`RegisterComponent selectSource ${e.target.value}`);
+    this.sourceId = e.target.value;
   }
 }

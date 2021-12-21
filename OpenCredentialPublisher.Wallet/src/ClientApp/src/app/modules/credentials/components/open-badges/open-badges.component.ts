@@ -34,7 +34,6 @@ export class OpenBadgesComponent implements OnInit {
 
   ngOnDestroy(): void {
   }
-
   getData():any {
     this.showSpinner = true;
     if (this.debug) console.log('OpenBadgesComponent getData');

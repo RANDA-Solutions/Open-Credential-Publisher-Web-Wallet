@@ -421,7 +421,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
             var clr = await _credentialService.GetClrAsync(input.ClrId);
 
-            var link = new LinkModel { ClrForeignKey = clr.ClrId, UserId = User.JwtUserId(), Nickname = input.Nickname, CreatedAt = DateTimeOffset.UtcNow };
+            var link = new LinkModel { ClrForeignKey = clr.ClrId, UserId = _userId, Nickname = input.Nickname, CreatedAt = DateTime.UtcNow };
 
             await _linkService.AddAsync(link);
 
@@ -451,7 +451,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     ShareTypeId = ShareTypeEnum.Email,
                     AccessKey = Crypto.CreateRandomString(16),
                     UseCount = 0,
-                    CreatedOn = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
                     StatusId = StatusEnum.Active
                 };
 
@@ -466,7 +466,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     Recipient = recipient.Email,
                     Body = new StringBuilder().Append($"Hello!<br />You have received a verifiable credential from {learner_name}. ")
                         .Append($"This credential is the student’s official electronic transcript.<br /><br />Use this unique link to locate the credential: ")
-                        .Append($"{GetLinkUrl(Request, linkIn.Id)}<br />You will need this key to access the credential: {shareModel.AccessKey}<br /><br />")
+                        .Append($"{LinkService.GetLinkUrl(Request, linkIn.Id)}<br />You will need this key to access the credential: {shareModel.AccessKey}<br /><br />")
                         .Append($"Once verified, you may download evidence in the form of a transcript document from the verified credential and upload it as needed.")
                         .Append($"<br /><br />Thank you.<br /><br /><hr><p style='font-size: 12px;'><u>About ND Electronic Transcripts</u><br />North Dakota")
                         .Append($" eTranscripts is a free high school transcript exchange system built through the Statewide Longitudinal Data System, allowing for")
@@ -478,14 +478,14 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     Subject = $"Verifiable Transcript Credential for {learner_name}",
                     SendAttempts = 0,
                     StatusId = StatusEnum.Created,
-                    CreatedOn = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
                     Share = shareModel
                 };
 
                 await _emailHelperService.AddMessageAsync(message);
 
                 linkIn.RequiresAccessKey = true;
-                linkIn.ModifiedAt = DateTimeOffset.UtcNow;
+                linkIn.ModifiedAt = DateTime.UtcNow;
                 await _linkService.UpdateAsync(linkIn);
 
                 await _emailSender.SendEmailAsync(message.Recipient, message.Subject, message.Body, true);
@@ -511,21 +511,11 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
             var clr = await _credentialService.GetClrAsync(input.ClrId);
 
-            var link = new LinkModel { ClrForeignKey = clr.ClrId, UserId = User.JwtUserId(), Nickname = input.Nickname, CreatedAt = DateTimeOffset.UtcNow };
+            var link = new LinkModel { ClrForeignKey = clr.ClrId, UserId = _userId, Nickname = input.Nickname, CreatedAt = DateTime.UtcNow };
 
             await _linkService.AddAsync(link);
 
             return ApiOk(null);
-        }
-        private string GetLinkUrl(HttpRequest request, string id)
-        {
-            //var Request = model.Request;
-            if (Uri.TryCreate($"{request.Scheme}://{request.Host}{request.PathBase}/Public/Links/Display/{id}", UriKind.Absolute, out var url))
-            {
-                return url.AbsoluteUri;
-            }
-
-            return string.Empty;
         }
     }
 }

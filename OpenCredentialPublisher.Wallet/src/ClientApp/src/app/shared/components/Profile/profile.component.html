@@ -14,7 +14,7 @@
   <div *ngIf="showSpinner == false" class="profile-body d-flex flex-column justify-items-middle">
     <div class="pencil-container"><a [routerLink]="['/account/manage/profile']"><i class="far fa-pencil fa-2x icon-color"></i></a></div>
     <div *ngIf="profile.missingDisplayName == true" class="profile-name h1 text-center">
-      <a router-link="/Account/Manage/Index">Set Display Name</a>
+      <a [routerLink]="['/account/manage/profile']">Set Display Name</a>
     </div>
     <div *ngIf="profile.missingDisplayName == false" class="profile-name h1 text-wrap"><abbr>{{profile.displayName}}</abbr></div>
     <div class="profile-stats-container d-flex flex-column justify-content-between">

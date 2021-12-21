@@ -1,6 +1,7 @@
 import { ApplicationUser } from "./applicationUser";
 import { LinkModel } from "./linkModel";
 import { MessageModel } from "./messageModel";
+import { RecipientModel } from "./recipientModel";
 
 export class ShareModel {
   id: number;
@@ -9,16 +10,11 @@ export class ShareModel {
   recipientId?: number;
   accessKey: string;
   useCount: number;
-  createdOn: Date;
+  createdAt: Date;
+  modifiedAt: Date;
+  isDeleted: boolean;
   statusId: any;
   messages: MessageModel[];
-  recipient: {
-    id: number;
-    userId: string;
-    user: ApplicationUser;
-    name: string;
-    email: string;
-    createdOn: Date;
-  };
+  recipient: RecipientModel;
   link: LinkModel;
 }
