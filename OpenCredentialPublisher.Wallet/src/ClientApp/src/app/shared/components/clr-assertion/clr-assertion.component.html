@@ -19,7 +19,7 @@
         <div class="card border-0">
           <dl class="row">
             <dt class="col-12 col-sm-4 col-md-3">Id</dt>
-            <dd *ngIf="!assertion.id.startsWith('urn')" class="col-12 col-sm-8 col-md-9"><a href="{{assertion.id}}">{{assertion.id}}</a></dd>
+            <dd *ngIf="!assertion.id.startsWith('urn')" class="col-12 col-sm-8 col-md-9"><a href="{{assertion.id}}"  target="_blank">{{assertion.id}}</a></dd>
             <dd *ngIf="assertion.id.startsWith('urn')" class="col-12 col-sm-8 col-md-9">{{assertion.id}}</dd>
             <ng-container *ngIf="assertion.creditsEarned != null">
               <dt class="col-12 col-sm-4 col-md-3">Credits Earned</dt>
@@ -45,14 +45,20 @@
                 {{assertion.recipient.identity}}
               </dd>
             </ng-container>
-            <ng-container *ngIf="assertion.revoked != null">
-            <ng-container *ngIf="assertion.revoked == true">
-              <dt class="col-12 col-sm-4 col-md-3 text-danger">Revoked</dt>
-              <dd class="col-12 col-sm-8 col-md-9 text-danger">Yes</dd>
-              </ng-container>
-              <ng-container *ngIf="assertion.revoked == false">
+            <ng-container *ngIf="assertion.achievement.achievementType == 'Badge'">
               <dt class="col-12 col-sm-4 col-md-3">Revoked</dt>
-              <dd class="col-12 col-sm-8 col-md-9">No</dd>
+              <dd class="col-12 col-sm-8 col-md-9"><a href="{{assertion.id}}"  target="_blank">Badge Status</a></dd>
+            </ng-container>
+            <ng-container *ngIf="assertion.achievement.achievementType != 'Badge'">
+              <ng-container *ngIf="assertion.revoked != null">
+                <ng-container *ngIf="assertion.revoked == true">
+                  <dt class="col-12 col-sm-4 col-md-3 text-danger">Revoked</dt>
+                  <dd class="col-12 col-sm-8 col-md-9 text-danger">Yes</dd>
+                </ng-container>
+                <ng-container *ngIf="assertion.revoked == false">
+                  <dt class="col-12 col-sm-4 col-md-3">Revoked</dt>
+                  <dd class="col-12 col-sm-8 col-md-9">No</dd>
+                </ng-container>
               </ng-container>
             </ng-container>
             <ng-container *ngIf="assertion.revocationReason != null">

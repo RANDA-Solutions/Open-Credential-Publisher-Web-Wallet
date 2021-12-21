@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CredentialService } from '@core/services/credentials.service';
-import { environment } from '@environment/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { AssertionHeaderVM } from '@shared/models/assertionHeaderVM';
@@ -58,6 +57,14 @@ export class ClrSectionAssertionComponent implements OnInit {
         this.isLoaded = true;
       });
   }
+
+  showIssuedDate() :boolean {
+    if (this.assertionHeader.issuedOn != null) {
+      return true;
+    }
+    return false;
+  }
+
   popup(assertionId: number){
     const modalRef = this.modalService.open(AssertionPopupComponent);
     modalRef.componentInstance.assertionId = assertionId;

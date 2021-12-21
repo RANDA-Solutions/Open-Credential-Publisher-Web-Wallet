@@ -8,7 +8,7 @@ using System.Text;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("CredentialSchema")]
-    public class CredentialSchema
+    public class CredentialSchema: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -22,15 +22,23 @@ namespace OpenCredentialPublisher.Data.Models
         public string Attributes { get; set; }
         public string Hash { get; set; }
         public StatusEnum StatusId { get; set; }
-        public DateTimeOffset CreatedOn { get; set; }
-        public DateTimeOffset? ModifiedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime ModifiedAt { get; set; }
+        public bool IsDeleted { get; set; }
+
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
 
 
         public List<CredentialDefinition> CredentialDefinitions { get; set; }
     }
 
     [Table("CredentialDefinitions")]
-    public class CredentialDefinition
+    public class CredentialDefinition: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -43,8 +51,16 @@ namespace OpenCredentialPublisher.Data.Models
         public string Name { get; set; }
         public string Tag { get; set; }
         public StatusEnum StatusId { get; set; }
-        public DateTimeOffset CreatedOn { get; set; }
-        public DateTimeOffset? ModifiedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime ModifiedAt { get; set; }
+        public bool IsDeleted { get; set; }
+
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
 
         [ForeignKey("CredentialSchemaId")]
         public CredentialSchema CredentialSchema { get; set; }

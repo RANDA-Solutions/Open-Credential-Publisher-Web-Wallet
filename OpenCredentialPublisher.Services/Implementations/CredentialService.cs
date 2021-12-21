@@ -139,7 +139,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             var packages = await _context.CredentialPackages.AsNoTracking()
                 .Where(cp => cp.UserId == userId)
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync();
 
             var pkgVMs = new List<PackageVM>();
@@ -258,7 +258,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var packages = await _context.CredentialPackages.AsNoTracking()
                 .Include(cp => cp.ContainedClrs)
                 .Include(cp => cp.VerifiableCredential)
-                .Where(cp => cp.UserId == userId && !cp.Revoked)
+                .Where(cp => cp.UserId == userId && !cp.Revoked && cp.TypeId != PackageTypeEnum.OpenBadge && cp.TypeId != PackageTypeEnum.OpenBadgeConnect)
                 .OrderBy(x => x.CreatedAt)
                 .ToListAsync();
 
@@ -287,7 +287,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
                 vm.Credentials = vm.Credentials.OrderByDescending(c => Convert.ToDateTime(c.DateAdded)).ToList();
             }
-            vm.Connection = new ConnectionViewModel { Name = wallet.WalletName, Id = id, RelationshipDid = wallet.RelationshipDid, DateCreated = wallet.CreatedOn.ToString("g") };
+            vm.Connection = new ConnectionViewModel { Name = wallet.WalletName, Id = id, RelationshipDid = wallet.RelationshipDid, DateCreated = wallet.CreatedAt.ToString("g") };
 
             return vm;
         }
@@ -745,12 +745,13 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task DeleteClrAsync(int id)
         {
             var item =  await _context.Clrs
-                    .AsNoTracking()
                     .Include(x => x.Authorization)
                     .ThenInclude(x => x.Source)
                     .SingleAsync(x => x.ClrId == id);
 
-            _context.Clrs.Remove(item);
+            item.Authorization.Delete();
+            item.Delete();
+            //_context.Clrs.Remove(item);
 
             await _context.SaveChangesAsync();
         }

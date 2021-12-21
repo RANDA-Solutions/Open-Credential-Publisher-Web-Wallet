@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CredentialService } from '@core/services/credentials.service';
 import { LinksService } from '@modules/links/links.service';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { ClrLinkVM } from '@shared/models/clrLinkVM';
-import { ClrVM } from '@shared/models/clrVM';
 import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-create-link-component',
+  styleUrls: [ './create-link.component.scss'],
   templateUrl: './create-link.component.html'
 })
 export class CreateLinkComponent  implements OnInit{
@@ -17,15 +17,25 @@ export class CreateLinkComponent  implements OnInit{
   clrLinks = new Array<ClrLinkVM>();
   showSpinner = false;
   modelErrors = new Array<string>();
-
+  
+  form = new FormGroup({
+    clrId: new FormControl(),
+    nickname: new FormControl()
+  });
+  
   constructor(private route: ActivatedRoute, private router: Router, private linksService: LinksService) {
   }
   ngOnInit() {
     this.showSpinner = true;
     this.getData();
   }
-  create(clrLink: ClrLinkVM) {
-    this.linksService.create(clrLink)
+  create() {
+    var link = { 
+      clrId: this.form.get("clrId").value,
+      nickname: this.form.get("nickname").value
+    } as ClrLinkVM;
+
+    this.linksService.create(link)
     .pipe(take(1)).subscribe(data => {
       console.log(data);
       if (data.statusCode == 200) {

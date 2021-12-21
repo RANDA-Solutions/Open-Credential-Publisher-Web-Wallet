@@ -51,7 +51,7 @@
                     {{relationship.credentialsSent}}
                 </td>
                 <td>
-                    {{relationship.createdOn | date: 'M/d/yyyy h:mm a'}}
+                    {{relationship.createdAt | date: 'M/d/yyyy h:mm a'}}
                 </td>
                 <td>
                   <span *ngIf="relationship.isConnected == true">

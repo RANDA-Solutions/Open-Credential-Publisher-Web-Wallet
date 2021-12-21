@@ -68,7 +68,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                         Subject = $"Proof Request - {request.Name} - Created ({request.PublicId})",
                         SendAttempts = 0,
                         StatusId = StatusEnum.Created,
-                        CreatedOn = DateTimeOffset.UtcNow,
+                        CreatedAt = DateTime.UtcNow,
                         ProofRequestId = request.Id
                     };
                     await _emailHelperService.AddMessageAsync(createdMessage);

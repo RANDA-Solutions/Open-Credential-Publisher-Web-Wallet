@@ -6,8 +6,6 @@
       </a>
       <button class="navbar-toggler"
               type="button"
-              data-toggle="collapse"
-              data-target=".navbar-collapse"
               aria-controls="navbarSupportedContent" aria-expanded="false"
               aria-label="Toggle navigation"
               [attr.aria-expanded]="isExpanded"
@@ -15,7 +13,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="navbar-collapse collapse  d-sm-inline-flex justify-content-end"
-           [ngClass]="{ show: isExpanded }">
+           [ngClass]="{ show: isExpanded }" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto ml-3">
           <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-light" [routerLink]="['/credentials']"><span class="credential-icon-default mr-2 align-middle"></span><span class="h2"> Credentials</span></a>
@@ -24,17 +22,9 @@
             <a class="nav-link text-light" [routerLink]="['/wallets/wallet-list']"><span class="fal fa-wallet font-1-5x mr-2 align-middle"></span><span class="h2"> Wallets</span></a>
           </li>
         </ul>
-        <ul class="navbar-nav" *ngIf="isAuthenticated">
+        <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link text-light" (click)="logout()" title="Logout">Logout</a>
-          </li>
-        </ul>
-        <ul class="navbar-nav" *ngIf="!(isAuthenticated)">
-          <li class="nav-item">
-            <a class="nav-link text-light" [routerLink]='["/authentication/register"]'>Register</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-light" [routerLink]='["/access/login"]'>Login</a>
           </li>
         </ul>
       </div>

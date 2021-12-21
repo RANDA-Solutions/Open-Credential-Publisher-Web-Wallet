@@ -58,7 +58,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             if (dReq.CreateLink)
             {
-                var link = new LinkModel { ClrForeignKey = clr.ClrId, UserId = userId, Nickname = $"{clr.Name} - {clr.PublisherName}", CreatedAt = DateTimeOffset.UtcNow };
+                var link = new LinkModel { ClrForeignKey = clr.ClrId, UserId = userId, Nickname = $"{clr.Name} - {clr.PublisherName}", CreatedAt = DateTime.UtcNow };
 
                 await _linkService.AddAsync(link);
                 shareModel = new ShareModel
@@ -67,12 +67,12 @@ namespace OpenCredentialPublisher.Services.Implementations
                     ShareTypeId = ShareTypeEnum.Pdf,
                     AccessKey = Crypto.CreateRandomString(16),
                     UseCount = 0,
-                    CreatedOn = DateTimeOffset.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
                     StatusId = StatusEnum.Active
                 };
 
                 link.RequiresAccessKey = true;
-                link.ModifiedAt = DateTimeOffset.UtcNow;
+                link.ModifiedAt = DateTime.UtcNow;
                 await _linkService.AddShareAsync(shareModel);
                 await _linkService.UpdateAsync(link);
             }
@@ -95,7 +95,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 ShareTypeId = ShareTypeEnum.Pdf,
                 AccessKey = Crypto.CreateRandomString(16),
                 UseCount = 0,
-                CreatedOn = DateTimeOffset.UtcNow,
+                CreatedAt = DateTime.UtcNow,
                 StatusId = StatusEnum.Active
             };
 
@@ -103,22 +103,13 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .Where(a => a.ArtifactId == dReq.ArtifactId.Value && a.EvidenceName == dReq.EvidenceName && a.AssertionId == dReq.AssertionId)
                 .FirstOrDefaultAsync();
 
-            link.ModifiedAt = DateTimeOffset.UtcNow;
+            link.ModifiedAt = DateTime.UtcNow;
             await _linkService.AddShareAsync(shareModel);
             await _linkService.UpdateAsync(link);
 
             return await GetFileContentResultAsync(request, artifact, dReq, userId, shareModel);
         }
-        private string GetLinkUrl(HttpRequest request, string id)
-        {
-            //var Request = model.Request;
-            if (Uri.TryCreate($"{request.Scheme}://{request.Host}{request.PathBase}/Public/Links/Display/{id}", UriKind.Absolute, out var url))
-            {
-                return url.AbsoluteUri;
-            }
-
-            return string.Empty;
-        }
+        
         private async Task<IActionResult> GetFileContentResultAsync(HttpRequest request, ArtifactModel artifact, PdfRequest dReq, string userId, ShareModel shareModel)
         {
             if (artifact.Url.StartsWith("data:"))
@@ -126,7 +117,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 var (mimeType, bytes) = DataUrlUtility.ParseDataUrl(artifact.Url);
                 if (dReq.LinkId != null)
                 {
-                    bytes = PdfUtility.AppendQRCodePage(bytes, this.GetLinkUrl(request, dReq.LinkId), shareModel.AccessKey);
+                    bytes = PdfUtility.AppendQRCodePage(bytes, LinkService.GetLinkUrl(request, dReq.LinkId), shareModel.AccessKey);
                 }
                 return new FileContentResult(bytes, mimeType) { FileDownloadName = $"{dReq.ArtifactName}.pdf" };
             }

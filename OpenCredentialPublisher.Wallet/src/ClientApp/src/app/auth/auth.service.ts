@@ -6,22 +6,20 @@ import { AuthenticatedResult, LoginResponse, OidcSecurityService } from 'angular
 import { AuthStateResult } from 'angular-auth-oidc-client/lib/auth-state/auth-state';
 import { Observable, of, ReplaySubject, throwError } from 'rxjs';
 import { catchError, first, switchMap, tap } from 'rxjs/operators';
-import { SecureRoutesService } from '../services/secureRoutes.service';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
-  private debug = false;
+  private debug = true;
   authStateChanged: EventEmitter<AuthStateResult> = new EventEmitter<AuthStateResult>();
   private checkAuthCompleted$ = new ReplaySubject(1);
 
 	constructor(private oidcSecurityService: OidcSecurityService
 		, private httpClient: HttpClient
-		, private secureRoutesService: SecureRoutesService
 		, private router: Router) {}
 
 	returnUrlKey = "originalReturnUrl";
 
-	get isLoggedIn() {
+	get isLoggedIn(): Observable<AuthenticatedResult> {
 		return this.oidcSecurityService.isAuthenticated$;
 	}
 
@@ -41,19 +39,19 @@ export class LoginService {
 		return this.oidcSecurityService.stsCallback$;
 	}
 
-	public get isAuthenticated$(): Observable<boolean | AuthenticatedResult> {
+	public get isAuthenticated$(): Observable<AuthenticatedResult> {
         return this.checkAuthCompleted$.pipe(
             first(),
-            switchMap((_) => { 
+            switchMap((_) => {
 				console.log("inside switchMap");
-				return this.oidcSecurityService.isAuthenticated$; 
+				return this.oidcSecurityService.isAuthenticated$;
 			})
         );
     }
 
-    // public checkAuth(): Observable<boolean | LoginResponse> {
-    //     return this.oidcSecurityService.checkAuth().pipe(tap((_) => this.checkAuthCompleted$.next()));
-    // }
+    public checkAuth(): Observable<LoginResponse> {
+        return this.oidcSecurityService.checkAuth(null, environment.configId).pipe(tap((_) => this.checkAuthCompleted$.next()));
+    }
 
 	public checkAuthIncludingServer(): Observable<LoginResponse> {
 		return this.oidcSecurityService.checkAuthIncludingServer(environment.configId)
@@ -63,17 +61,22 @@ export class LoginService {
 					return throwError(error);
 				})
 				, tap((_) => {
-					this.checkAuthCompleted$.next(); 
+					this.checkAuthCompleted$.next();
 		}));
 	}
 
-	public authorize() {
-		return this.oidcSecurityService.getRefreshToken();
+	public refreshToken() {
+		return this.oidcSecurityService.getRefreshToken(environment.configId);
+	}
+
+	public refreshSession() {
+		return this.oidcSecurityService.forceRefreshSession(null, environment.configId);
 	}
 
 	doLogin() {
+		
     if (this.debug) console.log(`OAuthService doLogin()`);
-		return of(this.oidcSecurityService.authorize());
+		return of(this.oidcSecurityService.authorize(environment.configId));
 	}
 
 	storeReturnUrl(returnUrl) {
@@ -91,20 +94,16 @@ export class LoginService {
 	reportAuthState(authState: AuthStateResult)
 	{
 		this.authStateChanged.emit(authState);
-		// if (!authState.isAuthenticated) {
-		// 	if (environment.debug) {
-		// 		console.log("No auth: ", this.router.url);
-		// 	}
-		// 	if (!this.secureRoutesService.isInsecure(this.router.url)) {
-		// 		this.oidcSecurityService.authorize(environment.configId);
-		// 	}
-		// }
 	}
 
 
-	signOut() {
+	signOut(infoMessage?: string) {
 		let url = `${environment.apiEndPoint}logout`;
-		this.httpClient.post(url, null).subscribe((_) => this.router.navigate(["/access/logout"], { replaceUrl: true }));
+		this.httpClient.post(url, null).subscribe((_) => this.goToLogout(infoMessage), (_) => this.goToLogout(infoMessage));
+	}
+
+	private goToLogout(infoMessage?: string) {
+		this.router.navigate(["/access/logout"], { queryParams: { infoMessage: infoMessage }, replaceUrl: true })
 	}
 }
 

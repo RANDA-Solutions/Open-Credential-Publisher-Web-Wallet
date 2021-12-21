@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("AgentContexts")]
-    public class AgentContextModel
+    public class AgentContextModel: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         [JsonPropertyName("walletName"), Newtonsoft.Json.JsonProperty(PropertyName = "walletName")]
@@ -60,9 +60,18 @@ namespace OpenCredentialPublisher.Data.Models
         [JsonIgnore]
         public bool Active { get; set; }
         [JsonIgnore]
-        public DateTimeOffset CreatedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? ModifiedOn { get; set; }
+
+        public DateTime ModifiedAt { get; set; }
+        [JsonIgnore]
+        public bool IsDeleted { get; set; }
+
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
 
         public ProvisioningTokenModel ProvisioningToken { get; set; }
     }

@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("WalletRelationships")]
-    public class WalletRelationshipModel
+    public class WalletRelationshipModel: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -27,9 +27,9 @@ namespace OpenCredentialPublisher.Data.Models
         public string UserId { get; set; }
 
 
-        public DateTimeOffset CreatedOn { get; set; }
-        public DateTimeOffset? ModifiedOn { get; set; }
-
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+        public bool IsDeleted { get; set; }
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
         [ForeignKey("AgentContextId")]
@@ -40,5 +40,11 @@ namespace OpenCredentialPublisher.Data.Models
 
         [NotMapped, JsonIgnore]
         public int CredentialsSent => CredentialRequests?.Count(cr => cr.CredentialRequestStep == CredentialRequestStepEnum.OfferAccepted) ?? default;
+
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
     }
 }

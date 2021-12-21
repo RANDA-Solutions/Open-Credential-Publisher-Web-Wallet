@@ -5,7 +5,7 @@ import { SourceListComponent } from './pages/source-list.component';
 import { sourceRouter } from './sources.router';
 import { SourcesService } from './sources.service';
 import { RegisterComponent } from './pages/register/register.component';
-import { SourceDetailComponent } from './pages/details/source-details.component';
+// import { SourceDetailComponent } from './pages/details/source-details.component';
 import { SourceDeleteComponent } from './pages/delete/source-delete.component';
 import { RegisterCallbackComponent } from './pages/callback/callback.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -19,7 +19,7 @@ import { SelectOpenBadgesComponent } from './pages/select-open-badges/select-ope
     ],
     declarations: [
       SelectOpenBadgesComponent,
-      SourceDetailComponent,
+      // SourceDetailComponent,
       SourceDeleteComponent,
       SourceListComponent,
       RegisterComponent,

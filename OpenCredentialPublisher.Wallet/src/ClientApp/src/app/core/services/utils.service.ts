@@ -1,7 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
+import { ApiOkResult } from '@shared/models/apiOkResponse';
 import { ApiResponse } from '@shared/models/apiResponse';
+import jwt_decode from 'jwt-decode';
 import * as moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { Observable, of } from 'rxjs';
@@ -10,7 +12,6 @@ import { environment } from '../../../environments/environment';
 import { LogService } from '../error-handling/logerror.service';
 import { AuthorizationService } from './authorization.service';
 import { ErrorService } from './error.service';
-import jwt_decode from 'jwt-decode';
 // https://angular.io/tutorial/toh-pt6#handleerror
 /**
  * Handle Http operation that failed.
@@ -27,6 +28,36 @@ export class UtilsService implements OnDestroy {
 
   ngOnDestroy(): void {
   }
+
+  handleObjectError(error: Error | HttpErrorResponse) : Observable<ApiOkResult<any>> {
+    if (error instanceof HttpErrorResponse) {
+      if (this.debug) console.log(`UtilsService.handleError HttpErrorResponse`);
+        // Server Error
+        this.logService.logNgError(`Http error occurred: ${this.errorService.getServerMessage(error)}`)
+          .pipe(take(1))
+          .subscribe(
+            data => {
+              this.errorId = data;
+              this.showError(error.message, this.errorId);
+            },
+            logError => {
+              if (error.status === 400) { // check the original error, logError is the logging error
+                this.showError(`An error occurred and logging the error failed.(${this.errorService.getServerMessage(error)})`);
+              } else { // 404
+                this.showError(`An error occurred and logging the error failed.(${this.errorService.getServerMessage(error)})`);
+              }
+            }
+          );
+        // Let the app keep running by returning an empty result.
+        return of({statusCode: error.status, message: error.message, result: null, redirectUrl: null});
+    } else {
+      if (this.debug) console.log(`UtilsService.handleError NOT HttpErrorResponse`);
+        this.showError(this.errorService.getClientMessage(error));
+        // Let the app keep running by returning an empty result.
+        return of({statusCode: 400, message: 'Unhandled client error.', result: null, redirectUrl: null});
+      }
+  }
+
   handleError(error: Error | HttpErrorResponse): Observable<ApiResponse> {
     if (error instanceof HttpErrorResponse) {
       if (this.debug) console.log(`UtilsService.handleError HttpErrorResponse`);

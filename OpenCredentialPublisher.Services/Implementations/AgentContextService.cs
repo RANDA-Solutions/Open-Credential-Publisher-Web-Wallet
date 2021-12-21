@@ -76,7 +76,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             if (agentContext.Id == Guid.Empty)
                 agentContext.Id = Guid.NewGuid();
 
-            agentContext.CreatedOn = DateTimeOffset.UtcNow;
+            agentContext.CreatedAt = DateTime.UtcNow;
             _walletContext.AgentContexts.Add(agentContext);
             await _walletContext.SaveChangesAsync();
 
@@ -86,7 +86,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public async Task<AgentContextModel> UpdateAgentContextAsync(AgentContextModel agentContext)
         {
-            agentContext.ModifiedOn = DateTimeOffset.UtcNow;
+            agentContext.ModifiedAt = DateTime.UtcNow;
             _walletContext.AgentContexts.Update(agentContext);
             await _walletContext.SaveChangesAsync();
 

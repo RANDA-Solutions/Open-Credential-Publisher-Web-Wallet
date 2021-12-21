@@ -44,8 +44,10 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task DeleteRecipientAsync(RecipientModel input)
         {
             var shares = _context.Shares.Include(s => s.Messages).Where(s => s.RecipientId == input.Id).ToList();
-            _context.RemoveRange(shares);
-            _context.Recipients.Remove(input);
+            shares.ForEach(s => s.Delete());
+            //_context.RemoveRange(shares);
+            input.Delete();
+            //_context.Recipients.Remove(input);
             await _context.SaveChangesAsync();
         }
         public async Task<RecipientModel> UpdateRecipientAsync(RecipientModel input)

@@ -68,6 +68,32 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             return ApiOk(null, result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.");
         }
 
+        /// <summary>
+        /// Gets site settings
+        /// GET api/public/FooterSettings
+        /// </summary>
+        /// <returns>FooterSettings</returns>
+        [HttpGet("FooterSettings")]
+        [ProducesResponseType(200, Type = typeof(ApiResponse))]  /* success returns 200 - Ok */
+        public async Task<IActionResult> GetFooterSettings()
+        {
+            try
+            {
+                return ApiOk(new FooterSettingsVM
+                {
+                    ShowFooter = _siteSettings.ShowFooter,
+                    ContactUsUrl = _siteSettings.ContactUsUrl,
+                    PrivacyPolicyUrl = _siteSettings.PrivacyPolicyUrl,
+                    TermsOfServiceUrl = _siteSettings.TermsOfServiceUrl
+
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "CredentialsController.GetClrWithAchievementIds", null);
+                throw;
+            }
+        }
         [HttpGet("Links/Display/{linkId}")]
         [ProducesResponseType(200, Type = typeof(LinkDisplayVM))]  /* success returns 200 - Ok */
         public async Task<IActionResult> GetDisplay(string linkId, string key = null)
@@ -265,7 +291,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToPage("./ForgotPasswordConfirmation");
+                    return ApiOk(null);
                 }
 
                 // For more information on how to enable account confirmation and password reset please 
@@ -375,11 +401,11 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     default:
                         if (dReq.LinkId != null)
                         {
-                            return await _downloadService.GetLinkPdfAsync(Request, dReq);
+                            return await _downloadService.GetLinkPdfAsync(Request, dReq, _userId);
                         }
                         else if (dReq.ClrId != null)
                         {
-                            return await _downloadService.GetClrPdfAsync(Request, dReq);
+                            return await _downloadService.GetClrPdfAsync(Request, dReq, _userId);
                         }
                         else
                         {
@@ -417,16 +443,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         {
             return Ok(new ApiOkResponse(model, message, redirectUrl));
         }
-        private string GetLinkUrl(HttpRequest request, string id)
-        {
-            //var Request = model.Request;
-            if (Uri.TryCreate($"{request.Scheme}://{request.Host}{request.PathBase}/Public/Links/Display/{id}", UriKind.Absolute, out var url))
-            {
-                return url.AbsoluteUri;
-            }
-
-            return string.Empty;
-        }
+        
         [HttpPost("Links/DownloadVCJson/{id}")]
         [ProducesResponseType(200, Type = typeof(ApiResponse))]  /* success returns 200 - Ok */
         public async Task<IActionResult> DownloadVCJson(string id, [FromBody]string accessKey = null)

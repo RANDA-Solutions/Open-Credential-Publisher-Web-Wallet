@@ -40,13 +40,18 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             var linkVMs = new List<LinkVM>();
 
+            var clrIds = links.Select(l => l.ClrForeignKey).ToList();
+
+            var pdfs = await _context.Artifacts
+                .Where(a => a.ClrId.HasValue && clrIds.Contains(a.ClrId.Value) && a.Url != null).ToListAsync();
+
             foreach (var link in links)
             {
-                var pdfs = await _context.Artifacts
-                .Where(a => a.ClrId == link.ClrForeignKey && a.Url != null)
+                var linkPdfs = pdfs
+                .Where(a => a.ClrId == link.ClrForeignKey)
                 .OrderByDescending(a => a.CreatedAt)
                 .Select(a => PdfShareViewModel.FromArtifact(a))
-                .ToListAsync();
+                .ToList();
 
                 var lvm = new LinkVM
                 {
@@ -54,7 +59,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     ClrId = link.Clr.ClrId,
                     ClrIssuedOn = link.Clr.IssuedOn,
                     ClrPublisherName = link.Clr.PublisherName,
-                    Pdfs = pdfs,
+                    Pdfs = linkPdfs,
                     DisplayCount = link.DisplayCount,
                     Nickname = link.Nickname,
                     PackageCreatedAt = link.Clr.CredentialPackage.CreatedAt,
@@ -158,6 +163,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             return await _context.Links
                 .Include(l => l.Shares)
                 .Include(l => l.Clr)
+                .ThenInclude(c => c.CredentialPackage)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
         }

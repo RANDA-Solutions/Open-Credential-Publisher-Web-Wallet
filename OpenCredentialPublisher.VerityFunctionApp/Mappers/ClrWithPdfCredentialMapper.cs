@@ -41,7 +41,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Mappers
             var artifact = await _credentialService.CredentialPackagePdfArtifactAsync(model.Clr.CredentialPackageId);
             var pdfDataUrlParts = DataUrlUtility.ParseDataUrl(artifact.Url);
 
-            var link = new LinkModel { ClrForeignKey = model.Clr.ClrId, CredentialRequestId = model.CredentialRequestId, UserId = model.WalletRelationship.UserId, Nickname = $"SentToWallet-{model.WalletRelationship.WalletName}", RequiresAccessKey = true, CreatedAt = DateTimeOffset.UtcNow };
+            var link = new LinkModel { ClrForeignKey = model.Clr.ClrId, CredentialRequestId = model.CredentialRequestId, UserId = model.WalletRelationship.UserId, Nickname = $"SentToWallet-{model.WalletRelationship.WalletName}", RequiresAccessKey = true, CreatedAt = DateTime.UtcNow };
             await _linkService.AddAsync(link);
 
             var shareModel = new ShareModel
@@ -50,15 +50,16 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Mappers
                 ShareTypeId = ShareTypeEnum.Wallet,
                 AccessKey = Crypto.CreateRandomString(16),
                 UseCount = 0,
-                CreatedOn = DateTimeOffset.UtcNow,
+                CreatedAt = DateTime.UtcNow,
                 StatusId = StatusEnum.Active
             };
 
             await _linkService.AddShareAsync(shareModel);
+
             string url = null;
-            if (Uri.TryCreate($"{_credentialPublisherOptions.HostUrl}/Links/Display/{link.Id}", UriKind.Absolute, out var uri))
+            if (Uri.TryCreate(_credentialPublisherOptions.HostUrl, UriKind.Absolute, out var baseUri))
             {
-                url = uri.ToString();
+                url = LinkService.GetLinkUrl(baseUri, link.Id);
             }
 
             var pdfBytes = PdfUtility.AppendQRCodePage(pdfDataUrlParts.bytes, url, shareModel.AccessKey);
@@ -85,16 +86,6 @@ namespace OpenCredentialPublisher.VerityFunctionApp.Mappers
                         Base64 = Convert.ToBase64String(pdfBytes)
                     }
                 }
-                //,
-                //Clr = new AttachmentData
-                //{
-                //    MimeType = "application/json",
-                //    Filename = "clr-transcript.json",
-                //    Data = new Base64Data
-                //    {
-                //        Base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(clrViewModel.RawClrDType.ToJson()))
-                //    }
-                //}
             };
             return credential;
         }

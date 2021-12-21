@@ -104,7 +104,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CredentialksController.GetPackageList", null);
+                _logger.LogError(ex, "CredentialsController.GetSources", null);
                 throw;
             }
         }
@@ -178,7 +178,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CredentialksController.PostDelete", null);
+                _logger.LogError(ex, "CredentialsController.PostDelete", null);
                 throw;
             }
         }
@@ -199,7 +199,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CredentialksController.PostDeleteConnection", null);
+                _logger.LogError(ex, "CredentialsController.PostDeleteConnection", null);
                 throw;
             }
         }
@@ -213,6 +213,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         {
             try
             {
+                var packageId = -1;
                 ModelStateDictionary modelState = new ModelStateDictionary();
                 var auth = await _authorizationsService.GetAsync(id);
                 var sourceType = auth.Source.SourceTypeId;
@@ -220,7 +221,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 {
                     //if (auth.Source.Url.Contains("badgr"))
                     //{
-                    await _badgrService.RefreshObcBackpackAsync(modelState, id);
+                    packageId = await _badgrService.RefreshObcBackpackAsync(modelState, id);
                     //}
                     //else // IMS Open Badge Badge Connect Reference Implementation
                     //{
@@ -237,13 +238,20 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
                 if (modelState.IsValid)
                 {
-                    return ApiOk(new ApiResponse(200, "Ok", Url.Content("~/credentials/credentials-list")));
+                    if (sourceType.Equals(SourceTypeEnum.OpenBadgeConnect))
+                    {
+                        return ApiOk(null, null, Url.Content($"~/sources/select-open-badges/{packageId}"));
+                    }
+                    else
+                    {
+                        return ApiOk(null, null, Url.Content("~/credentials"));
+                    }
                 }
                 return ApiModelInvalid(modelState);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CredentialksController.PostRefresh", null);
+                _logger.LogError(ex, "CredentialsController.PostRefresh", null);
                 throw;
             }
         }
@@ -339,7 +347,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CredentialksController.PostCallback", null);
+                _logger.LogError(ex, "CredentialsController.PostCallback", null);
                 throw;
             }
         }
@@ -397,7 +405,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CredentialksController.PostRegistert", null);
+                _logger.LogError(ex, "CredentialsController.PostRegister", null);
                 throw;
             }
         }
@@ -479,7 +487,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "CredentialksController.GetAccesToken", null);
+                _logger.LogError(e, "CredentialsController.GetAccesToken", null);
                 throw;
 
                 // Remove the source
@@ -837,15 +845,15 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     scopes.AddRange(new List<string> { ClrConstants.Scopes.Readonly });
                     scopes.Add("offline_access");
                 }
-                var tmpIsBadgr = isBadgr;
+                var tmpIsBadgr = false; //isBadgr
                 var registrationRequest = new RegistrationRequest
                 {
                     ClientName = "Open Credential Publisher",
                     ClientUri = GetUrl(Request, "/"),
                     GrantTypes = new[] { OpenIdConnectGrantTypes.AuthorizationCode, OpenIdConnectGrantTypes.RefreshToken },
-                    LogoUri = GetUrl(Request, "/images/Logo_with_text.png", false),
-                    PolicyUri = GetUrl(Request, "/public/privacy", false),
-                    TosUri = GetUrl(Request, "/public/terms", false),
+                    LogoUri = GetUrl(Request, "/assets/images/Logo_with_text.png", tmpIsBadgr),
+                    PolicyUri = GetUrl(Request, "/public/privacy", tmpIsBadgr),
+                    TosUri = GetUrl(Request, "/public/terms", tmpIsBadgr),
                     RedirectUris = new[] { GetUrl(Request, _sourcesSettings.CallbackUrl) },
                     ResponseTypes = new[] { OpenIdConnectResponseType.Code },
                     Scope = string.Join(' ', scopes),

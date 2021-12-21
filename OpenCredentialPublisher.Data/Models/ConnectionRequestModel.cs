@@ -8,7 +8,7 @@ using System.Text;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("ConnectionRequests")]
-    public class ConnectionRequestModel
+    public class ConnectionRequestModel: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -25,8 +25,8 @@ namespace OpenCredentialPublisher.Data.Models
 
         public int? WalletRelationshipId { get; set; }
 
-        public DateTimeOffset CreatedOn { get; set; }
-        public DateTimeOffset? ModifiedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
 
         [ForeignKey("AgentContextId")]
         public AgentContextModel AgentContext { get; set; }
@@ -35,5 +35,11 @@ namespace OpenCredentialPublisher.Data.Models
         
         [ForeignKey("WalletRelationshipId")]
         public WalletRelationshipModel WalletRelationship { get; set; }
+        public bool IsDeleted { get; set; }
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
     }
 }

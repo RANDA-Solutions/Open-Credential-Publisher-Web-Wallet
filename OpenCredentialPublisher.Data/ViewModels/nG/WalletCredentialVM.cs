@@ -21,7 +21,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
             Id = credentialPackage.Id;
             DateAdded = credentialPackage.CreatedAt.ToString("g");
 
-            if (credentialPackage.TypeId == PackageTypeEnum.Clr)
+            if (credentialPackage.TypeId == PackageTypeEnum.Clr || credentialPackage.TypeId == PackageTypeEnum.Collection)
             {
                 Title = credentialPackage.ContainedClrs[0].Name;
             }

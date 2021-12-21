@@ -124,7 +124,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     ModelState.AddModelError("", "Cannot find the connection requested.");
                     return ApiModelInvalid(ModelState);
                 }
-                var invite = new ConnectionViewModel {  Name = relationship.WalletName, Id = id, RelationshipDid = relationship.RelationshipDid, DateCreated = relationship.CreatedOn.ToString("g") };
+                var invite = new ConnectionViewModel {  Name = relationship.WalletName, Id = id, RelationshipDid = relationship.RelationshipDid, DateCreated = relationship.CreatedAt.ToString("g") };
 
                 return ApiOk(invite);
             }

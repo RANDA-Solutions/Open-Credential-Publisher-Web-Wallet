@@ -25,7 +25,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<string> StoreAsync(string filename, string contents, string blobContainerName)
         {
             // Get a reference to a container
-            BlobContainerClient container = new BlobContainerClient(_options.StorageConnectionString, blobContainerName);
+            BlobContainerClient container = new BlobContainerClient(_options.StorageConnectionString, blobContainerName.ToLower());
             await container.CreateIfNotExistsAsync();
 
             BlobClient blob = container.GetBlobClient(filename);
@@ -45,13 +45,13 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public async Task<string> SaveToBlobAsync(string containerName, string fileId, string extension, byte[] contents, PublicAccessType publicAccessType = PublicAccessType.None)
         {
-            var container = new BlobContainerClient(_options.StorageConnectionString, containerName);
+            var container = new BlobContainerClient(_options.StorageConnectionString, containerName.ToLower());
             if (!(await container.ExistsAsync()))
             {
                 await container.CreateIfNotExistsAsync();
                 await container.SetAccessPolicyAsync(publicAccessType);
             }
-            var date = DateTimeOffset.UtcNow;
+            var date = DateTime.UtcNow;
             var filename = $"{date:yyyy/MM/dd}/{fileId}.{extension}";
             var location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
 
@@ -66,7 +66,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<string> StoreAsync(string filename, byte[] contents, string blobContainerName)
         {
             // Get a reference to a container
-            BlobContainerClient container = new BlobContainerClient(_options.StorageConnectionString, blobContainerName);
+            BlobContainerClient container = new BlobContainerClient(_options.StorageConnectionString, blobContainerName.ToLower());
             await container.CreateIfNotExistsAsync();
 
             BlobClient blob = container.GetBlobClient(filename);
@@ -81,7 +81,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public async Task<string> DownloadAsStringAsync(string filename, string blobContainerName)
         {
-            var bytes = await DownloadAsync(filename, blobContainerName);
+            var bytes = await DownloadAsync(filename, blobContainerName.ToLower());
 
             string utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
@@ -91,7 +91,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<byte[]> DownloadAsync(string filename, string blobContainerName)
         {
             // Get a reference to a container named "sample-container" and then create it
-            BlobContainerClient container = new BlobContainerClient(_options.StorageConnectionString, blobContainerName);
+            BlobContainerClient container = new BlobContainerClient(_options.StorageConnectionString, blobContainerName.ToLower());
             await container.CreateIfNotExistsAsync();
 
             BlobClient blob = container.GetBlobClient(filename);

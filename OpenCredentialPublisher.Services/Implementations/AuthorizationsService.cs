@@ -170,7 +170,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         /// <returns></returns>
         public async Task<bool> RefreshTokenAsync(ModelStateDictionary modelState, AuthorizationModel authorization)
         {
-            if (authorization.ValidTo >= DateTimeOffset.UtcNow)
+            if (authorization.ValidTo >= DateTime.UtcNow)
             {
                 return true;
             }
@@ -222,8 +222,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                 }
 
                 // Delete the authorization to force re-authorization
-                //_context.Authorizations.Remove(authorization);
-                //await _context.SaveChangesAsync();
+                _context.Authorizations.Remove(authorization);
+                await _context.SaveChangesAsync();
 
                 return false;
             }

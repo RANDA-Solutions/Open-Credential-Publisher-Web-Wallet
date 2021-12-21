@@ -5,7 +5,7 @@ export class ClrAssertionVM {
   achievementName: string;
   achievementType: string;
   achievementIssuerName: string;
-  issuedOn?: Date;
+  issuedOn: Date | null;
   isCollapsed: boolean;
   achievementResults: AchievementResult[];
 }

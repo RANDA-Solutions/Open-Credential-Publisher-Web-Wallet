@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppService } from '@core/services/app.service';
-import { AuthorizationService } from '@core/services/authorization.service';
-import { environment } from '@environment/environment';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { SourceCallback } from '@shared/models/sourceCallback';
 import { SourcesCallbackResponse } from '@shared/models/sourcesCallbackResponse';
@@ -18,7 +15,7 @@ export class SourcesCallbackComponent implements OnInit {
   private sub: Subscription;
   sourceCallback = new SourceCallback();
   private debug = false;
-  constructor(private appService: AppService, private authService: AuthorizationService,
+  constructor(
     private router: Router, private route: ActivatedRoute, ) {
   }
 
@@ -31,7 +28,7 @@ export class SourcesCallbackComponent implements OnInit {
 		  this.router.navigate(['/sources-error'],  { state: { errors: data.response.errorMessages }});
       }
       else {
-        this.router.navigate(['/sources/details', data.response.sourceId]);
+        this.router.navigate(['/credentials']);
       }
     });
   }

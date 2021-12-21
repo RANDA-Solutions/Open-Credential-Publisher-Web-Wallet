@@ -8,7 +8,7 @@ using System.Text;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("Shares")]
-    public class ShareModel
+    public class ShareModel: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -18,7 +18,8 @@ namespace OpenCredentialPublisher.Data.Models
         public int? RecipientId { get; set; }
         public string AccessKey { get; set; }
         public int UseCount { get; set; }
-        public DateTimeOffset CreatedOn { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
         public StatusEnum StatusId { get; set; }
 
         public List<MessageModel> Messages { get; set; }
@@ -28,6 +29,12 @@ namespace OpenCredentialPublisher.Data.Models
 
         [ForeignKey("LinkId")]
         public LinkModel Link { get; set; }
+        public bool IsDeleted { get; set; }
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
     }
 
     public enum ShareTypeEnum

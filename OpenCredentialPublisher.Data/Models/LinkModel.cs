@@ -9,7 +9,7 @@ namespace OpenCredentialPublisher.Data.Models
     /// <summary>
     /// Represents a Shareable link to a CLR.
     /// </summary>
-    public class LinkModel
+    public class LinkModel: IBaseEntity
     {
         /// <summary>
         /// Create a new instance of the object.
@@ -17,7 +17,7 @@ namespace OpenCredentialPublisher.Data.Models
         public LinkModel()
         {
             // Create an ID that can be used in the link URL.
-            Id = CryptoRandom.CreateUniqueId();
+            Id = CryptoRandom.CreateUniqueId(32).Substring(0, 16);
         }
 
         /// <summary>
@@ -58,7 +58,12 @@ namespace OpenCredentialPublisher.Data.Models
 
         public List<ShareModel> Shares { get; set; }
         public bool IsDeleted { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset? ModifiedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
     }
 }

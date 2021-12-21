@@ -6,11 +6,11 @@
 </ng-container>
 <ng-container *ngIf="profile.email != null">
   <dt class="col-12 col-lg-3">Email</dt>
-  <dd class="col-12 col-lg-9"><a href="mailto:{{profile.email}}">{{profile.email}}</a></dd>
+  <dd class="col-12 col-lg-9"><a href="mailto:{{profile.email}}"  target="_blank">{{profile.email}}</a></dd>
 </ng-container>
 <ng-container *ngIf="profile.url != null">
   <dt class="col-12 col-lg-3">URL</dt>
-  <dd class="col-12 col-lg-9"><a href="{{profile.url}}">{{profile.url}}</a></dd>
+  <dd class="col-12 col-lg-9"><a href="{{profile.url}}"  target="_blank">{{profile.url}}</a></dd>
 </ng-container>
 <ng-container *ngIf="profile.address != null">
   <ng-container *ngIf="profile.address.streetAddress != null || profile.address.addressRegion != null

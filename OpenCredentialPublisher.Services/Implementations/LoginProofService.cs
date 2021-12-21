@@ -125,8 +125,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                 State = state.ToLower(),
                 PublicId = Guid.NewGuid().ToString("d").ToLower(),
                 ProofAttributeId = Guid.NewGuid().ToString(),
-                CreatedAt = DateTimeOffset.UtcNow,
-                ValidUntil = DateTimeOffset.UtcNow.AddMinutes(ValidForMinutes),
+                CreatedAt = DateTime.UtcNow,
+                ValidUntil = DateTime.UtcNow.AddMinutes(ValidForMinutes),
             };
 
             proofAttributes.Add(new AttributesType
@@ -213,7 +213,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 await container.CreateIfNotExistsAsync();
                 await container.SetAccessPolicyAsync(publicAccessType);
             }
-            var date = DateTimeOffset.UtcNow;
+            var date = DateTime.UtcNow;
             var filename = $"{date:yyyy/MM/dd}/{fileId}.{extension}";
             var location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
             

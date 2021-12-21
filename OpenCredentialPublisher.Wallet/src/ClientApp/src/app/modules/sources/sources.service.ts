@@ -16,7 +16,6 @@ export class SourcesService {
   constructor(private http: HttpClient, private utilsService: UtilsService) { }
 
   connect(input: SourceConnectInput): Observable<ApiResponse> {
-
     const urlApi = `${environment.apiEndPoint}sources/Register`;
     if (this.debug) console.log(`sources service ${urlApi}`);
     return this.http.post<ApiResponse>(urlApi, input)

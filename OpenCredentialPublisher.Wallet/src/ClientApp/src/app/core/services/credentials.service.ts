@@ -2,7 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UtilsService } from '@core/services/utils.service';
 import { environment } from '@environment/environment';
+import { ApiOkResult } from '@shared/models/apiOkResponse';
 import { ApiResponse } from '@shared/models/apiResponse';
+import { AssertionHeaderVM } from '@shared/models/assertionHeaderVM';
+import { ClrAssertionVM } from '@shared/models/clrAsserrtionVM';
 import { ClrCollectionVM } from '@shared/models/clrCollectionVM';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -41,21 +44,21 @@ export class CredentialService {
         catchError(err => this.utilsService.handleError(err))
       );
   }
-  getClrAssertion(clrId: number, id: string): Observable<ApiResponse> {
+  getClrAssertion(clrId: number, id: string): Observable<ApiOkResult<ClrAssertionVM>> {
     const urlApi = `${environment.apiEndPoint}credentials/Clr/${clrId}/AssertionDetail?assertionId=${id}`;
     if (this.debug) console.log(`credentials service ${urlApi}`);
-    return this.http.get<ApiResponse>(urlApi)
+    return this.http.get<ApiOkResult<ClrAssertionVM>>(urlApi)
       .pipe(
-        catchError(err => this.utilsService.handleError(err)
+        catchError(err => this.utilsService.handleObjectError(err)
         )
       );
   }
-  getClrAssertions(clrId: number): Observable<ApiResponse> {
+  getClrAssertions(clrId: number): Observable<ApiOkResult<Array<AssertionHeaderVM>>> {
     const urlApi = `${environment.apiEndPoint}credentials/ClrAssertions/${clrId}`;
     if (this.debug) console.log(`credentials service ${urlApi}`);
-    return this.http.get<ApiResponse>(urlApi)
+    return this.http.get<ApiOkResult<Array<AssertionHeaderVM>>>(urlApi)
       .pipe(
-        catchError(err => this.utilsService.handleError(err)
+        catchError(err => this.utilsService.handleObjectError(err)
         )
       );
   }

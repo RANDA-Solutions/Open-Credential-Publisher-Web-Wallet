@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace OpenCredentialPublisher.Data.Models
 {
     [Table("EmailVerifications")]
-    public class EmailVerification
+    public class EmailVerification: IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -28,7 +28,15 @@ namespace OpenCredentialPublisher.Data.Models
         [ForeignKey("Message")]
         public int? MessageId { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+        public bool IsDeleted { get; set; }
+
+        public void Delete()
+        {
+            this.IsDeleted = true;
+            this.ModifiedAt = DateTime.UtcNow;
+        }
 
         public DateTimeOffset ValidUntil { get; set; }
 

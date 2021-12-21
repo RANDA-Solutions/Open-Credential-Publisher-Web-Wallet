@@ -28,5 +28,5 @@ export class LinkModel {
   credentialRequest: any;
   shares: ShareModel[];
   createdAt: Date;
-  modifiedAt?: Date;
+  modifiedAt: Date;
 }

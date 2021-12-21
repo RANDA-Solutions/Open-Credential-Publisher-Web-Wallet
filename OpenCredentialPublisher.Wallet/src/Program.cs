@@ -15,6 +15,8 @@ namespace OpenCredentialPublisher.ClrWallet
         {
             Console.Title = "Open Credential Publisher";
 
+            
+
             try
             {
                 var host = CreateHostBuilder(args).Build();

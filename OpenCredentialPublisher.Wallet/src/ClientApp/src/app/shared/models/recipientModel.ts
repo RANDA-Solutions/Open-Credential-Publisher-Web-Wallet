@@ -6,5 +6,7 @@ export class RecipientModel {
   user: ApplicationUser;
   name: string;
   email: string;
-  createdOn: Date;
+  createdAt: Date;
+  modifiedAt: Date;
+  isDeleted: boolean;
 }

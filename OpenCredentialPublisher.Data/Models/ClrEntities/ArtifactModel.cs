@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using OpenCredentialPublisher.ClrLibrary.Extensions;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Constants;
@@ -19,6 +20,8 @@ namespace OpenCredentialPublisher.Data.Models
     /// <summary>
     /// Represents an Artifact entity in the CLR model.
     /// </summary>
+
+    [Index(nameof(ClrId))]
     public class ArtifactModel : IBaseEntity
     {
         /**************************************************************************************************/

@@ -116,7 +116,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 Status = StatusEnum.Created,
                 EmailAddress = email,
-                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedAt = DateTime.UtcNow,
                 
                 VerificationString = WebEncoders.Base64UrlEncode(verificationBytes)
             };
@@ -131,7 +131,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 Subject = $"Verify your email",
                 SendAttempts = 0,
                 StatusId = StatusEnum.Created,
-                CreatedOn = DateTimeOffset.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
             await _emailHelperService.AddMessageAsync(verificationMessage);
 
@@ -140,7 +140,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var credentialType = new EmailVerificationCredential
             {
                 EmailAddress = email,
-                ValidFor = DateTimeOffset.UtcNow.AddYears(1).ToString()
+                ValidFor = DateTime.UtcNow.AddYears(1).ToString()
             };
             var schemaName = credentialType.GetSchemaName();
             var schemaArray = credentialType.ToSchemaArray();
@@ -209,7 +209,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var payload = queryString["m"];
             emailVerification.OfferPayload = payload;
             emailVerification.EmailVerificationCredentialQrCode = await SaveQRCodeToBlobAsync(response.Id, response.Contents);
-            emailVerification.ValidUntil = DateTimeOffset.UtcNow.AddMinutes(VerificationEmailValidInMinutes);
+            emailVerification.ValidUntil = DateTime.UtcNow.AddMinutes(VerificationEmailValidInMinutes);
             await _context.EmailVerifications.AddAsync(emailVerification);
             await _context.SaveChangesAsync();
 

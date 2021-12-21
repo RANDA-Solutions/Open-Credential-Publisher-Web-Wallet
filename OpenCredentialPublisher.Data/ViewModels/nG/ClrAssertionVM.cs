@@ -27,16 +27,17 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
                     results.Add(new AchievementResult { Name = rd.Name, Value = resultValue.Value });
                 }
             }
-            return new ClrAssertionVM
+            var vm = new ClrAssertionVM
             {
                 Id = assertion.AssertionId,
-                IssuedOn = assertion.IssuedOn,
+                IssuedOn = assertion.IssuedOn == DateTime.MinValue || assertion.IssuedOn == null ? null : assertion.IssuedOn,
                 AchievementName = assertion.Achievement?.Name,
                 AchievementType = assertion.Achievement?.AchievementType,
                 AchievementIssuerName = assertion.Achievement?.Issuer.Name,
                 AchievementResults = results,
                 IsCollapsed = true
             };
+            return vm;
         }
     }
     public class AchievementResult

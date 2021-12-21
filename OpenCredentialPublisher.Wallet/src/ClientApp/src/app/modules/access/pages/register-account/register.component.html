@@ -20,7 +20,7 @@
             <input type="password" required placeholder="Confirm Password" name="confirmPassword" class="form-control" ngModel/>
         </div>
         <button type="submit" class="btn btn-outline-primary mr-3" id="btn-register" [disabled]="f.invalid || showSpinner">REGISTER</button>
-        <a id="cancel"[routerLink]="['/credentials']" >CANCEL</a>
+        <a id="cancel" [routerLink]="['/access/login']" >CANCEL</a>
 
         <p class="mt-3"><small><sup>*</sup>Please complete all fields to enable the REGISTER button.</small></p>
     </form>

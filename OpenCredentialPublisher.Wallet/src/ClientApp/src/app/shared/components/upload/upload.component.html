@@ -1,29 +1,40 @@
 <div class="col">
-  <div class="upload-container p-5">
-    <form method="post" enctype="multipart/form-data">
-      <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
-        <span *ngFor="let msg of modelErrors">{{msg}}</span>
-      </div>
-      <div class="form-group">
-        <label class="control-label">CLR</label>
-        <div class="input-group mb-3">
-          <div class="custom-file">
-            <input type="file" (change)="onFileSelected($event)" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
-            <label class="custom-file-label" for="inputGroupFile01">{{fileName}}</label>
+  <div class="upload-container px-5 pt-1">
+    <div class="row credential-row mx-1 mt-3 mb-3">
+      <div class="col">
+        <div class="row card mb-3">
+          <div class="card-header">
+            <div class="card-section-header" (click)="collapseToggle($event)" [attr.aria-expanded]="!isCollapsed">
+                Click Here to Import Credentials
+            </div>
+          </div>
+          <div class="card-body" #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed">
+            <div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+              <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+            </div>
+            <ng-template #theContent>
+              <form method="post" enctype="multipart/form-data">
+                <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+                  <span *ngFor="let msg of modelErrors">{{msg}}</span>
+                </div>
+                <div class="form-group">
+                  <label class="control-label">CLR</label>
+                  <div class="input-group mb-3">
+                    <div class="custom-file">
+                      <input type="file" (change)="onFileSelected($event)" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                      <label class="custom-file-label" for="inputGroupFile01">{{fileName}}</label>
+                    </div>
+                  </div>
+                  <span asp-validation-for="ClrUpload" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                  <button type="button" (click)="fileUpload()" class="btn btn-outline-primary btn-lg float-right">UPLOAD</button>
+                </div>
+              </form>
+            </ng-template>
           </div>
         </div>
-        <span asp-validation-for="ClrUpload" class="text-danger"></span>
       </div>
-      <div class="form-group">
-        <button type="button" (click)="fileUpload()" class="btn btn-outline-primary btn-lg float-right">UPLOAD</button>
-      </div>
-    </form>
-    <div class="tw-spinner-overlay" [hidden]="!showSpinner">
-      <div class="tw-spinner-wrapper">
-      </div>
-    </div>
-    <div id="spinner-container" [hidden]="!showSpinner">
-      <app-spinner id="spinner"></app-spinner>
     </div>
   </div>
 </div>

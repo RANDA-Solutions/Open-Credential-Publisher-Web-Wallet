@@ -836,7 +836,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                         .Include(l => l.Shares)
                         .FirstOrDefaultAsync(l => l.ClrForeignKey == clr.ClrId);
                     link.IsDeleted = true;
-                    link.ModifiedAt = DateTimeOffset.UtcNow;
+                    link.ModifiedAt = DateTime.UtcNow;
                     link.Shares.ForEach(s => s.StatusId = StatusEnum.Deleted);
                 }
             }

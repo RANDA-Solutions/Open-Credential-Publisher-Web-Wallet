@@ -6,7 +6,6 @@ import { ToastModule } from 'primeng/toast';
 import { GlobalErrorHandler } from './error-handling/error.handler';
 import { LogService } from './error-handling/logerror.service';
 import { AuthGuard } from './guards/auth.guard';
-import { LoginGuard } from './guards/login.guard';
 import { throwIfAlreadyLoaded } from './guards/module-import-guard';
 import { AppService } from './services/app.service';
 import { AuthorizationService } from './services/authorization.service';
@@ -25,7 +24,6 @@ import { UtilsService } from './services/utils.service';
 		AuthGuard,
 		ClrDetailService,
 		CredentialService,
-    	LoginGuard,
 		LogService,
 		MessageService,
 		UtilsService,
