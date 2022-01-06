@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { environment } from '@environment/environment';
 import { AccountService } from '@modules/account/account.service';
-import { LoginService } from '@root/app/auth/auth.service';
+import { LoginService } from '@root/app/auth/login.service';
 import { TwoFactorAuthenticationResultEnum } from '@shared/models/enums/twoFactorAuthenticationResultEnum';
 import { TwoFactorAuthenticationModel } from '@shared/models/twoFactorAuthenticationModel';
 import { TwoFactorAuthenticationModelInput } from '@shared/models/TwoFactorAuthModelInput';

@@ -2,7 +2,7 @@ import { Component, NgZone, OnDestroy, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { LoginProofService } from "@modules/access/services/login-proof.service";
 import { UntilDestroy } from "@ngneat/until-destroy";
-import { LoginService } from "@root/app/auth/auth.service";
+import { LoginService } from "@root/app/auth/login.service";
 import { LoginProofModel } from "@shared/models/LoginProofModel";
 import { DeviceDetectorService } from "ngx-device-detector";
 

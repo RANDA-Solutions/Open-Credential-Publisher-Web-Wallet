@@ -2400,6 +2400,16 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         },
                         new
                         {
+                            Id = 11,
+                            Name = "PendingSchemaEndorsement"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "PendingCredentialDefinitionEndorsement"
+                        },
+                        new
+                        {
                             Id = 13,
                             Name = "Error"
                         },
@@ -3462,6 +3472,11 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         {
                             Id = 18,
                             Name = "Success"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Name = "NeedsEndorsement"
                         });
                 });
 
@@ -3640,6 +3655,13 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Navigation("Issuer");
 
                     b.Navigation("Requirement");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ArtifactModel", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.ClrModel", null)
+                        .WithMany("Artifacts")
+                        .HasForeignKey("ClrId");
                 });
 
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.AssertionModel", b =>
@@ -4514,6 +4536,8 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
 
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ClrModel", b =>
                 {
+                    b.Navigation("Artifacts");
+
                     b.Navigation("ClrAchievements");
 
                     b.Navigation("ClrAssertions");

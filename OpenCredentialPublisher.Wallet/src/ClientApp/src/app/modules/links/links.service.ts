@@ -62,15 +62,7 @@ export class LinksService {
       catchError(err => this.utilsService.handleError(err))
     );
   }
-  getLink(id: string): Observable<ApiResponse> {
 
-    const urlApi = `${environment.apiEndPoint}Links/${id}`;
-    console.log(`links service ${urlApi}`);
-    return this.http.get<ApiResponse>(urlApi)
-    .pipe(
-      catchError(err => this.utilsService.handleError(err))
-    );
-  }
   getShareVM(id: string): Observable<ApiResponse> {
 
     const urlApi = `${environment.apiEndPoint}Links/ShareVM/${id}`;

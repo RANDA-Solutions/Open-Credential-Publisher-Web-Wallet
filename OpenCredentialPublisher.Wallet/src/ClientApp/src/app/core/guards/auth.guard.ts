@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate, CanLoad, Route, Router, RouterStat
 import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { LoginService } from '@root/app/auth/auth.service';
+import { LoginService } from '@root/app/auth/login.service';
 import { UserDataResult } from 'angular-auth-oidc-client';
 import { AuthenticatedResult } from 'angular-auth-oidc-client/lib/auth-state/auth-result';
 import { Observable, of } from 'rxjs';

@@ -30,72 +30,85 @@ namespace OpenCredentialPublisher.Services.Implementations
             _schemaService = schemaService;
         }
 
-        public async Task<List<LinkVM>> GetLinkVMListAsync(string userId, HttpRequest request)
+        public async Task<LinkListVM> GetLinkVMListAsync(string userId, HttpRequest request)
         {
-            var links = await _context.Links.AsNoTracking()
-                .Include(l => l.Clr)
-                .ThenInclude(c => c.CredentialPackage)
-                .Where(l => l.UserId == userId)
-                .ToListAsync();            
+            var packages = await _context.CredentialPackages.AsNoTracking()
+                .Include(cp => cp.ContainedClrs)
+                    .ThenInclude(cl => cl.Links)
+                .Include(cp => cp.ContainedClrs)
+                    .ThenInclude(cl => cl.Artifacts)
+                .Where(cp => cp.UserId == userId
+                    && cp.IsDeleted == false
+                    && cp.ContainedClrs.Any(cl => cl.Links.Any(l => !l.IsDeleted)))
+                .ToListAsync();
 
-            var linkVMs = new List<LinkVM>();
-
-            var clrIds = links.Select(l => l.ClrForeignKey).ToList();
-
-            var pdfs = await _context.Artifacts
-                .Where(a => a.ClrId.HasValue && clrIds.Contains(a.ClrId.Value) && a.Url != null).ToListAsync();
-
-            foreach (var link in links)
+            var credentials = new List<CredentialLinkVM>();
+            foreach (var package in packages)
             {
-                var linkPdfs = pdfs
-                .Where(a => a.ClrId == link.ClrForeignKey)
-                .OrderByDescending(a => a.CreatedAt)
-                .Select(a => PdfShareViewModel.FromArtifact(a))
-                .ToList();
-
-                var lvm = new LinkVM
+                foreach (var clr in package.ContainedClrs)
                 {
-                    Id = link.Id,
-                    ClrId = link.Clr.ClrId,
-                    ClrIssuedOn = link.Clr.IssuedOn,
-                    ClrPublisherName = link.Clr.PublisherName,
-                    Pdfs = linkPdfs,
-                    DisplayCount = link.DisplayCount,
-                    Nickname = link.Nickname,
-                    PackageCreatedAt = link.Clr.CredentialPackage.CreatedAt,
-                    Url = GetLinkUrl(request, link.Id)
-                };
+                    var credential = new CredentialLinkVM
+                    {
+                        CredentialPackageId = package.Id,
+                        PackageCreatedAt = package.CreatedAt,
+                        ClrId = clr.ClrId,
+                        ClrName = clr.Name,
+                        ClrIssuedOn = clr.IssuedOn,
+                        ClrPublisherName = clr.PublisherName
+                    };
+                    var artifacts = clr.Artifacts
+                        .Where(ar => ar.IsPdf);
 
-                linkVMs.Add(lvm);
+                    credential.Pdfs =
+                            artifacts
+                                .OrderByDescending(a => a.CreatedAt)
+                                .Select(a => PdfShareViewModel.FromArtifact(a))
+                                .ToList();
+
+                    credential.Links =
+                        clr.Links.Select(l =>
+                            new ShortLinkVM
+                            {
+                                Id = l.Id,
+                                DisplayCount = l.DisplayCount,
+                                Nickname = l.Nickname,
+                                Url = GetLinkUrl(request, l.Id)
+                            }
+                        ).ToList();
+
+                    credentials.Add(credential);
+                }
             }
-            return linkVMs;
+            return new LinkListVM { Credentials = credentials };
         }
         public async Task<LinkVM> GetLinkVMAsync(string userId, string id, HttpRequest request)
         {
             var link = await _context.Links.AsNoTracking()
                 .Include(l => l.Clr)
                 .ThenInclude(c => c.CredentialPackage)
-                .Where(l => (l.UserId == userId || userId == null) && l.Id == id)
-                .FirstOrDefaultAsync();
+                .Include(l => l.Clr)
+                .ThenInclude(cl => cl.Artifacts)
+                .FirstOrDefaultAsync(l => (l.UserId == userId || userId == null) && l.Id == id);
 
-                var pdfs = await _context.Artifacts
-                .Where(a => a.ClrId == link.ClrForeignKey && a.Url != null)
-                .OrderByDescending(a => a.CreatedAt)
-                .Select(a => PdfShareViewModel.FromArtifact(a))
-                .ToListAsync();
+            var pdfs = 
+                 link.Clr.Artifacts
+                    .Where(a => a.IsPdf)
+                    .OrderByDescending(a => a.CreatedAt)
+                    .Select(a => PdfShareViewModel.FromArtifact(a))
+                    .ToList();
 
-                var lvm = new LinkVM
-                {
-                    Id = link.Id,
-                    ClrId = link.Clr.ClrId,
-                    ClrIssuedOn = link.Clr.IssuedOn,
-                    ClrPublisherName = link.Clr.PublisherName,
-                    Pdfs = pdfs,
-                    DisplayCount = link.DisplayCount,
-                    Nickname = link.Nickname,
-                    PackageCreatedAt = link.Clr.CredentialPackage.CreatedAt,
-                    Url = GetLinkUrl(request, link.Id)
-                };
+            var lvm = new LinkVM
+            {
+                Id = link.Id,
+                ClrId = link.Clr.ClrId,
+                ClrIssuedOn = link.Clr.IssuedOn,
+                ClrPublisherName = link.Clr.PublisherName,
+                Pdfs = pdfs,
+                DisplayCount = link.DisplayCount,
+                Nickname = link.Nickname,
+                PackageCreatedAt = link.Clr.CredentialPackage.CreatedAt,
+                Url = GetLinkUrl(request, link.Id)
+            };
 
             return lvm;
         }

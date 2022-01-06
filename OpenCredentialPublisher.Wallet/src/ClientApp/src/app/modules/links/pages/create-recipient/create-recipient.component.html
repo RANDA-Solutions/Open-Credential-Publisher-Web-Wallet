@@ -11,21 +11,23 @@
             <div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
               <span *ngFor="let msg of modelErrors">{{msg}}</span>
             </div>
-            <form>
+            <form #f="ngForm">
                 <div class="form-group">
                     <label required class="control-label">Name</label>
-                    <input [(ngModel)]="vm.name" class="form-control" />
+                    <input name="name" [(ngModel)]="vm.name" class="form-control" />
                 </div>
                 <div class="form-group">
                     <label required class="control-label">Email</label>
-                    <input [(ngModel)]="vm.email" class="form-control" />
+                    <input name="email" [(ngModel)]="vm.email" class="form-control" />
                 </div>
                 <div class="form-group">
                     <button type="button" (click)="save()" class="btn btn-outline-primary btn-lg">Save</button>
                 </div>
             </form>
-
-            <a [routerLink]="['/links']">Back to List of Recipients</a>
+            <span *ngIf="linkId">
+                <a  [routerLink]="['/links/share', linkId]">Back to Email Credential</a> | 
+            </span>
+            <a [routerLink]="['/links/recipients']">Back to List of Recipients</a>
         </section>
     </div>
 </div>

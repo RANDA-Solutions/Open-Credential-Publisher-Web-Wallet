@@ -21,6 +21,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
+
 namespace OpenCredentialPublisher.Wallet.Controllers
 {
 
@@ -204,13 +206,17 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             {
                 modelState.AddModelError("Email", "Email is required.");
             }
+            if (string.IsNullOrEmpty(input.UserName))
+            {
+                modelState.AddModelError("UserName", "UserName is required.");
+            }
 
             if (errors.Any())
             {
                 return ApiModelInvalid(modelState);
             }
 
-            var user = new ApplicationUser { UserName = input.Email, Email = input.Email };
+            var user = new ApplicationUser { UserName = input.UserName, Email = input.Email, DisplayName = input.DisplayName };
             var result = await _userManager.CreateAsync(user, input.Password);
             if (result.Succeeded)
             {
@@ -218,10 +224,16 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
+                Uri callbackUrl;
+                if (string.IsNullOrEmpty(input.ReturnUrl))
+                {
+                    Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/access/email-confirmation?userId={user.Id}&code={code}", UriKind.Absolute, out callbackUrl);
+                }
+                else
+                {
+                    Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/access/email-confirmation?userId={user.Id}&code={code}&returnUrl={HttpUtility.UrlEncode(input.ReturnUrl)}", UriKind.Absolute, out callbackUrl);
+                }
                 Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/access/register-confirmation?userId={user.Id}&code={code}", UriKind.Absolute, out var confirmUrl);
-                Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/access/email-confirmation?userId={user.Id}&code={code}", UriKind.Absolute, out var callbackUrl);
-                Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/credentials", UriKind.Absolute, out var mainUrl);
 
                 await _emailSender.SendEmailAsync(input.Email, "Confirm your email",
                     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl.AbsoluteUri)}'>clicking here</a>.");
@@ -232,6 +244,20 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 }
                 else
                 {
+                    Uri mainUrl;
+                    if (string.IsNullOrEmpty(input.ReturnUrl))
+                    {
+                        Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/credentials", UriKind.Absolute, out mainUrl);
+                    }
+                    else if (Uri.IsWellFormedUriString(input.ReturnUrl, UriKind.Relative))
+                    {
+                        Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}{input.ReturnUrl}", UriKind.Absolute, out mainUrl);
+                    }
+                    else
+                    {
+                        Uri.TryCreate($"{input.ReturnUrl}", UriKind.Absolute, out mainUrl);
+                    }
+
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return ApiOk(RegisterResultEnum.Success, null, mainUrl.PathAndQuery);
                 }

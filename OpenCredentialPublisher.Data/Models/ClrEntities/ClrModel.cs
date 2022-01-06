@@ -201,6 +201,8 @@ namespace OpenCredentialPublisher.Data.Models
         public ICollection<ClrAssertion> ClrAssertions { get; set; }
         public ICollection<ClrAchievement> ClrAchievements { get; set; }
         public ICollection<ClrEndorsement> ClrEndorsements { get; set; }
+
+        public ICollection<ArtifactModel> Artifacts { get; set; }
         public static ClrModel FromDType(ClrDType clr, string json, string signedClr = null)
         {
             return new ClrModel

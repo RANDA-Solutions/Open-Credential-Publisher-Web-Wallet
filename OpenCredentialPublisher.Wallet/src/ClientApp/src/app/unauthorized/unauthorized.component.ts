@@ -1,10 +1,11 @@
 
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { LoginService } from '../auth/auth.service';
+import { LoginService } from '../auth/login.service';
 
 @Component({
 	selector: 'app-unauthorized',
+	styleUrls: ['./unauthorized.component.scss'],
 	templateUrl: 'unauthorized.component.html'
 })
 export class UnauthorizedComponent implements OnInit {

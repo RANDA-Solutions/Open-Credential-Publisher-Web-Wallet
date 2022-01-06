@@ -3,36 +3,31 @@
     <section class="default-container p-5">
       <span class="h1">Share your credential</span>
 
-      <div class="alert alert-primary font-16">
+      <div class="alert alert-primary font-16 mt-3">
         You have three options to share your credential
         <ol>
-            <li>
-                Below you will see a shareable link.  Copy and paste as needed.
-            </li>
-            <li>
-                Download a PDF copy of your shareable credential.
-            </li>
-            <li>
-                Generate an email.
-            </li>
+          <li>
+            Below you will see a shareable link. Copy and paste as needed.
+          </li>
+          <li>
+            Download a PDF copy of your shareable credential.
+          </li>
+          <li>
+            Generate an email.
+          </li>
         </ol>
       </div>
-      <a [routerLink]="['/links/create']">Share a credential</a>
+      <a [routerLink]="['/links/create']" class="btn btn-outline-primary btn-lg mb-3">Share a credential</a>
       <div *ngIf="showSpinner == true" class="table-responsive">
         <table class="table">
-          <thead>
+          <thead class="thead-dark">
             <tr>
-              <th colspan="4">CLR</th>
-              <th colspan="4">Link</th>
-            </tr>
-            <tr>
-              <th>Nickname</th>
-              <th>Publisher</th>
-              <th>Published</th>
-              <th>Added</th>
-              <th>Shareable Link</th>
-              <th class="text-center">Display Count</th>
               <th></th>
+              <th>CLR</th>
+              <th>Publisher</th>
+              <th class="text-center">Shares</th>
+              <th class="text-center">Published</th>
+              <th class="text-center">Added</th>
             </tr>
           </thead>
         </table>
@@ -42,48 +37,78 @@
       </div>
       <div *ngIf="showSpinner == false" class="table-responsive">
         <table class="table">
-          <thead>
+          <thead class="thead-dark">
             <tr>
-              <th colspan="4">CLR</th>
-              <th colspan="4">Link</th>
-            </tr>
-            <tr>
-              <th>Nickname</th>
+              <th class="expand-column"></th>
+              <th>CLR</th>
               <th>Publisher</th>
-              <th>Published</th>
-              <th>Added</th>
-              <th>Shareable Link</th>
-              <th class="text-center">Display Count</th>
-              <th></th>
+              <th class="text-center">Shares</th>
+              <th class="text-center">Published</th>
+              <th class="text-center">Added</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let link of links">
-              <td>{{link.nickname}}</td>
-              <td>{{link.clrPublisherName}}</td>
-              <td>{{link.clrIssuedOn  | date: 'M/d/yyyy'}}</td>
-              <td>{{link.packageCreatedAt | date: 'M/d/yyyy'}} </td>
-              <td class="overflow-hidden" style="max-width: 20em;">
-                  <a [routerLink]="[getLink(link.url)]">{{link.url}}</a>
+          <tbody *ngFor="let credential of viewmodel.credentials; let i = index">
+            <tr class="accordion-toggle collapsed" id="accordion{{i}}" data-toggle="collapse" [attr.data-parent]="getId('#accordion', i)" [attr.href]="getId('#collapse', i)">
+              <td class="">
+                <i class="contract-button far fa-2x fa-chevron-circle-right"></i>
+                <i class="expand-button far fa-2x fa-chevron-circle-down"></i>
               </td>
-              <td class="text-center">{{link.displayCount}}</td>
-
-              <td style="white-space: nowrap">
-                <form method="post" *ngFor="let pdf of link.pdfs">
-                    <button type="submit" class="btn text-primary btn-sm " title="View {{pdf.artifactName}}"
-                      (click)="showPdf(link.id, link.clrId, pdf.assertionId, pdf.evidenceName, pdf.artifactId, pdf.artifactName)">
-                      <i class="fal fa-file-pdf fa-2x"></i>
-                    </button>
-                </form>
-                <a [routerLink]="['/links/share', link.id]" title="Share Through Email"><i class="fal fa-upload fa-2x"></i></a>
-                <a [routerLink]="['/links/delete', link.id]" title="Delete Link"><i class="fal fa-trash fa-2x"></i></a>
-              </td>
+              <td>{{credential.clrName}}</td>
+              <td>{{credential.clrPublisherName}}</td>
+              <td class="text-center">{{credential.links?.length ?? 0}}</td>
+              <td class="text-center">{{credential.clrIssuedOn | date: 'M/d/yyyy'}}</td>
+              <td class="text-center">{{credential.packageCreatedAt | date: 'M/d/yyyy'}} </td>
             </tr>
+              <tr class="hide-table-padding">
+                <td></td>
+                <td colspan="5">
+                  <div [attr.id]="getId('collapse', i)" class="collapse in">
+                  <table class="table table-borderless">
+                    <thead class="thead-light">
+                    <tr>
+                      <th>Nickname</th>
+                      <th>URL</th>
+                      <th class="text-center">Views</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ng-container *ngFor="let link of credential.links; let j = index">
+                    <tr [ngClass]="{ 'bg-light': j % 2 == 1 }">
+                      <td>{{link.nickname}}</td>
+                      <td class="overflow-hidden" style="max-width: 20em;">
+                        <a [routerLink]="[getLink(link.url)]">{{link.url}}</a>
+                      </td>
+                      <td class="text-center">{{link.displayCount}}</td>
+                      <td>
+                        <a [routerLink]="['/links/share', link.id]" title="Share Through Email" class="btn btn-sm btn-outline-primary mr-3">Email</a>
+                        <a [routerLink]="['/links/delete', link.id]" title="Delete Share" class="btn btn-sm btn-outline-danger">Delete</a>
+                      </td>
+                    </tr>
+                    <tr class="border-top" *ngFor="let pdf of credential.pdfs" [ngClass]="{'bg-light': j % 2 == 1}">
+                      <td></td>
+                      <td colspan="2">
+                        {{pdf.artifactName}}
+                      </td>
+                      <td>
+                        <form method="post">
+                          <button type="submit" class="btn text-primary btn-sm btn-outline-primary" title="View {{pdf.artifactName}}"
+                            (click)="showPdf(link.id, credential.clrId, pdf.assertionId, pdf.evidenceName, pdf.artifactId, pdf.artifactName)">
+                            Download
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  </ng-container>
+                  </tbody>
+                  </table>
+                </div>
+                </td>
+              </tr>
           </tbody>
         </table>
       </div>
       <a [routerLink]="['/credentials']">Back to Credentials</a>
-
     </section>
   </div>
 </div>

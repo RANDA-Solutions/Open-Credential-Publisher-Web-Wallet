@@ -6,7 +6,7 @@ import { LinksService } from '@modules/links/links.service';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { PdfRequestTypeEnum } from '@shared/models/enums/pdfRequestTypeEnum';
-import { LinkVM } from '@shared/models/linkVM';
+import { LinkListVM } from '@shared/models/LinkListVM';
 import { PdfRequest } from '@shared/models/pdfRequest';
 import { take } from 'rxjs/operators';
 
@@ -16,7 +16,7 @@ import { take } from 'rxjs/operators';
   styleUrls: ['./link-list.component.scss']
 })
 export class LinkListComponent implements OnInit {
-  links = new Array<LinkVM>();
+  viewmodel = new LinkListVM();
   redirectUrl = '';
   showSpinner = false;
   private debug = false;
@@ -63,9 +63,9 @@ export class LinkListComponent implements OnInit {
       .pipe(take(1)).subscribe(data => {
         console.log(data);
         if (data.statusCode == 200) {
-          this.links = (<ApiOkResponse>data).result as Array<LinkVM>;
+          this.viewmodel = (<ApiOkResponse>data).result as LinkListVM;
         } else {
-          this.links = new Array<LinkVM>();
+          this.viewmodel = new LinkListVM();
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
         }
         this.showSpinner = false;
@@ -74,6 +74,10 @@ export class LinkListComponent implements OnInit {
 
   getLink(url: string) {
     return url.replace(environment.baseUrl, '');
+  }
+
+  getId(name: string, index: number) {
+    return `${name}${index}`;
   }
 
 }

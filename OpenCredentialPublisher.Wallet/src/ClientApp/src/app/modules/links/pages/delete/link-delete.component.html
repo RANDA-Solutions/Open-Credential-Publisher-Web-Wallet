@@ -3,7 +3,7 @@
     <section class="default-container p-5">
       <span class="h1">Delete Link</span>
 
-      <div class="alert alert-primary">
+      <div class="alert alert-primary mt-3">
           A link is a URL you can share with people that lets them see your CLR. The people that click on the link will
           only be able to see the one CLR you select. You can see how many times people have displayed your CLR in the
           table below.
@@ -27,12 +27,13 @@
                 </dd>
             </dl>
             <form method="post">
-                <button type="button"  (click)="deleteLink()" class="btn btn-outline-danger btn-lg">Delete</button>|
-                <a [routerLink]="['/links']">Back to List of Links</a>
+                <a class="btn btn-lg btn-outline-secondary mr-3" [routerLink]="['/links']">Cancel</a> 
+                <button type="button"  (click)="deleteLink()" class="btn btn-outline-danger btn-lg">Delete</button>
             </form>
         </div>
       </ng-container>
-      <a *ngIf="vm.linkId == null" [routerLink]="['/links']">Back to List of Links</a>
+      <hr />
+      <a [routerLink]="['/links']" class="mt-5">Back to Shareable Credentials</a>
     </section>
   </div>
   <ng-template #showLoading>
