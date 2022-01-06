@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
-import { environment } from '@environment/environment';
 import { LinksService } from '@modules/links/links.service';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { RecipientModel } from '@shared/models/recipientModel';
 import { take } from 'rxjs/operators';
 
+@UntilDestroy()
 @Component({
   selector: 'app-create-recipient',
   templateUrl: './create-recipient.component.html',
@@ -15,13 +16,19 @@ import { take } from 'rxjs/operators';
 export class CreateRecipientComponent implements OnInit {
   modelErrors = new Array<string>();
   vm = new RecipientModel();
-   private debug = false;
+  linkId: string = null;
+  private sub: any;
+  private debug = false;
   showSpinner = false;
   constructor(private appService: AppService, private linksService: LinksService
     , private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
     if (this.debug) console.log('CreateRecipientComponent ngOnInit');
+
+    this.sub = this.route.queryParams.pipe(untilDestroyed(this)).subscribe(params => {
+      this.linkId = params['linkId'];
+   });
   }
   save(){
     this.showSpinner = true;
@@ -30,7 +37,12 @@ export class CreateRecipientComponent implements OnInit {
       .pipe(take(1)).subscribe(data => {
         if (this.debug) console.log(data);
         if (data.statusCode == 200) {
-          this.router.navigate(['/links'])
+          if (this.linkId) {
+            this.router.navigate(['/links/share', this.linkId], { queryParams: { infoMessage: "New recipient created." }});
+          }
+          else {
+            this.router.navigate(['/recipients'], { queryParams: { infoMessage: "New recipient created." }});
+          }
         } else {
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
         }

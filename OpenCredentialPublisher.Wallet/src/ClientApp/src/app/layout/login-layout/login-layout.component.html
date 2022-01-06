@@ -1,0 +1,11 @@
+<div class="tw-page-wrapper d-flex flex-column login-background">
+	<div class="parent-spacer">&nbsp;</div>
+	<div class="tw-layout-container flex-column flex-fill container">
+	  <router-outlet></router-outlet>
+	  <div class="flex-fill">&nbsp;</div>
+	  <div class="row justify-content-center">
+		<p-toast class="tw-toast" position="bottom-center" key="main" [baseZIndex]="5000"></p-toast>
+	  </div>
+	  <app-site-footer></app-site-footer>	
+	</div>
+  </div>

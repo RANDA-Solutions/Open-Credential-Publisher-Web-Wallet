@@ -1,0 +1,15 @@
+tr.hide-table-padding > td {
+	padding: 0;
+}
+
+.accordion-toggle.collapsed .expand-button {
+	display: none;
+}
+
+.accordion-toggle:not(.collapsed) .contract-button {
+	display: none;
+}
+
+th.expand-column {
+	width: 87px;
+}

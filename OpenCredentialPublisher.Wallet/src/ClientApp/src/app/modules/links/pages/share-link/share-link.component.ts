@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { environment } from '@environment/environment';
 import { LinksService } from '@modules/links/links.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
@@ -21,6 +20,7 @@ export class ShareLinkComponent implements OnInit {
   public vm = new LinkShareVM();
   showSpinner = false;
   showIt = false;
+  infoMessage: string = null;
   private sub: any;
   private debug = false;
   constructor(private route: ActivatedRoute, private router: Router, private linksService: LinksService) {
@@ -33,20 +33,28 @@ export class ShareLinkComponent implements OnInit {
       this.id = params['id'];
       this.getData(this.id );
    });
+
+   this.route.queryParams.pipe(untilDestroyed(this)).subscribe(params => {
+    this.infoMessage = params['infoMessage'];
+ });
   }
 
   onSubmit():any {
     this.showSpinner = true;
+    this.infoMessage = null;
     if (this.debug) console.log('link-share deleteSource');
     this.linksService.shareLink(this.vm)
       .pipe(take(1)).subscribe(data => {
         if (this.debug) console.log(data);
+        this.showSpinner = false;
         if (data.statusCode == 200) {
-          this.router.navigate(['/links'])
+          let recipient = this.vm.recipients.find((recipient) => {
+            return recipient.id == this.vm.recipientId;
+          });
+          this.infoMessage = `Credential shared with ${recipient.name}`;
         } else {
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
         }
-        this.showSpinner = false;
       });
   }
 

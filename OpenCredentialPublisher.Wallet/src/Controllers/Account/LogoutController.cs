@@ -11,13 +11,16 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Wallet.Controllers.Account
 {
-    public class LogoutController : SecureApiController<LogoutController>
+    public class LogoutController : ApiController<LogoutController>
     {
         
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IIdentityServerInteractionService _identityServer;
 
-        public LogoutController(IIdentityServerInteractionService identityServer, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ILogger<LogoutController> logger):base(userManager, logger)
+        public LogoutController(IIdentityServerInteractionService identityServer
+            , SignInManager<ApplicationUser> signInManager
+            , ILogger<LogoutController> logger)
+            : base(logger)
         {
             _identityServer = identityServer;
             _signInManager = signInManager;

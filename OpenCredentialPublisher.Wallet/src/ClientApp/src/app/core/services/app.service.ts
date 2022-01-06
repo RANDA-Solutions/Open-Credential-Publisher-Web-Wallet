@@ -4,7 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { LoginService } from '@root/app/auth/auth.service';
+import { LoginService } from '@root/app/auth/login.service';
 import { ApiResponse } from '@shared/models/apiResponse';
 import { CredentialSendStatus } from '@shared/models/credentialSendStatus';
 import { WalletConnectionStatus } from '@shared/models/walletConnectionStatus';

@@ -450,6 +450,12 @@ namespace OpenCredentialPublisher.Data.Contexts
                 .WithOne(c => c.ClrEndorsement)
                 .HasForeignKey<ClrEndorsement>(pt => pt.EndorsementId);
 
+            modelBuilder.Entity<ClrModel>()
+                .HasMany(cl => cl.Artifacts)
+                .WithOne(ar => ar.Clr)
+                .HasForeignKey(ar => ar.ClrId)
+                .IsRequired(false);
+
             modelBuilder.Entity<AchievementAlignment>()
                 .HasOne(pc => pc.Achievement)
                 .WithMany(c => c.AchievementAlignments)

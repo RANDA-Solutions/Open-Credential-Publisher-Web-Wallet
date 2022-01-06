@@ -77,6 +77,11 @@ export const accessRoutes: Routes = [
         path: 'register', component: RegisterAccountComponent,
         data: { hideNavBar: true }
       },
+      {
+        path: '',
+        component: LoginFormComponent,
+        data: { hideNavBar: true }
+      }
     ]
   }
 

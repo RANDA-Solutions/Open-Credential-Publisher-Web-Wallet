@@ -3,7 +3,7 @@ import { environment } from '@environment/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DEFAULT_INTERRUPTSOURCES, Idle, StorageInterruptSource, WindowInterruptSource } from '@ng-idle/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { LoginService } from '../auth/auth.service';
+import { LoginService } from '../auth/login.service';
 
 @UntilDestroy()
 @Injectable({
@@ -17,13 +17,15 @@ export class TimeoutService implements OnDestroy {
   private _onBadRefresh = new EventEmitter<boolean>();
   
   private INTERRUPT_SOURCES: any[] = [new StorageInterruptSource(), new WindowInterruptSource('keyup scroll touch focus')];
-
+  private id: string;
   constructor(
     private _idle: Idle,
     private _modalService: NgbModal,
     private _ngZone: NgZone,
 	private loginService: LoginService
   ) {
+    this.id = new Date().toDateString();
+    console.log("Timeout Service: ", this.id);
     this.loginService.isAuthenticated$.pipe(untilDestroyed(this)).subscribe(val => { 
 		this._isLoggedIn = val.isAuthenticated; 
 		if (this._isLoggedIn && !this._watching) {

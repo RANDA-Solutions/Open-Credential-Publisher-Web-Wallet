@@ -3,7 +3,11 @@
     <section class="default-container p-5">
       <span class="h1">Email your credential</span>
       <ng-container *ngIf="vm.linkId != null">
-        <!--var dict = new Dictionary<string, string> { { "linkId", Model.Link.Id } };-->
+      <ng-container *ngIf="infoMessage"> 
+        <div class="alert alert-info my-3">
+          {{infoMessage}}
+        </div>
+        </ng-container>
         <div>
           <div class="row">
             <div class="col">
@@ -16,7 +20,7 @@
               <div class="row">
                 <div class="col">
                   <div class="form-group">
-                    <a class="btn btn-outline-secondary btn-sm mb-3" [routerLink]="['/links/recipients/create']">Create new recipient</a>
+                    <a class="btn btn-outline-secondary btn-sm mb-3" [routerLink]="['/links/recipients/create']" [queryParams]="{linkId: vm.linkId}">Create new recipient</a>
                   </div>
                   <div class="form-group">
                     <label for="recipient" class="">Send to:</label>
@@ -48,7 +52,7 @@
                   <div class="alert alert-warning">
                     <p>
                         You haven't created any recipients. Click this to
-                        <a class="btn btn-outline-primary btn-lg" [routerLink]="['/links/recipients/create']">
+                        <a class="btn btn-outline-primary btn-lg" [routerLink]="['/links/recipients/create']" [queryParams]="{linkId: vm.linkId}">
                         Create a recipient</a>
                     </p>
                   </div>

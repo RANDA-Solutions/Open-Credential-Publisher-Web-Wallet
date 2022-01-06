@@ -5,7 +5,7 @@ import { AuthorizationService } from '@core/services/authorization.service';
 import { environment } from '@environment/environment';
 import { AccessService } from '@modules/access/services/access.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { LoginService } from '@root/app/auth/auth.service';
+import { LoginService } from '@root/app/auth/login.service';
 import { Credentials } from '@shared/interfaces/credentials.interface';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
@@ -64,7 +64,14 @@ export class LoginFormComponent implements OnInit {
 				}
 			});
 
-		//this.accessService.externalProviders().subscribe((providers: AuthenticationSchemeModel[]) => this.externalProviders = providers);
+			this.loginService.isAuthenticated$.pipe(untilDestroyed(this)).subscribe(authResult => {
+				if (environment.debug) {
+					console.log("LoginForm: ", authResult);
+				}
+				if (authResult.isAuthenticated) {
+					this.router.navigate(["/credentials"]);
+				}
+			});
 	}
 
 	login({ value, valid }: { value: Credentials; valid: boolean }) {

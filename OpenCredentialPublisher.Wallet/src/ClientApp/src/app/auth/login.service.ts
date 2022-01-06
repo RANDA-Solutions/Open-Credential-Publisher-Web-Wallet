@@ -6,6 +6,7 @@ import { AuthenticatedResult, LoginResponse, OidcSecurityService } from 'angular
 import { AuthStateResult } from 'angular-auth-oidc-client/lib/auth-state/auth-state';
 import { Observable, of, ReplaySubject, throwError } from 'rxjs';
 import { catchError, first, switchMap, tap } from 'rxjs/operators';
+import { AuthStorageService } from './auth-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
@@ -14,6 +15,7 @@ export class LoginService {
   private checkAuthCompleted$ = new ReplaySubject(1);
 
 	constructor(private oidcSecurityService: OidcSecurityService
+		, private storageService: AuthStorageService
 		, private httpClient: HttpClient
 		, private router: Router) {}
 
@@ -32,7 +34,7 @@ export class LoginService {
 	}
 
 	get config() {
-		return this.oidcSecurityService.getConfiguration();
+		return this.oidcSecurityService.getConfiguration(environment.configId);
 	}
 
 	get stsCallback$() {
@@ -43,7 +45,6 @@ export class LoginService {
         return this.checkAuthCompleted$.pipe(
             first(),
             switchMap((_) => {
-				console.log("inside switchMap");
 				return this.oidcSecurityService.isAuthenticated$;
 			})
         );
@@ -75,20 +76,22 @@ export class LoginService {
 
 	doLogin() {
 		
-    if (this.debug) console.log(`OAuthService doLogin()`);
+    	if (this.debug) console.log(`OAuthService doLogin()`);
 		return of(this.oidcSecurityService.authorize(environment.configId));
 	}
 
 	storeReturnUrl(returnUrl) {
+		if (this.debug) console.log(`Storing return url: ${returnUrl}`);
 		localStorage.setItem(this.returnUrlKey, returnUrl);
 	}
 
 	clearReturnUrl() {
+		if (this.debug) console.log(`Clearing return url: ${this.returnUrl}`);
 		localStorage.removeItem(this.returnUrlKey);
 	}
 
 	get returnUrl() {
-		return localStorage.getItem(this.returnUrlKey);
+		return this.storageService.read("redirect", this.config);
 	}
 
 	reportAuthState(authState: AuthStateResult)

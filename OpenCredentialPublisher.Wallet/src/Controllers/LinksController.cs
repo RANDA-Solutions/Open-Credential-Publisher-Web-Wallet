@@ -148,23 +148,6 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         }
         //End V2 *************************************************************************************************
 
-        [HttpGet("Link/{id}")]
-        [ProducesResponseType(200, Type = typeof(ApiResponse))]  /* success returns 200 - Ok */
-        public async Task<IActionResult> GetLink(string id)
-        {
-            try
-            {
-                var linkVM = await _linkService.GetLinkVMAsync(_userId, id, Request);
-
-                return ApiOk(linkVM);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "LinksController.GetLink", null);
-                throw;
-            }
-        }
-
         [HttpGet("ShareVM/{id}")]
         [ProducesResponseType(200, Type = typeof(ApiResponse))]  /* success returns 200 - Ok */
         public async Task<IActionResult> GetShareVM(string id)

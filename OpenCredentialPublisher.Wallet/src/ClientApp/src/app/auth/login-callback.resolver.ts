@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 import { environment } from '@environment/environment';
-import { LoginService } from '@root/app/auth/auth.service';
+import { LoginService } from '@root/app/auth/login.service';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { mergeMap, take } from 'rxjs/operators';

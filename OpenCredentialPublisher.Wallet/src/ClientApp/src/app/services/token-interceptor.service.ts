@@ -1,7 +1,7 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "@environment/environment";
-import { LoginService } from "@root/app/auth/auth.service";
+import { LoginService } from "@root/app/auth/login.service";
 import { Observable } from "rxjs";
 import { SecureRoutesService } from "./secureRoutes.service";
 

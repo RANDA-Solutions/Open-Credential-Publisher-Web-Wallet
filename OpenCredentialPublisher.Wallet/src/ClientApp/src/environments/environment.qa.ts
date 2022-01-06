@@ -13,5 +13,6 @@ export const environment = {
   hubCredentialsStatusEndpoint: `${baseUrl}/hubs/credentials`,
   hubProofStatusEndpoint: `${baseUrl}/hubs/proofrequests`,
   configId: '0-ocp-wallet-client',
+  allowSelfEmailConfirmation: true,
   logoutTimer: 10// in minutes
 };

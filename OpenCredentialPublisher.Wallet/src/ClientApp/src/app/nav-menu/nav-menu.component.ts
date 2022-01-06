@@ -3,7 +3,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AuthenticatedResult } from 'angular-auth-oidc-client/lib/auth-state/auth-result';
 import { filter, map, mergeMap, tap } from 'rxjs/operators';
-import { LoginService } from '../auth/auth.service';
+import { LoginService } from '../auth/login.service';
 @UntilDestroy()
 @Component({
   selector: 'app-nav-menu',

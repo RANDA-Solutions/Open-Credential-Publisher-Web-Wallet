@@ -1,16 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
 import { Idle } from '@ng-idle/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { ApiOkResponse } from '@shared/models/apiOkResponse';
-import { FooterSettingsVM } from '@shared/models/footerSettingsVM';
 import { AuthStateResult, EventTypes, OidcClientNotification, PublicEventsService } from 'angular-auth-oidc-client';
 import { AuthResult } from 'angular-auth-oidc-client/lib/flows/callback-context';
-import { BehaviorSubject } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
-import { LoginService } from './auth/auth.service';
+import { filter } from 'rxjs/operators';
+import { LoginService } from './auth/login.service';
 import { TimeoutService } from './services/timeout.service';
 
 @UntilDestroy()
@@ -21,28 +17,19 @@ import { TimeoutService } from './services/timeout.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
 	title = 'Open Credential Publisher';
-  footerSettingsVM = new FooterSettingsVM();
+  
 	envName = environment.name;
-	private _onLoginPage = false;
-	private _onLoginPageBehavior = new BehaviorSubject(this._onLoginPage);
-  	onLoginPage$ = this._onLoginPageBehavior.asObservable();
-  	 private debug = true;
+
+	 private debug = true;
 	private authStatus: AuthResult;
 	constructor(
 		public appService: AppService
 		, private idle: Idle
 		, private loginService: LoginService
 		, private readonly eventService: PublicEventsService
-    	, private router: Router
 		, private timeoutService: TimeoutService
 		) {
-    	this.router.events
-    		.pipe(
-				filter(event => event instanceof NavigationEnd)
-				, untilDestroyed(this))
-			.subscribe((event: NavigationEnd) => {
-				this._onLoginPageBehavior.next(event.url.includes('/access/'));
-			});
+    	
 	}
 
 	ngOnInit() {
@@ -92,15 +79,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   getData():any {
     if (environment.debug) console.log('AppComponent getData');
-    this.appService.getFooterSettings()
-      .pipe(take(1)).subscribe(data => {
-        if (data.statusCode == 200) {
-          this.footerSettingsVM = (<ApiOkResponse>data).result as FooterSettingsVM;
-          if (environment.debug) console.log(`AppComponent gotData ${JSON.stringify(this.footerSettingsVM)}`);
-        } else {
-          this.footerSettingsVM = new FooterSettingsVM();
-          if (environment.debug) console.log(`AppComponent gotData ${data.statusCode}`);
-        }
-      });
+    
   }
 }

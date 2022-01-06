@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '@environment/environment';
 import { AccountService } from '@modules/account/account.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Subscription } from 'rxjs';
@@ -17,7 +18,9 @@ export class RegisterConfirmationComponent implements OnInit {
   message = '';
   confirmationMessage = '';
   showSpinner = false;
+  allowEmailConfirmation = environment.allowSelfEmailConfirmation;
   private sub: Subscription;
+  
 
   constructor(private route: ActivatedRoute, private router: Router, private accountService: AccountService) {
     this.sub = this.route.queryParams.pipe(untilDestroyed(this)).subscribe(
@@ -35,19 +38,4 @@ export class RegisterConfirmationComponent implements OnInit {
       code: this.code
     };
   }
-  // getData() {
-  //   if (this.userId == null || this.code == null){
-  //     this.message = 'Confirmation information is not valid.';
-  //   }
-  //   this.showSpinner = true;
-  //   this.accountService.confirmEmailAccount(this.userId, this.code)
-  //     .pipe(take(1)).subscribe(data => {
-  //       if (data.statusCode == 200) {
-  //         this.confirmationMessage = 'Success';
-  //       } else {
-  //         this.confirmationMessage = 'Error - Confirmation was not successful.';
-  //       }
-  //       this.showSpinner = false;
-  //     });
-  // }
 }

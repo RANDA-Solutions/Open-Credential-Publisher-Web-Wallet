@@ -106,6 +106,7 @@ namespace OpenCredentialPublisher.Data.Models
 
         //Relationships
         public virtual EvidenceArtifact EvidenceArtifact { get; set; }
+        public virtual ClrModel Clr { get; set; }
 
         public static ArtifactModel FromArtifactDType(ArtifactDType art)
         {

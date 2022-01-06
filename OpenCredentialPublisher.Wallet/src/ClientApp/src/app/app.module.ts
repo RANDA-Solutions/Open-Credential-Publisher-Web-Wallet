@@ -15,6 +15,10 @@ import { AppComponent } from './app.component';
 import { LoginCallbackComponent } from './auth/login-callback.component';
 import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
 import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
+import { LoginLayoutComponent } from './layout/login-layout/login-layout.component';
+import { PlainLayoutComponent } from './layout/plain-layout/plain-layout.component';
+import { SecureLayoutComponent } from './layout/secure-layout/secure-layout.component';
+import { SiteFooterComponent } from './layout/site-footer/site-footer.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { SecureRoutesService } from './services/secureRoutes.service';
 import { TimeoutService } from './services/timeout.service';
@@ -23,6 +27,10 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 @NgModule({
 	declarations: [
 		AppComponent,
+		SiteFooterComponent,
+		PlainLayoutComponent,
+		SecureLayoutComponent,
+		LoginLayoutComponent,
 		LoginCallbackComponent,
 		SourcesCallbackComponent,
 		SourcesErrorComponent,
@@ -50,7 +58,7 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 				historyCleanupOff: true,
 				logLevel: LogLevel.Error,
 				postLoginRoute: `/credentials`,
-				postLogoutRedirectUri: `${window.location.origin}/credentials`,
+				postLogoutRedirectUri: `${window.location.origin}/access/login`,
 				renewTimeBeforeTokenExpiresInSeconds: 30,
 				redirectUrl: `${window.location.origin}/callback`,
 				responseType: 'code',

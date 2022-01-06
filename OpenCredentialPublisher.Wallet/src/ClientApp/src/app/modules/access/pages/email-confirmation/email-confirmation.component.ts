@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '@environment/environment';
 import { AccountService } from '@modules/account/account.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
+import { AuthStorageService } from '@root/app/auth/auth-storage.service';
+import { LoginService } from '@root/app/auth/login.service';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { getAllJSDocTags } from 'typescript';
 
 @UntilDestroy()
 @Component({
@@ -16,16 +17,24 @@ import { getAllJSDocTags } from 'typescript';
 export class EmailConfirmationComponent implements OnInit {
   userId: string;
   code: string;
+  returnUrl: string;
   message = '';
   confirmationMessage = '';
   showSpinner = false;
   private sub: Subscription;
 
-  constructor(private route: ActivatedRoute, private router: Router, private accountService: AccountService) {
+  constructor(private route: ActivatedRoute
+    , private router: Router
+    , private accountService: AccountService
+    , private storageService: AuthStorageService
+    , private loginService: LoginService) {
     this.sub = this.route.queryParams.pipe(untilDestroyed(this)).subscribe(
 			(param: any) => {
 				this.userId = param['userId'];
 				this.code = param['code'];
+        this.returnUrl = param['returnUrl'];
+        if (environment.debug)
+          console.log(param);
         this.getData();
 			});
   }
@@ -41,6 +50,9 @@ export class EmailConfirmationComponent implements OnInit {
     this.accountService.confirmEmailAccount(this.userId, this.code)
       .pipe(take(1)).subscribe(data => {
         if (data.statusCode == 200) {
+          if (this.returnUrl) {
+            this.storageService.write("redirect", this.returnUrl, this.loginService.config);
+          }
           this.confirmationMessage = 'Success';
         } else {
           this.confirmationMessage = 'Error - Confirmation was not successful.';

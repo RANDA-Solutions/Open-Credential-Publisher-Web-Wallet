@@ -2,7 +2,7 @@ import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { LoginService } from '@root/app/auth/auth.service';
+import { LoginService } from '@root/app/auth/login.service';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { NGXLogger } from 'ngx-logger';
 
