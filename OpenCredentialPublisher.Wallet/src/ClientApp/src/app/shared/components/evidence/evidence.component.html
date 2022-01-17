@@ -1,4 +1,4 @@
-<div *ngIf="showSpinner == true; else evidenceContent" class="row d-flex flex-column">
+<div *ngIf="(showSpinner$ | async) == true; else evidenceContent" class="row d-flex flex-column">
   <app-spinner id="profile-spinner" [message]="message"></app-spinner>
 </div>
 <ng-template #evidenceContent>

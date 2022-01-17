@@ -17,9 +17,11 @@ namespace OpenCredentialPublisher.Services.Implementations
         public const string ProfilePictureContainerName = AzureConstants.ProfilePictureContainerName;
 
         private readonly AzureBlobOptions _options;
-        public AzureBlobStoreService(IOptions<AzureBlobOptions> options)
+        private readonly PublicBlobOptions _publicBlobOptions;
+        public AzureBlobStoreService(IOptions<AzureBlobOptions> options, IOptions<PublicBlobOptions> publicBlobOptions)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _publicBlobOptions = publicBlobOptions?.Value;
         }
 
         public async Task<string> StoreAsync(string filename, string contents, string blobContainerName)
@@ -45,7 +47,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public async Task<string> SaveToBlobAsync(string containerName, string fileId, string extension, byte[] contents, PublicAccessType publicAccessType = PublicAccessType.None)
         {
-            var container = new BlobContainerClient(_options.StorageConnectionString, containerName.ToLower());
+            var container = new BlobContainerClient(publicAccessType == PublicAccessType.None ? _options.StorageConnectionString : _publicBlobOptions.StorageConnectionString, containerName.ToLower());
             if (!(await container.ExistsAsync()))
             {
                 await container.CreateIfNotExistsAsync();
@@ -53,7 +55,11 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             var date = DateTime.UtcNow;
             var filename = $"{date:yyyy/MM/dd}/{fileId}.{extension}";
-            var location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
+            string location;
+            if (publicAccessType == PublicAccessType.None || String.IsNullOrWhiteSpace(_publicBlobOptions.CustomDomainName))
+                location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
+            else
+                location = $"https://{_publicBlobOptions.CustomDomainName}/{containerName}/{filename}";
 
             BlobClient blob = container.GetBlobClient(filename);
             using (var ms = new MemoryStream(contents))

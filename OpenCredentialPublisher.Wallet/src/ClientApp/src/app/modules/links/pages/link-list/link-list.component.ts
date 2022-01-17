@@ -72,6 +72,11 @@ export class LinkListComponent implements OnInit {
       });
   }
 
+  navigate(url: string) {
+    let relativeUrl = this.getLink(url);
+    return this.router.navigate([relativeUrl]);
+  }
+
   getLink(url: string) {
     return url.replace(environment.baseUrl, '');
   }

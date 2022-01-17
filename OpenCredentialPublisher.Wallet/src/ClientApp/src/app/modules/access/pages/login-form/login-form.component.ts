@@ -5,6 +5,7 @@ import { AuthorizationService } from '@core/services/authorization.service';
 import { environment } from '@environment/environment';
 import { AccessService } from '@modules/access/services/access.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { AuthService } from '@root/app/auth/auth.service';
 import { LoginService } from '@root/app/auth/login.service';
 import { Credentials } from '@shared/interfaces/credentials.interface';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
@@ -41,6 +42,7 @@ export class LoginFormComponent implements OnInit {
 		private loginService: LoginService,
 		private appService: AppService,
 		private accessService: AccessService,
+		private authService: AuthService,
 		private router: Router,
 		private route: ActivatedRoute) {
 	}
@@ -63,15 +65,16 @@ export class LoginFormComponent implements OnInit {
 					history.pushState({ }, null, `${window.location.origin}/access/login`);
 				}
 			});
-
-			this.loginService.isAuthenticated$.pipe(untilDestroyed(this)).subscribe(authResult => {
-				if (environment.debug) {
-					console.log("LoginForm: ", authResult);
-				}
-				if (authResult.isAuthenticated) {
-					this.router.navigate(["/credentials"]);
-				}
-			});
+			
+		this.authService.checkLogin().then((loggedIn) =>
+		{
+			if (environment.debug) {
+				console.log("LoginForm: ", loggedIn);
+			}
+			if (loggedIn) {
+				this.router.navigate(["/credentials"]);
+			} 
+		});
 	}
 
 	login({ value, valid }: { value: Credentials; valid: boolean }) {
@@ -89,7 +92,20 @@ export class LoginFormComponent implements OnInit {
 						this.modelErrors = (<ApiBadRequestResponse>data).errors;
 					}
 					if (this.resultModel.result == TwoFactorAuthenticationResultEnum.Success) {
-						this.loginService.doLogin().subscribe(resp => {
+						this.loginService.completeLogin().then(result => {
+							if (result) {
+								let returnUrl = this.loginService.returnUrl;
+								if (returnUrl) {
+									if (returnUrl.includes(environment.baseUrl)) {
+										returnUrl = returnUrl.replace(environment.baseUrl, '');
+									}
+									this.loginService.clearReturnUrl();
+									this.router.navigateByUrl(returnUrl);
+								} 
+								else {
+									this.router.navigate(["/credentials"]);
+								}
+							}
 							if (this.debug) console.log(`LoginFormComponent returned from OAuthService.doLogin()`);
 						});
 					} else if (this.resultModel.result == TwoFactorAuthenticationResultEnum.Required) {

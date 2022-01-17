@@ -4,7 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { LoginService } from '@root/app/auth/login.service';
+import { AuthService } from '@root/app/auth/auth.service';
 import { ApiResponse } from '@shared/models/apiResponse';
 import { CredentialSendStatus } from '@shared/models/credentialSendStatus';
 import { WalletConnectionStatus } from '@shared/models/walletConnectionStatus';
@@ -14,10 +14,10 @@ import { catchError, filter, tap } from 'rxjs/operators';
 import { UtilsService } from './utils.service';
 
 @UntilDestroy()
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AppService {
-  private _loggedInBehavior = new BehaviorSubject<boolean>(false);
-  public loggedIn$ = this._loggedInBehavior.asObservable();
 
   public disconnectedPage = false;
   public currentUrl = '';
@@ -36,6 +36,9 @@ export class AppService {
     return this._authResult.isAuthenticated;
   }
 
+  private _loggedInBehavior = new BehaviorSubject<boolean>(false);
+  loggedIn$ = this._loggedInBehavior.asObservable();
+
   private _authResult: AuthenticatedResult;
   private _hubs: { [name: string]: HubConnection } = {};
   private debug = false;
@@ -50,13 +53,10 @@ export class AppService {
   proofFinished = new EventEmitter<boolean>();
   proofStatusChanged = new EventEmitter<string>();
 
-  constructor(private http: HttpClient, private utilsService: UtilsService, public loginService: LoginService, private router: Router) {
-    this.loginService.isLoggedIn
-      .pipe(untilDestroyed(this), tap((val: AuthenticatedResult) => {
-        if (val?.isAuthenticated != this._authResult?.isAuthenticated) {
-          this._loggedInBehavior.next(val.isAuthenticated);
-        }
-        this._authResult = val;
+  constructor(private http: HttpClient, private utilsService: UtilsService, public authService: AuthService, private router: Router) {
+    this.authService.isLoggedIn$
+      .pipe(untilDestroyed(this), tap((val) => {
+        this._loggedInBehavior.next(val);
       }))
       .subscribe();
 
@@ -128,17 +128,17 @@ export class AppService {
       }
       else if (flow == this.generateInvitationFlow) {
         this._hubs[flow] = new HubConnectionBuilder()
-          .withUrl(environment.hubConnectionStatusEndpoint, { accessTokenFactory: () => { return of(this.loginService.token).toPromise(); } })
+          .withUrl(environment.hubConnectionStatusEndpoint, { accessTokenFactory: () => { return of(this.authService.getAccessToken()).toPromise(); } })
           .build();
       }
       else if (flow == this.completeInvitationFlow) {
         this._hubs[flow] = new HubConnectionBuilder()
-          .withUrl(environment.hubConnectionStatusEndpoint, { accessTokenFactory: () => { return of(this.loginService.token).toPromise(); } })
+          .withUrl(environment.hubConnectionStatusEndpoint, { accessTokenFactory: () => { return of(this.authService.getAccessToken()).toPromise(); } })
           .build();
       }
       else if (flow == this.credentialStatusFlow) {
         this._hubs[flow] = new HubConnectionBuilder()
-          .withUrl(environment.hubCredentialsStatusEndpoint, { accessTokenFactory: () => { return of(this.loginService.token).toPromise(); } })
+          .withUrl(environment.hubCredentialsStatusEndpoint, { accessTokenFactory: () => { return of(this.authService.getAccessToken()).toPromise(); } })
           .build();
       }
     }

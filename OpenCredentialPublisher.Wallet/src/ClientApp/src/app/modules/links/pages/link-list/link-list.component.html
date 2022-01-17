@@ -77,7 +77,7 @@
                     <tr [ngClass]="{ 'bg-light': j % 2 == 1 }">
                       <td>{{link.nickname}}</td>
                       <td class="overflow-hidden" style="max-width: 20em;">
-                        <a [routerLink]="[getLink(link.url)]">{{link.url}}</a>
+                        <a class="link" (click)="navigate(link.url)">{{link.url}}</a>
                       </td>
                       <td class="text-center">{{link.displayCount}}</td>
                       <td>

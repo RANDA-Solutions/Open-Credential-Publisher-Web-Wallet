@@ -3,9 +3,8 @@ import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
 import { Idle } from '@ng-idle/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AuthStateResult, EventTypes, OidcClientNotification, PublicEventsService } from 'angular-auth-oidc-client';
 import { AuthResult } from 'angular-auth-oidc-client/lib/flows/callback-context';
-import { filter } from 'rxjs/operators';
+import { AuthService } from './auth/auth-client.service';
 import { LoginService } from './auth/login.service';
 import { TimeoutService } from './services/timeout.service';
 
@@ -26,50 +25,56 @@ export class AppComponent implements OnInit, OnDestroy {
 		public appService: AppService
 		, private idle: Idle
 		, private loginService: LoginService
-		, private readonly eventService: PublicEventsService
 		, private timeoutService: TimeoutService
+		, private authService: AuthService
 		) {
     	
 	}
 
 	ngOnInit() {
+		if (environment.debug)
+			console.log("Environment: ", environment);
 		this.timeoutService.initialize();
 
 		this.idle.onTimeout.pipe(untilDestroyed(this)).subscribe(e => {
 			this.loginService.signOut("Your session timed out, please login again.");
 		  });
 
-		if (environment.debug) console.log('AppComponent ngOnInit');
-		this.loginService.checkAuthIncludingServer().subscribe((result) => {
-				if (environment.debug) console.log("Auth Result: ", result);
-		}, (error) => {
-			if (environment.debug) {
-				console.log(error);
-			}
-		});
+		  this.authService.checkLogin();
+		  this.authService.clearStaleStorage();
 
-		if (environment.debug) {
-			this.eventService
-				.registerForEvents()
-				.pipe(filter((notification) => notification.type === EventTypes.ConfigLoaded))
-				.subscribe((config) => {
-					// console.log('ConfigLoaded', config);
-				});
+		
+		// if (environment.debug) console.log('AppComponent ngOnInit');
+		// this.loginService.checkAuthIncludingServer().subscribe((result) => {
+		// 		if (environment.debug) console.log("Auth Result: ", result);
+		// }, (error) => {
+		// 	if (environment.debug) {
+		// 		console.log(error);
+		// 	}
+		// });
+
+		// if (environment.debug) {
+		// 	this.eventService
+		// 		.registerForEvents()
+		// 		.pipe(filter((notification) => notification.type === EventTypes.ConfigLoaded))
+		// 		.subscribe((config) => {
+		// 			// console.log('ConfigLoaded', config);
+		// 		});
 			
-			this.eventService
-				.registerForEvents()
-				.subscribe(notification => console.log(notification));
-		}
-		this.eventService
-			.registerForEvents()
-			.pipe(filter((notification) => notification.type === EventTypes.NewAuthenticationResult))
-			.subscribe((result: OidcClientNotification<AuthStateResult>) => {
-				if (environment.debug) {
-					console.log(`Auth State (isAuthenticated: ${result.value?.isAuthenticated}) (isRenewProcess: ${result.value?.isRenewProcess})`);
-				}
+		// 	this.eventService
+		// 		.registerForEvents()
+		// 		.subscribe(notification => console.log(notification));
+		// }
+		// this.eventService
+		// 	.registerForEvents()
+		// 	.pipe(filter((notification) => notification.type === EventTypes.NewAuthenticationResult))
+		// 	.subscribe((result: OidcClientNotification<AuthStateResult>) => {
+		// 		if (environment.debug) {
+		// 			console.log(`Auth State (isAuthenticated: ${result.value?.isAuthenticated}) (isRenewProcess: ${result.value?.isRenewProcess})`);
+		// 		}
 
-				this.loginService.reportAuthState(result.value);
-			});
+		// 		this.loginService.reportAuthState(result.value);
+		// 	});
 
 	}
 

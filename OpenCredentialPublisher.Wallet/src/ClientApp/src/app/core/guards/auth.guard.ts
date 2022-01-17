@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
 import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { LoginService } from '@root/app/auth/login.service';
 import { UserDataResult } from 'angular-auth-oidc-client';
 import { AuthenticatedResult } from 'angular-auth-oidc-client/lib/auth-state/auth-result';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 @UntilDestroy()
 @Injectable()
@@ -17,10 +16,7 @@ export class AuthGuard implements CanActivate, CanLoad {
   private userDataResult: UserDataResult;
   private debug = environment.debug;
 	  constructor(private appService: AppService, private loginService: LoginService, private router: Router) {
-		this.loginService.userData.pipe(untilDestroyed(this), map((data: UserDataResult) => {
-			if (this.debug) console.log('AuthGuard constructor - isAdmin ', data);
-			this.userDataResult = data;
-		}));
+		
 	}
 	
 	canLoad(route: Route, segments: UrlSegment[]): Observable<boolean | UrlTree> {

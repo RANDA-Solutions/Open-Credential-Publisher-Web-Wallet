@@ -43,6 +43,10 @@
     {
       "library": "microsoft-signalr@5.0.3",
       "destination": "wwwroot/lib/signalr"
+    },
+    {
+      "library": "oidc-client@1.11.5",
+      "destination": "wwwroot/lib/oidc-client"
     }
   ]
 }

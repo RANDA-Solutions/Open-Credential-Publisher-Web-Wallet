@@ -34,13 +34,13 @@ namespace OpenCredentialPublisher.Services.Implementations
         private readonly SiteSettingsOptions _siteSettings;
         private readonly CredentialDefinitionService _credentialDefinitionService;
         private readonly CredentialSchemaService _credentialSchemaService;
-        private readonly AzureBlobOptions _azureBlobOptions;
+        private readonly PublicBlobOptions _publicBlobOptions;
         private readonly AgentContextService _agentContextService;
         private readonly IdRampApiOptions _idRampApiOptions;
 
         public EmailVerificationService(
             IOptions<SiteSettingsOptions> siteSettings,
-            IOptions<AzureBlobOptions> azureBlobOptions,
+            IOptions<PublicBlobOptions> publicBlobOptions,
             IOptions<IdRampApiOptions> idRampApiOptions,
             WalletDbContext context,
             EmailHelperService emailHelperService,
@@ -51,7 +51,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             CredentialSchemaService credentialSchemaService)
         {
             _siteSettings = siteSettings.Value;
-            _azureBlobOptions = azureBlobOptions?.Value;
+            _publicBlobOptions = publicBlobOptions?.Value;
             _idRampApiOptions = idRampApiOptions?.Value;
             _context = context;
             _emailHelperService = emailHelperService;
@@ -221,15 +221,20 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<string> SaveQRCodeToBlobAsync(string offerId, string contents)
         {
             const string containerName = "emailverifications";
-            var container = new BlobContainerClient(_azureBlobOptions.StorageConnectionString, containerName);
+            var container = new BlobContainerClient(_publicBlobOptions.StorageConnectionString, containerName);
             if (!(await container.ExistsAsync()))
             {
                 await container.CreateIfNotExistsAsync();
                 await container.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
             }
 
-            var filename = $"{offerId}.png";
-            var location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
+            var date = DateTime.UtcNow;
+            var filename = $"{date:yyyy/MM/dd}/{offerId}.png";
+            string location;
+            if (String.IsNullOrWhiteSpace(_publicBlobOptions.CustomDomainName))
+                location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
+            else
+                location = $"https://{_publicBlobOptions.CustomDomainName}/{containerName}/{filename}";
 
             using var generator = new QRCodeGenerator();
             var codeData = generator.CreateQrCode(contents, QRCodeGenerator.ECCLevel.Q);

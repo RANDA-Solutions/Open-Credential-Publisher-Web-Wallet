@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
-import { AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
-import { LoginCallbackComponent } from './auth/login-callback.component';
-import { LoginCallbackResolver } from './auth/login-callback.resolver';
+import { AuthGuard } from './auth/auth.guard';
 import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
 import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
 import { LoginLayoutComponent } from './layout/login-layout/login-layout.component';
@@ -47,32 +45,32 @@ export const appRoutes: Routes = [
       {
         path: 'credentials',
         loadChildren: () => import('./modules/credentials/credentials.module').then(m =>m.CredentialsModule),
-        canActivate: [AutoLoginPartialRoutesGuard]
+        canActivate: [AuthGuard]
        },
        {
         path: 'sources',
         loadChildren: () => import('./modules/sources/sources.module').then(m =>m.SourcesModule),
-        canActivate: [AutoLoginPartialRoutesGuard]
+        canActivate: [AuthGuard]
        },
        {
          path: 'links',
          loadChildren: () => import('./modules/links/links.module').then(m =>m.LinksModule),
-         canActivate: [AutoLoginPartialRoutesGuard]
+         canActivate: [AuthGuard]
        },
        {
          path: 'Links',
          loadChildren: () => import('./modules/links/links.module').then(m =>m.LinksModule),
-         canActivate: [AutoLoginPartialRoutesGuard]
+         canActivate: [AuthGuard]
        },
        {
          path: 'wallets',
          loadChildren: () => import('./modules/wallets/wallets.module').then(m =>m.WalletsModule),
-         canActivate: [AutoLoginPartialRoutesGuard]
+         canActivate: [AuthGuard]
        },
        {
          path: 'account',
          loadChildren: () => import('./modules/account/account.module').then(m =>m.AccountModule),
-         canActivate: [AutoLoginPartialRoutesGuard]
+         canActivate: [AuthGuard]
        },
     ]
   },
@@ -114,11 +112,7 @@ export const appRoutes: Routes = [
     path: 'Search',
     loadChildren: () => import('./modules/search/search.module').then(m =>m.SearchModule)
   },
-  {
-      path: 'callback',
-      resolve: { result: LoginCallbackResolver },
-      component: LoginCallbackComponent
-  },
+  
   {
       path: 'sources-callback',
       component: SourcesCallbackComponent,

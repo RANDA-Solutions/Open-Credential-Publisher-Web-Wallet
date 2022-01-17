@@ -18,7 +18,7 @@ export class UnauthorizedComponent implements OnInit {
 	}
 
 	login() {
-		this.loginService.doLogin();
+		this.loginService.completeLogin();
 	}
 
 	goback() {

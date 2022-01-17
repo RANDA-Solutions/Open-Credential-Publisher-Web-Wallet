@@ -7,12 +7,12 @@ import { CoreModule } from '@core/core.module';
 import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
 import { NgIdleModule } from '@ng-idle/core';
-import { AuthModule, LogLevel } from 'angular-auth-oidc-client';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { WebStorageStateStore } from 'oidc-client';
 import { MessageService } from 'primeng/api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginCallbackComponent } from './auth/login-callback.component';
+import { AuthModule } from './auth/auth-client.service';
 import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
 import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
 import { LoginLayoutComponent } from './layout/login-layout/login-layout.component';
@@ -31,7 +31,6 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 		PlainLayoutComponent,
 		SecureLayoutComponent,
 		LoginLayoutComponent,
-		LoginCallbackComponent,
 		SourcesCallbackComponent,
 		SourcesErrorComponent,
 		NavMenuComponent
@@ -51,25 +50,21 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 		NgIdleModule.forRoot(),
 		AppRoutingModule,
 		AuthModule.forRoot({
-			config: {
 				authority: `${environment.baseUrl}`,
-				clientId: 'ocp-wallet-client',
-				configId: environment.configId,
-				historyCleanupOff: true,
-				logLevel: LogLevel.Error,
-				postLoginRoute: `/credentials`,
-				postLogoutRedirectUri: `${window.location.origin}/access/login`,
-				renewTimeBeforeTokenExpiresInSeconds: 30,
-				redirectUrl: `${window.location.origin}/callback`,
-				responseType: 'code',
+				client_id: 'ocp-wallet-client',
+				loadUserInfo: true,
+				lockSkew: 0,
+				post_logout_redirect_uri: `${window.location.origin}/access/login`,
+				redirect_uri: `${window.location.origin}/callback`,
+				response_type: 'code',
 				scope: 'openid profile roles offline_access', // 'openid profile offline_access ' + your scopes
-				silentRenew: true,
-				silentRenewUrl: `${window.location.origin}/silent-renew.html`,
-				startCheckSession: true,
-				triggerAuthorizationResultEvent: true,
-				unauthorizedRoute: '/unauthorized',
-				useRefreshToken: true,
-			},
+				automaticSilentRenew: true,
+				silent_redirect_uri: `${window.location.origin}/silent-renew.html`,
+				accessTokenExpiringNotificationTime: 30,
+				userStore: new WebStorageStateStore({
+					store: window.localStorage
+				}),
+				filterProtocolClaims: true,
 		})
 	],
 	providers: [

@@ -342,7 +342,6 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 }
                 await GetAccessToken(authorization, modelState);
                 if (!modelState.IsValid) return ApiModelInvalid(modelState);
-
                 return ApiOk(authorization.Id);
             }
             catch (Exception ex)
@@ -828,28 +827,18 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     else
                     {
                         scopes.AddRange(source.DiscoveryDocument.ScopesOffered);
-                        //IMS ref failures https://dc.imsglobal.org/obprovider
-
-                        //3 scopes.AddRange(new List<string> { ObcConstants.Scopes.AssertionReadonly, ObcConstants.Scopes.AssertionCreate, ObcConstants.Scopes.ProfileReadonly });
-                        //3 scopes.Add("offline_access");
-
-                        //2 scopes.AddRange(ObcConstants.Scopes.AllScopes);
-                        //2 scopes.Add("offline_access");
                     }
-                    //scopes.AddRange(new List<string> { ObcConstants.Scopes.AssertionReadonly, ObcConstants.Scopes.AssertionCreate, ObcConstants.Scopes.ProfileReadonly });
-                    //scopes.AddRange(ObcConstants.Scopes.AllScopes);
-                    //scopes.Add("offline_access");
                 }
                 else
                 {
                     scopes.AddRange(new List<string> { ClrConstants.Scopes.Readonly });
                     scopes.Add("offline_access");
                 }
-                var tmpIsBadgr = false; //isBadgr
+                var tmpIsBadgr = isBadgr; //isBadgr
                 var registrationRequest = new RegistrationRequest
                 {
                     ClientName = "Open Credential Publisher",
-                    ClientUri = GetUrl(Request, "/"),
+                    ClientUri = GetUrl(Request, "/", tmpIsBadgr),
                     GrantTypes = new[] { OpenIdConnectGrantTypes.AuthorizationCode, OpenIdConnectGrantTypes.RefreshToken },
                     LogoUri = GetUrl(Request, "/assets/images/Logo_with_text.png", tmpIsBadgr),
                     PolicyUri = GetUrl(Request, "/public/privacy", tmpIsBadgr),

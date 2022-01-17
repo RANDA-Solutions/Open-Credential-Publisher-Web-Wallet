@@ -19,7 +19,7 @@
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
     "target": "es2015",
     "typeRoots": [
@@ -34,3 +34,4 @@
     "strictTemplates": true,
   }
 }
+ 

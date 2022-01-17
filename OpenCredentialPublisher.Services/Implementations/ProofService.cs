@@ -27,15 +27,15 @@ namespace OpenCredentialPublisher.Services.Implementations
         private readonly WalletDbContext _context;
         private readonly ILogger<ProofService> _logger;
         private readonly VerityThreadService _verityThreadService;
-        private readonly AzureBlobOptions _azureBlobOptions;
+        private readonly PublicBlobOptions _publicBlobOptions;
 
 
-        public ProofService(WalletDbContext context, VerityThreadService verityThreadService, IOptions<AzureBlobOptions> azureBlobOptions, ILogger<ProofService> logger)
+        public ProofService(WalletDbContext context, VerityThreadService verityThreadService, IOptions<PublicBlobOptions> publicBlobOptions, ILogger<ProofService> logger)
         {
             _context = context;
             _logger = logger;
             _verityThreadService = verityThreadService;
-            _azureBlobOptions = azureBlobOptions?.Value;
+            _publicBlobOptions = publicBlobOptions?.Value;
         }
 
         public async Task<ProofRequest> CreateProofRequestAsync(int credentialSchemaId, string notificationAddress, string name, List<ProofAttribute> proofAttributes, string relationship = default(string), string userId = default(string))
@@ -217,15 +217,21 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task SaveQRCodeInvitationToBlobAsync(ProofRequest request)
         {
             const string containerName = "invitations";
-            var container = new BlobContainerClient(_azureBlobOptions.StorageConnectionString, containerName);
+            var container = new BlobContainerClient(_publicBlobOptions.StorageConnectionString, containerName);
             if (!(await container.ExistsAsync()))
             {
                 await container.CreateIfNotExistsAsync();
                 await container.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
             }
 
-            var filename = $"{request.PublicId}.png";
-            request.InvitationQrCode = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
+            var date = DateTime.UtcNow;
+            var filename = $"{date:yyyy/MM/dd}/{request.PublicId}.png";
+            string location;
+            if (String.IsNullOrWhiteSpace(_publicBlobOptions.CustomDomainName))
+                location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
+            else
+                location = $"https://{_publicBlobOptions.CustomDomainName}/{containerName}/{filename}";
+            request.InvitationQrCode = location;
 
             using var generator = new QRCodeGenerator();
             var codeData = generator.CreateQrCode($"{request.ShortInvitationLink}", QRCodeGenerator.ECCLevel.Q);

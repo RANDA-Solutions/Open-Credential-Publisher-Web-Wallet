@@ -1,18 +1,15 @@
-import { EventEmitter, Injectable, NgZone, OnDestroy } from '@angular/core';
+import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { environment } from '@environment/environment';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DEFAULT_INTERRUPTSOURCES, Idle, StorageInterruptSource, WindowInterruptSource } from '@ng-idle/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { LoginService } from '../auth/login.service';
+import { AuthService } from '../auth/auth.service';
 
 @UntilDestroy()
 @Injectable({
   providedIn: 'root',
 })
 export class TimeoutService implements OnDestroy {
-  private _isLoggedIn: boolean = false;
   private _watching: boolean = false;
-  private _alreadyRefreshing: boolean = false;
   private _debug: boolean = environment.debug;
   private _onBadRefresh = new EventEmitter<boolean>();
   
@@ -20,21 +17,25 @@ export class TimeoutService implements OnDestroy {
   private id: string;
   constructor(
     private _idle: Idle,
-    private _modalService: NgbModal,
-    private _ngZone: NgZone,
-	private loginService: LoginService
+    private authService: AuthService,
   ) {
     this.id = new Date().toDateString();
     console.log("Timeout Service: ", this.id);
-    this.loginService.isAuthenticated$.pipe(untilDestroyed(this)).subscribe(val => { 
-		this._isLoggedIn = val.isAuthenticated; 
-		if (this._isLoggedIn && !this._watching) {
-			this.startWatching();
-		}
-		else if (!this._isLoggedIn && this._watching) {
-			this.stopWatching();
-		}
-	});
+
+    this.authService.userLoaded.pipe(untilDestroyed(this)).subscribe(val => {
+      if (this.authService.isLoggedIn && !this._watching)
+        this.startWatching();
+    });
+
+    this.authService.userUnloaded.pipe(untilDestroyed(this)).subscribe(val => {
+      if (this._watching)
+        this.stopWatching();
+    });
+
+    this.authService.accessTokenExpiring.pipe(untilDestroyed(this)).subscribe(val => {
+      if (this.authService.isLoggedIn)
+        this.authService.refreshLogin();
+    });
   }
 
 
