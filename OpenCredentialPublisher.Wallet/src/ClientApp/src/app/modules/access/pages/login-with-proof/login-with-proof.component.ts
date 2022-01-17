@@ -51,7 +51,7 @@ export class LoginWithProofComponent implements OnInit, OnDestroy {
 							if (response.status == 'Accepted') {
 								this.message = 'proof received... redirecting';
 								let returnUrl = this.loginService.returnUrl
-								this.loginService.doLogin().subscribe(resp => {
+								this.loginService.completeLogin().then(resp => {
 								});
 								clearInterval(this.timeout);
 								//this.router.navigate([returnUrl]);

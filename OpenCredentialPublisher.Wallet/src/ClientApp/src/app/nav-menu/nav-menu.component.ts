@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AuthenticatedResult } from 'angular-auth-oidc-client/lib/auth-state/auth-result';
-import { filter, map, mergeMap, tap } from 'rxjs/operators';
+import { filter, map, mergeMap } from 'rxjs/operators';
 import { LoginService } from '../auth/login.service';
 @UntilDestroy()
 @Component({
@@ -12,19 +11,14 @@ import { LoginService } from '../auth/login.service';
 })
 export class NavMenuComponent implements OnInit {
 	public isExpanded = false;
-	public get isAuthenticated() : boolean { return this._authResult?.isAuthenticated ?? false; };
+	public get isAuthenticated() : boolean { return this.loginService.isLoggedIn; };
 	public userName: string;
   public showNavMenu: boolean;
-  private _authResult: AuthenticatedResult;
 
 	constructor(private loginService: LoginService, private router: Router, private activatedRoute: ActivatedRoute) {
     this.showNavMenu = true;
 
-		loginService.isLoggedIn
-			.pipe(untilDestroyed(this), tap(val => this._authResult = val)).subscribe(
-				val => {
-					this._authResult = val;
-				});
+		
     router.events
       .pipe(filter(event => event instanceof NavigationEnd), untilDestroyed(this))
       .subscribe((val) => {

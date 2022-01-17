@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { AuthorizationVM } from '@shared/models/authorization';
-import { SourceDetail } from '@shared/models/sourceDetail';
 import { take } from 'rxjs/operators';
 import { SourcesService } from '../sources.service';
 
+@UntilDestroy()
 @Component({
   selector: 'app-source-list-component',
   templateUrl: './source-list.component.html'
@@ -15,6 +16,7 @@ export class SourceListComponent {
   modelErrors = new Array<string>();
   public authorizations = new Array<AuthorizationVM>();
   message = 'loading source list';
+  private sourceId: string;
   showSpinner = false;
   private debug = false;
   constructor(private route: ActivatedRoute, private router: Router, private sourcesService: SourcesService) {
@@ -23,7 +25,11 @@ export class SourceListComponent {
   ngOnInit() {
     if (this.debug) console.log('source-list ngOnInit');
     this.showSpinner = true;
-    this.getData();
+    this.route.queryParams.pipe(untilDestroyed(this)).subscribe(
+			(param: any) => {
+				this.sourceId = param['sourceId'];
+        this.getData();
+			});
   }
 
   ngOnDestroy(): void {
@@ -34,7 +40,7 @@ export class SourceListComponent {
     if (this.debug) console.log('source-list getData');
     this.sourcesService.getAuthorizationList()
       .pipe(take(1)).subscribe(data => {
-        console.log(data);
+        if (this.debug) console.log(data);
         if (data.statusCode == 200) {
           this.authorizations = (<ApiOkResponse>data).result as Array<AuthorizationVM>;
         } else {
@@ -43,6 +49,9 @@ export class SourceListComponent {
         }
         this.message = 'loading source list';
         this.showSpinner = false;
+        if (this.sourceId) {
+          this.refreshClrs(this.sourceId);
+        }
       });
   }
   refreshClrs(id: string):any {

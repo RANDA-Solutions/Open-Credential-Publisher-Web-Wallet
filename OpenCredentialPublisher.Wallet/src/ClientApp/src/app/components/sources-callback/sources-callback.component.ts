@@ -22,13 +22,13 @@ export class SourcesCallbackComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe((data: { response: SourcesCallbackResponse }) => {
       if (data.response.error) {
-		  if (this.debug) {
-			  console.log("Error: ", data.response.errorMessages);
-		  }
-		  this.router.navigate(['/sources-error'],  { state: { errors: data.response.errorMessages }});
+        if (this.debug) {
+          console.log("Error: ", data.response.errorMessages);
+        }
+		    this.router.navigate(['/sources-error'],  { state: { errors: data.response.errorMessages }});
       }
       else {
-        this.router.navigate(['/credentials']);
+        this.router.navigate(['/sources/source-list'], { queryParams: { sourceId: data.response.sourceId }});
       }
     });
   }

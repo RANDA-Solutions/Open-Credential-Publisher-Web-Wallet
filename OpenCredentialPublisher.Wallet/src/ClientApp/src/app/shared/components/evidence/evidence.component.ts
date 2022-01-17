@@ -3,12 +3,12 @@ import { AppService } from '@core/services/app.service';
 import { ClrService } from '@core/services/clr.service';
 import { DownloadService } from '@core/services/download.service';
 import { UtilsService } from '@core/services/utils.service';
-import { environment } from '@environment/environment';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { ArtifactVM } from '@shared/models/clrSimplified/artifactVM';
 import { EvidenceVM } from '@shared/models/clrSimplified/evidenceVM';
 import { PdfRequestTypeEnum } from '@shared/models/enums/pdfRequestTypeEnum';
 import { PdfRequest } from '@shared/models/pdfRequest';
+import { BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -17,6 +17,9 @@ import { take } from 'rxjs/operators';
   styleUrls: ['./evidence.component.scss']
 })
 export class EvidenceComponent implements OnInit {
+  private _showSpinnerBehavior = new BehaviorSubject(false);
+  private debug = false;
+  
   @Input() clrId: number;
   @Input() clrIdentifier: string;
   @Input() id: string;
@@ -24,10 +27,10 @@ export class EvidenceComponent implements OnInit {
   @Input() ancestorKeys: string;
   @Output() doesEvidenceExist = new EventEmitter<boolean>();
   evidences: Array<EvidenceVM>;
-  showSpinner = false;
+  showSpinner$ = this._showSpinnerBehavior.asObservable();
   message = 'loading evidence';
   showIt = false;
-  private debug = false;
+  
   constructor(private appService: AppService, private clrService: ClrService, public utils: UtilsService, private downloads: DownloadService
     , private utilsService: UtilsService) { }
 
@@ -45,7 +48,7 @@ export class EvidenceComponent implements OnInit {
   getData():any {
     if (this.debug) console.log('EvidenceComponent getData');
     if (this.ancestors.split('.').pop() == 'assertion') {
-      this.showSpinner = true;
+      this._showSpinnerBehavior.next(true);
       this.clrService.getAssertionEvidenceVMList(this.clrId, encodeURIComponent(this.id))
         .pipe(take(1)).subscribe(data => {
           if (this.debug) console.log(data);
@@ -56,7 +59,7 @@ export class EvidenceComponent implements OnInit {
           } else {
             this.evidences = new Array<EvidenceVM>();
           }
-          this.showSpinner = false;
+          this._showSpinnerBehavior.next(false);
         });
     }
   }
@@ -74,15 +77,20 @@ export class EvidenceComponent implements OnInit {
       createLink: false
     }
     this.message = 'loading pdf';
-    this.showSpinner = true;
+    this._showSpinnerBehavior.next(true);
       if (this.debug) console.log('EvidenceComponent showPdf');
       this.downloads.pdf(dr)
         .pipe(take(1))
         .subscribe(resp => {
-          let blob =  new Blob([resp.body], { type: 'application/pdf' })
+          let blob =  new Blob([resp.body], { type: 'application/pdf' });
           var fileURL = URL.createObjectURL(blob);
+          this._showSpinnerBehavior.next(false);
           window.open(fileURL);
-          this.showSpinner = false;
+        }
+        , err => { console.log(err); }
+        , () => {
+          this._showSpinnerBehavior.next(false);
+
           this.message = 'loading evidence';
         });
   }

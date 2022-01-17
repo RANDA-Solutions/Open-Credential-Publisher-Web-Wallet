@@ -43,7 +43,7 @@ export class LoginWithRecoveryComponent implements OnInit {
           this.resultModel = data as TwoFactorAuthenticationModel;
           if (this.debug) console.log(`LoginWithRecoveryComponent returned from api/Login result: ${this.resultModel.result}`);
           if (this.resultModel.result == TwoFactorAuthenticationResultEnum.Success) {
-            this.loginService.doLogin().subscribe(resp => {
+            this.loginService.completeLogin().then(resp => {
               if (this.debug) console.log(`LoginFormComponent returned from OAuthService.doLogin()`);
             });
             this.router.navigate([this.resultModel.returnUrl]);

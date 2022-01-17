@@ -1,83 +1,57 @@
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '@environment/environment';
-import { AuthenticatedResult, LoginResponse, OidcSecurityService } from 'angular-auth-oidc-client';
-import { AuthStateResult } from 'angular-auth-oidc-client/lib/auth-state/auth-state';
-import { Observable, of, ReplaySubject, throwError } from 'rxjs';
-import { catchError, first, switchMap, tap } from 'rxjs/operators';
-import { AuthStorageService } from './auth-storage.service';
+import { of, ReplaySubject } from 'rxjs';
+import { AuthService } from './auth-client.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+	providedIn: 'root'
+})
 export class LoginService {
   private debug = true;
-  authStateChanged: EventEmitter<AuthStateResult> = new EventEmitter<AuthStateResult>();
+
   private checkAuthCompleted$ = new ReplaySubject(1);
 
-	constructor(private oidcSecurityService: OidcSecurityService
-		, private storageService: AuthStorageService
+	constructor(private authService: AuthService
 		, private httpClient: HttpClient
 		, private router: Router) {}
 
 	returnUrlKey = "originalReturnUrl";
 
-	get isLoggedIn(): Observable<AuthenticatedResult> {
-		return this.oidcSecurityService.isAuthenticated$;
+	get isLoggedIn() {
+		return this.authService.isLoggedIn();
 	}
 
 	get token() {
-		return this.oidcSecurityService.getAccessToken(environment.configId);
+		return this.authService.getAccessToken();
 	}
 
 	get userData() {
-		return this.oidcSecurityService.userData$;
+		return of(this.authService.getClaims());
 	}
 
 	get config() {
-		return this.oidcSecurityService.getConfiguration(environment.configId);
+		return {};
+		//return this.oidcSecurityService.getConfiguration(environment.configId);
 	}
 
 	get stsCallback$() {
-		return this.oidcSecurityService.stsCallback$;
-	}
-
-	public get isAuthenticated$(): Observable<AuthenticatedResult> {
-        return this.checkAuthCompleted$.pipe(
-            first(),
-            switchMap((_) => {
-				return this.oidcSecurityService.isAuthenticated$;
-			})
-        );
-    }
-
-    public checkAuth(): Observable<LoginResponse> {
-        return this.oidcSecurityService.checkAuth(null, environment.configId).pipe(tap((_) => this.checkAuthCompleted$.next()));
-    }
-
-	public checkAuthIncludingServer(): Observable<LoginResponse> {
-		return this.oidcSecurityService.checkAuthIncludingServer(environment.configId)
-			.pipe(
-				catchError((error) => {
-					this.checkAuthCompleted$.next();
-					return throwError(error);
-				})
-				, tap((_) => {
-					this.checkAuthCompleted$.next();
-		}));
+		return of("");
 	}
 
 	public refreshToken() {
-		return this.oidcSecurityService.getRefreshToken(environment.configId);
+		return of();
 	}
 
 	public refreshSession() {
-		return this.oidcSecurityService.forceRefreshSession(null, environment.configId);
+		return of()
 	}
 
-	doLogin() {
+	completeLogin() {
 		
     	if (this.debug) console.log(`OAuthService doLogin()`);
-		return of(this.oidcSecurityService.authorize(environment.configId));
+		return this.authService.checkLogin();
 	}
 
 	storeReturnUrl(returnUrl) {
@@ -91,13 +65,9 @@ export class LoginService {
 	}
 
 	get returnUrl() {
-		return this.storageService.read("redirect", this.config);
+		return localStorage.getItem(this.returnUrlKey);
 	}
 
-	reportAuthState(authState: AuthStateResult)
-	{
-		this.authStateChanged.emit(authState);
-	}
 
 
 	signOut(infoMessage?: string) {

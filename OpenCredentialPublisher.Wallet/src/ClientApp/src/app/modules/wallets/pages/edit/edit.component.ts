@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthorizationService } from '@core/services/authorization.service';
-import { environment } from '@environment/environment';
 import { WalletService } from '@modules/wallets/wallets.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -26,7 +24,7 @@ export class EditWalletComponent implements OnInit {
   private sub: any;
   private debug = false;
   constructor(private walletService: WalletService, private route: ActivatedRoute, private router: Router
-    , private modalService: NgbModal, private authService: AuthorizationService
+    , private modalService: NgbModal
     , private sanitizer:DomSanitizer ) {
   }
 

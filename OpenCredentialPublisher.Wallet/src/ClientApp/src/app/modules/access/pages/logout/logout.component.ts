@@ -2,7 +2,7 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { AuthService } from '@root/app/auth/auth.service';
 
 @UntilDestroy()
 @Component({
@@ -15,7 +15,7 @@ export class LogoutComponent implements OnInit {
   message = 'logging out';
   private _infoMessage?: string;
   constructor(
-	private oidcSecurityService: OidcSecurityService,
+	private authService: AuthService,
 	private router: Router,
 	private ngZone: NgZone,
 	private activeRoute: ActivatedRoute
@@ -32,7 +32,7 @@ ngOnInit() {
 	var self = this;
 	setTimeout((self) => {
 		this.ngZone.run(() => {
-			this.oidcSecurityService.logoffLocal();
+			this.authService.logout();
 			console.log(this._infoMessage);
 			this.router.navigate(["/access/login"], { queryParams: { infoMessage: this._infoMessage }});
 		},  self);

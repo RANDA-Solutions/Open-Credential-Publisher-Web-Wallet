@@ -2,8 +2,6 @@ import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
-import { AuthorizationService } from '@core/services/authorization.service';
-import { environment } from '@environment/environment';
 import { WalletService } from '@modules/wallets/wallets.service';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -35,7 +33,7 @@ export class SendWalletComponent implements OnDestroy, OnInit {
   statSubscription: Subscription;
   private debug = false;
   constructor(public appService: AppService, private walletService: WalletService, private route: ActivatedRoute
-    , private router: Router, private modalService: NgbModal, private authService: AuthorizationService
+    , private router: Router, private modalService: NgbModal
     , private sanitizer:DomSanitizer, private ngZone: NgZone ) {
   }
 

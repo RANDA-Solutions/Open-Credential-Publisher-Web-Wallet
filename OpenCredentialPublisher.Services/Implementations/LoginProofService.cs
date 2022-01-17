@@ -40,12 +40,14 @@ namespace OpenCredentialPublisher.Services.Implementations
         private readonly CredentialDefinitionService _credentialDefinitionService;
         private readonly CredentialSchemaService _credentialSchemaService;
         private readonly AzureBlobOptions _azureBlobOptions;
+        private readonly PublicBlobOptions _publicBlobOptions;
         private readonly AgentContextService _agentContextService;
         private readonly IdRampApiOptions _idRampApiOptions;
 
         public LoginProofService(
             IOptions<SiteSettingsOptions> siteSettings,
             IOptions<AzureBlobOptions> azureBlobOptions,
+            IOptions<PublicBlobOptions> publicBlobOptions,
             IOptions<IdRampApiOptions> idRampApiOptions,
             WalletDbContext context,
             EmailHelperService emailHelperService,
@@ -57,6 +59,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             _siteSettings = siteSettings.Value;
             _azureBlobOptions = azureBlobOptions?.Value;
+            _publicBlobOptions = publicBlobOptions?.Value;
             _idRampApiOptions = idRampApiOptions?.Value;
             _context = context;
             _emailHelperService = emailHelperService;
@@ -207,16 +210,20 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         public async Task<string> SaveToBlobAsync(string containerName, string fileId, string extension, byte[] contents, PublicAccessType publicAccessType = PublicAccessType.None)
         {
-            var container = new BlobContainerClient(_azureBlobOptions.StorageConnectionString, containerName);
+            var container = new BlobContainerClient((publicAccessType == PublicAccessType.None) ? _azureBlobOptions.StorageConnectionString : _publicBlobOptions.StorageConnectionString, containerName);
             if (!(await container.ExistsAsync()))
             {
                 await container.CreateIfNotExistsAsync();
                 await container.SetAccessPolicyAsync(publicAccessType);
             }
-            var date = DateTime.UtcNow;
-            var filename = $"{date:yyyy/MM/dd}/{fileId}.{extension}";
-            var location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
-            
+                var date = DateTime.UtcNow;
+                var filename = $"{date:yyyy/MM/dd}/{fileId}.{extension}";
+            string location;
+            if (publicAccessType == PublicAccessType.None || String.IsNullOrWhiteSpace(_publicBlobOptions.CustomDomainName))
+                location = $"https://{container.AccountName}.blob.core.windows.net/{containerName}/{filename}";
+            else
+                location = $"https://{_publicBlobOptions.CustomDomainName}/{containerName}/{filename}";
+
             BlobClient blob = container.GetBlobClient(filename);
             using (var ms = new MemoryStream(contents))
             {

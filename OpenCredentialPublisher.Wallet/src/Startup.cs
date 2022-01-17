@@ -64,7 +64,9 @@ namespace OpenCredentialPublisher.ClrWallet
         {
             services.AddOptions();
             services.Configure<AzureBlobOptions>(Configuration.GetSection(AzureBlobOptions.Section));
+            services.Configure<PublicBlobOptions>(Configuration.GetSection(PublicBlobOptions.Section));
             services.Configure<SourcesSettingsOptions>(Configuration.GetSection(SourcesSettingsOptions.Section));
+            services.Configure<DevSettingsOptions>(Configuration.GetSection(DevSettingsOptions.Section));
             services.Configure<AzureQueueOptions>(Configuration.GetSection(AzureQueueOptions.Section));
             services.Configure<AzureListenerOptions>(Configuration.GetSection(AzureListenerOptions.Section));
             services.Configure<IdRampApiOptions>(Configuration.GetSection(IdRampApiOptions.Section));

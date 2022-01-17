@@ -15,24 +15,32 @@ namespace OpenCredentialPublisher.Services.Implementations
     {
         private const string BlobContainerName = "ocp-profile-images";
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly AzureBlobOptions _azureBlobOptions;
-        public ProfileImageService(UserManager<ApplicationUser> userManager, IOptions<AzureBlobOptions> azureBlobOptions)
+        private readonly PublicBlobOptions _publicBlobOptions;
+        public ProfileImageService(UserManager<ApplicationUser> userManager, IOptions<PublicBlobOptions> publicBlobOptions)
         {
             _userManager = userManager;
-            _azureBlobOptions = azureBlobOptions?.Value;
+            _publicBlobOptions = publicBlobOptions?.Value;
         }
 
         public async Task<string> SaveImageToBlobAsync(string userId, byte[] imageBytes, string extension = ".png")
         {
-            var container = new BlobContainerClient(_azureBlobOptions.StorageConnectionString, BlobContainerName);
+            var container = new BlobContainerClient(_publicBlobOptions.StorageConnectionString, BlobContainerName);
             if (!(await container.ExistsAsync())) {
                 await container.CreateIfNotExistsAsync();
                 await container.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
             }
 
+            if (!string.IsNullOrWhiteSpace(extension) && !extension.StartsWith('.'))
+                extension = extension.Insert(0, ".");
+
+            var date = DateTime.UtcNow;
             var imageId = Guid.NewGuid();
-            var filename = $"{imageId}{extension}";
-            var imageUrl = $"https://{container.AccountName}.blob.core.windows.net/{BlobContainerName}/{filename}";
+            var filename = $"{date:yyyy/MM/dd}/{imageId}{extension}";
+            string location;
+            if (String.IsNullOrWhiteSpace(_publicBlobOptions.CustomDomainName))
+                location = $"https://{container.AccountName}.blob.core.windows.net/{BlobContainerName}/{filename}";
+            else
+                location = $"https://{_publicBlobOptions.CustomDomainName}/{BlobContainerName}/{filename}";
 
             BlobClient blob = container.GetBlobClient(filename);
             using (var ms = new MemoryStream(imageBytes))
@@ -41,11 +49,11 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
 
             var user = await _userManager.FindByIdAsync(userId);
-            user.ProfileImageUrl = imageUrl;
+            user.ProfileImageUrl = location;
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
-                return imageUrl;
+                return location;
             }
             throw new Exception("There was a problem saving your profile image to your account.");
         }

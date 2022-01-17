@@ -2,8 +2,6 @@ import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
-import { AuthorizationService } from '@core/services/authorization.service';
-import { environment } from '@environment/environment';
 import { WalletService } from '@modules/wallets/wallets.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -40,7 +38,6 @@ export class InvitationComponent implements OnInit,  OnDestroy {
     , private router: Router
     , private detectorService: DeviceDetectorService
     , private modalService: NgbModal
-    , private authService: AuthorizationService
     , private appService: AppService
     , private zone: NgZone
     , private sanitizer:DomSanitizer ) {

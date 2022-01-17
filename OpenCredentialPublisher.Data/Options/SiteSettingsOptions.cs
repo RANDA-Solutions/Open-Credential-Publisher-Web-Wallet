@@ -27,5 +27,6 @@ namespace OpenCredentialPublisher.Data.Options
 
         public string AllowedOrigins { get; set; }
         public string SpaClientUrl { get; set; }
+        public string IssuerUri { get; set; }
     }
 }

@@ -1,8 +1,6 @@
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
-import { AuthorizationService } from '@core/services/authorization.service';
-import { environment } from '@environment/environment';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
@@ -29,7 +27,7 @@ export class WalletListComponent  implements OnDestroy, OnInit {
   private debug = false;
 
   constructor(public appService: AppService, private walletService: WalletService, private router: Router
-    , private modalService: NgbModal, private authService: AuthorizationService, private ngZone: NgZone ) {
+    , private modalService: NgbModal, private ngZone: NgZone ) {
   }
   ngOnInit() {
     if (this.debug) console.log('WalletListComponent ngOnInit');

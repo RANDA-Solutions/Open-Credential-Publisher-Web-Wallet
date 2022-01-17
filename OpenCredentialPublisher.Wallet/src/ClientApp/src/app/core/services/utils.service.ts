@@ -10,7 +10,6 @@ import { Observable, of } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { LogService } from '../error-handling/logerror.service';
-import { AuthorizationService } from './authorization.service';
 import { ErrorService } from './error.service';
 // https://angular.io/tutorial/toh-pt6#handleerror
 /**
@@ -23,7 +22,7 @@ import { ErrorService } from './error.service';
 export class UtilsService implements OnDestroy {
   errorId = 'N/A';
   private debug = false;
-  constructor(public logService: LogService, public authService: AuthorizationService, public messageService: MessageService,
+  constructor(public logService: LogService, public messageService: MessageService,
                public errorService: ErrorService) { }
 
   ngOnDestroy(): void {
@@ -89,7 +88,7 @@ export class UtilsService implements OnDestroy {
   handleErrorNoLog<T>(error: Error | HttpErrorResponse, result?: T): Observable<T> {
       if (error instanceof HttpErrorResponse) {
         if (error.status === 401) {
-          this.authService.refresh();
+          //this.authService.refresh();
         } else {
           this.showError(this.errorService.getServerMessage(error));
           // Let the app keep running by returning an empty result.

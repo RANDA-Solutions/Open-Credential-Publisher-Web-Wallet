@@ -37,7 +37,7 @@ export class RegisterCallbackComponent implements OnInit {
     if (this.debug) console.log('RegisterCallbackComponent getData');
     this.sourcesService.postCallback(this.sourceCallback)
       .pipe(take(1)).subscribe(data => {
-        console.log(data);
+        if (this.debug) console.log(data);
         if (data.statusCode == 200) {
           this.router.navigate(['/sources/source-list', (<ApiOkResponse>data).result as number]);
         } else {
