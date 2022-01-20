@@ -3,7 +3,6 @@ import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
 import { Idle } from '@ng-idle/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AuthResult } from 'angular-auth-oidc-client/lib/flows/callback-context';
 import { AuthService } from './auth/auth-client.service';
 import { LoginService } from './auth/login.service';
 import { TimeoutService } from './services/timeout.service';
@@ -19,8 +18,7 @@ export class AppComponent implements OnInit, OnDestroy {
   
 	envName = environment.name;
 
-	 private debug = true;
-	private authStatus: AuthResult;
+	 private debug = environment.debug;
 	constructor(
 		public appService: AppService
 		, private idle: Idle
@@ -32,7 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		if (environment.debug)
+		if (this.debug)
 			console.log("Environment: ", environment);
 		this.timeoutService.initialize();
 

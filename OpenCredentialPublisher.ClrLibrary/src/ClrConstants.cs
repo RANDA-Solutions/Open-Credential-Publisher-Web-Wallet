@@ -3,6 +3,11 @@ namespace OpenCredentialPublisher.ClrLibrary
 {
     public static class ClrConstants
     {
+        public static class Type
+        {
+            public static string Clr = "Clr";
+        }
+
         public static class JsonLd
         {
             public static string Context = "https://purl.imsglobal.org/spec/clr/v1p0/context/clr_v1p0.jsonld";

@@ -5,7 +5,7 @@ const baseUrl = 'https://localhost:44392';
 export const environment = {
 	name: '[default]',
 	production: false,
-	debug: false,
+	debug: true,
 	errorMessageLife: 3000,
 	httpDelay: 0,
 	apiEndPoint: `${baseUrl}/api/`,

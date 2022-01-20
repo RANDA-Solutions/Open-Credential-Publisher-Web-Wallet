@@ -20,7 +20,8 @@ export class TimeoutService implements OnDestroy {
     private authService: AuthService,
   ) {
     this.id = new Date().toDateString();
-    console.log("Timeout Service: ", this.id);
+    if (this._debug)
+      console.log("Timeout Service: ", this.id);
 
     this.authService.userLoaded.pipe(untilDestroyed(this)).subscribe(val => {
       if (this.authService.isLoggedIn && !this._watching)
@@ -33,8 +34,10 @@ export class TimeoutService implements OnDestroy {
     });
 
     this.authService.accessTokenExpiring.pipe(untilDestroyed(this)).subscribe(val => {
-      if (this.authService.isLoggedIn)
-        this.authService.refreshLogin();
+      if (this._debug)
+        console.log("Access token is expiring");
+        //this.authService.checkLogin();
+
     });
   }
 

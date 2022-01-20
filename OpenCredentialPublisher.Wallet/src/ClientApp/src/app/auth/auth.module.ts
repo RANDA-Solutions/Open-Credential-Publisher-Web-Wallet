@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
-import { InjectionToken, ModuleWithProviders, NgModule, Optional, SkipSelf } from "@angular/core";
+import { InjectionToken, ModuleWithProviders, NgModule, NgZone, Optional, SkipSelf } from "@angular/core";
 import { Router, RouterModule } from "@angular/router";
 import { AuthGuard } from "./auth.guard";
 import { AuthService } from "./auth.service";
@@ -26,7 +26,7 @@ export class AuthModule {
 			providers: [
 				{ provide: AUTH_CONFIG, useValue: config,  },
 				{ provide: AuthService, deps: [AUTH_CONFIG]},
-				{ provide: LoginService, deps: [AuthService, HttpClient, Router] },
+				{ provide: LoginService, deps: [AuthService, HttpClient, Router, NgZone] },
 				{ provide: AuthGuard, deps: [AuthService, LoginService, Router] }
 			],
 			

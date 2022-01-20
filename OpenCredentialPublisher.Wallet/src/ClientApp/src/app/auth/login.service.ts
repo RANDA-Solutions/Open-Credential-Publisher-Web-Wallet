@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '@environment/environment';
 import { of, ReplaySubject } from 'rxjs';
@@ -9,13 +9,14 @@ import { AuthService } from './auth-client.service';
 	providedIn: 'root'
 })
 export class LoginService {
-  private debug = true;
+  private debug = environment.debug;
 
   private checkAuthCompleted$ = new ReplaySubject(1);
 
 	constructor(private authService: AuthService
 		, private httpClient: HttpClient
-		, private router: Router) {}
+		, private router: Router
+		, private ngZone: NgZone) {}
 
 	returnUrlKey = "originalReturnUrl";
 
@@ -29,23 +30,6 @@ export class LoginService {
 
 	get userData() {
 		return of(this.authService.getClaims());
-	}
-
-	get config() {
-		return {};
-		//return this.oidcSecurityService.getConfiguration(environment.configId);
-	}
-
-	get stsCallback$() {
-		return of("");
-	}
-
-	public refreshToken() {
-		return of();
-	}
-
-	public refreshSession() {
-		return of()
 	}
 
 	completeLogin() {
@@ -76,7 +60,9 @@ export class LoginService {
 	}
 
 	private goToLogout(infoMessage?: string) {
-		this.router.navigate(["/access/logout"], { queryParams: { infoMessage: infoMessage }, replaceUrl: true })
+		this.ngZone.run((infoMessage?: string) => {
+			this.router.navigate(["/access/logout"], { queryParams: { infoMessage: infoMessage }, replaceUrl: true });
+		}, this, [infoMessage]);
 	}
 }
 

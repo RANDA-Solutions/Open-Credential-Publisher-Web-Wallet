@@ -8,7 +8,6 @@ import { AuthService } from '@root/app/auth/auth.service';
 import { ApiResponse } from '@shared/models/apiResponse';
 import { CredentialSendStatus } from '@shared/models/credentialSendStatus';
 import { WalletConnectionStatus } from '@shared/models/walletConnectionStatus';
-import { AuthenticatedResult } from 'angular-auth-oidc-client/lib/auth-state/auth-result';
 import { BehaviorSubject, Observable, of, Subscription, throwError } from 'rxjs';
 import { catchError, filter, tap } from 'rxjs/operators';
 import { UtilsService } from './utils.service';
@@ -32,14 +31,9 @@ export class AppService {
   public credentialStatusFlow: string = 'credential-status';
   public credentialStatusMethod: string = 'CredentialStatus';
 
-  get IsLoggedIn() {
-    return this._authResult.isAuthenticated;
-  }
-
   private _loggedInBehavior = new BehaviorSubject<boolean>(false);
   loggedIn$ = this._loggedInBehavior.asObservable();
 
-  private _authResult: AuthenticatedResult;
   private _hubs: { [name: string]: HubConnection } = {};
   private debug = false;
   private routerSubscription: Subscription;

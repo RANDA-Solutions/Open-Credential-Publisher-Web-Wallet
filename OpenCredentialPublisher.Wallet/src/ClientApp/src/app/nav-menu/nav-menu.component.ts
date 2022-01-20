@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { Observable } from 'rxjs';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { LoginService } from '../auth/login.service';
 @UntilDestroy()
@@ -11,7 +12,7 @@ import { LoginService } from '../auth/login.service';
 })
 export class NavMenuComponent implements OnInit {
 	public isExpanded = false;
-	public get isAuthenticated() : boolean { return this.loginService.isLoggedIn; };
+	public isAuthenticated() : Observable<boolean> { return this.loginService.isLoggedIn; };
 	public userName: string;
   public showNavMenu: boolean;
 

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenCredentialPublisher.ClrLibrary;
 using OpenCredentialPublisher.ClrLibrary.Extensions;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Contexts;
@@ -857,7 +858,8 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             var newClrDType = new ClrDType
             {
-                Context = "https://purl.imsglobal.org/spec/clr/v1p0/context",
+                Context = ClrConstants.JsonLd.Context,
+                Type = ClrConstants.Type.Clr,
                 Assertions = new List<AssertionDType>(),
                 Id = $"urn:uuid:{Guid.NewGuid():D}",
                 IssuedOn = DateTime.Now.ToLocalTime(),
