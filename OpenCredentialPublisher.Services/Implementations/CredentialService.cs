@@ -20,6 +20,7 @@ using OpenCredentialPublisher.Data.Models.ClrEntities.Relationships;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using OpenCredentialPublisher.Data.Models.ClrEntities;
 using QRCoder;
+using OpenCredentialPublisher.ClrLibrary;
 //2021-06-17 EF Tracking OK
 namespace OpenCredentialPublisher.Services.Implementations
 {
@@ -773,6 +774,8 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             var newClr = new ClrDType
             {
+                Context = ClrConstants.JsonLd.Context,
+                Type = ClrConstants.Type.Clr,
                 Assertions = new List<AssertionDType>(),
                 Id = $"urn:uuid:{Guid.NewGuid():D}",
                 IssuedOn = DateTime.Now.ToLocalTime(),

@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '@environment/environment';
 import { AccountService } from '@modules/account/account.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AuthStorageService } from '@root/app/auth/auth-storage.service';
 import { LoginService } from '@root/app/auth/login.service';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -26,7 +25,6 @@ export class EmailConfirmationComponent implements OnInit {
   constructor(private route: ActivatedRoute
     , private router: Router
     , private accountService: AccountService
-    , private storageService: AuthStorageService
     , private loginService: LoginService) {
     this.sub = this.route.queryParams.pipe(untilDestroyed(this)).subscribe(
 			(param: any) => {
@@ -51,7 +49,7 @@ export class EmailConfirmationComponent implements OnInit {
       .pipe(take(1)).subscribe(data => {
         if (data.statusCode == 200) {
           if (this.returnUrl) {
-            this.storageService.write("redirect", this.returnUrl, this.loginService.config);
+            this.loginService.storeReturnUrl(this.returnUrl);
           }
           this.confirmationMessage = 'Success';
         } else {

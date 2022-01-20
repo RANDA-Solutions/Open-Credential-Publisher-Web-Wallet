@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { environment } from '@environment/environment';
 import { SourcesService } from '@modules/sources/sources.service';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
@@ -22,7 +23,7 @@ export class RegisterComponent implements OnInit {
   modelIsValid = true;
   showSpinner = false;
   connectForm: FormGroup;
-  private debug = true;
+  private debug = environment.debug;
   constructor(private sourcesService: SourcesService, private fb: FormBuilder ) {
     this.createForm();
   }

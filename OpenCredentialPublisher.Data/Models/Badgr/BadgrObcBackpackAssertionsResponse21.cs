@@ -8,7 +8,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
     /// <summary>
     /// Response payload for the GET /backpack/assertions endpoint.
     /// </summary>
-    public partial class BadgrObcBackpackAssertionsResponse
+    public partial class BadgrObcBackpackAssertionsResponse21
     { 
         /// <summary>
         /// Gets or Sets Status

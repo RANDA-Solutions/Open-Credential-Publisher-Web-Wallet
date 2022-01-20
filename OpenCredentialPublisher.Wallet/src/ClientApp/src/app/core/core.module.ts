@@ -5,7 +5,6 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { GlobalErrorHandler } from './error-handling/error.handler';
 import { LogService } from './error-handling/logerror.service';
-import { AuthGuard } from './guards/auth.guard';
 import { throwIfAlreadyLoaded } from './guards/module-import-guard';
 import { AppService } from './services/app.service';
 import { AuthorizationService } from './services/authorization.service';
@@ -21,7 +20,6 @@ import { UtilsService } from './services/utils.service';
 	providers: [
 		AppService,
 		AuthorizationService,
-		AuthGuard,
 		ClrDetailService,
 		CredentialService,
 		LogService,

@@ -11,6 +11,7 @@ export class AuthService {
 	private _user: User | null;
 	private _userManager: UserManager;
 
+	private _silientRenewStarted: boolean = false;
 	private _loggedInBehavior: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 	public isLoggedIn$: Observable<boolean> = this._loggedInBehavior.asObservable();
 
@@ -68,19 +69,32 @@ export class AuthService {
 			this.silentRenewError.emit(ev);
 		});
 
-		this.getUserManager();
+		this.getUser();
 		if (environment.debug)
 		{
 			console.log("Auth Service Constructor");
 		}
 	}
 
-	isLoggedIn() {
+	isLoggedIn() : Observable<boolean> {
 		if (environment.debug) console.log("User is logged in: ", this._user);
-		return this._user != null && !this._user.expired;
+		return new Observable((obs) => {
+			if (this._user) {
+				if (this._user.expired) {
+					if (environment.debug)
+						 console.log("User expired, refreshing login");
+					this.getUser().then(() => obs.next(!this._user.expired));
+				}
+				else {
+					obs.next(!this._user.expired);
+				}
+			}
+			else {
+				obs.next(false);
+			}
+		})
+		
 	}
-
-
 
 	getAccessToken() {
 		return this._user ? this._user.access_token : '';
@@ -93,9 +107,17 @@ export class AuthService {
 	checkLogin(): Promise<boolean> {
 		return this._userManager.signinSilent().then((user) => {
 			this._user = user;
+			if (!this._silientRenewStarted) {
+				this._userManager.startSilentRenew();
+				this._silientRenewStarted = true;
+			}
 			return true;
 		}, (reason) => {
 			if (environment.debug) console.log("Not logged in: ", reason);
+			if (this._silientRenewStarted) {
+				this._userManager.stopSilentRenew();
+				this._silientRenewStarted = false;
+			}
 			localStorage.clear();
 			return false;
 		});
@@ -105,16 +127,11 @@ export class AuthService {
 		this._userManager.clearStaleState();
 	}
 
-	startAuthentication() {
-		this.getUserManager();
-
-	}
-
-	refreshLogin() {
-		this._userManager.startSilentRenew();
-	}
-
 	logout(): Promise<void> {
+		if (this._silientRenewStarted) {
+			this._userManager.stopSilentRenew();
+			this._silientRenewStarted = false;
+		}
 		return this._userManager.revokeAccessToken().then(() => {
 			return this._userManager.removeUser().then(() => {
 				this._user = null;
@@ -122,8 +139,8 @@ export class AuthService {
 		});
 	}
 
-	private getUserManager() {
-		this._userManager.getUser().then((user) => {
+	private getUser() {
+		return this._userManager.getUser().then((user) => {
 			this._user = user;
 		})
 	}

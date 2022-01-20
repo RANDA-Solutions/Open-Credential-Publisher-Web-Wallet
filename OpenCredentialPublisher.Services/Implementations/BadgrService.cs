@@ -124,19 +124,34 @@ namespace OpenCredentialPublisher.Services.Implementations
                 modelState.AddModelError(string.Empty, response.ReasonPhrase);
             }
         }
-        private async Task ObcSaveBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
+        private async Task<int> ObcSaveBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
         {
             try
             {
                 //Turn EF Tracking on for untracked authorization
                 _context.Attach(authorization);
+                var badgrAssertions = new List<BadgrObcAssertionDType>();
 
-                var badgrBackpackAssertionsResponse = JsonConvert.DeserializeObject<BadgrObcBackpackAssertionsResponse>(content);
-
-                var credentialPackage = await _context.CredentialPackages
-                        .Include(cp => cp.BadgrBackpack)
-                        .ThenInclude(bp => bp.BadgrAssertions)
-                        .FirstOrDefaultAsync(cp => cp.UserId == _httpContextAccessor.HttpContext.User.JwtUserId() && cp.AuthorizationForeignKey == authorization.Id);
+                if (content.Contains(@"""results"""))
+                {   // (old) "results" not IMSGlobal conformant
+                    // Log.Debug("ObcSaveBackpackDataAsync - (old) results not IMSGlobal conformant");
+                    var badgrBackpackAssertionsResponse21 = JsonConvert.DeserializeObject<BadgrObcBackpackAssertionsResponse21>(content);
+                    badgrAssertions = badgrBackpackAssertionsResponse21.BadgrAssertions;
+                }
+                else
+                {   // results replaced with assertions/signedassertions per Badgr IMSGlobal conformance change
+                    // Log.Debug("ObcSaveBackpackDataAsync - Badgr IMSGlobal conformance change");
+                    var badgrBackpackAssertionsResponse21c = JsonConvert.DeserializeObject<BadgrObcBackpackAssertionsResponse21c>(content);
+                    badgrAssertions = badgrBackpackAssertionsResponse21c.BadgrAssertions;
+                }
+                // Log.Debug($"ObcSaveBackpackDataAsync - badgrAssertions  {JsonConvert.SerializeObject(badgrAssertions)}");
+                // Log.Debug($"ObcSaveBackpackDataAsync - badgrAssertions from {content}");
+                // Every refresh of badges creates a new package - this was supposed to be the case since last year (see removed SaveObcBackpackDataAsync)
+                var credentialPackage = null as CredentialPackageModel;
+                //var credentialPackage = await _context.CredentialPackages
+                //        .Include(cp => cp.BadgrBackpack)
+                //        .ThenInclude(bp => bp.BadgrAssertions)
+                //        .FirstOrDefaultAsync(cp => cp.UserId == _httpContextAccessor.HttpContext.User.JwtUserId() && cp.AuthorizationForeignKey == authorization.Id);
 
                 if (credentialPackage == null)
                 {
@@ -153,7 +168,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                             Identifier = authorization.Id,
                             Json = content,
                             IssuedOn = DateTime.UtcNow,
-                            AssertionsCount = badgrBackpackAssertionsResponse.BadgrAssertions.Count,
+                            AssertionsCount = badgrAssertions.Count,
                             BadgrAssertions = new List<BadgrAssertionModel>()
                         }
                     };
@@ -164,27 +179,29 @@ namespace OpenCredentialPublisher.Services.Implementations
                     credentialPackage.BadgrBackpack.Identifier = authorization.Id;
                     credentialPackage.BadgrBackpack.Json = content;
                     credentialPackage.BadgrBackpack.IssuedOn = DateTime.UtcNow;
-                    credentialPackage.BadgrBackpack.AssertionsCount = badgrBackpackAssertionsResponse.BadgrAssertions.Count;
+                    credentialPackage.BadgrBackpack.AssertionsCount = badgrAssertions.Count;
                     credentialPackage.BadgrBackpack.BadgrAssertions = new List<BadgrAssertionModel>();
                 }
 
                 // Save each Assertion
 
-                foreach (var assertion in badgrBackpackAssertionsResponse.BadgrAssertions)
+                foreach (var assertion in badgrAssertions)
                 {
-                    var currentAssertion = BadgrAssertionModel.FromBadgrAssertion(assertion.ToJson(), assertion);
-                    var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == currentAssertion.Id);
+                    // Log.Debug($"ObcSaveBackpackDataAsync - current raw assertion  {JsonConvert.SerializeObject(assertion)}");
+                    var currentAssertion = await EnhanceConvertObcAssertionResponseAsync(modelState, assertion, authorization);
+                    // Log.Debug($"ObcSaveBackpackDataAsync - current model assertion  {JsonConvert.SerializeObject(currentAssertion)}");
+                    //var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == currentAssertion.Id);
 
-                    if (savedAssertion != null)
-                    {
-                        currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
-                        currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
-                        _context.Entry(currentAssertion).State = EntityState.Modified;
-                    }
-                    else
-                    {
+                    //if (savedAssertion != null)
+                    //{
+                    //    currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
+                    //    currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
+                    //    _context.Entry(currentAssertion).State = EntityState.Modified;
+                    //}
+                    //else
+                    //{
                         credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
-                    }
+                    //}
                 }
                 //TODO skip until later, Open Badges v2.0, 2.1 does not implement signed assertions
                 //foreach (var signedAssertion in badgrBackpackAssertionsResponse.SignedAssertions)
@@ -206,16 +223,19 @@ namespace OpenCredentialPublisher.Services.Implementations
                 //}
 
                 //debugging info
+                credentialPackage.AssertionsCount = credentialPackage.BadgrBackpack.BadgrAssertions.Count;
                 _context.ChangeTracker.DetectChanges();
-                var addedEntities = _context.ChangeTracker.Entries<IBaseEntity>().Where(E => E.State == EntityState.Added).ToList();
-                var editedEntities = _context.ChangeTracker.Entries<IBaseEntity>().Where(E => E.State == EntityState.Modified).ToList();
+                //var addedEntities = _context.ChangeTracker.Entries<IBaseEntity>().Where(E => E.State == EntityState.Added).ToList();
+                //var editedEntities = _context.ChangeTracker.Entries<IBaseEntity>().Where(E => E.State == EntityState.Modified).ToList();
                 //
                 await _context.SaveChangesAsync();
+                return credentialPackage.Id;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, ex.Message);
                 modelState.AddModelError(string.Empty, ex.Message);
+                throw;
             }
         }
 
@@ -302,57 +322,57 @@ namespace OpenCredentialPublisher.Services.Implementations
         /// </summary>
         /// <param name="page">The PageModel calling this method.</param>
         /// <param name="id">The authorization id for the resource server.</param>
-        public async Task RefreshBackpackAsync(ModelStateDictionary modelState, string id)
-        {
-            if (id == null)
-            {
-                modelState.AddModelError(string.Empty, "Missing authorization id.");
-                return;
-            }
+        //public async Task RefreshBackpackAsync(ModelStateDictionary modelState, string id)
+        //{
+        //    if (id == null)
+        //    {
+        //        modelState.AddModelError(string.Empty, "Missing authorization id.");
+        //        return;
+        //    }
 
-            var authorization = await _authorizationsService.GetDeepAsync(id);
+        //    var authorization = await _authorizationsService.GetDeepAsync(id);
 
-            if (authorization == null)
-            {
-                modelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
-                return;
-            }
+        //    if (authorization == null)
+        //    {
+        //        modelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
+        //        return;
+        //    }
 
-            if (authorization.AccessToken == null)
-            {
-                modelState.AddModelError(string.Empty, "No access token.");
-                return;
-            }
+        //    if (authorization.AccessToken == null)
+        //    {
+        //        modelState.AddModelError(string.Empty, "No access token.");
+        //        return;
+        //    }
 
-            if (!await _authorizationsService.RefreshTokenAsync(modelState, authorization))
-            {
-                modelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
-                return;
-            }
+        //    if (!await _authorizationsService.RefreshTokenAsync(modelState, authorization))
+        //    {
+        //        modelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
+        //        return;
+        //    }
 
-            var serviceUrl = string.Concat(authorization.Source.Url.EnsureTrailingSlash(), "v2/backpack/assertions");
+        //    var serviceUrl = string.Concat(authorization.Source.Url.EnsureTrailingSlash(), "v2/backpack/assertions");
 
-            var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
-            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonLdMediaType);
-            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonMediaType);
-            request.SetBearerToken(authorization.AccessToken);
+        //    var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
+        //    request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonLdMediaType);
+        //    request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonMediaType);
+        //    request.SetBearerToken(authorization.AccessToken);
 
-            var client = _factory.CreateClient("default");
+        //    var client = _factory.CreateClient("default");
 
-            var response = await client.SendAsync(request);
-            await _logHttpClientService.LogAsync(response);
+        //    var response = await client.SendAsync(request);
+        //    await _logHttpClientService.LogAsync(response);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        var content = await response.Content.ReadAsStringAsync();
 
-                await SaveBackpackDataAsync(modelState, content, authorization);
-            }
-            else
-            {
-                modelState.AddModelError(string.Empty, response.ReasonPhrase);
-            }
-        }
+        //        await SaveBackpackDataAsync(modelState, content, authorization);
+        //    }
+        //    else
+        //    {
+        //        modelState.AddModelError(string.Empty, response.ReasonPhrase);
+        //    }
+        //}
 
         /// <summary>
         /// Get fresh copies of the Open Badges from the Badgr server via Badge Connect.
@@ -404,69 +424,13 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 var content = await response.Content.ReadAsStringAsync();
 
-                packageId = await SaveObcBackpackDataAsync(modelState, content, authorization);
+                packageId = await ObcSaveBackpackDataAsync(modelState, content, authorization);
             }
             else
             {
                 modelState.AddModelError(string.Empty, response.ReasonPhrase);
             }
             return packageId;
-        }
-        /// <summary>
-        /// Get fresh copies of the Open Badges from the Badgr server.
-        /// </summary>
-        /// <param name="page">The PageModel calling this method.</param>
-        /// <param name="id">The authorization id for the resource server.</param>
-        public async Task RefreshBackpackConnectAsync(ModelStateDictionary modelState, string id)
-        {
-            if (id == null)
-            {
-                modelState.AddModelError(string.Empty, "Missing authorization id.");
-                return;
-            }
-
-            var authorization = await _authorizationsService.GetDeepAsync(id);
-
-            if (authorization == null)
-            {
-                modelState.AddModelError(string.Empty, $"Cannot find authorization {id}.");
-                return;
-            }
-
-            if (authorization.AccessToken == null)
-            {
-                modelState.AddModelError(string.Empty, "No access token.");
-                return;
-            }
-
-            if (!await _authorizationsService.RefreshTokenAsync(modelState, authorization))
-            {
-                modelState.AddModelError(string.Empty, "The access token has expired and cannot be refreshed.");
-                return;
-            }
-
-            var serviceUrl = string.Concat(authorization.Source.Url.EnsureTrailingSlash(), "v2/backpack/assertions");
-
-            var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
-            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonLdMediaType);
-            request.Headers.Accept.ParseAdd(ClrLibrary.ClrConstants.MediaTypes.JsonMediaType);
-            request.SetBearerToken(authorization.AccessToken);
-
-            var client = _factory.CreateClient("default");
-
-            var response = await client.SendAsync(request);
-            await _logHttpClientService.LogAsync(response);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-
-                await SaveBackpackDataAsync(modelState, content, authorization);
-            }
-            else
-            {
-                modelState.AddModelError(string.Empty, response.ReasonPhrase);
-            }
         }
 
         public async Task<BackpackPackageVM> GetBackpackPackageForSelectionAsync(string userId, int id)
@@ -551,6 +515,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                     _context.Entry(ba).State = EntityState.Modified;
                 }
             }
+            pkg.AssertionsCount = pkg.BadgrBackpack.BadgrAssertions.Count(b => !b.IsDeleted);
+            _context.Entry(pkg).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
         private async Task<BadgrBackpackModel> GetPreviousBackpackAsync(string id)
@@ -566,155 +532,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             return backpack;
         }
-        private async Task SaveBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
-        {
-
-            //Turn EF Tracking on for untracked authorization
-            _context.Attach(authorization);
-
-            var badgrBackpackAssertionsResponse = JsonConvert.DeserializeObject<BadgrBackpackAssertionsResponse>(content);
-
-            var credentialPackage = await _context.CredentialPackages
-                    .Include(cp => cp.BadgrBackpack)
-                    .ThenInclude(bp => bp.BadgrAssertions)
-                    .FirstOrDefaultAsync(cp => cp.UserId == _httpContextAccessor.HttpContext.User.JwtUserId() && cp.AuthorizationForeignKey == authorization.Id);
-
-            if (credentialPackage == null)
-            {
-                credentialPackage = new CredentialPackageModel
-                {
-                    TypeId = PackageTypeEnum.OpenBadge,
-                    AuthorizationForeignKey = authorization.Id,
-                    UserId = _httpContextAccessor.HttpContext.User.JwtUserId(),
-                    CreatedAt = DateTime.UtcNow,
-                    BadgrBackpack = new BadgrBackpackModel
-                    {
-                        IsBadgr = true,
-                        ParentCredentialPackage = credentialPackage,
-                        Identifier = authorization.Id,
-                        Json = content,
-                        IssuedOn = DateTime.UtcNow,
-                        AssertionsCount = badgrBackpackAssertionsResponse.BadgrAssertions.Count,
-                        BadgrAssertions = new List<BadgrAssertionModel>()
-                    }
-                };
-                _context.CredentialPackages.Add(credentialPackage);
-            }
-            else
-            {
-               credentialPackage.BadgrBackpack.Identifier = authorization.Id;
-               credentialPackage.BadgrBackpack.Json = content;
-               credentialPackage.BadgrBackpack.IssuedOn = DateTime.UtcNow;
-               credentialPackage.BadgrBackpack.AssertionsCount = badgrBackpackAssertionsResponse.BadgrAssertions.Count;
-               credentialPackage.BadgrBackpack.BadgrAssertions = new List<BadgrAssertionModel>();
-            }
-
-            // Save each Assertion
-
-            foreach (var currentAssertion in badgrBackpackAssertionsResponse.BadgrAssertions)
-            {
-                try
-                {                
-                    var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == currentAssertion.Id);
-
-                    await EnhanceAssertionResponseAsync(modelState, currentAssertion, authorization);
-                    if (savedAssertion != null)
-                    {
-                        currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
-                        currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
-                        _context.Entry(currentAssertion).State = EntityState.Modified;
-                    }
-                    else
-                    {
-                        credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, ex.Message);
-                    modelState.AddModelError(string.Empty, ex.Message);
-                }
-            }
-
-            credentialPackage.AssertionsCount = credentialPackage.BadgrBackpack.BadgrAssertions.Count;
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task<int> SaveObcBackpackDataAsync(ModelStateDictionary modelState, string content, AuthorizationModel authorization)
-        {            
-            // Every refresh of packages will save the raw package in blob storage, but the database will contain only the most recent version
-
-            //Turn EF Tracking on for untracked authorization
-            _context.Attach(authorization);
-
-            var badgrObcBackpackAssertionsResponse = JsonConvert.DeserializeObject<BadgrObcBackpackAssertionsResponse>(content);
-
-            //var credentialPackage = await _context.CredentialPackages
-            //        .Include(cp => cp.BadgrBackpack)
-            //        .ThenInclude(bp => bp.BadgrAssertions)
-            //        .FirstOrDefaultAsync(cp => cp.UserId == _httpContextAccessor.HttpContext.User.JwtUserId() && cp.AuthorizationForeignKey == authorization.Id);
-            var credentialPackage = null as CredentialPackageModel;
-            if (credentialPackage == null)
-            {
-                credentialPackage = new CredentialPackageModel
-                {
-                    TypeId = PackageTypeEnum.OpenBadge,
-                    AuthorizationForeignKey = authorization.Id,
-                    UserId = _httpContextAccessor.HttpContext.User.JwtUserId(),
-                    CreatedAt = DateTime.UtcNow,
-                    BadgrBackpack = new BadgrBackpackModel
-                    {
-                        IsBadgr = true,
-                        ParentCredentialPackage = credentialPackage,
-                        Identifier = authorization.Id,
-                        Json = content,
-                        IssuedOn = DateTime.UtcNow,
-                        AssertionsCount = badgrObcBackpackAssertionsResponse.BadgrAssertions.Count,
-                        BadgrAssertions = new List<BadgrAssertionModel>()
-                    }
-                };
-                _context.CredentialPackages.Add(credentialPackage);
-            }
-            else
-            {
-                credentialPackage.BadgrBackpack.Identifier = authorization.Id;
-                credentialPackage.BadgrBackpack.Json = content;
-                credentialPackage.BadgrBackpack.IssuedOn = DateTime.UtcNow;
-                credentialPackage.BadgrBackpack.AssertionsCount = badgrObcBackpackAssertionsResponse.BadgrAssertions.Count;
-                credentialPackage.BadgrBackpack.BadgrAssertions = new List<BadgrAssertionModel>();
-            }
-
-            // Save each Assertion
-
-            foreach (var assertion in badgrObcBackpackAssertionsResponse.BadgrAssertions)
-            {
-                try
-                {
-                    //var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == assertion.Id);
-                    var savedAssertion = null as BadgrAssertionModel;
-                    var currentAssertion = await EnhanceConvertObcAssertionResponseAsync(modelState, assertion, authorization);
-                    if (savedAssertion != null)
-                    {
-                        currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
-                        currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
-                        _context.Entry(currentAssertion).State = EntityState.Modified;
-                    }
-                    else
-                    {
-                        credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, ex.Message);
-                    modelState.AddModelError(string.Empty, ex.Message);
-                }
-            }
-
-            credentialPackage.AssertionsCount = badgrObcBackpackAssertionsResponse.BadgrAssertions.Count;
-            await _context.SaveChangesAsync();
-            return credentialPackage.Id;
-        }
+        
         private async Task<bool> EnhanceAssertionResponseAsync(ModelStateDictionary modelState, BadgrAssertionModel assertion, AuthorizationModel authorization)
         {
             var status = await GetBadgeDetailAsync(assertion.BadgeClassOpenBadgeId, authorization);
