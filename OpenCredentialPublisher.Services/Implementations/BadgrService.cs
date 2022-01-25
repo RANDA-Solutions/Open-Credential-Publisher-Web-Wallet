@@ -144,14 +144,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                     var badgrBackpackAssertionsResponse21c = JsonConvert.DeserializeObject<BadgrObcBackpackAssertionsResponse21c>(content);
                     badgrAssertions = badgrBackpackAssertionsResponse21c.BadgrAssertions;
                 }
-                // Log.Debug($"ObcSaveBackpackDataAsync - badgrAssertions  {JsonConvert.SerializeObject(badgrAssertions)}");
-                // Log.Debug($"ObcSaveBackpackDataAsync - badgrAssertions from {content}");
                 // Every refresh of badges creates a new package - this was supposed to be the case since last year (see removed SaveObcBackpackDataAsync)
                 var credentialPackage = null as CredentialPackageModel;
-                //var credentialPackage = await _context.CredentialPackages
-                //        .Include(cp => cp.BadgrBackpack)
-                //        .ThenInclude(bp => bp.BadgrAssertions)
-                //        .FirstOrDefaultAsync(cp => cp.UserId == _httpContextAccessor.HttpContext.User.JwtUserId() && cp.AuthorizationForeignKey == authorization.Id);
 
                 if (credentialPackage == null)
                 {
@@ -187,21 +181,11 @@ namespace OpenCredentialPublisher.Services.Implementations
 
                 foreach (var assertion in badgrAssertions)
                 {
-                    // Log.Debug($"ObcSaveBackpackDataAsync - current raw assertion  {JsonConvert.SerializeObject(assertion)}");
-                    var currentAssertion = await EnhanceConvertObcAssertionResponseAsync(modelState, assertion, authorization);
-                    // Log.Debug($"ObcSaveBackpackDataAsync - current model assertion  {JsonConvert.SerializeObject(currentAssertion)}");
-                    //var savedAssertion = credentialPackage.BadgrBackpack.BadgrAssertions.SingleOrDefault(a => a.Id == currentAssertion.Id);
-
-                    //if (savedAssertion != null)
-                    //{
-                    //    currentAssertion.BadgrBackpackId = savedAssertion.BadgrBackpackId;
-                    //    currentAssertion.BadgrAssertionId = savedAssertion.BadgrAssertionId;
-                    //    _context.Entry(currentAssertion).State = EntityState.Modified;
-                    //}
-                    //else
-                    //{
+                    if (assertion.BadgeClassOpenBadgeId != null && assertion.Image != null)
+                    { 
+                        var currentAssertion = await EnhanceConvertObcAssertionResponseAsync(modelState, assertion, authorization);
                         credentialPackage.BadgrBackpack.BadgrAssertions.Add(currentAssertion);
-                    //}
+                    }
                 }
                 //TODO skip until later, Open Badges v2.0, 2.1 does not implement signed assertions
                 //foreach (var signedAssertion in badgrBackpackAssertionsResponse.SignedAssertions)
@@ -222,11 +206,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                 //    }                
                 //}
 
-                //debugging info
                 credentialPackage.AssertionsCount = credentialPackage.BadgrBackpack.BadgrAssertions.Count;
                 _context.ChangeTracker.DetectChanges();
-                //var addedEntities = _context.ChangeTracker.Entries<IBaseEntity>().Where(E => E.State == EntityState.Added).ToList();
-                //var editedEntities = _context.ChangeTracker.Entries<IBaseEntity>().Where(E => E.State == EntityState.Modified).ToList();
                 //
                 await _context.SaveChangesAsync();
                 return credentialPackage.Id;
