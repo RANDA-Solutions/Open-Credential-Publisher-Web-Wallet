@@ -129,7 +129,9 @@ namespace OpenCredentialPublisher.Services.Implementations
             try
             {
                 //Turn EF Tracking on for untracked authorization
-                _context.Attach(authorization);
+                if (_context.Entry(authorization).State == EntityState.Detached)
+                    _context.Attach(authorization);
+
                 var badgrAssertions = new List<BadgrObcAssertionDType>();
 
                 if (content.Contains(@"""results"""))
@@ -207,17 +209,22 @@ namespace OpenCredentialPublisher.Services.Implementations
                 //}
 
                 credentialPackage.AssertionsCount = credentialPackage.BadgrBackpack.BadgrAssertions.Count;
-                _context.ChangeTracker.DetectChanges();
-                //
                 await _context.SaveChangesAsync();
                 return credentialPackage.Id;
             }
             catch (Exception ex)
             {
-                Log.Error(ex, ex.Message);
+                LogError(ex);
                 modelState.AddModelError(string.Empty, ex.Message);
                 throw;
             }
+        }
+
+        private void LogError(Exception ex)
+        {
+            Log.Error(ex, ex.Message);
+            if (ex.InnerException != null)
+                LogError(ex.InnerException);
         }
 
         #endregion
