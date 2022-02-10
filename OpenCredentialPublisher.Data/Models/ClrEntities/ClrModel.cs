@@ -1,6 +1,7 @@
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Models.ClrEntities;
 using OpenCredentialPublisher.Data.Models.ClrEntities.Relationships;
+using OpenCredentialPublisher.Data.Models.Idatafy;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -180,6 +181,8 @@ namespace OpenCredentialPublisher.Data.Models
         public int LearnerId { get; set; }
         public int PublisherId { get; set; }
         public int? VerificationId { get; set; }
+
+        public SmartResume SmartResume { get; set; }
 
         //Relationships
         public List<LinkModel> Links { get; set; }

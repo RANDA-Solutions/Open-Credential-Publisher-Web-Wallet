@@ -65,6 +65,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp
             //services.Configure<HostSettings>((o) => new HostSettings());
 
             services.Configure<AzureBlobOptions>(config.GetSection(AzureBlobOptions.Section));
+            services.Configure<PublicBlobOptions>(config.GetSection(PublicBlobOptions.Section));
 
             var verityConfig = config.GetSection(VerityOptions.Section);
             services.Configure<VerityOptions>(verityConfig);

@@ -52,9 +52,13 @@ export class LoginWithProofComponent implements OnInit, OnDestroy {
 								this.message = 'proof received... redirecting';
 								let returnUrl = this.loginService.returnUrl
 								this.loginService.completeLogin().then(resp => {
+									if (resp) {
+										clearInterval(this.timeout);
+										this.router.navigate([returnUrl ?? '/credentials']);
+										
+									}
 								});
-								clearInterval(this.timeout);
-								//this.router.navigate([returnUrl]);
+								
 							}
 							else if (response.status == 'Rejected') {
 								this.modelErrors = new Array<string>();

@@ -21,6 +21,9 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG.ClrSimplified
         public List<string> AchievementIds { get; set; }
         public ProfileVM Learner { get; set; }
         public ProfileVM Publisher { get; set; }
+        public bool HasSmartResume { get; set; }
+        public bool EnableSmartResume { get; set; }
+        public string SmartResumeUrl { get; set; }
 
         public static ClrVM FromModel(ClrModel clr, List<string> achievementIds = null)
         {
@@ -39,7 +42,9 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG.ClrSimplified
                 Identifier = clr.Id,
                 AchievementIds = achievementIds ?? new List<string>(),
                 Learner = ProfileVM.FromModel(clr.Learner),
-                Publisher = ProfileVM.FromModel(clr.Publisher)
+                Publisher = ProfileVM.FromModel(clr.Publisher),
+                HasSmartResume = clr?.SmartResume != null && clr.SmartResume.IsReady,
+                SmartResumeUrl = clr?.SmartResume?.SmartResumeUrl,
             };
         }
     }

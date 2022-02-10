@@ -225,6 +225,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var clr = await _context.Clrs.AsNoTracking()
                 .Include(c => c.Learner)
                 .Include(c => c.Publisher)
+                .Include(c => c.SmartResume)
                 .Include(c => c.ClrAchievements)
                 .ThenInclude(c => c.Achievement)
                 .Where(clr => clr.ClrId == id)
@@ -303,10 +304,16 @@ namespace OpenCredentialPublisher.Services.Implementations
         }
 
 
-        public async Task<ClrModel> GetClrForVerificationAsync(int id)
+        public async Task<ClrModel> GetClrForDeletionAsync(int id)
         {
-            return await _context.Clrs.AsNoTracking()
-
+            return await _context.Clrs.AsNoTracking().IgnoreQueryFilters()
+                .Include(c => c.SmartResume)
+                .Include(c => c.Artifacts)
+                    .ThenInclude(a => a.EvidenceArtifact)
+                .Include(a => a.ClrAssertions)
+                    .ThenInclude(ca => ca.Assertion)
+                        .ThenInclude(a => a.AssertionEvidences)
+                        .ThenInclude(e => e.Evidence)
                 .Include(a => a.ClrAssertions)
                 .ThenInclude(ca => ca.Assertion)
                 .ThenInclude(a => a.Results)
@@ -318,9 +325,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .ThenInclude(ca => ca.Assertion)
                 .ThenInclude(a => a.Achievement)
                 .ThenInclude(aa => aa.Issuer)
-                .Include(x => x.CredentialPackage)
                 .Include(x => x.Authorization)
-                .ThenInclude(x => x.Source)
                 .Include(x => x.Verification)
                 //All Endorsements
                 .Include(c => c.Learner)

@@ -79,6 +79,11 @@ namespace OpenCredentialPublisher.ClrWallet
             Config.UseSlidingSessionExpiration = siteSettingsOptions.SlidingSessionExpiration;
             Config.SessionTimeout = siteSettingsOptions.SessionTimeout;
 
+            if (siteSettingsOptions.EnableSmartResume)
+            {
+                services.Configure<IdatafyOptions>(Configuration.GetSection(IdatafyOptions.Section));
+            }
+
             services.Configure<VerityOptions>(Configuration.GetSection(VerityOptions.Section));
             services.Configure<HostSettings>(Configuration.GetSection(nameof(HostSettings)));
             var keyVaultSection = Configuration.GetSection(nameof(KeyVaultOptions));
@@ -142,6 +147,7 @@ namespace OpenCredentialPublisher.ClrWallet
             {
                 options.UseSqlServer(connectionString,
                     sql => {
+                        sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                         sql.EnableRetryOnFailure(5);
                      });
             });
@@ -194,13 +200,19 @@ namespace OpenCredentialPublisher.ClrWallet
             {
                 options.ConfigureDbContext = builder =>
                     builder.UseSqlServer(connectionString,
-                        sql => sql.MigrationsAssembly(migrationsAssembly));
+                        sql => {
+                            sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                            sql.MigrationsAssembly(migrationsAssembly);
+                        });
             })
             .AddOperationalStore(options =>
             {
                 options.ConfigureDbContext = builder =>
                     builder.UseSqlServer(connectionString,
-                        sql => sql.MigrationsAssembly(migrationsAssembly));
+                        sql => {
+                            sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                            sql.MigrationsAssembly(migrationsAssembly);
+                        });
             });
             
 

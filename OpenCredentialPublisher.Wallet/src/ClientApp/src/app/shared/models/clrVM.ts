@@ -1,4 +1,3 @@
-import { AchievementDType } from "./clrLibrary/achievementDType";
 import { ProfileVM } from "./clrSimplified/profileVM";
 
 export class ClrVM {
@@ -15,6 +14,9 @@ export class ClrVM {
   isCollapsed = false;
   identifier = '';
   achievementIds: string[];
+  enableSmartResume: boolean = false;
+  hasSmartResume: boolean = false;
+  smartResumeUrl: string = '';
   learner: ProfileVM;
   publisher: ProfileVM;
   constructor(){
@@ -33,5 +35,8 @@ export class ClrVM {
     this.achievementIds = new Array<string>();
     this.learner = null;
     this.publisher = null;
+    this.enableSmartResume = false;
+    this.hasSmartResume = false;
+    this.smartResumeUrl = '';
   }
 }

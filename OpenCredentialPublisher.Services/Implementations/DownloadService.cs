@@ -104,6 +104,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .FirstOrDefaultAsync();
 
             link.ModifiedAt = DateTime.UtcNow;
+            link.RequiresAccessKey = true;
             await _linkService.AddShareAsync(shareModel);
             await _linkService.UpdateAsync(link);
 

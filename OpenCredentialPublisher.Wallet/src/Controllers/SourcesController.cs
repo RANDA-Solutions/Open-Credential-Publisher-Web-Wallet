@@ -840,7 +840,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     ClientName = "Open Credential Publisher",
                     ClientUri = GetUrl(Request, "/", tmpIsBadgr),
                     GrantTypes = new[] { OpenIdConnectGrantTypes.AuthorizationCode, OpenIdConnectGrantTypes.RefreshToken },
-                    LogoUri = GetUrl(Request, "/assets/images/Logo_with_text.png", tmpIsBadgr),
+                    LogoUri = GetUrl(Request, "/images/ocp-badge-logo.svg", tmpIsBadgr),
                     PolicyUri = GetUrl(Request, "/public/privacy", tmpIsBadgr),
                     TosUri = GetUrl(Request, "/public/terms", tmpIsBadgr),
                     RedirectUris = new[] { GetUrl(Request, _sourcesSettings.CallbackUrl) },

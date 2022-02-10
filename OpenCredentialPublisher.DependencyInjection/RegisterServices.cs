@@ -38,6 +38,8 @@ namespace OpenCredentialPublisher.DependencyInjection
             services.AddTransient<RecipientService>();
             services.AddTransient<RevocationService>();
             services.AddTransient<SearchService>();
+            services.AddTransient<IdatafyService>();
+            services.AddTransient<ForgetMeService>();
             return services;
         }
 

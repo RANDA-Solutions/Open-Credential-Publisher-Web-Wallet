@@ -32,9 +32,12 @@ ngOnInit() {
 	var self = this;
 	setTimeout((self) => {
 		this.ngZone.run(() => {
-			this.authService.logout();
-			console.log(this._infoMessage);
-			this.router.navigate(["/access/login"], { queryParams: { infoMessage: this._infoMessage }});
+			this.authService.logout().then(
+				() => {
+					console.log(this._infoMessage);
+					this.router.navigate(["/access/login"], { queryParams: { infoMessage: this._infoMessage }});
+				}
+			);
 		},  self);
 	}, 500, [ self ]);
 }

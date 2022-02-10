@@ -18,10 +18,28 @@
                     <button class="btn btn-outline-primary btn-lg" type="button" (click)="downloadUserJson()">Download</button>
                 </form>
                 <p>
-                    <a id="delete" asp-page="DeletePersonalData" class="btn btn-outline-danger btn-lg">Delete</a>
+                    <a id="delete" asp-page="DeletePersonalData" class="btn btn-outline-danger btn-lg" (click)="confirmDelete(deleteUserModal)">Delete</a>
                 </p>
               </ng-template>
           </div>
       </div>
   </section>
+</ng-template>
+
+<ng-template #deleteUserModal let-modal>
+  <div class="modal-header" style="border-bottom:none;">
+    <h2 class="modal-title">Permanently delete your account</h2>
+  </div>
+  <div class="modal-body">
+    <p>
+      You are about to permanently delete your account.  This is not reversible.  
+    </p>
+    <p>
+      To continue deleting your account, click the <b>Continue deleting my account</b> button below, otherwise, click Cancel.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-lg btn-outline-danger" (click)="deleteUser()">Continue deleting my account</button> 
+    <button type="button" class="btn btn-lg btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+  </div>
 </ng-template>

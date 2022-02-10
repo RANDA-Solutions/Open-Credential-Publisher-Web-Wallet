@@ -52,7 +52,7 @@ namespace OpenCredentialPublisher.ClrWallet
                         {
                             $"{SpaClientUrl}"
                         },
-                        AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+                        AllowedGrantTypes = GrantTypes.Code,
                         AllowedScopes = {
                             IdentityServerConstants.StandardScopes.OfflineAccess,
                             "roles",
@@ -80,6 +80,7 @@ namespace OpenCredentialPublisher.ClrWallet
                             $"{SpaClientUrl}"
 
                         },
+                        RefreshTokenUsage = TokenUsage.OneTimeOnly,
                         RefreshTokenExpiration = TokenExpiration.Sliding,
                         RequireConsent = false,
                         RequireClientSecret = false,

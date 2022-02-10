@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -28,6 +28,9 @@ namespace ObcLibrary.OAuth
         /// </summary>
         [JsonPropertyName("logo_uri")]
         public string LogoUri { get; set; }
+
+        [JsonPropertyName("image")]
+        public string Image => LogoUri;
 
         /// <summary>
         /// URL string that points to a human-readable terms of service

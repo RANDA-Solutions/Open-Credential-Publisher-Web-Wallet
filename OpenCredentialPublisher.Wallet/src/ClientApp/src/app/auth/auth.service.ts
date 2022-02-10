@@ -80,10 +80,16 @@ export class AuthService {
 		if (environment.debug) console.log("User is logged in: ", this._user);
 		return new Observable((obs) => {
 			if (this._user) {
-				if (this._user.expired) {
+				if (this._user?.expired) {
 					if (environment.debug)
 						 console.log("User expired, refreshing login");
-					this.getUser().then(() => obs.next(!this._user.expired));
+					this.getUser().then(() => {
+						let loggedIn = !(this._user == null || this._user.expired);
+						if (!loggedIn) {
+							this.stopSilentRenew();
+						}
+						obs.next(loggedIn);
+					});
 				}
 				else {
 					obs.next(!this._user.expired);
@@ -105,21 +111,43 @@ export class AuthService {
 	}
 
 	checkLogin(): Promise<boolean> {
+		if (this._user?.expired === false)
+		{
+			this.startSilentRenew();
+			return Promise.resolve(true);
+		}
+		else if (this._user?.expired) {
+			return this.signIn();
+		}
+		return Promise.resolve(false);
+	}
+
+	signIn(): Promise<boolean> {
 		return this._userManager.signinSilent().then((user) => {
 			this._user = user;
-			if (!this._silientRenewStarted) {
-				this._userManager.startSilentRenew();
-				this._silientRenewStarted = true;
-			}
+			this.startSilentRenew();
 			return true;
 		}, (reason) => {
 			if (environment.debug) console.log("Not logged in: ", reason);
-			if (this._silientRenewStarted) {
-				this._userManager.stopSilentRenew();
-				this._silientRenewStarted = false;
-			}
-			localStorage.clear();
+			this.stopSilentRenew();
+			this.clearLocalStorage();
 			return false;
+		});
+	}
+
+	clearLocalStorage() {
+		let keysToRemove: string[] = [];
+		for(let i = 0; i < localStorage.length; i++) {
+			let key = localStorage.key(i);
+			if (key != 'originalReturnUrl')
+				keysToRemove.push(key);
+		}
+
+		keysToRemove.forEach(k => {
+			if (environment.debug) {
+				console.log("Removing: ", k);
+			}
+			localStorage.removeItem(k);
 		});
 	}
 
@@ -128,15 +156,26 @@ export class AuthService {
 	}
 
 	logout(): Promise<void> {
-		if (this._silientRenewStarted) {
-			this._userManager.stopSilentRenew();
-			this._silientRenewStarted = false;
-		}
+		this.stopSilentRenew();
 		return this._userManager.revokeAccessToken().then(() => {
 			return this._userManager.removeUser().then(() => {
 				this._user = null;
 			});
 		});
+	}
+
+	private startSilentRenew() {
+		if (!this._silientRenewStarted) {
+			this._userManager.startSilentRenew();
+			this._silientRenewStarted = true;
+		}
+	}
+
+	private stopSilentRenew() {
+		if (this._silientRenewStarted) {
+			this._userManager.stopSilentRenew();
+			this._silientRenewStarted = false;
+		}
 	}
 
 	private getUser() {

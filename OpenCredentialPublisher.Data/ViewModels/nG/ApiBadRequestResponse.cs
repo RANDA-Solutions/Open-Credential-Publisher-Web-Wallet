@@ -22,5 +22,12 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
             Errors = modelState.SelectMany(x => x.Value.Errors)
                 .Select(x => x.ErrorMessage).ToArray();
         }
+
+        public ApiBadRequestResponse(String error)
+            : base(400)
+        {
+
+            Errors = new List<string> { error };
+        }
     }
 }

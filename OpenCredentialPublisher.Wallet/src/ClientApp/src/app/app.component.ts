@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Event as NavigationEvent, NavigationStart, Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
 import { Idle } from '@ng-idle/core';
@@ -18,6 +19,9 @@ export class AppComponent implements OnInit, OnDestroy {
   
 	envName = environment.name;
 
+
+	private currentUrl: string;
+	private navigationEvents$;
 	 private debug = environment.debug;
 	constructor(
 		public appService: AppService
@@ -25,8 +29,16 @@ export class AppComponent implements OnInit, OnDestroy {
 		, private loginService: LoginService
 		, private timeoutService: TimeoutService
 		, private authService: AuthService
+		, private router: Router
 		) {
-    	
+			this.navigationEvents$ = this.router.events
+				.subscribe(
+			  		(event: NavigationEvent) => {
+						if(event instanceof NavigationStart) {
+							this.currentUrl = event.url;
+							if (this.debug) console.log(this.currentUrl);
+						}
+				});
 	}
 
 	ngOnInit() {
@@ -38,9 +50,15 @@ export class AppComponent implements OnInit, OnDestroy {
 			this.loginService.signOut("Your session timed out, please login again.");
 		  });
 
-		  this.authService.checkLogin();
-		  this.authService.clearStaleStorage();
-
+		this.authService.clearStaleStorage();
+		
+		this.authService.silentRenewError.pipe(untilDestroyed(this)).subscribe(ev => {
+			if (this.debug) {
+				console.log(`Current url is ${this.currentUrl} and silent renew error is ${ev}`);
+			}
+		})
+		this.authService.checkLogin();
+		this.authService.signIn();
 		
 		// if (environment.debug) console.log('AppComponent ngOnInit');
 		// this.loginService.checkAuthIncludingServer().subscribe((result) => {
@@ -77,7 +95,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
-
+		this.navigationEvents$.unsubscribe();
 	}
 
   getData():any {

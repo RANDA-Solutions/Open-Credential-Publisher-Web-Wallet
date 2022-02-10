@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Options;
@@ -14,10 +15,12 @@ namespace OpenCredentialPublisher.Services.Implementations
     public class ProfileImageService
     {
         private const string BlobContainerName = "ocp-profile-images";
+        private readonly ILogger<ProfileImageService> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly PublicBlobOptions _publicBlobOptions;
-        public ProfileImageService(UserManager<ApplicationUser> userManager, IOptions<PublicBlobOptions> publicBlobOptions)
+        public ProfileImageService(UserManager<ApplicationUser> userManager, IOptions<PublicBlobOptions> publicBlobOptions, ILogger<ProfileImageService> logger)
         {
+            _logger = logger;
             _userManager = userManager;
             _publicBlobOptions = publicBlobOptions?.Value;
         }
@@ -30,6 +33,11 @@ namespace OpenCredentialPublisher.Services.Implementations
                 await container.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
             }
 
+            var user = await _userManager.FindByIdAsync(userId);
+            if (!string.IsNullOrWhiteSpace(user.ProfileImageUrl))
+            {
+                await DeleteImageFromBlobAsync(user.ProfileImageUrl);
+            }
             if (!string.IsNullOrWhiteSpace(extension) && !extension.StartsWith('.'))
                 extension = extension.Insert(0, ".");
 
@@ -48,7 +56,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 await blob.UploadAsync(ms);
             }
 
-            var user = await _userManager.FindByIdAsync(userId);
+            
             user.ProfileImageUrl = location;
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -56,6 +64,27 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return location;
             }
             throw new Exception("There was a problem saving your profile image to your account.");
+        }
+
+        public async Task<bool> DeleteImageFromBlobAsync(string filename)
+        {
+            var container = new BlobContainerClient(_publicBlobOptions.StorageConnectionString, BlobContainerName);
+            if (!(await container.ExistsAsync()))
+            {
+                await container.CreateIfNotExistsAsync();
+                await container.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
+            }
+            try
+            {
+
+                BlobClient blob = container.GetBlobClient(filename);
+                return await blob.DeleteIfExistsAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"There was a problem deleting {filename} from {BlobContainerName}");
+            }
+            return false;
         }
     }
 }
