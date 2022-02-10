@@ -9,3 +9,4 @@ export class VerifyVM {
   ancestors: string;
   ancestorKeys: string;
 }
+

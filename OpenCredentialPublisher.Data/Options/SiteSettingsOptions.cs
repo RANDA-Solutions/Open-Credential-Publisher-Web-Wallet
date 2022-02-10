@@ -15,6 +15,7 @@ namespace OpenCredentialPublisher.Data.Options
 
         public bool EnableSource { get; set; }
         public bool EnableCollections { get; set; }
+        public bool EnableSmartResume { get; set; }
         public int SessionTimeout { get; set; }
         public string SiteName { get; set; }
 

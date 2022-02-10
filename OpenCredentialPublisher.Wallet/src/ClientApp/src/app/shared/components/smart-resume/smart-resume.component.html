@@ -1,0 +1,16 @@
+<ng-container *ngIf="clr.enableSmartResume">
+    <ng-container *ngIf="!clr.hasSmartResume">
+      <div class="row">
+        <div class="col">
+          <button type="button" class="btn btn-tertiary"(click)="submit()">Create Smart Resume</button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="clr.hasSmartResume">
+        <div class="row">
+          <div class="col">
+            <a [href]="clr.smartResumeUrl" target="_blank">Go to Smart Resume</a>
+          </div>  
+        </div>
+    </ng-container>
+</ng-container>

@@ -361,14 +361,17 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 var achIds = new List<string>();
                 var clr = await _credentialService.GetSingleClrAsync(id);
 
-                var rawClr = GetRawClr(clr);
+                //var rawClr = GetRawClr(clr);
                 if (clr.ClrAchievements.Count > 0 )
                 {
                     achIds = clr.ClrAchievements.Select(a => a.Achievement.Id).ToList();
-                    return ApiOk(ClrVM.FromModel(clr, achIds));
+                    var clrVM = ClrVM.FromModel(clr, achIds);
+                    clrVM.EnableSmartResume = _siteSettings.EnableSmartResume;
+                    return ApiOk(clrVM);
                 }
-
-                return ApiOk(ClrVM.FromModel(clr));
+                var model = ClrVM.FromModel(clr);
+                model.EnableSmartResume = _siteSettings.EnableSmartResume;
+                return ApiOk(model);
             }
             catch (Exception ex)
             {

@@ -27,6 +27,7 @@ import { ProofComponent } from './components/proof/proof.component';
 import { PublicKeyComponent } from './components/public-key/public-key.component';
 import { ResultComponent } from './components/result/result.component';
 import { ResultsComponent } from './components/results/results.component';
+import { SmartResumeComponent } from './components/smart-resume/smart-resume.component';
 import { UploadComponent } from './components/upload/upload.component';
 import { VCVerificationComponent } from './components/vc-verification/vc-verification.component';
 import { VerificationComponent } from './components/verification/verification.component';
@@ -62,6 +63,7 @@ import { DisableControlDirective } from './directives/disable-control.directive'
     ResultsComponent,
     ResultsComponent,
     ResultComponent,
+    SmartResumeComponent,
     SpinnerComponent,
     UploadComponent,
     VCVerificationComponent,
@@ -98,6 +100,7 @@ import { DisableControlDirective } from './directives/disable-control.directive'
     ReactiveFormsModule,
     ResultsComponent,
     ResultComponent,
+    SmartResumeComponent,
     SpinnerComponent,
     UploadComponent,
     VCVerificationComponent,

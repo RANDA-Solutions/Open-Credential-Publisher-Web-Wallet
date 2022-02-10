@@ -99,7 +99,9 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 var clrs = await _credentialService.GetPackageClrsAsync(id);
                 foreach (var clr in clrs)
                 {
-                    clrVMs.Add(ClrVM.FromModel(clr));
+                    var clrVM = ClrVM.FromModel(clr);
+                    clrVM.EnableSmartResume = _siteSettings.EnableSmartResume;
+                    clrVMs.Add(clrVM);
                 }
 
                 return ApiOk(clrVMs);

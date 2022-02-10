@@ -69,50 +69,57 @@ namespace OpenCredentialPublisher.Services.Implementations
             return await _context.CredentialPackages.AsNoTracking().FirstOrDefaultAsync(cp => cp.Id == id && cp.UserId == userId);
         }
 
-        public async Task<CredentialPackageViewModel> GetCredentialPackageViewModelAsync(CredentialPackageModel model)
+        public CredentialPackageViewModel GetCredentialPackageViewModel(CredentialPackageModel model)
         {
+            GetCredentialPackageModel(ref model);
+            return CredentialPackageViewModel.FromCredentialPackageModel(model);
+        }
+
+        public void GetCredentialPackageModel(ref CredentialPackageModel model, bool includeSource = true, bool includeDeleted = false)
+        {
+            var packageId = model.Id;
+            var query = _context.CredentialPackages.AsNoTracking();
+            if (includeDeleted)
+                query = query.IgnoreQueryFilters();
+
             if (model.TypeId == PackageTypeEnum.Clr)
             {
-                model = await _context.CredentialPackages.AsNoTracking()
-                    .Include(cp => cp.Clr).FirstOrDefaultAsync(cp => cp.Id == model.Id);
+                model = query
+                    .Include(cp => cp.Clr).FirstOrDefault(cp => cp.Id == packageId);
             }
             else if (model.TypeId == PackageTypeEnum.ClrSet)
             {
-                model = await _context.CredentialPackages.AsNoTracking()
+                model = query
                     .Include(cp => cp.ClrSet)
                     .ThenInclude(clrs => clrs.Clrs)
-                    .FirstOrDefaultAsync(cp => cp.Id == model.Id);
+                    .FirstOrDefault(cp => cp.Id == packageId);
             }
             else if (model.TypeId == PackageTypeEnum.VerifiableCredential)
             {
-                model = await _context.CredentialPackages.AsNoTracking()
+                model = query
                 .Include(cp => cp.VerifiableCredential)
                 .ThenInclude(vc => vc.ClrSets)
                 .ThenInclude(clrSets => clrSets.Clrs)
                 .Include(cp => cp.VerifiableCredential)
                 .ThenInclude(vc => vc.Clrs)
-                .FirstOrDefaultAsync(cp => cp.Id == model.Id);
+                .FirstOrDefault(cp => cp.Id == packageId);
             }
-            else if (model.TypeId == PackageTypeEnum.OpenBadge)
+            else if (model.TypeId == PackageTypeEnum.OpenBadge || model.TypeId == PackageTypeEnum.OpenBadgeConnect)
             {
-                model = await _context.CredentialPackages.AsNoTracking()
-                .Include(cp => cp.BadgrBackpack)
-                .ThenInclude(bdgr => bdgr.BadgrAssertions)
-                .Include(cp => cp.Authorization)
-                .ThenInclude(au => au.Source)
-                .FirstOrDefaultAsync(cp => cp.Id == model.Id);
-            }
-            else if (model.TypeId == PackageTypeEnum.OpenBadgeConnect)
-            {
-                model = await _context.CredentialPackages.AsNoTracking()
-                .Include(cp => cp.BadgrBackpack)
-                .ThenInclude(bdgr => bdgr.BadgrAssertions)
-                .Include(cp => cp.Authorization)
-                .ThenInclude(au => au.Source)
-                .FirstOrDefaultAsync(cp => cp.Id == model.Id);
-            }
+                var badgeQuery = query
+                    .Include(cp => cp.BadgrBackpack)
+                    .ThenInclude(bdgr => bdgr.BadgrAssertions)
+                    .Include(cp => cp.Authorization);
 
-            return CredentialPackageViewModel.FromCredentialPackageModel(model);
+                if (includeSource)
+                {
+                    model = badgeQuery.ThenInclude(au => au.Source).FirstOrDefault(cp => cp.Id == packageId);
+                }
+                else
+                {
+                    model = badgeQuery.FirstOrDefault(cp => cp.Id == packageId);
+                }
+            }
         }
 
         public async Task<(bool revoked, string revocationReason)> CheckRevocationAsync(CredentialPackageModel package)

@@ -225,4 +225,14 @@ export class AccountService {
         )
       );
   }
+
+  deleteUser(): Observable<ApiResponse> {
+    const urlApi = `${environment.apiEndPoint}account/deleteUser`;
+    if (this.debug) console.log(`account service ${urlApi}`);
+    return this.http.post<ApiResponse>(urlApi, null)
+      .pipe(
+        catchError(err => this.utilsService.handleError(err)
+        )
+      );
+  }
 }

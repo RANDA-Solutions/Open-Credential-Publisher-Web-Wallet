@@ -30,16 +30,19 @@ namespace OpenCredentialPublisher.Wallet.Controllers
     public class AccountController : SecureApiController<AccountController>
     {
         private readonly CredentialService _credentialService;
+        private readonly ForgetMeService _forgetMeService;
         private readonly RevocationService _revocationService;
         private readonly ProfileImageService _profileImageService;
 
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
 
-        public AccountController(UserManager<ApplicationUser> userManager, ILogger<AccountController> logger, CredentialService credentialService
+        public AccountController(UserManager<ApplicationUser> userManager, ILogger<AccountController> logger
+            , CredentialService credentialService, ForgetMeService forgetMeService
             , RevocationService revocationService, ProfileImageService profileImageService, IEmailSender emailSender
             , SignInManager<ApplicationUser> signInManager) : base(userManager, logger)
         {
+            _forgetMeService = forgetMeService;
             _credentialService = credentialService;
             _revocationService = revocationService;
             _profileImageService = profileImageService;
@@ -133,6 +136,37 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
 
             return ApiOk(user.ProfileImageUrl);
+        }
+
+        [HttpPost]
+        [Route("deleteUser")]
+        public async Task<IActionResult> DeleteUser()
+        {
+            var user = await _userManager.FindByIdAsync(User.JwtUserId());
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            await _forgetMeService.ForgetUser(user.Id);
+
+            if (await _profileImageService.DeleteImageFromBlobAsync(user.ProfileImageUrl))
+            {
+                user.ProfileImageUrl = null;
+                await _userManager.UpdateAsync(user);
+            }
+
+            await _userManager.DeleteAsync(user);
+            try
+            {
+                await _signInManager.SignOutAsync();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message, user);
+            }
+
+            return Ok();
         }
 
         [HttpPost("saveProfileImage"), DisableRequestSizeLimit]

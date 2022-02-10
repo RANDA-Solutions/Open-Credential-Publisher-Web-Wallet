@@ -35,7 +35,7 @@ export class LoginService {
 	completeLogin() {
 		
     	if (this.debug) console.log(`OAuthService doLogin()`);
-		return this.authService.checkLogin();
+		return this.authService.signIn();
 	}
 
 	storeReturnUrl(returnUrl) {

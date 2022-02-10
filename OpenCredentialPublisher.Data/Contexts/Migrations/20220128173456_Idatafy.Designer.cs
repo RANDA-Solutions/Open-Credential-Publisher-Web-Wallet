@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenCredentialPublisher.Data.Contexts;
 
 namespace OpenCredentialPublisher.Data.Contexts.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    partial class WalletDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220128173456_Idatafy")]
+    partial class Idatafy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1939,6 +1941,9 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Property<string>("SignedClr")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("SmartResumeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
@@ -1962,6 +1967,10 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.HasIndex("ParentVerifiableCredentialId");
 
                     b.HasIndex("PublisherId");
+
+                    b.HasIndex("SmartResumeId")
+                        .IsUnique()
+                        .HasFilter("[SmartResumeId] IS NOT NULL");
 
                     b.HasIndex("VerificationId")
                         .IsUnique()
@@ -2813,9 +2822,6 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClrId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -4106,6 +4112,10 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("OpenCredentialPublisher.Data.Models.Idatafy.SmartResume", "SmartResume")
+                        .WithOne("Clr")
+                        .HasForeignKey("OpenCredentialPublisher.Data.Models.ClrModel", "SmartResumeId");
+
                     b.HasOne("OpenCredentialPublisher.Data.Models.ClrEntities.VerificationModel", "Verification")
                         .WithOne("Clr")
                         .HasForeignKey("OpenCredentialPublisher.Data.Models.ClrModel", "VerificationId");
@@ -4123,6 +4133,8 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Navigation("ParentVerifiableCredential");
 
                     b.Navigation("Publisher");
+
+                    b.Navigation("SmartResume");
 
                     b.Navigation("Verification");
                 });
@@ -4302,17 +4314,9 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
 
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.Idatafy.SmartResume", b =>
                 {
-                    b.HasOne("OpenCredentialPublisher.Data.Models.ClrModel", "Clr")
-                        .WithOne("SmartResume")
-                        .HasForeignKey("OpenCredentialPublisher.Data.Models.Idatafy.SmartResume", "ClrId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
-
-                    b.Navigation("Clr");
 
                     b.Navigation("User");
                 });
@@ -4602,8 +4606,6 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Navigation("ClrEndorsements");
 
                     b.Navigation("Links");
-
-                    b.Navigation("SmartResume");
                 });
 
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.ClrSetModel", b =>
@@ -4645,6 +4647,11 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Navigation("AssertionEvidence");
 
                     b.Navigation("EvidenceArtifacts");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.Idatafy.SmartResume", b =>
+                {
+                    b.Navigation("Clr");
                 });
 
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.LinkModel", b =>

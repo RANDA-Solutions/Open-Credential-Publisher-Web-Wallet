@@ -9,6 +9,7 @@ using OpenCredentialPublisher.Data.Models.Badgr;
 using OpenCredentialPublisher.Data.Models.ClrEntities;
 using OpenCredentialPublisher.Data.Models.ClrEntities.Relationships;
 using OpenCredentialPublisher.Data.Models.Enums;
+using OpenCredentialPublisher.Data.Models.Idatafy;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,7 +117,9 @@ namespace OpenCredentialPublisher.Data.Contexts
 
         public DbSet<WalletRelationshipModel> WalletRelationships { get; set; }
 
-
+        #region Idatafy
+        public DbSet<SmartResume> SmartResumes { get; set; }
+        #endregion
 
         #region Views
         public DbSet<CredentialListView> CredentialListViews { get; set; }
@@ -124,6 +127,23 @@ namespace OpenCredentialPublisher.Data.Contexts
         public DbSet<CredentialPackageArtifactView> CredentialPackageArtifactView { get; set; }
         #endregion
 
+        private ValueComparer<List<string>> StringValueComparer() =>
+            new ValueComparer<List<string>>((l, r) => l.SequenceEqual(r),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList());
+
+        private ValueComparer<List<SystemIdentifierDType>> SystemIdentifierDTypeValueComparer() =>
+            new ValueComparer<List<SystemIdentifierDType>>((l, r) => l.SequenceEqual(r),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, JsonSerializer.Serialize(v, null).GetHashCode())),
+                c => c.ToList());
+
+        private ValueComparer<Dictionary<string, object>> DictionaryValueComparer() =>
+            new ValueComparer<Dictionary<string, object>>
+            (
+                (l, r) => JsonSerializer.Serialize(l, null) == JsonSerializer.Serialize(r, null),
+                v => v == null ? 0 : JsonSerializer.Serialize(v, null).GetHashCode(),
+                v => JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(v, null), null)
+            );
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -166,43 +186,59 @@ namespace OpenCredentialPublisher.Data.Contexts
             modelBuilder.Entity<RubricCriterionLevelAlignment>().ToTable("RubricCriterionLevelAlignments", schema: "cred");
             #endregion
 
+            #region Idatafy
+            modelBuilder.Entity<SmartResume>(sr =>
+            {
+                sr.ToTable("SmartResumes", "idatafy");
+                sr.HasQueryFilter(sr => !sr.Clr.IsDeleted);
+            });
+
+            modelBuilder.Entity<ClrModel>()
+                .HasOne(clr => clr.SmartResume)
+                .WithOne(sr => sr.Clr)
+                .HasForeignKey<SmartResume>(sr => sr.ClrId);
+            #endregion
+
             modelBuilder.Entity<DiscoveryDocumentModel>()
                 .Property(x => x.ScopesOffered)
                 .HasConversion(v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<List<string>>(v, null));
 
-            var stringListValueComparer = new ValueComparer<List<string>>(
-                (c1, c2) => c1.SequenceEqual(c2),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => c.ToList());
-
-            var dictValueComparer = new ValueComparer<Dictionary<string, object>>
-            (
-                (l, r) => JsonSerializer.Serialize(l, null) == JsonSerializer.Serialize(r, null),
-                v => v == null ? 0 : JsonSerializer.Serialize(v, null).GetHashCode(),
-                v => JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(v, null), null)
-            );
-
             modelBuilder
                 .Entity<DiscoveryDocumentModel>()
                 .Property(x => x.ScopesOffered)
                 .Metadata
-                .SetValueComparer(stringListValueComparer);
+                .SetValueComparer(StringValueComparer());
 
             modelBuilder.Entity<AuthorizationModel>()
                 .Property(x => x.Scopes)
                 .HasConversion(v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<List<string>>(v, null));
 
+            modelBuilder.Entity<AuthorizationModel>()
+                .Property(x => x.Scopes)
+                .Metadata
+                .SetValueComparer(StringValueComparer());
+
             modelBuilder.Entity<AchievementModel>()
                 .Property(x => x.Tags)
                 .HasConversion(v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<List<string>>(v, null));
 
+            modelBuilder.Entity<AchievementModel>()
+                .Property(x => x.Tags)
+                .Metadata
+                .SetValueComparer(StringValueComparer());
+
             modelBuilder.Entity<ResultDescriptionModel>()
                 .Property(x => x.AllowedValues)
                 .HasConversion(v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<List<string>>(v, null));
+
+            modelBuilder.Entity<ResultDescriptionModel>()
+                .Property(x => x.AllowedValues)
+                .Metadata
+                .SetValueComparer(StringValueComparer());
 
             modelBuilder.Entity<VerificationModel>()
                 .Property(x => x.AllowedOrigins)
@@ -210,9 +246,19 @@ namespace OpenCredentialPublisher.Data.Contexts
                     v => JsonSerializer.Deserialize<List<string>>(v, null));
 
             modelBuilder.Entity<VerificationModel>()
+                .Property(x => x.AllowedOrigins)
+                .Metadata
+                .SetValueComparer(StringValueComparer());
+
+            modelBuilder.Entity<VerificationModel>()
                 .Property(x => x.StartsWith)
                 .HasConversion(v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<List<string>>(v, null));
+
+            modelBuilder.Entity<VerificationModel>()
+                .Property(x => x.StartsWith)
+                .Metadata
+                .SetValueComparer(StringValueComparer());
 
             #region AdditionalProperties
             modelBuilder.Entity<AchievementModel>()
@@ -222,12 +268,24 @@ namespace OpenCredentialPublisher.Data.Contexts
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
 
+            modelBuilder
+                .Entity<AchievementModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
+
             modelBuilder.Entity<AchievementModel>()
                .Property(b => b.Identifiers)
                .HasConversion(
                    v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<List<SystemIdentifierDType>>(v, null)
                );
+
+            modelBuilder
+                .Entity<AchievementModel>()
+                .Property(b => b.Identifiers)
+                .Metadata
+                .SetValueComparer(SystemIdentifierDTypeValueComparer());
 
             modelBuilder.Entity<AlignmentModel>()
                .Property(b => b.AdditionalProperties)
@@ -236,12 +294,24 @@ namespace OpenCredentialPublisher.Data.Contexts
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
 
+            modelBuilder
+                .Entity<AlignmentModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
+
             modelBuilder.Entity<AssociationModel>()
                .Property(b => b.AdditionalProperties)
                .HasConversion(
                    v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
+
+            modelBuilder
+                .Entity<AssociationModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<ClrModel>()
                .Property(b => b.AdditionalProperties)
@@ -250,12 +320,24 @@ namespace OpenCredentialPublisher.Data.Contexts
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
 
+            modelBuilder
+                .Entity<ClrModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
+
             modelBuilder.Entity<CriteriaModel>()
                .Property(b => b.AdditionalProperties)
                .HasConversion(
                    v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
+
+            modelBuilder
+                .Entity<CriteriaModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<EndorsementClaimModel>()
                .Property(b => b.AdditionalProperties)
@@ -264,12 +346,24 @@ namespace OpenCredentialPublisher.Data.Contexts
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
 
+            modelBuilder
+                .Entity<EndorsementClaimModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
+
             modelBuilder.Entity<EndorsementModel>()
                .Property(b => b.AdditionalProperties)
                .HasConversion(
                    v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
+
+            modelBuilder
+                .Entity<EndorsementModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<ResultDescriptionModel>()
                .Property(b => b.AdditionalProperties)
@@ -278,12 +372,24 @@ namespace OpenCredentialPublisher.Data.Contexts
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
 
+            modelBuilder
+                .Entity<ResultDescriptionModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
+
             modelBuilder.Entity<ResultModel>()
                .Property(b => b.AdditionalProperties)
                .HasConversion(
                    v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
+
+            modelBuilder
+                .Entity<ResultModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<RubricCriterionLevelModel>()
                .Property(b => b.AdditionalProperties)
@@ -292,12 +398,24 @@ namespace OpenCredentialPublisher.Data.Contexts
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
 
+            modelBuilder
+                .Entity<RubricCriterionLevelModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
+
             modelBuilder.Entity<VerificationModel>()
                .Property(b => b.AdditionalProperties)
                .HasConversion(
                    v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
+
+            modelBuilder
+                .Entity<VerificationModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<ProfileModel>()
                .Property(b => b.PublicKey)
@@ -306,12 +424,20 @@ namespace OpenCredentialPublisher.Data.Contexts
                    v => JsonSerializer.Deserialize<CryptographicKeyDType>(v, null)
                );
 
+            // add converter
+
             modelBuilder.Entity<ProfileModel>()
                .Property(b => b.AdditionalProperties)
                .HasConversion(
                    v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
+
+            modelBuilder
+                .Entity<ProfileModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<ProfileModel>()
                .Property(b => b.Identifiers)
@@ -320,12 +446,25 @@ namespace OpenCredentialPublisher.Data.Contexts
                    v => JsonSerializer.Deserialize<List<SystemIdentifierDType>>(v, null)
                );
 
-             modelBuilder.Entity<Models.ClrEntities.IdentityModel>()
+            modelBuilder
+                .Entity<ProfileModel>()
+                .Property(b => b.Identifiers)
+                .Metadata
+                .SetValueComparer(SystemIdentifierDTypeValueComparer());
+            // add list converter
+
+            modelBuilder.Entity<Models.ClrEntities.IdentityModel>()
                .Property(b => b.AdditionalProperties)
                .HasConversion(
                    v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
                );
+
+            modelBuilder
+                .Entity<Models.ClrEntities.IdentityModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<BadgrAssertionModel>()
                .Property(b => b.AdditionalProperties)
@@ -338,7 +477,7 @@ namespace OpenCredentialPublisher.Data.Contexts
                 .Entity<BadgrAssertionModel>()
                 .Property(x => x.AdditionalProperties)
                 .Metadata
-                .SetValueComparer(dictValueComparer);
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<AssertionModel>()
                 .Property(x => x.SignedEndorsements)
@@ -347,12 +486,24 @@ namespace OpenCredentialPublisher.Data.Contexts
                     v => JsonSerializer.Deserialize<List<string>>(v, null)
                 );
 
+            modelBuilder
+                .Entity<AssertionModel>()
+                .Property(x => x.SignedEndorsements)
+                .Metadata
+                .SetValueComparer(StringValueComparer());
+
             modelBuilder.Entity<AssertionModel>()
                 .Property(x => x.AdditionalProperties)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
                 );
+
+            modelBuilder
+                .Entity<AssertionModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<ArtifactModel>()
                 .Property(x => x.AdditionalProperties)
@@ -361,19 +512,11 @@ namespace OpenCredentialPublisher.Data.Contexts
                     v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
                 );
 
-            modelBuilder.Entity<AssertionModel>()
-                .Property(x => x.SignedEndorsements)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null)
-                );
-
-            modelBuilder.Entity<AssertionModel>()
+            modelBuilder
+                .Entity<ArtifactModel>()
                 .Property(x => x.AdditionalProperties)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
-                );
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
 
             modelBuilder.Entity<EvidenceModel>()
                 .Property(x => x.AdditionalProperties)
@@ -381,6 +524,12 @@ namespace OpenCredentialPublisher.Data.Contexts
                     v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
                 );
+
+            modelBuilder
+                .Entity<EvidenceModel>()
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
             #endregion
 
             modelBuilder.Entity<AssertionModel>()
@@ -388,12 +537,6 @@ namespace OpenCredentialPublisher.Data.Contexts
                     .WithMany(a => a.ChildAssertions)
                     .HasForeignKey(pt => pt.ParentAssertionId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder
-                .Entity<AuthorizationModel>()
-                .Property(x => x.Scopes)
-                .Metadata
-                .SetValueComparer(stringListValueComparer);
 
             modelBuilder.Entity<ClrModel>()
                 .HasMany(clrModel => clrModel.Links)
@@ -547,18 +690,6 @@ namespace OpenCredentialPublisher.Data.Contexts
                .HasForeignKey(pkg => pkg.AuthorizationForeignKey)
                .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<ProofRequest>()
-                .HasOne(pr => pr.ProofResponse)
-                .WithOne(pr => pr.ProofRequest)
-                .HasForeignKey<ProofResponse>(pr => pr.ProofRequestId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<ProofRequest>()
-                .HasOne(pr => pr.CredentialSchema)
-                .WithMany()
-                .HasForeignKey(pr => pr.CredentialSchemaId)
-                .OnDelete(DeleteBehavior.NoAction);
-
             modelBuilder.Entity<SourceModel>()
                 .HasOne(sourceModel => sourceModel.DiscoveryDocument)
                 .WithOne(documentModel => documentModel.Source)
@@ -703,27 +834,46 @@ namespace OpenCredentialPublisher.Data.Contexts
                 .Property(w => w.CredentialRequestStep)
                 .HasConversion<int>();
 
-            modelBuilder.Entity<AgentContextModel>()
-                .HasOne(ac => ac.ProvisioningToken).WithOne(pt => pt.AgentContext)
-                .HasForeignKey<ProvisioningTokenModel>(pt => pt.AgentContextId);
+            modelBuilder.Entity<AgentContextModel>(acm =>
+            {
+                acm.HasOne(ac => ac.ProvisioningToken).WithOne(pt => pt.AgentContext)
+                    .HasForeignKey<ProvisioningTokenModel>(pt => pt.AgentContextId);
+                acm.HasQueryFilter(x => !x.IsDeleted);
+            });
 
-            modelBuilder.Entity<ProofRequestStep>()
-                .Property(s => s.Id)
-                .HasConversion<int>();
+            modelBuilder.Entity<ProofRequestStep>(prs =>
+            {
+                prs.Property(s => s.Id)
+                    .HasConversion<int>();
+                prs.HasData(
+                    Enum.GetValues(typeof(ProofRequestStepEnum))
+                        .Cast<ProofRequestStepEnum>()
+                        .Select(s => new ProofRequestStep { Id = s, Name = s.ToString() }));
+            });
 
-            modelBuilder.Entity<ProofRequestStep>()
-                .HasData(Enum.GetValues(typeof(ProofRequestStepEnum)).Cast<ProofRequestStepEnum>().Select(s => new ProofRequestStep { Id = s, Name = s.ToString() }));
+            modelBuilder.Entity<ProofRequest>(pr =>
+            {
+                pr.HasOne(pr => pr.ProofResponse)
+                    .WithOne(pr => pr.ProofRequest)
+                    .HasForeignKey<ProofResponse>(pr => pr.ProofRequestId)
+                    .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<ProofRequest>()
-                .Property(w => w.StepId)
-                .HasConversion<int>();
+                pr.HasOne(pr => pr.CredentialSchema)
+                    .WithMany()
+                    .HasForeignKey(pr => pr.CredentialSchemaId)
+                    .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<ProofRequest>()
-                .HasOne(pr => pr.User)
-                .WithMany()
-                .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.NoAction)
-                .IsRequired(false);
+                pr.Property(w => w.StepId)
+                    .HasConversion<int>();
+
+                pr.HasOne(pr => pr.User)
+                    .WithMany()
+                    .HasForeignKey(c => c.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired(false);
+
+                pr.HasQueryFilter(x => !x.IsDeleted);
+            });
 
             modelBuilder.Entity<VerityThread>()
                 .Property(w => w.FlowTypeId)
@@ -732,9 +882,14 @@ namespace OpenCredentialPublisher.Data.Contexts
             // IsDeleted Filters, use .IgnoreQueryFilters() to include deleted items
             // IsDeleted Filters, use .IgnoreQueryFilters() to include deleted items
             modelBuilder.Entity<SourceModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<AuthorizationModel>().HasQueryFilter(x => !x.Source.IsDeleted);
+            modelBuilder.Entity<DiscoveryDocumentModel>().HasQueryFilter(x => !x.Source.IsDeleted);
             modelBuilder.Entity<CredentialPackageModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<ClrSetModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<ClrModel>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<ClrEndorsement>().HasQueryFilter(x => !x.Clr.IsDeleted);
+            modelBuilder.Entity<ClrAchievement>().HasQueryFilter(x => !x.Clr.IsDeleted);
+            modelBuilder.Entity<ClrAssertion>().HasQueryFilter(x => !x.Clr.IsDeleted);
             modelBuilder.Entity<LinkModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<VerifiableCredentialModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<BadgrBackpackModel>().HasQueryFilter(x => !x.IsDeleted);
@@ -746,11 +901,9 @@ namespace OpenCredentialPublisher.Data.Contexts
             modelBuilder.Entity<RecipientModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<ProvisioningTokenModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<ProofResponse>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<ProofRequest>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<MessageModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<CredentialSchema>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<CredentialDefinition>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<AgentContextModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<RevocationModel>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<EmailVerification>().HasQueryFilter(x => !x.IsDeleted);
 
