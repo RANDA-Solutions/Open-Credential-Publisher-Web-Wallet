@@ -9,6 +9,7 @@ using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Shared.Commands;
 using OpenCredentialPublisher.VerityRestApi.Model;
+using OpenCredentialPublisher.Wallet.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,13 +26,18 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         private readonly IMediator _mediator;
         private readonly EmailService _emailService;
         private readonly EmailHelperService _emailHelperService;
+        private readonly AzureBlobStoreService _azureBlobStoreService;
         private readonly SiteSettingsOptions _siteSettings;
-        public ProofController(IOptions<SiteSettingsOptions> siteSettingsOptions, EmailService emailService, EmailHelperService emailHelperService, ProofService proofService, IMediator mediator, ILogger<ProofController> logger) : base(logger)
+
+        public ProofController(IOptions<SiteSettingsOptions> siteSettingsOptions, EmailService emailService, EmailHelperService emailHelperService,
+            AzureBlobStoreService azureBlobStoreService,
+            ProofService proofService, IMediator mediator, ILogger<ProofController> logger) : base(logger)
         {
             _proofService = proofService;
             _mediator = mediator;
             _emailHelperService = emailHelperService;
             _emailService = emailService;
+            _azureBlobStoreService = azureBlobStoreService;
             _siteSettings = siteSettingsOptions.Value;
         }
 
@@ -106,12 +112,15 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             var invitationUrl = new Uri(request.InvitationLink);
             var queryString = HttpUtility.ParseQueryString(invitationUrl.Query);
             var payload = queryString["oob"];
+
+            string imageUrl = await StorageUtility.StorageAccountToDataUrl(request.InvitationQrCode, _azureBlobStoreService, _siteSettings);
+
             var invitation = new Invitation
             {
                 InvitationId = request.InvitationId,
                 InvitationLink = request.InvitationLink,
                 ShortInvitationLink = request.ShortInvitationLink,
-                QrCodeUrl = request.InvitationQrCode,
+                QrCodeUrl = imageUrl,
                 CredentialName = request.CredentialSchema.Name,
                 Payload = payload
             };

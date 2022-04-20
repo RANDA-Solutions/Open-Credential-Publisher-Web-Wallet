@@ -4,12 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.ClrLibrary.Models;
+using OpenCredentialPublisher.Data.Dtos.Account;
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Models.Badgr;
 using OpenCredentialPublisher.Data.Models.ClrEntities;
 using OpenCredentialPublisher.Data.Models.ClrEntities.Relationships;
 using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Data.Models.Idatafy;
+using OpenCredentialPublisher.Data.Models.MSProofs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,6 +93,8 @@ namespace OpenCredentialPublisher.Data.Contexts
         public DbSet<LinkModel> Links { get; set; }
 
         public DbSet<LoginProofRequest> LoginProofRequests { get; set; }
+        public DbSet<AzLoginProofGetResponseModel> MSLoginProofRequests { get; set; }
+        public DbSet<AzLoginProofStatusModel> MSLoginProofStatuses { get; set; }
 
         public DbSet<MessageModel> Messages { get; set; }
         public DbSet<ProofRequest> ProofRequests { get; set; }
@@ -775,6 +779,10 @@ namespace OpenCredentialPublisher.Data.Contexts
 
             modelBuilder.Entity<EmailVerification>()
                 .Property(s => s.Status)
+                .HasConversion<int>();
+
+            modelBuilder.Entity<EmailVerification>()
+                .Property(model => model.Type)
                 .HasConversion<int>();
 
             modelBuilder.Entity<ShareTypeModel>()

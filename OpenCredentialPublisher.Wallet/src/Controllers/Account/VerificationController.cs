@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Dtos.Account;
+using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Implementations;
+using OpenCredentialPublisher.Wallet.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +19,20 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
     {
         private readonly ILogger<VerificationController> _logger;
         private readonly EmailVerificationService _emailVerifcationService;
+        private readonly AzureBlobStoreService _azureBlobStoreService;
+        private readonly SiteSettingsOptions _siteSettingsOptions;
+
 
         public VerificationController(
             EmailVerificationService emailVerificationService,
+            AzureBlobStoreService azureBlobStoreService,
+            IOptions<SiteSettingsOptions> siteSettings,
             ILogger<VerificationController> logger)
         {
             _emailVerifcationService = emailVerificationService;
             _logger = logger;
+            _azureBlobStoreService = azureBlobStoreService;
+            _siteSettingsOptions = siteSettings?.Value;
         }
 
         [HttpPost]
@@ -31,7 +41,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
         {
             try
             {
-                var verification = await _emailVerifcationService.CreateEmailVerificationAsync(model.EmailAddress);
+                var verification = await _emailVerifcationService.CreateEmailVerificationAsync(model.EmailAddress, model.Type);
 
                 return new OkResult();
             }
@@ -59,11 +69,13 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
                             ErrorMessage = "Your email verification link has expired.  Please create a new request."
                         };
                     }
-                    
+
+                    string imageUrl = await StorageUtility.StorageAccountToDataUrl(verification.EmailVerificationCredentialQrCode, _azureBlobStoreService, _siteSettingsOptions);
+
                     return new EmailVerificationGetResponseModel
                     {
                         Verified = true,
-                        Image = verification.EmailVerificationCredentialQrCode,
+                        Image = imageUrl,
                         Payload = verification.OfferPayload,
                         Url = verification.OfferContents
                     };

@@ -16,7 +16,7 @@ namespace OpenCredentialPublisher.Data.Models.Idatafy
 
         public int ClrId { get; set; }
         public string SmartResumeUrl { get; set; }
-
+        public string UploadName { get; set; }
         public bool IsReady { get; set; }
 
 

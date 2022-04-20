@@ -41,6 +41,7 @@ export class WalletListComponent  implements OnDestroy, OnInit {
       if (this.debug) console.log("calling unsubscribe on statSubscription");
       this.statSubscription.unsubscribe();
     }
+    this.modalService.dismissAll();
   }
   getData():any {
     this.message = 'refreshing wallets';

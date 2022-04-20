@@ -13,6 +13,9 @@
             <div class="card-deck">
               <div class="card border-0 thin-corners">
                 <dl class="row">
+                  <dt class="col-12 col-sm-4 col-md-3">Id</dt>
+                  <dd *ngIf="!endorsement.id.startsWith('urn:')" class="col-12 col-sm-8 col-md-9"><a [href]="endorsement.id" target="_blank">{{endorsement.id}}</a></dd>
+                  <dd *ngIf="endorsement.id.startsWith('urn:')"class="col-12 col-sm-8 col-md-9">{{endorsement.id}}</dd>
                   <dt class="col-12 col-sm-4 col-md-3">Issued On</dt>
                   <dd class="col-12 col-sm-8 col-md-9">{{endorsement.issuedOn | date: 'MM.dd.yyyy'}}</dd>
                   <ng-container *ngIf="endorsement.endorsementClaim != null">

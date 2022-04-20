@@ -16,7 +16,7 @@ namespace OpenCredentialPublisher.VerityFunctionApp
             services.AddMvc();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, Capture capture)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Capture capture)
         {
             app.UseMvcAndSniffRoutes();
         }

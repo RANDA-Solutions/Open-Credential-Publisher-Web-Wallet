@@ -12,7 +12,7 @@ import { take } from 'rxjs/operators';
   selector: '[app-clr-assertion]',
   templateUrl: './clr-assertion.component.html',
   styleUrls: ['./clr-assertion.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush //NB: this affects ALL CHILDREN components
 })
 export class ClrAssertionComponent implements OnInit {
   @Input() clrId = -1;

@@ -8,7 +8,7 @@ import { DeviceDetectorService } from "ngx-device-detector";
 
 @UntilDestroy()
 @Component({
-	selector: 'app-login-with-proof',
+	selector: 'app-az-login-with-proof',
 	templateUrl: './login-with-proof.component.html',
 	styleUrls: ['./login-with-proof.component.scss']
 })
@@ -35,7 +35,7 @@ export class LoginWithProofComponent implements OnInit, OnDestroy {
 				this.modelErrors.push(response.errorMessage);
 			}
 			else {
-				this.timeout = setInterval(() => { 
+				this.timeout = setInterval(() => {
 					self.zone.run(() => {
 						this.message = 'waiting for proof';
 						this.showSpinner = true;
@@ -47,7 +47,7 @@ export class LoginWithProofComponent implements OnInit, OnDestroy {
 								clearInterval(this.timeout);
 								return;
 							}
-							
+
 							if (response.status == 'Accepted') {
 								this.message = 'proof received... redirecting';
 								let returnUrl = this.loginService.returnUrl
@@ -55,10 +55,10 @@ export class LoginWithProofComponent implements OnInit, OnDestroy {
 									if (resp) {
 										clearInterval(this.timeout);
 										this.router.navigate([returnUrl ?? '/credentials']);
-										
+
 									}
 								});
-								
+
 							}
 							else if (response.status == 'Rejected') {
 								this.modelErrors = new Array<string>();
@@ -70,7 +70,7 @@ export class LoginWithProofComponent implements OnInit, OnDestroy {
 									console.log(response.status);
 								}
 							}
-							
+
 						});
 					}, self);
 				}, 2500);

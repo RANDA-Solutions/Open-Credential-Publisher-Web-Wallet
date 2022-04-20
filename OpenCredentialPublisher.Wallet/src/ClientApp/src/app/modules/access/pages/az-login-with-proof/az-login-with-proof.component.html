@@ -1,0 +1,34 @@
+<section class="login-form">
+	<span class="h1">Login with Microsoft Azure Proof</span>
+	<hr />
+	<ng-container>
+		<div *ngIf="!getProofResponse" class="alert alert-info">
+			If you do not already have Microsoft Authenticator installed on your phone, please get it here: <a target="_blank" href="https://aka.ms/VC/get-authenticator" class="btn btn-outline-primary" >Get Authenticator</a>
+		</div>
+		<div *ngIf="!getProofResponse" class="alert alert-info">
+			If you do not already have a verified email credential in Microsoft Authenticator, please get one here: <a class="btn btn-outline-primary" [routerLink]="['/access/email-verification', 2]">Get Email Credential</a>
+		</div>
+    <div class="row justify-content-around"><button [disabled]="showSpinner" type="button" class="btn btn-success" (click)="login()">I'm ready! Log me in!</button></div>
+		<div *ngIf="getProofResponse" class="row justify-content-around mt-2">
+      <p>
+        Please scan the following QR Code with MS Authenticator and respond to the proof request to login to your account.
+      </p>
+    </div>
+		<div [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
+		<span *ngFor="let msg of modelErrors">{{msg}}</span>
+		</div>
+		<div class="row">
+			<div class="col-12 text-center" *ngIf="showUrl">
+				<!-- <app-mobile-wallets [payload]="getProofResponse.payload" [passportLink]="getProofResponse.url"></app-mobile-wallets> -->
+			</div>
+			<div class="col-12 text-center">
+        <img class="connection-qr-code" [src]="imageTransform()" />
+				<hr />
+			</div>
+		</div>
+	</ng-container>
+	<div *ngIf="showSpinner == true" class="d-flex flex-column">
+		<app-spinner id="profile-spinner" [message]="message"></app-spinner>
+	</div>
+</section>
+

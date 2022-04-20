@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { UtilsService } from '@core/services/utils.service';
 import { VerificationService } from '@core/services/verification.service';
 import { environment } from '@environment/environment';
@@ -35,9 +35,9 @@ export class VerificationComponent implements OnInit {
   verificationResult = new VerificationResult();
   showSpinner = false;
   miniSpinner = false;
-  private debug = false;
+  private debug = true;
 
-  constructor(private utilsService: UtilsService, private verificationService: VerificationService) { }
+  constructor(private ref: ChangeDetectorRef, private utilsService: UtilsService, private verificationService: VerificationService) { }
 
   ngOnChanges() {
     this.resultId = this.assertionId || this.endorsementId || this.clrIdentifier;
@@ -45,7 +45,7 @@ export class VerificationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.debug) console.log('VerificationComponent ngOnInit');
+    if (this.debug) console.log('VerificationComponent ngOnChanges');
   }
 
   get safeResultId():string {
@@ -71,16 +71,23 @@ export class VerificationComponent implements OnInit {
       .pipe(take(1)).subscribe(data => {
         console.log(data);
         if (data.statusCode == 200) {
+          if (this.debug) console.log('VerificationComponent verify status 200');
           this.verificationResult = (<ApiOkResponse>data).result;
+          this.miniSpinner = false;
+          if (this.debug) console.log('VerificationComponent this.miniSpinner = false;');
           if (this.verificationResult.infoBubble) {
+            if (this.debug) console.log('VerificationComponent verify infoBubble');
             this.infoImageUrl = 'assets/images/noun_Info_742307.svg';
             this.tooltip2.open();
           }
         } else {
+          if (this.debug) console.log('VerificationComponent verify status NOT 200');
           this.vresult.nativeElement.setAttribute('class','alert-danger');
           this.verificationResult.message = 'Verification not completed.';
         }
         this.miniSpinner = false;
+        if (this.debug) console.log('VerificationComponent this.miniSpinner = false;');
+        this.ref.markForCheck();
       });
   }
 }

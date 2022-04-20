@@ -14,7 +14,7 @@ namespace OpenCredentialPublisher.Data.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
+        public EmailVerificationTypeEnum Type { get; set; }
         [ForeignKey("User")]
         public string UserId { get; set; }
         public string EmailAddress { get; set; }
@@ -39,7 +39,6 @@ namespace OpenCredentialPublisher.Data.Models
         }
 
         public DateTimeOffset ValidUntil { get; set; }
-
 
         public MessageModel Message { get; set; }
         public ApplicationUser User { get; set; }

@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "@environment/environment";
 import { EmailCredentialStatusResponse } from "@shared/models/EmailCredentialStatusResponse";
+import { EmailVerificationModelInput } from "@shared/models/EmailVerificationModelInput";
 import { EmailVerificationResponse } from "@shared/models/EmailVerificationResponse";
 import { Observable } from "rxjs";
 
@@ -12,12 +13,10 @@ export class EmailVerificationService {
 
 	constructor(private http: HttpClient) {}
 
-	beginVerification(emailAddress: string) {
+	beginVerification(model: EmailVerificationModelInput) {
 		const apiUrl = `${environment.publicEndPoint}Account/Verification`;
-		const headers = new HttpHeaders();
-		headers.append('Content-Type', 'application/json');
 		return this.http
-			.post<any>(encodeURI(apiUrl), { emailAddress }, { headers });
+			.post<any>(encodeURI(apiUrl), model);
 	}
 
 	verify(key: string) : Observable<EmailVerificationResponse> {

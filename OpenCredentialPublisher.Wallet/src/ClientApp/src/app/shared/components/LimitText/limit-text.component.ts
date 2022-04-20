@@ -9,7 +9,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewEncapsulation }
 
 export class LimitTextComponent implements OnInit, OnChanges {
   @Input() text = '';
-  @Input() limit = 20;
+  @Input() limit: number = 20;
 
   newText = '';
   cleanText = '';

@@ -1,24 +1,28 @@
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build ---prod` replaces `environment.ts` with `environment.prod.ts`.
+
+import { baseEnvironment } from "./ienvironment";
+
 // The list of file replacements can be found in `angular.json`.
 const baseUrl = 'https://localhost:44392';
-export const environment = {
-	name: '[default]',
-	production: false,
-	debug: true,
-	errorMessageLife: 3000,
-	httpDelay: 0,
-	apiEndPoint: `${baseUrl}/api/`,
-	publicEndPoint: `${baseUrl}/public/`,
-	baseUrl: baseUrl,
-	secureRoutes: [`${baseUrl}/api`],
+export const environment: baseEnvironment  = {
+  name: '[default]',
+  production: false,
+  debug: true,
+  errorMessageLife: 3000,
+  httpDelay: 0,
+  apiEndPoint: `${baseUrl}/api/`,
+  publicEndPoint: `${baseUrl}/public/`,
+  baseUrl: baseUrl,
+  secureRoutes: [`${baseUrl}/api`],
   hubConnectionStatusEndpoint: `${baseUrl}/hubs/connection`,
   hubCredentialsStatusEndpoint: `${baseUrl}/hubs/credentials`,
   hubProofStatusEndpoint: `${baseUrl}/hubs/proofrequests`,
   configId: '0-ocp-wallet-client',
   allowSelfEmailConfirmation: true,
-  logoutTimer: 10// in minutes
-
+  logoutTimer: 10 // in minutes
+  ,
+  showMicrosoftLogin: true
 };
 
 /*

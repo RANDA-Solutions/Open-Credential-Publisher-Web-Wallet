@@ -37,6 +37,9 @@ export class EndorsementsComponent implements OnInit {
   }
   ngOnInit(): void {
     if (this.debug) console.log('EndorsementsComponent ngOnInit');
+    // Since this is a parent/group component it's lineage is the same as it's parent...
+    this.lineage = `${this.ancestors}`;
+    this.lineageKeys = `${this.ancestorKeys}`;
   }
   getData():any {
     if (this.debug) console.log('EndorsementsComponent getData');
@@ -48,13 +51,9 @@ export class EndorsementsComponent implements OnInit {
           if (data.statusCode == 200) {
             this.endorsements = (<ApiOkResponse>data).result as Array<EndorsementVM>;
             this.doEndorsementsExist.emit(this.endorsements.length > 0 );
-            this.lineage = `${this.ancestors}.endorsement`;
-            this.lineageKeys = `${this.ancestorKeys}.${this.id}`;
             if (this.debug) console.log(`EndorsementsComponent endorsements: ${this.endorsements.length}`);
           } else {
             this.endorsements = new Array<EndorsementVM>();
-            this.lineage = `${this.ancestors}.endorsement`;
-            this.lineageKeys = `${this.ancestorKeys}.${this.id}`;
           }
           this.showSpinner = false;
         });
@@ -66,11 +65,9 @@ export class EndorsementsComponent implements OnInit {
           if (this.debug) console.log(data);
           if (data.statusCode == 200) {
             this.endorsements = (<ApiOkResponse>data).result as Array<EndorsementVM>;
-            this.lineage = `${this.ancestors}.endorsement`;
             if (this.debug) console.log(`EndorsementsComponent endorsements: ${this.endorsements.length}`);
           } else {
             this.endorsements = new Array<EndorsementVM>();
-            this.lineage = `${this.ancestors}.endorsement`;
           }
           this.showSpinner = false;
         });

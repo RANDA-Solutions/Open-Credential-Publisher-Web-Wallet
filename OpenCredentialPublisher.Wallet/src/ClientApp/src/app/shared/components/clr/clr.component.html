@@ -14,7 +14,10 @@
             <dl class="row">
                 <dt class="col-12 col-sm-4 col-md-3">Id</dt>
                 <dd class="col-12 col-sm-8 col-md-9">
-                  <div class="text-truncate" data-toggle="tooltip" [title]="clr.identifier">{{clr.identifier}}</div>
+                  <div *ngIf="!clr.identifier.startsWith('http')" class="text-truncate" data-toggle="tooltip" [title]="clr.identifier">{{clr.identifier}}</div>
+                  <a *ngIf="clr.identifier.startsWith('http')" [href]="clr.identifier" target="_blank">
+                    <app-limit-text [text]="clr.identifier" [limit]=50></app-limit-text>
+                  </a>
                 </dd>
                 <dt class="col-12 col-sm-4 col-md-3">Issued</dt>
                 <dd class="col-12 col-sm-8 col-md-9">{{clr.issuedOn | date: 'M/d/yyyy'}}</dd>

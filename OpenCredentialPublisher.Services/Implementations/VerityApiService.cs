@@ -237,9 +237,20 @@ namespace OpenCredentialPublisher.Services.Implementations
                 var json = JsonConvert.SerializeObject(offer, serializerSettings);
                 await _blobStoreService.StoreAsync($"{request.Id}-{credential.CredentialTitle.Replace(" ", String.Empty)}-{request.ThreadId}.json", json, "issuecredential");
             }
-            var response = await issueCredentialApi.IssueCredentialAsync(agentContext.DomainDid, Guid.Parse(request.ThreadId), offer);
+            try
+            {
+                var response = await issueCredentialApi.IssueCredentialAsync(agentContext.DomainDid, Guid.Parse(request.ThreadId), offer);
 
-            HandleResponse(response, request, credential);
+                HandleResponse(response, request, credential);
+            }
+            catch(Exception ex)
+            {
+                request.ErrorMessage = ex.Message;
+                request.CredentialRequestStep = CredentialRequestStepEnum.Error;
+                await _credentialRequestService.UpdateCredentialRequestAsync(request);
+                LogException(ex, request);
+                
+            }
 
             await _queueService.SendMessageAsync(
                 CredentialStatusNotification.QueueName,
@@ -249,6 +260,13 @@ namespace OpenCredentialPublisher.Services.Implementations
                         request.WalletRelationshipId,
                         request.CredentialPackageId,
                         (int)request.CredentialRequestStep)));
+        }
+
+        private void LogException(Exception ex, params object[] args)
+        {
+            _logger.LogError(ex, ex.Message, args);
+            if (ex.InnerException != null)
+                LogException(ex, args);
         }
 
         public async Task ProcessMessageAsync(byte[] responseBytes)
@@ -267,6 +285,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     VerityMessageFamilies.CreateIssuerCreated => JsonConvert.DeserializeObject<CreateIssuerCreated>(responseJson.AsString()),
                     VerityMessageFamilies.IssueCredentialAckReceived => JsonConvert.DeserializeObject<IssueCredentialAckReceived>(responseJson.AsString()),
                     VerityMessageFamilies.IssueCredentialStatusReport => JsonConvert.DeserializeObject<IssueCredentialStatusReport>(responseJson.AsString()),
+                    VerityMessageFamilies.IssueCredentialProblemReport => JsonConvert.DeserializeObject<IssueCredentialProblemReport>(responseJson.AsString()),
                     VerityMessageFamilies.IssuerProblemReport => JsonConvert.DeserializeObject<SetupIssuerProblemReport>(responseJson.AsString()),
                     VerityMessageFamilies.MoveProtocol => JsonConvert.DeserializeObject<MoveProtocol>(responseJson.AsString()),
                     VerityMessageFamilies.ProofInvite => JsonConvert.DeserializeObject<ProofInvite>(responseJson.AsString()),
@@ -368,6 +387,27 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             var credentialRequest = await _credentialRequestService.GetCredentialRequestAsync(message.Thread.Thid);
             _logger.LogInformation(message.Type, message, credentialRequest);
+        }
+
+        private async Task HandleMessage(IssueCredentialProblemReport message)
+        {
+            var credentialRequest = await _credentialRequestService.GetCredentialRequestAsync(message.Thread.Thid);
+            if (credentialRequest.CredentialRequestStep != CredentialRequestStepEnum.Error)
+            {
+                credentialRequest.ErrorMessage = message.Description.English;
+                credentialRequest.CredentialRequestStep = CredentialRequestStepEnum.Error;
+                await _credentialRequestService.UpdateCredentialRequestAsync(credentialRequest);
+                await _queueService.SendMessageAsync(
+                    CredentialStatusNotification.QueueName,
+                    JsonConvert.SerializeObject(
+                        new CredentialStatusNotification(
+                            credentialRequest.UserId,
+                            credentialRequest.WalletRelationshipId,
+                            credentialRequest.CredentialPackageId,
+                            (int)credentialRequest.CredentialRequestStep)));
+            }
+            _logger.LogInformation(message.Type, message, credentialRequest);
+
         }
 
         private async Task HandleMessage(IssueCredentialStatusReport message)
@@ -578,10 +618,10 @@ namespace OpenCredentialPublisher.Services.Implementations
         private async Task HandleMessage(WriteSchemaResponse message)
         {
             var schema = await _credentialSchemaService.UpdateCredentialSchemaAsync(message.Thread.Thid, message.SchemaId);
-            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(schema.Id, schema.Name);
+            var agentContext = await GetAgentContextAsync();
+            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(agentContext.Id, schema.Id, schema.Name);
             if (credentialDefinition == null)
             {
-                var agentContext = await GetAgentContextAsync();
                 credentialDefinition = await _credentialDefinitionService.CreateCredentialDefinitionAsync(agentContext.Id, schema.Id, schema.Name, Guid.NewGuid().ToString());
                 var credentialRequests = await _credentialRequestService.GetCredentialRequests(CredentialRequestStepEnum.PendingSchema).Where(cr => cr.CredentialSchemaId == schema.Id).ToListAsync();
                 foreach (var credentialRequest in credentialRequests)
@@ -607,7 +647,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             var schema = await _credentialSchemaService.UpdateCredentialSchemaAsync(message.Thread.Thid, message.SchemaId, StatusEnum.NeedsEndorsement);
             var agentContext = await GetAgentContextAsync();
-            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(schema.Id, schema.Name);
+            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(agentContext.Id, schema.Id, schema.Name);
             if (credentialDefinition == null)
             {
                 credentialDefinition = await _credentialDefinitionService.CreateCredentialDefinitionAsync(agentContext.Id, schema.Id, schema.Name, Guid.NewGuid().ToString());

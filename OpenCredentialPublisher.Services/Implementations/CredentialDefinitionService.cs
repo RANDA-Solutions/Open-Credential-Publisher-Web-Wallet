@@ -30,9 +30,9 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         #region Credential Definition
 
-        public async Task<CredentialDefinition> GetCredentialDefinitionAsync(int schemaId, string name)
+        public async Task<CredentialDefinition> GetCredentialDefinitionAsync(Guid agentContextId, int schemaId, string name)
         {
-            return await _walletContext.CredentialDefinitions.AsNoTracking().FirstOrDefaultAsync(cs => cs.CredentialSchemaId == schemaId && cs.Name == name);
+            return await _walletContext.CredentialDefinitions.AsNoTracking().FirstOrDefaultAsync(cs => cs.AgentContextId == agentContextId && cs.CredentialSchemaId == schemaId && cs.Name == name);
         }
 
         public async Task<CredentialDefinition> GetCredentialDefinitionAsync(int id)

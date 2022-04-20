@@ -1,3 +1,4 @@
+using OpenCredentialPublisher.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace OpenCredentialPublisher.Data.Dtos.Account
     {
         [JsonPropertyName("emailAddress")]
         public string EmailAddress { get; set; }
+        [JsonPropertyName("type")]
+        public EmailVerificationTypeEnum Type { get; set; }
     }
 
     public class EmailVerifcationPostResponseModel

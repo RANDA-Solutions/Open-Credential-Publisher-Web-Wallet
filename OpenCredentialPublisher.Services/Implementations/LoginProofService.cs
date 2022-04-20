@@ -97,18 +97,19 @@ namespace OpenCredentialPublisher.Services.Implementations
                 await _credentialSchemaService.UpdateCredentialSchemaAsync(credentialSchema);
             }
 
-            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(credentialSchema.Id, schemaName);
-            if (credentialDefinition == null)
+            var agentContext = await _agentContextService.GetAgentContextByTokenAsync(_idRampApiOptions.BearerToken);
+            if (agentContext == null)
             {
-                var agentContext = await _agentContextService.GetAgentContextByTokenAsync(_idRampApiOptions.BearerToken);
-                if (agentContext == null)
+                agentContext = await _agentContextService.CreateAgentContextAsync(new AgentContextModel
                 {
-                    agentContext = await _agentContextService.CreateAgentContextAsync(new AgentContextModel
-                    {
-                        TokenHash = _agentContextService.ConvertTokenToHash(_idRampApiOptions.BearerToken),
-                        EndpointUrl = _idRampApiOptions.ApiBaseUri
-                    });
-                }
+                    TokenHash = _agentContextService.ConvertTokenToHash(_idRampApiOptions.BearerToken),
+                    EndpointUrl = _idRampApiOptions.ApiBaseUri
+                });
+            }
+
+            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(agentContext.Id, credentialSchema.Id, schemaName);
+            if (credentialDefinition == null)
+            {  
                 credentialDefinition = await _credentialDefinitionService.CreateCredentialDefinitionAsync(agentContext.Id, credentialSchema.Id, schemaName, Guid.NewGuid().ToString());
                 var newDefinition = new Definition()
                 {
