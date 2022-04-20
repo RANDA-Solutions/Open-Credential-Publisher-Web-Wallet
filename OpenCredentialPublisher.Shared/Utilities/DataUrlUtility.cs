@@ -13,6 +13,11 @@ namespace OpenCredentialPublisher.Shared.Utilities
             return $"data:{PdfMimeType};base64,{Convert.ToBase64String(pdfBytes)}";
         }
 
+        public static string ToDataUrl(this byte[] bytes, string mimetype)
+        {
+            return $"data:{mimetype};base64,{Convert.ToBase64String(bytes)}";
+        }
+
         public static (string mimeType, byte[] bytes) ParseDataUrl(string dataUrl)
         {
             var match = Regex.Match(dataUrl, @"data:(?<mime>\w*/\w*);base64,(?<data>[a-zA-Z0-9+/=]*)");

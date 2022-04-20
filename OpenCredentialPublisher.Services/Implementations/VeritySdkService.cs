@@ -300,7 +300,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                         var schemaId = messageJson.GetSchemaId();
                         // update schema with id
                         var schema = await _credentialSchemaService.UpdateCredentialSchemaAsync(threadId, schemaId);
-                        var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(schema.Id, schema.Name);
+                        var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(agentContext.Id, schema.Id, schema.Name);
                         if (credentialDefinition == null)
                         {
                             credentialDefinition = await _credentialDefinitionService.CreateCredentialDefinitionAsync(agentContext.Id, schema.Id, schema.Name, Guid.NewGuid().ToString());

@@ -2,13 +2,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Dtos.Account;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Services.Implementations;
+using OpenCredentialPublisher.Shared.Utilities;
+using OpenCredentialPublisher.Wallet.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -23,17 +29,23 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
         private readonly LoginProofService _loginProofService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AzureBlobStoreService _azureBlobStoreService;
+        private readonly SiteSettingsOptions _siteSettingsOptions;
 
         public ProofController(
             LoginProofService loginProofService,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
+            AzureBlobStoreService azureBlobStoreService,
+            IOptions<SiteSettingsOptions> siteSettings,
             ILogger<ProofController> logger)
         {
             _logger = logger;
             _loginProofService = loginProofService;
             _signInManager = signInManager;
             _userManager = userManager;
+            _azureBlobStoreService = azureBlobStoreService;
+            _siteSettingsOptions = siteSettings?.Value;
         }
 
         [HttpGet]
@@ -45,11 +57,13 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
                 var state = Guid.NewGuid().ToString();
                 Response.Cookies.Append(StateCookieName, state, new CookieOptions { HttpOnly = true, IsEssential = true, Expires = DateTimeOffset.UtcNow.AddMinutes(10), Secure = true });
                 var request = await _loginProofService.CreateLoginProofAsync(state);
+
+                string imageUrl = await StorageUtility.StorageAccountToDataUrl(request.QrCodeUrl, _azureBlobStoreService, _siteSettingsOptions);
                 
                 return new LoginProofGetResponseModel
                 {
                     Id = request.PublicId,
-                    Image = request.QrCodeUrl,
+                    Image = imageUrl,
                     Payload = request.ProofPayload,
                     Url = request.ProofContent
                 };

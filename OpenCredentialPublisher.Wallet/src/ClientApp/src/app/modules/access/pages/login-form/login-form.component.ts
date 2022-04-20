@@ -33,7 +33,8 @@ export class LoginFormComponent implements OnInit {
 	credentials: Credentials = { email: '', password: '' };
 	infoMessage?: string;
 	//externalProviders: AuthenticationSchemeModel[];
-
+  showMicrosoftLogin: boolean = environment?.showMicrosoftLogin == true;
+  public
 	private sub: Subscription;
 	private returnUrl: string | null;
 	private debug = false;
@@ -59,13 +60,13 @@ export class LoginFormComponent implements OnInit {
 				{
 					this.loginService.storeReturnUrl(this.returnUrl);
 				}
-				else 
+				else
 				{
 					this.returnUrl = '';
 					history.pushState({ }, null, `${window.location.origin}/access/login`);
 				}
 			});
-			
+
 		this.authService.checkLogin().then((loggedIn) =>
 		{
 			if (environment.debug) {
@@ -73,7 +74,7 @@ export class LoginFormComponent implements OnInit {
 			}
 			if (loggedIn) {
 				this.router.navigate(["/credentials"]);
-			} 
+			}
 		});
 	}
 
@@ -101,7 +102,7 @@ export class LoginFormComponent implements OnInit {
 									}
 									this.loginService.clearReturnUrl();
 									this.router.navigateByUrl(returnUrl);
-								} 
+								}
 								else {
 									this.router.navigate(["/credentials"]);
 								}

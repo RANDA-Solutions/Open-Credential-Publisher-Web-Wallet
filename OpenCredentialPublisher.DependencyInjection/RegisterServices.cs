@@ -17,6 +17,7 @@ namespace OpenCredentialPublisher.DependencyInjection
             CommonServices(services);
 
             services.AddTransient<AuthorizationsService>();
+            services.AddTransient<AzLoginProofService>();
             services.AddTransient<AzureListenerService>();
             services.AddTransient<BadgrService>();
             services.AddTransient<OpenBadge2dot1Service>();
@@ -38,7 +39,6 @@ namespace OpenCredentialPublisher.DependencyInjection
             services.AddTransient<RecipientService>();
             services.AddTransient<RevocationService>();
             services.AddTransient<SearchService>();
-            services.AddTransient<IdatafyService>();
             services.AddTransient<ForgetMeService>();
             return services;
         }
@@ -47,7 +47,6 @@ namespace OpenCredentialPublisher.DependencyInjection
         {
             CommonServices(services);
 
-            services.AddTransient<AzureBlobStoreService>();
             services.AddScoped<CredentialService>();
             
             return services;
@@ -56,12 +55,15 @@ namespace OpenCredentialPublisher.DependencyInjection
         private static IServiceCollection CommonServices(IServiceCollection services = null)
         {
             services.AddTransient<AgentContextService>();
+            services.AddTransient<AzureBlobStoreService>();
+
             services.AddTransient<ConnectionRequestService>();
             services.AddTransient<CredentialDefinitionService>();
             services.AddTransient<CredentialPackageService>();
             services.AddTransient<CredentialRequestService>();
             services.AddTransient<CredentialSchemaService>();
             services.AddTransient<ETLService>();
+            services.AddTransient<IdatafyService>();
             services.AddTransient<LinkService>();
             services.AddTransient<ProofService>();
             services.AddTransient<IQueueService, AzureQueueService>();

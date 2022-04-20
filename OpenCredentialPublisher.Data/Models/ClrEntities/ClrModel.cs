@@ -19,7 +19,7 @@ namespace OpenCredentialPublisher.Data.Models
         /**************************************************************************************************/
         /* START Actual persisted data                                                                    */
         /**************************************************************************************************/
-        
+
         /// <summary>
         /// Foreign key back to the authorization.
         /// </summary>
@@ -33,7 +33,7 @@ namespace OpenCredentialPublisher.Data.Models
         /// <summary>
         /// The resource server authorization that was used to get this CLR.
         /// </summary>
-        public AuthorizationModel Authorization { get; set; }        
+        public AuthorizationModel Authorization { get; set; }
 
         /// <summary>
         /// Primary key.

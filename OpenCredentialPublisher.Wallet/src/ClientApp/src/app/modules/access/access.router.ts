@@ -1,5 +1,7 @@
 import { RouterModule, Routes } from '@angular/router';
 import { AccessComponent } from './access.component';
+import { AzEmailCredentialComponent } from './pages/az-email-credential/az-email-credential.component';
+import { AzLoginWithProofComponent } from './pages/az-login-with-proof/az-login-with-proof.component';
 import { EmailConfirmationComponent } from './pages/email-confirmation/email-confirmation.component';
 import { EmailCredentialComponent } from './pages/email-credential/email-credential.component';
 import { EmailVerificationComponent } from './pages/email-verification/email-verification.component';
@@ -46,7 +48,11 @@ export const accessRoutes: Routes = [
         data: { hideNavBar: true }
       },
       {
-        path: 'email-verification', component: EmailVerificationComponent,
+        path: 'az-email-credential/:key', component: AzEmailCredentialComponent,
+        data: { hideNavBar: true }
+      },
+      {
+        path: 'email-verification/:type', component: EmailVerificationComponent,
         data: { hideNavBar: true }
       },
       {
@@ -59,6 +65,10 @@ export const accessRoutes: Routes = [
       },
       {
         path: 'login-with-proof', component: LoginWithProofComponent,
+        data: { hideNavBar: true }
+      },
+      {
+        path: 'az-login-with-proof', component: AzLoginWithProofComponent,
         data: { hideNavBar: true }
       },
       {

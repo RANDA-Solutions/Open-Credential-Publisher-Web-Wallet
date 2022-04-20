@@ -4,6 +4,8 @@ import { LogService } from '@core/error-handling/logerror.service';
 import { SharedModule } from '@shared/shared.module';
 import { AccessComponent } from './access.component';
 import { accessRouter } from './access.router';
+import { AzEmailCredentialComponent } from './pages/az-email-credential/az-email-credential.component';
+import { AzLoginWithProofComponent } from './pages/az-login-with-proof/az-login-with-proof.component';
 import { EmailConfirmationComponent } from './pages/email-confirmation/email-confirmation.component';
 import { EmailCredentialComponent } from './pages/email-credential/email-credential.component';
 import { EmailVerificationComponent } from './pages/email-verification/email-verification.component';
@@ -20,6 +22,7 @@ import { ResetPasswordComponent } from './pages/reset-password/reset-password.co
 import { SetPasswordConfirmationComponent } from './pages/set-password/set-password-confirmation.component';
 import { SetPasswordComponent } from './pages/set-password/set-password.component';
 import { AccessService } from './services/access.service';
+import { AzLoginProofService } from './services/az-login-proof.service';
 import { EmailVerificationService } from './services/email-verification.service';
 import { LoginProofService } from './services/login-proof.service';
 import { ResetPasswordResolver } from './services/reset-password-resolver.service';
@@ -48,8 +51,10 @@ import { ResetPasswordResolver } from './services/reset-password-resolver.servic
       EmailVerificationComponent,
       EmailCredentialComponent,
       LoginWithProofComponent,
+      AzLoginWithProofComponent,
+      AzEmailCredentialComponent,
       ],
-      providers: [ AccessService, ResetPasswordResolver, LogService, LoginProofService, EmailVerificationService ],
+      providers: [ AccessService, ResetPasswordResolver, LogService, LoginProofService, AzLoginProofService, EmailVerificationService ],
       entryComponents: [
       ],
   })

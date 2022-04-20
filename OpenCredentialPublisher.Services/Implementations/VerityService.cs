@@ -129,7 +129,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 }
                 else
                 {
-                    var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(credentialSchema.Id, schemaName);
+                    var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(agentContext.Id, credentialSchema.Id, schemaName);
                     if (credentialDefinition == null)
                     {
                         credentialDefinition = await _credentialDefinitionService.CreateCredentialDefinitionAsync(agentContext.Id, credentialSchema.Id, schemaName, Guid.NewGuid().ToString());

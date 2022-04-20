@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Services.Implementations
@@ -111,6 +112,45 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return ms.ToArray();
             }
 
+        }
+
+        public async Task<byte[]> DownloadAsync(string filename, string blobContainerName, bool isCustom)
+        {
+            var connectionString = isCustom ? _publicBlobOptions.StorageConnectionString : _options.StorageConnectionString;
+            
+            BlobContainerClient container = new BlobContainerClient(connectionString, blobContainerName.ToLower());
+
+            BlobClient blob = container.GetBlobClient(filename);
+
+            BlobDownloadInfo download = await blob.DownloadAsync();
+
+            using (var ms = new MemoryStream())
+            {
+                await download.Content.CopyToAsync(ms);
+
+                return ms.ToArray();
+            }
+        }
+
+        public static (string account, string container, string filename, bool isCustom) ParseStorageAccountUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                throw new ArgumentNullException("url");
+
+            var isCustom = !url.Contains("blob.core.windows.net");
+
+            const string commonExp = @"https://(?<account>\w+)[\w-\.]*/(?<container>[\w-]+)/(?<filename>.*)";
+            const string customExp = @"https://(?<account>[\w-\.]+)/(?<container>[\w-]+)/(?<filename>.*)";
+            var regex = new Regex(isCustom ? customExp : commonExp);
+            var match = regex.Match(url);
+            if (match.Success)
+            {
+                var account = match.Groups["account"];
+                var container = match.Groups["container"];
+                var filename = match.Groups["filename"];
+                return (account.Value, container.Value, filename.Value, isCustom);
+            }
+            throw new ArgumentException("Only valid storage account urls are allowed");
         }
 
     }

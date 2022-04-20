@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
@@ -63,6 +64,33 @@ namespace OpenCredentialPublisher.Data.Models
                 ResponseStatusCode = (int)response.StatusCode,
                 RequestMethod = response.RequestMessage.Method.ToString(),
                 RequestHeaders = SerializeHeaders(response.RequestMessage.Headers),
+                RequestContentBody = reqContent,
+                RequestContentType = reqContentType,
+                RequestTimestamp = resTimeStamp,
+                ResponseTimestamp = resTimeStamp,
+                ResponseContentType = resContentType,
+                ResponseContentBody = resContent
+            };
+        }
+        public static HttpClientLog CreateApiLogEntryFromRequestData(HttpRequest request, string reqContent)
+        {            
+            var reqContentType = request.ContentType;
+            if (reqContent != null)
+            {
+                HideSensitiveInfo(ref reqContent);
+            }
+
+            var reqTimeHeader = request.Headers.Where(h => h.Key == HeaderNames.Date).FirstOrDefault();
+            var reqTimeStamp = reqTimeHeader.Key == null ? (DateTime?)null : DateTime.Parse(reqTimeHeader.Value.ToString());
+            var resTimeStamp = DateTime.UtcNow;
+            var resContentType = string.Empty;
+            string resContent = null;
+            return new HttpClientLog
+            {
+                RequestUri = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(request),
+                ResponseStatusCode = 0,
+                RequestMethod = request.Method.ToString(),
+                RequestHeaders = request.Headers.ToString(),
                 RequestContentBody = reqContent,
                 RequestContentType = reqContentType,
                 RequestTimestamp = resTimeStamp,

@@ -7,7 +7,7 @@
     <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
       <span *ngFor="let msg of modelErrors">{{msg}}</span>
     </div>
-    
+
     <div class="input-group my-3">
       <div class="input-group-prepend mr-3">
           <span><i class="fal fa-user fa-2x icon-color"></i></span>
@@ -46,11 +46,13 @@
         <br />
         <a class="btn btn-tertiary" [routerLink]="['/access/login-with-proof']">Login with Proof</a>
       </div>
-      <!-- <div class="col mt-2" *ngFor="let provider of externalProviders">
-        <span class="h4">{{provider.displayName}} users login here</span>
-        <br />
-        <a class="btn btn-tertiary" href="{{external(provider.name)}}">{{provider.displayName}}</a>
-      </div> -->
+      <div class="col mt-2">
+        <ng-container *ngIf="showMicrosoftLogin">
+          <span class="h4">Login using MS Authenticator</span>
+          <br />
+          <a class="btn btn-tertiary" [routerLink]="['/access/az-login-with-proof']">Login with Azure</a>
+        </ng-container>
+      </div>
     </div>
   </ng-container>
     <hr />

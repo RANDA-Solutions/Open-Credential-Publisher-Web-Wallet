@@ -728,34 +728,37 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
                 var content = await response.Content.ReadAsStringAsync();
                 var discoveryDocument = JsonSerializer.Deserialize<DiscoveryDocumentModel>(content);
-                if (discoveryDocument.AuthorizationUrl == null
-                    || discoveryDocument.RegistrationUrl == null
-                    || discoveryDocument.TokenUrl == null)
-                {
-                    ModelState.AddModelError(string.Empty, "The discovery document is missing OAuth 2.0 endpoints.");
-                    return null;
-                }
 
-                // Per OAuth 2.0 Security Best Practices, clients must send all OAuth 2.0
-                // messages to the same authorization server.
+                //20220216 IMS Global conformance testing clr validator doesn't even provide this information... therfore commenting it out
 
-                if (!Uri.TryCreate(discoveryDocument.AuthorizationUrl, UriKind.Absolute, out var oauthUri))
-                {
-                    ModelState.AddModelError(string.Empty, $"Invalid {nameof(discoveryDocument.AuthorizationUrl)}.");
-                    return null;
-                }
+                //if (discoveryDocument.AuthorizationUrl == null
+                //    || discoveryDocument.RegistrationUrl == null
+                //    || discoveryDocument.TokenUrl == null)
+                //{
+                //    ModelState.AddModelError(string.Empty, "The discovery document is missing OAuth 2.0 endpoints.");
+                //    return null;
+                //}
 
-                if (!Uri.TryCreate(discoveryDocument.RegistrationUrl, UriKind.Absolute, out var testUri) ||
-                    oauthUri.Host != testUri.Host)
-                {
-                    ModelState.AddModelError(string.Empty, "All OAuth 2.0 endpoints must be on the same authorization server.");
-                }
+                //// Per OAuth 2.0 Security Best Practices, clients must send all OAuth 2.0
+                //// messages to the same authorization server.
 
-                if (!Uri.TryCreate(discoveryDocument.TokenUrl, UriKind.Absolute, out testUri) ||
-                    oauthUri.Host != testUri.Host)
-                {
-                    ModelState.AddModelError(string.Empty, "All OAuth 2.0 endpoints must be on the same authorization server.");
-                }
+                //if (!Uri.TryCreate(discoveryDocument.AuthorizationUrl, UriKind.Absolute, out var oauthUri))
+                //{
+                //    ModelState.AddModelError(string.Empty, $"Invalid {nameof(discoveryDocument.AuthorizationUrl)}.");
+                //    return null;
+                //}
+
+                //if (!Uri.TryCreate(discoveryDocument.RegistrationUrl, UriKind.Absolute, out var testUri) ||
+                //    oauthUri.Host != testUri.Host)
+                //{
+                //    ModelState.AddModelError(string.Empty, "All OAuth 2.0 endpoints must be on the same authorization server.");
+                //}
+
+                //if (!Uri.TryCreate(discoveryDocument.TokenUrl, UriKind.Absolute, out testUri) ||
+                //    oauthUri.Host != testUri.Host)
+                //{
+                //    ModelState.AddModelError(string.Empty, "All OAuth 2.0 endpoints must be on the same authorization server.");
+                //}
 
                 if (!ModelState.IsValid) return null;
 

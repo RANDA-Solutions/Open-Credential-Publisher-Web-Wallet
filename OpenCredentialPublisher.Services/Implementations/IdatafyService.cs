@@ -63,7 +63,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 sftp.Connect();
 
                 sftp.ChangeDirectory(_idatafyOptions.DropFolder);
-
+                var uploadName = $"{userId}-{clrId}-{DateTime.UtcNow.Ticks}.json";
                 using (var stream = new MemoryStream(UTF8Encoding.UTF8.GetBytes(jsonFile)))
                 {
                     sftp.UploadFile(stream, $"{userId}-{clrId}-{DateTime.UtcNow.Ticks}.json");
@@ -73,7 +73,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                 {
                     UserId = userId,
                     ClrId = clrId,
-                    IsReady = true,
+                    UploadName = uploadName,
+                    IsReady = false,
                     CreatedAt = DateTime.UtcNow,
                     SmartResumeUrl = _idatafyOptions.SmartResumeUrl
                 };
@@ -93,6 +94,14 @@ namespace OpenCredentialPublisher.Services.Implementations
 
         }
 
+        public async Task UpdateSmartResumeAsync(string uploadName)
+        {
+            var smartResume = await _context.SmartResumes.FirstOrDefaultAsync(u => u.UploadName == uploadName);
+            smartResume.IsReady = true;
+            smartResume.ModifiedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+        }
 
     }
 }

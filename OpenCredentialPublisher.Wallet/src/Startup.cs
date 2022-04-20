@@ -85,6 +85,7 @@ namespace OpenCredentialPublisher.ClrWallet
             }
 
             services.Configure<VerityOptions>(Configuration.GetSection(VerityOptions.Section));
+            services.Configure<MSVCOptions>(Configuration.GetSection(MSVCOptions.Section));
             services.Configure<HostSettings>(Configuration.GetSection(nameof(HostSettings)));
             var keyVaultSection = Configuration.GetSection(nameof(KeyVaultOptions));
             services.Configure<KeyVaultOptions>(keyVaultSection);
@@ -156,6 +157,7 @@ namespace OpenCredentialPublisher.ClrWallet
                 services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddMemoryCache();
+            services.AddDistributedMemoryCache();
             services.AddHttpContextAccessor();
 
             services.AddSingleton<HostSettings>(sp => Configuration.GetSection(nameof(HostSettings)).Get<HostSettings>());
@@ -340,7 +342,7 @@ namespace OpenCredentialPublisher.ClrWallet
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            InitializeDatabase(app);
+            DatabaseConfig.InitializeDatabase(app);
             app.UseCookiePolicy(new CookiePolicyOptions
             {
                 MinimumSameSitePolicy = SameSiteMode.None
@@ -377,7 +379,14 @@ namespace OpenCredentialPublisher.ClrWallet
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseCors(CorsConfig.PolicyName);
+
+            //app.UseCors(CorsConfig.PolicyName);
+
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
 
             app.UseAuthentication();
             app.UseIdentityServer();
@@ -397,59 +406,10 @@ namespace OpenCredentialPublisher.ClrWallet
              app1.UseSpa(spa =>
              {
                  spa.Options.SourcePath = "ClientApp";
-                 if (Environment.IsDevelopment())
+                 if (Environment.IsDevelopmentOrLocalhost())
                      spa.UseProxyToSpaDevelopmentServer("https://localhost:4200");
              })
             );
-        }
-
-        private void InitializeDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var walletDbContext = serviceScope.ServiceProvider.GetRequiredService<WalletDbContext>();
-                walletDbContext.Database.Migrate();
-
-                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
-
-                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-                context.Database.Migrate();
-                if (!context.Clients.Any())
-                {
-                    foreach (var client in Config.Clients)
-                    {
-                        context.Clients.Add(client.ClientToEntity());
-                    }
-                    context.SaveChanges();
-                }
-
-                if (!context.IdentityResources.Any())
-                {
-                    foreach (var resource in Config.IdentityResources)
-                    {
-                        context.IdentityResources.Add(resource.ToEntity());
-                    }
-                    context.SaveChanges();
-                }
-
-                if (!context.ApiScopes.Any())
-                {
-                    foreach (var scope in Config.ApiScopes)
-                    {
-                        context.ApiScopes.Add(scope.ToEntity());
-                        context.SaveChanges();
-                    }
-                }
-
-                if (!context.ApiResources.Any())
-                {
-                    foreach (var resource in Config.ApiResources)
-                    {
-                        context.ApiResources.Add(resource.ToEntity());
-                    }
-                    context.SaveChanges();
-                }
-            }
         }
     }
 

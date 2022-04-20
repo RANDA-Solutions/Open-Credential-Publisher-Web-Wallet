@@ -5,13 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Dtos.Account_Manage;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Data.ViewModels.nG;
 using OpenCredentialPublisher.Services.Extensions;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Wallet.Controllers;
 using OpenCredentialPublisher.Wallet.Models.Account;
+using OpenCredentialPublisher.Wallet.Utilities;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System;
@@ -33,13 +36,16 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         private readonly ForgetMeService _forgetMeService;
         private readonly RevocationService _revocationService;
         private readonly ProfileImageService _profileImageService;
-
+        private readonly AzureBlobStoreService _azureBlobStoreService;
+        private readonly SiteSettingsOptions _siteSettingsOptions;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
 
         public AccountController(UserManager<ApplicationUser> userManager, ILogger<AccountController> logger
             , CredentialService credentialService, ForgetMeService forgetMeService
             , RevocationService revocationService, ProfileImageService profileImageService, IEmailSender emailSender
+            , AzureBlobStoreService azureBlobStoreService
+            , IOptions<SiteSettingsOptions> siteSettings
             , SignInManager<ApplicationUser> signInManager) : base(userManager, logger)
         {
             _forgetMeService = forgetMeService;
@@ -48,6 +54,8 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             _profileImageService = profileImageService;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _azureBlobStoreService = azureBlobStoreService;
+            _siteSettingsOptions = siteSettings?.Value;
         }
 
         [HttpGet]
@@ -135,7 +143,9 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            return ApiOk(user.ProfileImageUrl);
+            string imageUrl = await StorageUtility.StorageAccountToDataUrl(user.ProfileImageUrl, _azureBlobStoreService, _siteSettingsOptions);
+
+            return ApiOk(imageUrl);
         }
 
         [HttpPost]
@@ -186,7 +196,9 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 }
 
                 var url = await _profileImageService.SaveImageToBlobAsync(_userId, imageBytes);
-                return ApiOk(url);
+                string imageUrl = await StorageUtility.StorageAccountToDataUrl(url, _azureBlobStoreService, _siteSettingsOptions);
+
+                return ApiOk(imageUrl);
             }
             catch (Exception ex)
             {

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
 using System;
@@ -19,6 +20,17 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<int> LogAsync(HttpResponseMessage response, Dictionary<string, string> parameters = null)
         {
             var apiLog = HttpClientLog.CreateApiLogEntryFromResponseData(response, parameters);
+
+            _context.HttpClientLogs.Add(apiLog);
+
+            await _context.SaveChangesAsync();
+
+            return apiLog.HttpClientLogId;
+
+        }
+        public async Task<int> LogRequestAsync(HttpRequest request, string content)
+        {
+            var apiLog = HttpClientLog.CreateApiLogEntryFromRequestData(request, content);
 
             _context.HttpClientLogs.Add(apiLog);
 

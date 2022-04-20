@@ -101,6 +101,13 @@ export class ViewComponent implements OnInit, OnDestroy {
 					});
 				}, self);
 			}
+      else {
+        this.proofService.getInvitation(this.id).subscribe(invitation => {
+          this.showSpinner = false;
+          this.invitation = invitation;
+          this.displayInvitation = true;
+        })
+      }
 		 });
 	}
 

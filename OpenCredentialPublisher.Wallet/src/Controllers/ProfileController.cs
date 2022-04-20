@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Extensions;
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Options;
 using OpenCredentialPublisher.Data.ViewModels.Credentials;
 using OpenCredentialPublisher.Data.ViewModels.nG;
 using OpenCredentialPublisher.Services.Implementations;
+using OpenCredentialPublisher.Wallet.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +21,18 @@ namespace OpenCredentialPublisher.Wallet.Controllers
     {
         private readonly CredentialService _credentialService;
         private readonly RevocationService _revocationService;
+        private readonly AzureBlobStoreService _azureBlobStoreService;
+        private readonly SiteSettingsOptions _siteSettingsOptions;
 
         public ProfileController(UserManager<ApplicationUser> userManager, ILogger<ProfileController> logger, CredentialService credentialService
+            , AzureBlobStoreService azureBlobStoreService
+            , IOptions<SiteSettingsOptions> siteSettings
             , RevocationService revocationService) : base(userManager, logger)
         {
             _credentialService = credentialService;
             _revocationService = revocationService;
+            _azureBlobStoreService = azureBlobStoreService;
+            _siteSettingsOptions = siteSettings?.Value;
         }
 
         /// <summary>
@@ -43,11 +52,13 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
             var assertions = await _credentialService.GetAssertionsCountAsync(_userId);
 
+            string imageUrl = await StorageUtility.StorageAccountToDataUrl(appUser.ProfileImageUrl, _azureBlobStoreService, _siteSettingsOptions);
+
             return ApiOk(new UserProfileModel
             {
                 DisplayName = appUser.DisplayName,
                 HasProfileImage = !String.IsNullOrEmpty(appUser.ProfileImageUrl),
-                ProfileImageUrl = appUser.ProfileImageUrl,
+                ProfileImageUrl = imageUrl,
                 Credentials = vcCount,
                 Achievements = assertions,
                 Scores = 0,

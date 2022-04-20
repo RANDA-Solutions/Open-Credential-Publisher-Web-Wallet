@@ -107,7 +107,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             _context.Entry(verification).State = EntityState.Detached;
         }
 
-        public async Task<EmailVerification> CreateEmailVerificationAsync(string email)
+        public async Task<EmailVerification> CreateEmailVerificationAsync(string email, EmailVerificationTypeEnum type)
         {
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentNullException(nameof(email));
@@ -117,14 +117,19 @@ namespace OpenCredentialPublisher.Services.Implementations
                 Status = StatusEnum.Created,
                 EmailAddress = email,
                 CreatedAt = DateTime.UtcNow,
-                
+                Type = type,
                 VerificationString = WebEncoders.Base64UrlEncode(verificationBytes)
             };
 
+            var path = "/access/email-credential/";
+            if (type == EmailVerificationTypeEnum.Microsoft)
+            {
+                path = "/access/az-email-credential/";
+            }
             var verificationMessage = new MessageModel
             {
                 Body = new StringBuilder($"We've received a request to verify your email address.  Please click the link below to verify your email.<br />")
-                                .Append($"<a href=\"{_siteSettings.SpaClientUrl}/access/email-credential/{emailVerification.VerificationString}\" >{_siteSettings.SpaClientUrl}</a><br /><br />")
+                                .Append($"<a href=\"{_siteSettings.SpaClientUrl}{path}{emailVerification.VerificationString}\" >{_siteSettings.SpaClientUrl}</a><br /><br />")
                                 .Append($"This link expires within {VerificationEmailValidInMinutes} minutes.<br />")
                                 .Append("<b>Please ignore this email if you did not request it.</b>").ToString(),
                 Recipient = email,
@@ -137,44 +142,47 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             emailVerification.MessageId = verificationMessage.Id;
 
-            var credentialType = new EmailVerificationCredential
+            if (type == EmailVerificationTypeEnum.Sovrin)
             {
-                EmailAddress = email,
-                ValidFor = DateTime.UtcNow.AddYears(1).ToString()
-            };
-            var schemaName = credentialType.GetSchemaName();
-            var schemaArray = credentialType.ToSchemaArray();
-            var schemaHash = CredentialSchemaService.SchemaHash(schemaArray);
-            var credentialSchema = await _credentialSchemaService.GetCredentialSchemaAsync(schemaName, schemaHash);
-            if (credentialSchema == null)
-            {
-                credentialSchema = await _credentialSchemaService.CreateCredentialSchemaAsync(credentialType.GetType().AssemblyQualifiedName, schemaName, schemaArray);
-                var newSchema = new NewSchema()
+                var credentialType = new EmailVerificationCredential
                 {
-                    Name = credentialSchema.Name,
-                    AttributeNames = schemaArray,
-                    Version = credentialSchema.Version
+                    EmailAddress = email,
+                    ValidFor = DateTime.UtcNow.AddYears(1).ToString()
                 };
+                var schemaName = credentialType.GetSchemaName();
+                var schemaArray = credentialType.ToSchemaArray();
+                var schemaHash = CredentialSchemaService.SchemaHash(schemaArray);
+                var credentialSchema = await _credentialSchemaService.GetCredentialSchemaAsync(schemaName, schemaHash);
+                if (credentialSchema == null)
+                {
+                    credentialSchema = await _credentialSchemaService.CreateCredentialSchemaAsync(credentialType.GetType().AssemblyQualifiedName, schemaName, schemaArray);
+                    var newSchema = new NewSchema()
+                    {
+                        Name = credentialSchema.Name,
+                        AttributeNames = schemaArray,
+                        Version = credentialSchema.Version
+                    };
 
-                var schemaType = await _idRampApiService.CreateSchemaAsync(newSchema);
-                credentialSchema.SchemaId = schemaType.ID;
-                credentialSchema.NetworkId = schemaType.NetworkId;
-                credentialSchema.StatusId = StatusEnum.Created;
-                await _credentialSchemaService.UpdateCredentialSchemaAsync(credentialSchema);
+                    var schemaType = await _idRampApiService.CreateSchemaAsync(newSchema);
+                    credentialSchema.SchemaId = schemaType.ID;
+                    credentialSchema.NetworkId = schemaType.NetworkId;
+                    credentialSchema.StatusId = StatusEnum.Created;
+                    await _credentialSchemaService.UpdateCredentialSchemaAsync(credentialSchema);
+                }
+
+            var agentContext = await _agentContextService.GetAgentContextByTokenAsync(_idRampApiOptions.BearerToken);
+            if (agentContext == null)
+            {
+                agentContext = await _agentContextService.CreateAgentContextAsync(new AgentContextModel
+                {
+                    TokenHash = _agentContextService.ConvertTokenToHash(_idRampApiOptions.BearerToken),
+                    EndpointUrl = _idRampApiOptions.ApiBaseUri
+                });
             }
 
-            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(credentialSchema.Id, schemaName);
+            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(agentContext.Id, credentialSchema.Id, schemaName);
             if (credentialDefinition == null)
             {
-                var agentContext = await _agentContextService.GetAgentContextByTokenAsync(_idRampApiOptions.BearerToken);
-                if (agentContext == null)
-                {
-                    agentContext = await _agentContextService.CreateAgentContextAsync(new AgentContextModel
-                    {
-                        TokenHash = _agentContextService.ConvertTokenToHash(_idRampApiOptions.BearerToken),
-                        EndpointUrl = _idRampApiOptions.ApiBaseUri
-                    });
-                }
                 credentialDefinition = await _credentialDefinitionService.CreateCredentialDefinitionAsync(agentContext.Id, credentialSchema.Id, schemaName, Guid.NewGuid().ToString());
                 var newDefinition = new Definition()
                 {
@@ -187,28 +195,30 @@ namespace OpenCredentialPublisher.Services.Implementations
                 await _credentialDefinitionService.UpdateCredentialDefinitionAsync(credentialDefinition);
             }
 
-            var list = new List<CredentialOffer.ValueItem>();
-            list.Add(new CredentialOffer.ValueItem { Name = nameof(EmailVerificationCredential.EmailAddress).ToCamelCase(), Value = credentialType.EmailAddress });
-            list.Add(new CredentialOffer.ValueItem { Name = nameof(EmailVerificationCredential.ValidFor).ToCamelCase(), Value = credentialType.ValidFor });
+                var list = new List<CredentialOffer.ValueItem>();
+                list.Add(new CredentialOffer.ValueItem { Name = nameof(EmailVerificationCredential.EmailAddress).ToCamelCase(), Value = credentialType.EmailAddress });
+                list.Add(new CredentialOffer.ValueItem { Name = nameof(EmailVerificationCredential.ValidFor).ToCamelCase(), Value = credentialType.ValidFor });
 
-            // create connectionless credential request
-            var credentialOffer = new CredentialOffer
-            {
-                CredentialDefinitionId = credentialDefinition.CredentialDefinitionId,
-                CredentialName = credentialSchema.Name,
-                Values = list.ToArray()
-            };
+                // create connectionless credential request
+                var credentialOffer = new CredentialOffer
+                {
+                    CredentialDefinitionId = credentialDefinition.CredentialDefinitionId,
+                    CredentialName = credentialSchema.Name,
+                    Values = list.ToArray()
+                };
 
-            var response = await _idRampApiService.CreateOfferAsync(credentialOffer);
-            emailVerification.OfferId = response.Id;
-            emailVerification.OfferContents = response.Contents;
+                var response = await _idRampApiService.CreateOfferAsync(credentialOffer);
+                emailVerification.OfferId = response.Id;
+                emailVerification.OfferContents = response.Contents;
 
-            using var httpClient = new HttpClient();
-            var qrCodeResponse = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, response.Contents));
-            var queryString = HttpUtility.ParseQueryString(qrCodeResponse.RequestMessage.RequestUri.Query);
-            var payload = queryString["m"];
-            emailVerification.OfferPayload = payload;
-            emailVerification.EmailVerificationCredentialQrCode = await SaveQRCodeToBlobAsync(response.Id, response.Contents);
+                using var httpClient = new HttpClient();
+                var qrCodeResponse = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, response.Contents));
+                var queryString = HttpUtility.ParseQueryString(qrCodeResponse.RequestMessage.RequestUri.Query);
+                var payload = queryString["m"];
+                emailVerification.OfferPayload = payload;
+                emailVerification.EmailVerificationCredentialQrCode = await SaveQRCodeToBlobAsync(response.Id, response.Contents);
+            }
+
             emailVerification.ValidUntil = DateTime.UtcNow.AddMinutes(VerificationEmailValidInMinutes);
             await _context.EmailVerifications.AddAsync(emailVerification);
             await _context.SaveChangesAsync();

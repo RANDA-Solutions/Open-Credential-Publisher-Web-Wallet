@@ -52,6 +52,9 @@ export class SendWalletComponent implements OnDestroy, OnInit {
     if (this.statSubscription) {
       this.statSubscription.unsubscribe();
     }
+    this.ngZone.run(() => {
+      this.modalService.dismissAll();
+    },  this);
   }
 
   getData(id: number):any {
