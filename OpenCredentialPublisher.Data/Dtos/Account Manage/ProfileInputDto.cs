@@ -9,8 +9,6 @@ namespace OpenCredentialPublisher.Data.Dtos.Account_Manage
 {
     public class ProfileInputDto
     {
-        [Display(Name = "Username")]
-        public string Username { get; set; }
 
         [Phone]
         [Display(Name = "Phone number")]

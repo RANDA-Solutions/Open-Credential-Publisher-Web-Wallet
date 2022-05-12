@@ -17,12 +17,14 @@ export class ResetPasswordComponent implements OnInit {
 	submitted = false;
   resetPasswordForm:ResetPasswordModel = { email: '', password: '', confirmPassword: '', code: '' };
   modelErrors = [];
+  buttonSpinner = false;
   private sub: Subscription;
 
   constructor(private accessServices: AccessService, private route: ActivatedRoute, private router: Router) {
     this.sub = this.route.queryParams.pipe(untilDestroyed(this)).subscribe(
 			(param: any) => {
 				this.resetPasswordForm.code = param['code'];
+        this.resetPasswordForm.email = param['email'];
 			});
   }
 
@@ -33,16 +35,19 @@ export class ResetPasswordComponent implements OnInit {
     this.submitted = true;
 		this.modelErrors = [];
 		if (valid) {
+      this.buttonSpinner = true;
       value.code = this.resetPasswordForm.code;
+      value.email = this.resetPasswordForm.email;
 			this.accessServices.resetPassword(value)
       .pipe(take(1)).subscribe(data => {
         //console.log(data);
         if (data.statusCode == 200) {
           this.router.navigate(['/access/reset-password-confirmation']);
         } else {
+          this.buttonSpinner = false;
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
         }
-      });
+      }, (error) => this.buttonSpinner = false);
 		}
   }
 }

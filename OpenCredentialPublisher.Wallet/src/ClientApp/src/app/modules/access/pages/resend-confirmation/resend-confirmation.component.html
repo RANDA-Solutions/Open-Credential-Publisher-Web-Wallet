@@ -1,7 +1,8 @@
 <section>
-	<h2>Forgot your password?</h2>
+	<h2>Resend Account Confirmation Email</h2>
     <h4>Enter your email.</h4>
     <hr />
+    <ng-container *ngIf="!sent">
     <form method="post" #f="ngForm" (ngSubmit)="forgot(f)">
         <div *ngIf="modelErrors && modelErrors.length > 0">
 			<div class="alert alert-danger mt-2">
@@ -15,4 +16,11 @@
         <button type="submit" class="btn btn-outline-primary mr-3" id="btn-forgot-password" [disabled]="buttonSpinner">Submit <span class="spinner-border spinner-border-sm" role="status" *ngIf="buttonSpinner" aria-hidden="true"></span></button>
         <a id="login" [routerLink]="['/access/login']">CANCEL</a>
     </form>
+  </ng-container>
+  <ng-container *ngIf="sent">
+    <p>
+      Please check your email to confirm your account.
+  </p>
+  <a id="login" [routerLink]="['/access/login']">LOGIN</a>
+  </ng-container>
 </section>

@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { DownloadService } from '@core/services/download.service';
-import { environment } from '@environment/environment';
+import { VerificationService } from '@core/services/verification.service';
 import { LinksService } from '@modules/links/links.service';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
@@ -23,10 +22,11 @@ export class LinkSummaryComponent implements OnChanges, OnInit {
   @ViewChild('tt') tooltip: NgbTooltip;
   message = 'loading summary';
   showSpinner = true;
+  miniSpinner = false;
   public vm = new LinkDisplayVMNew();
   private debug = false;
 
-  constructor(private linkService: LinksService, private downloads: DownloadService, private ref: ChangeDetectorRef) { }
+  constructor(private linkService: LinksService, private downloads: DownloadService, private verificationService: VerificationService, private ref: ChangeDetectorRef) { }
 
   ngOnChanges() {
     if (this.debug) console.log('LinkSummaryComponent ngOnChanges');

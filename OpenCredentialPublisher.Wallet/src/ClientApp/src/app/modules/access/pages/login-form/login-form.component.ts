@@ -29,6 +29,7 @@ export class LoginFormComponent implements OnInit {
 	brandNew: boolean;
 	errors: string;
 	showSpinner = false;
+  loginSpinner = false;
 	submitted = false;
 	credentials: Credentials = { email: '', password: '' };
 	infoMessage?: string;
@@ -83,7 +84,7 @@ export class LoginFormComponent implements OnInit {
 		this.submitted = true;
 		this.errors = '';
 		if (valid) {
-			this.showSpinner = true;
+			this.loginSpinner = true;
 			this.authorizationService.login(value.email, value.password, this.returnUrl)
 				.pipe(take(1)).subscribe(data => {
 					if (this.debug) console.log(`LoginFormComponent returned from api/Login result: ${this.resultModel.result}`);
@@ -91,6 +92,7 @@ export class LoginFormComponent implements OnInit {
 						this.resultModel = (<ApiOkResponse>data).result as TwoFactorAuthenticationModel;
 					} else {
 						this.modelErrors = (<ApiBadRequestResponse>data).errors;
+            this.loginSpinner = false;
 					}
 					if (this.resultModel.result == TwoFactorAuthenticationResultEnum.Success) {
 						this.loginService.completeLogin().then(result => {
@@ -107,6 +109,9 @@ export class LoginFormComponent implements OnInit {
 									this.router.navigate(["/credentials"]);
 								}
 							}
+              else {
+                this.loginSpinner = false;
+              }
 							if (this.debug) console.log(`LoginFormComponent returned from OAuthService.doLogin()`);
 						});
 					} else if (this.resultModel.result == TwoFactorAuthenticationResultEnum.Required) {
@@ -115,11 +120,12 @@ export class LoginFormComponent implements OnInit {
 						this.router.navigate(['/public/lockout']);
 					} else {
 						this.modelErrors.push(this.resultModel.errorMessage);
+            this.loginSpinner = false;
 					}
-					this.showSpinner = false;
+
 				}, (error) => {
 					this.modelErrors.push("The provided credentials are not valid.  Please try again.");
-					this.showSpinner = false;
+					this.loginSpinner = false;
 				});
 		}
 	}
@@ -129,4 +135,8 @@ export class LoginFormComponent implements OnInit {
 			return `${this.externalApiUrl}${name}?returnUrl=${this.returnUrl}`;
 		return `${this.externalApiUrl}${name}`;
 	}
+
+  localError() {
+    throw Error("The app component has thrown an error!");
+  }
 }

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { environment } from '@environment/environment';
 import { AccountService } from '@modules/account/account.service';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
@@ -35,7 +34,6 @@ export class AccountProfileComponent implements OnInit {
         this.form = this._formBuilder.group({
           displayName: [this.profile.displayName],
           phoneNumber: [this.profile.phoneNumber],//, [Validators.required]],
-          username: [this.profile.username]//, [Validators.required]]
         });
       } else {
         //this.relationships = new Array<WalletVM>();
@@ -56,7 +54,6 @@ export class AccountProfileComponent implements OnInit {
       this.form = this._formBuilder.group({
         displayName: [this.profile.displayName],
         phoneNumber: [this.profile.phoneNumber],//, [Validators.required]],
-        username: [this.profile.username]//, [Validators.required]]
       });
     });
   }

@@ -66,7 +66,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             throw new Exception("There was a problem saving your profile image to your account.");
         }
 
-        public async Task<bool> DeleteImageFromBlobAsync(string filename)
+        public async Task<bool> DeleteImageFromBlobAsync(string location)
         {
             var container = new BlobContainerClient(_publicBlobOptions.StorageConnectionString, BlobContainerName);
             if (!(await container.ExistsAsync()))
@@ -76,13 +76,13 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             try
             {
-
-                BlobClient blob = container.GetBlobClient(filename);
+                var storageAccount = AzureBlobStoreService.ParseStorageAccountUrl(location);
+                BlobClient blob = container.GetBlobClient(storageAccount.filename);
                 return await blob.DeleteIfExistsAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"There was a problem deleting {filename} from {BlobContainerName}");
+                _logger.LogError(ex, $"There was a problem deleting {location} from {BlobContainerName}");
             }
             return false;
         }

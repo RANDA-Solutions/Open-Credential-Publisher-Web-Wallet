@@ -14,6 +14,8 @@ const routerOptions: ExtraOptions = {
   anchorScrolling: 'enabled',
 };
 
+export const protectedRoutes = new RegExp(/credentials|sources|links|wallets|account/, 'i');
+
 export const appRoutes: Routes = [
   {
     path: '',
@@ -78,7 +80,7 @@ export const appRoutes: Routes = [
   /****************************************************
    * Unprotected routes                               *
    ****************************************************/
-  
+
   {
     path: 'public',
     loadChildren: () => import('./modules/public/public.module').then(m =>m.PublicModule)
@@ -95,7 +97,7 @@ export const appRoutes: Routes = [
       loadChildren: () => import('./modules/public/public.module').then(m =>m.PublicModule)
     }]
   },
- 
+
   {
     path: 'Verifier',
     loadChildren: () => import('./modules/verifier/verifier.module').then(m =>m.VerifierModule)
@@ -112,7 +114,7 @@ export const appRoutes: Routes = [
     path: 'Search',
     loadChildren: () => import('./modules/search/search.module').then(m =>m.SearchModule)
   },
-  
+
   {
       path: 'sources-callback',
       component: SourcesCallbackComponent,
@@ -122,7 +124,7 @@ export const appRoutes: Routes = [
       path: 'sources-error',
       component: SourcesErrorComponent
   },
-  
+
 ];
 
 @NgModule({

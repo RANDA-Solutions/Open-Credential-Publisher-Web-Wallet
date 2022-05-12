@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { AccountService } from '@modules/account/account.service';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
@@ -32,8 +31,11 @@ export class ChangePasswordComponent implements OnInit {
       this.accountService.changePassword(value)
         .pipe(take(1)).subscribe(data => {
           if (data.statusCode == 200) {
+            this.isError = false;
             this.statusMessage = (<ApiOkResponse>data).result;
           } else {
+            this.statusMessage = '';
+            this.isError = true;
             this.modelErrors = (<ApiBadRequestResponse>data).errors;
           }
           this.showSpinner = false;

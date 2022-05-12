@@ -1,6 +1,6 @@
-import { VerificationDType } from "./clrLibrary/verificationDType";
 import { PdfShare } from "./pdfShare";
 import { PdfShareViewModel } from "./pdfShareViewModel";
+import { VerificationModel } from "./verificationModel";
 
 export class LinkDisplayVMNew {
   id: string;
@@ -18,7 +18,7 @@ export class LinkDisplayVMNew {
   learnerName: string;
   publisherName: string;
   clrIssuedOn: Date;
-  verification: VerificationDType;
+  verification: VerificationModel;
   //verificationType: string;
   //verificationCreator: string;
   pdfs: PdfShareViewModel[];

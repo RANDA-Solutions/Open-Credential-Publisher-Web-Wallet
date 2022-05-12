@@ -74,8 +74,8 @@ export class AccountService {
       .pipe(
         catchError(err => this.utilsService.handleError(err))
    );
-
   }
+
   saveEmail(args: any): Observable<ApiResponse> {
     const urlApi = `${environment.apiEndPoint}email/saveEmail`;
     if (this.debug) console.log(`account service ${urlApi}`);
@@ -139,6 +139,13 @@ export class AccountService {
         catchError(err => this.utilsService.handleError(err))
    );
 
+  }
+
+  removeProfileImage(): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${environment.apiEndPoint}account/removeProfileImage`, null)
+      .pipe(
+        catchError(err => this.utilsService.handleError(err))
+      );
   }
 
   getTwoFAVM(): Observable<ApiResponse> {

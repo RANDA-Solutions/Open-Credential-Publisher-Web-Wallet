@@ -23,6 +23,7 @@ import { EvidenceComponent } from './components/evidence/evidence.component';
 import { MobileWalletsComponent } from './components/mobile-wallets/mobile-wallets.component';
 import { PaginationComponent } from './components/Pagination/pagination.component';
 import { PaginationService } from './components/Pagination/pagination.service';
+import { PasswordRequirementsComponent } from './components/password-requirements/password-requirements.component';
 import { ProofComponent } from './components/proof/proof.component';
 import { PublicKeyComponent } from './components/public-key/public-key.component';
 import { ResultComponent } from './components/result/result.component';
@@ -58,6 +59,7 @@ import { DisableControlDirective } from './directives/disable-control.directive'
     LimitTextComponent,
     MobileWalletsComponent,
     PaginationComponent,
+    PasswordRequirementsComponent,
     ProfileComponent,
     PublicKeyComponent,
     ResultsComponent,
@@ -95,6 +97,7 @@ import { DisableControlDirective } from './directives/disable-control.directive'
     LimitTextComponent,
     MobileWalletsComponent,
     PaginationComponent,
+    PasswordRequirementsComponent,
     ProfileComponent,
     QRCodeModule,
     ReactiveFormsModule,

@@ -10,7 +10,7 @@
       "prefix": "app",
       "schematics": {},
       "architect": {
-        "build": { 
+        "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "progress": false,
@@ -21,7 +21,8 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/assets",
-              "src/web.config"
+              "src/web.config",
+              "src/silent-renew.html"
             ],
             "styles": [
               "../wwwroot/lib/fontawesome-pro-5.15.1-web/css/all.css",

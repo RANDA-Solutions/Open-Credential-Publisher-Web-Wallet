@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -43,12 +44,12 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
 
             return ApiOk(new ChangeEmailVM
             {
-                NewEmail = user.Email,
                 EmailConfirmed = user.EmailConfirmed,
                 Email = user.Email
             });
         }
 
+        [AllowAnonymous]
         [HttpPost("ConfirmEmailChange")]
         public async Task<IActionResult> ConfirmEmailChange(VerifyEmailVM vm)
         {
@@ -71,7 +72,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
                 ModelState.AddModelError("", "Error changing email.");
                 return ApiModelInvalid(ModelState);
             }
-
+            await _userManager.SetUserNameAsync(user, vm.Email);
             await _signInManager.RefreshSignInAsync(user);
             return ApiOk("Thank you for confirming your email change.");
         }
@@ -93,7 +94,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/public/confirm-email-change?code={code}&userId={userId}&email={input.NewEmail}", UriKind.Absolute, out var callbackUri);                
+                Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/access/confirm-email-change?code={code}&userId={userId}&email={input.NewEmail}", UriKind.Absolute, out var callbackUri);                
                 await _emailSender.SendEmailAsync(
                     input.NewEmail,
                     "Confirm your email",

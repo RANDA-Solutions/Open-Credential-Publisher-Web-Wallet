@@ -1,0 +1,25 @@
+<div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
+  <app-spinner id="profile-spinner" [message]="message"></app-spinner>
+</div>
+<ng-template #theContent>
+  <section>
+      <span class="h1 mb-3">Confirm Email Change</span>
+      <ng-container *ngIf="statusMessage != null && statusMessage != ''">
+        <ng-container *ngIf="!isError">
+          <div class="alert alert-success alert-dismissible mt-3">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            {{statusMessage}}
+          </div>
+
+          <a [routerLink]="['/access/login']" class="my-3">Please login using your updated email address</a>
+        </ng-container>
+        <ng-container *ngIf="isError">
+          <div class="alert alert-danger alert-dismissible mt-3">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            {{statusMessage}}
+        </div>
+        </ng-container>
+      </ng-container>
+
+  </section>
+</ng-template>

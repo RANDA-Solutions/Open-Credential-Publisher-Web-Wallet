@@ -5,13 +5,12 @@ import { LinksService } from '@modules/links/links.service';
 import { LinkDeleteComponent } from '@modules/links/pages/delete/link-delete.component';
 import { SharedModule } from '@shared/shared.module';
 import { LinkSummaryComponent } from './components/link-summary/link-summarycomponent';
-import { ConfirmEmailChangeComponent } from './pages/confirm-email-change/confirm-email-change.component';
-import { LinkDisplayComponent } from './pages/link-display/link-display.component';
-import { publicRouter } from './public.router';
 import { ContactusComponent } from './pages/contactus/contactus.component';
-import { TermsComponent } from './pages/terms/terms.component';
-import { PrivacyComponent } from './pages/privacy/privacy.component';
+import { LinkDisplayComponent } from './pages/link-display/link-display.component';
 import { LockoutComponent } from './pages/lockout/lockout.component';
+import { PrivacyComponent } from './pages/privacy/privacy.component';
+import { TermsComponent } from './pages/terms/terms.component';
+import { publicRouter } from './public.router';
 @NgModule({
     imports: [
       publicRouter,
@@ -21,7 +20,6 @@ import { LockoutComponent } from './pages/lockout/lockout.component';
       LinkDisplayComponent,
       LinkSummaryComponent,
       LinkDeleteComponent,
-      ConfirmEmailChangeComponent,
       ContactusComponent,
       TermsComponent,
       PrivacyComponent,

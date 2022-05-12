@@ -1,18 +1,18 @@
 <ng-container *ngIf="verification != null">
     <ng-container *ngIf="resultId != null">
       <div class="row">
-        <div class="col-3 justify-content-center">
-          <div class="row>"><button type="button" class="btn btn-tertiary"(click)="verify()">Verify</button></div>
+        <div class="col-6 justify-content-center">
+          <button type="button" class="btn btn-tertiary"(click)="verify()">Verify</button>
         </div>
-        <div class="col-9">
-          <div *ngIf="verificationResult.revocationsMessage != null" class ="row mb-2"><span #vrevoc [attr.id]="'revocationlist-result-' + safeResultId">{{verificationResult.revocationsMessage}}</span></div>
-          <div class ="row">
+        <div class="col-6 justify-content-right">
+          <div *ngIf="verificationResult.revocationsMessage != null" class ="mb-2"><span #vrevoc [attr.id]="'revocationlist-result-' + safeResultId">{{verificationResult.revocationsMessage}}</span></div>
+          <div class="mb-2">
             {{verification.type}}
             <img src="assets/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
               #tt="ngbTooltip" data-html="true" [ngbTooltip]="labelsX" triggers="manual" (mouseover)="tt.open()" [closeDelay]="2500"/>
             <div id="minispinner" *ngIf="miniSpinner == true" class="spinner-grow spinner-grow-sm float-right" role="status"></div>
           </div>
-          <div class="row">
+          <div class="mb-2">
             <span [attr.id]="'verification-result-' + safeResultId" [innerHtml]="verificationResult.message"></span>
             <img [src]="infoImageUrl" style="width: 1.5em" alt="Info"
               #tt2="ngbTooltip" data-html="true" [ngbTooltip]="messageInfo" triggers="manual" (mouseover)="bubbleOpen()" [closeDelay]="2500"/>
@@ -21,22 +21,22 @@
       </div>
       <ng-container *ngIf="verification.creator != null">
         <div class="row">
-          <dt class="col-sm-3">Creator</dt>
-          <dd class="col-sm-9">{{verification.creator}}</dd>
+          <dt class="col-sm-6">Creator</dt>
+          <dd class="col-sm-6 justify-content-right">{{verification.creator}}</dd>
         </div>
       </ng-container>
     </ng-container>
     <ng-container *ngIf="resultId == null">
       <ng-container *ngIf="verification.allowedOrigins != null && verification.allowedOrigins.length > 0">
         <div class="row">
-          <dt class="col-sm-3">Allowed Origins</dt>
-          <dd class="col-sm-9">{{verification.allowedOrigins.join(', ')}}</dd>
+          <dt class="col-sm-6">Allowed Origins</dt>
+          <dd class="col-sm-6 justify-content-right">{{verification.allowedOrigins.join(', ')}}</dd>
         </div>
       </ng-container>
       <ng-container *ngIf="verification.startsWith != null && verification.startsWith.length > 0">
         <div class="row">
-          <dt class="col-sm-3">Starts With</dt>
-          <dd class="col-sm-9">{{verification.startsWith.join(', ')}}</dd>
+          <dt class="col-sm-6">Starts With</dt>
+          <dd class="col-sm-6 justify-content-right">{{verification.startsWith.join(', ')}}</dd>
         </div>
       </ng-container>
     </ng-container>

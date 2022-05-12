@@ -52,31 +52,7 @@
           </div>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              <form>
-                <dl class="row">
-                  <dt class="col-4 col-sm-3">
-                    <input type="hidden" name="ClrEntityId" value="{{vm.clrId}}" />
-                    <input type="hidden" name="ClrId" value="{{vm.clrIdentifier}}" />
-                    <input type="submit" class="btn btn-outline-tertiary" value="Verify" />
-                  </dt>
-                  <dd class="col-8 col-sm-9">
-                    <div class="pl-3" style="padding-top: 5px;">
-                        {{vm.verification.type}}
-                        <img src="assets/images/noun_Info_742307.svg" style="width: 1.5em" alt="Info"
-                          #tt="ngbTooltip" [ngbTooltip]="labels" triggers="manual" (mouseover)="tt.open()" [closeDelay]="2500" />
-                    </div>
-                    <div class="mt-2">
-                        <span [attr.id]="'verification-result-' + vm.clrId.toString()"></span>
-                    </div>
-                    <div class="mt-2"><span [attr.id]="'revocationlist-result-' + vm.clrId.toString()"></span></div>
-                  </dd>
-                  <ng-container *ngIf="vm.verification.creator != null">
-                    <dt class="col-3">Creator</dt>
-                    <dd class="col-9">{{vm.verification.creator}}</dd>
-                  </ng-container>
-                </dl>
-              </form>
-
+              <app-verification ancestors="clr" [ancestorKeys]="vm.clrId.toString()" [clrId]="vm.clrId" [clrIdentifier]="vm.clrIdentifier" [verification]="vm.verification"></app-verification>
             </li>
           </ul>
         </div>

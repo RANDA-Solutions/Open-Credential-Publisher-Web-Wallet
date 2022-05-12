@@ -5,15 +5,16 @@ import { ForgotPasswordModel } from '@shared/interfaces/forgot-password.interfac
 import { PostResponseModel } from '@shared/interfaces/post-response.interface';
 
 @Component({
-  selector: 'app-forgot-password',
-  templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+  selector: 'app-resend-confirmation',
+  templateUrl: './resend-confirmation.component.html',
+  styleUrls: ['./resend-confirmation.component.scss']
 })
-export class ForgotPasswordComponent implements OnInit {
+export class ResendConfirmationComponent implements OnInit {
 	submitted = false;
   forgotPasswordForm:ForgotPasswordModel = { email: '' };
   modelErrors = [];
   buttonSpinner = false;
+  sent = false;
 
   constructor(private accessServices: AccessService, private router: Router) { }
 
@@ -29,14 +30,14 @@ export class ForgotPasswordComponent implements OnInit {
 		this.modelErrors = [];
 		if (valid) {
       this.buttonSpinner = true;
-			this.accessServices.forgotPassword(value.email).subscribe((response: PostResponseModel) => {
+			this.accessServices.resendConfirmation(value.email).subscribe((response: PostResponseModel) => {
               if (response.hasError) {
                 this.modelErrors = response.errorMessages;
-                this.buttonSpinner = false;
               }
               else {
-                this.router.navigate(['/access/forgot-password-confirmation']);
+                this.sent = true;
               }
+              this.buttonSpinner = false;
             }, (error) => {
               this.buttonSpinner = false;
             });
