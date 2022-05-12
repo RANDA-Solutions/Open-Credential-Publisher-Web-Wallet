@@ -1,38 +1,73 @@
-<span class="h2 mb-4">Email</span>
+<span class="h1 mb-4">Email</span>
+<hr />
 <div *ngIf="showSpinner == true; else theContent" class="d-flex flex-column">
   <app-spinner id="profile-spinner" [message]="message"></app-spinner>
 </div>
 <ng-template #theContent>
   <div *ngIf="statusMessage != ''" role="alert"
     [ngClass]="{'alert alert-success alert-dismissible': !statusMessage.startsWith('Error'), 'alert alert-danger alert-dismissible': statusMessage.startsWith('Error')}">
-      <button type="button" class="close" (click)="statusMessage = '';" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      {{statusMessage}}
+    <button type="button" class="close" (click)="statusMessage = '';" aria-label="Close"><span
+        aria-hidden="true">&times;</span></button>
+    {{statusMessage}}
   </div>
-  <div *ngIf="showSpinner == false" class="row">
-      <div class="col-md-6">
-          <form #f="ngForm" novalidate (ngSubmit)="change(f)">
-              <div class="form-group">
-                  <div *ngIf="changeEmailVM.emailConfirmed">
-                      <label for="email">Email address</label>
-                      <div class="input-group">
-                          <input id="email" name="email" [ngModel]="changeEmailVM.email" placeholder="Email" class="form-control" disabled/>
-                          <div class="input-group-append">
-                              <span class="input-group-text text-success font-weight-bold">✓</span>
-                          </div>
-                      </div>
-                  </div>
-                  <div *ngIf="!changeEmailVM.emailConfirmed">
-                      {{changeEmailVM.newEmail}} <br>
-                      <button id="email-verification" type="button" (click)="SendVerificationEmail()" class="btn btn-link">Send verification email</button>
-                  </div>
+  <div *ngIf="showSpinner == false">
+    <div class="alert alert-warning mb-4" *ngIf="!changeEmailVM.emailConfirmed">
+        <b>Your email address has not been verified, please take a moment and click the Send Verification Email button
+          below.</b>
+    </div>
+    <form #f="ngForm" novalidate (ngSubmit)="change(f)">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <div *ngIf="changeEmailVM.emailConfirmed">
+              <label for="email">Current Email</label>
+              <div class="input-group">
+                <input id="email" name="email" [ngModel]="changeEmailVM.email" placeholder="Email" class="form-control"
+                  disabled />
+                <div class="input-group-append">
+                  <span class="input-group-text text-success font-weight-bold" title="Verified">✓</span>
+                </div>
               </div>
-              <div class="form-group">
-                  <label for="newEmail">New Email address</label>
-                  <input name="newEmail" id="newEmail" required placeholder="New Email" [(ngModel)]="changeEmailVM.newEmail" class="form-control" #newEmail="ngModel"/>
-                  <small [hidden]="newEmail.valid || (newEmail.pristine && !submitted)" class="text-danger">Please enter a valid email</small>
+            </div>
+            <div *ngIf="!changeEmailVM.emailConfirmed">
+              <label for="email">Current Email</label>
+              <div class="input-group">
+                <input id="email" name="email" [ngModel]="changeEmailVM.email" placeholder="Email" class="form-control"
+                  disabled />
+                <div class="input-group-append">
+                  <span class="input-group-text text-danger font-weight-bold" title="Unverified">&times;</span>
+                </div>
               </div>
-              <button id="change-email-button" type="submit" class="btn btn-outline-primary btn-lg">Change email</button>
-          </form>
+              <button id="email-verification" type="button" (click)="SendVerificationEmail()"
+                class="btn btn-outline-primary btn-lg my-3">Send verification email</button>
+            </div>
+          </div>
+        </div>
       </div>
+      <hr>
+      <fieldset>
+        <legend>Change your email address</legend>
+      <div class="alert alert-warning">
+        <div class="alert-heading">Warning!</div>
+        Changing your email address will change how you login to this website. Once you have confirmed your new email
+        address by clicking the link in the email that we will send you, you must use the new email address when logging
+        in.
+      </div>
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label for="newEmail">New Email</label>
+            <input name="newEmail" id="newEmail" autocomplete="off" required placeholder="New Email" [(ngModel)]="changeEmailVM.newEmail"
+              class="form-control" #newEmail="ngModel" />
+            <small [hidden]="newEmail.valid || (newEmail.pristine && !submitted)" class="text-danger">Please enter a
+              valid email</small>
+          </div>
+          <button id="change-email-button" type="submit" class="btn btn-outline-primary btn-lg"
+            [disabled]="buttonSpinner">Change email <span class="spinner-border spinner-border-sm" role="status"
+              *ngIf="buttonSpinner" aria-hidden="true"></span></button>
+        </div>
+      </div>
+    </fieldset>
+    </form>
   </div>
 </ng-template>

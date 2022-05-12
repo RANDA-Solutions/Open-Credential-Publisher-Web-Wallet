@@ -24,6 +24,16 @@ export class AccessService {
 			.pipe();
 	}
 
+  resendConfirmation(email) {
+		const headers = new HttpHeaders();
+    const apiUrl = `${environment.apiEndPoint}Public/Account/Confirmation/Resend/${email}`;
+		headers.append('Content-Type', 'application/json');
+
+		return this.http
+			.post<any>(encodeURI(apiUrl), null, { headers })
+			.pipe();
+	}
+
 	resetPassword(input: ResetPasswordModel) {
 		const headers = new HttpHeaders();
     const apiUrl = `${environment.apiEndPoint}Public/Account/Password/Reset`;

@@ -1,5 +1,4 @@
 import { RouterModule, Routes } from '@angular/router';
-import { ConfirmEmailChangeComponent } from './pages/confirm-email-change/confirm-email-change.component';
 import { ContactusComponent } from './pages/contactus/contactus.component';
 import { LinkDisplayComponent } from './pages/link-display/link-display.component';
 import { LockoutComponent } from './pages/lockout/lockout.component';
@@ -12,7 +11,7 @@ export const publicRoutes: Routes = [
     component: LinkDisplayComponent,
     data: {hideNavBar: true}
   },
-  {path: 'confirm-email-change', component: ConfirmEmailChangeComponent},
+
   {path: 'contactus', component: ContactusComponent},
   {path: 'privacy', component: PrivacyComponent},
   {path: 'terms', component: TermsComponent},

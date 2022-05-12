@@ -19,6 +19,7 @@ export class EmailComponent implements OnInit {
   statusMessage = '';
   message = 'loading email';
   showSpinner = false;
+  buttonSpinner = false;
 
   public form: FormGroup;
 
@@ -44,7 +45,11 @@ export class EmailComponent implements OnInit {
     this.showSpinner = true;
     this.accountService.sendVerificationEmail()
     .pipe(take(1)).subscribe(data => {
-      this.statusMessage = (<ApiOkResponse>data).result;
+      if (data.statusCode == 200) {
+        let response = (<ApiOkResponse>data);
+        if (response.result)
+          this.statusMessage = response.result;
+      }
       this.showSpinner = false;
     });
 
@@ -52,12 +57,19 @@ export class EmailComponent implements OnInit {
 
   change({value, valid} : { value: ChangeEmailVM; valid: boolean}) {
     this.submitted = true;
-    this.message = 'saving new email';
-    this.showSpinner = true;
+    this.statusMessage = 'saving new email';
+    this.buttonSpinner = true;
     this.accountService.saveEmail(value)
         .pipe(take(1)).subscribe(data => {
-          this.statusMessage = (<ApiOkResponse>data).result;
-          this.showSpinner = false;
+          if (data.statusCode == 200) {
+            let response = (<ApiOkResponse>data);
+            if (response.result)
+              this.statusMessage = response.result;
+          }
+          else {
+            this.statusMessage = '';
+          }
+          this.buttonSpinner = false;
           this.message = 'loading email';
         });
   }

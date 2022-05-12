@@ -12,16 +12,6 @@
           <div class="row">
               <div class="col-md-6">
                   <div class="form-group">
-                      <label >Username</label>
-                      <div *ngIf="profile.emailIsConfirmed">
-                          <input formControlName="username" class="form-control"/>
-                      </div>
-                      <div *ngIf="!profile.emailIsConfirmed">
-                          {{profile.username}}<br>
-                          <small>To update your username, please <a asp-page="/Account/Manage/Email">verify your email address</a>.</small>
-                      </div>
-                  </div>
-                  <div class="form-group">
                       <label>Display Name</label>
                       <input formControlName="displayName" class="form-control" />
                   </div>

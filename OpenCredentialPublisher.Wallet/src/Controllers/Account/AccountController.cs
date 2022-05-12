@@ -72,7 +72,6 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             {
                 DisplayName = user.DisplayName,
                 PhoneNumber = user.PhoneNumber,
-                Username = user.UserName,
                 EmailIsConfirmed = await _userManager.IsEmailConfirmedAsync(user)
             });
         }
@@ -85,23 +84,6 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            if (user.EmailConfirmed)
-            {
-                var username = await _userManager.GetUserNameAsync(user);
-                if (String.IsNullOrWhiteSpace(input.Username))
-                {
-                    return BadRequest("Must Provide a username");
-                }
-                if (input.Username != username)
-                {
-                    var setUsernameResult = await _userManager.SetUserNameAsync(user, input.Username);
-                    if (!setUsernameResult.Succeeded)
-                    {
-                        return BadRequest("Error setting username");
-                    }
-                }
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
@@ -128,9 +110,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             {
                 DisplayName = input.DisplayName,
                 PhoneNumber = input.PhoneNumber,
-                Username = input.Username
             });
-
         }
 
         [HttpGet]
@@ -206,6 +186,31 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             return BadRequest("Error setting saving image.");
         }
+
+        [HttpPost("removeProfileImage")]
+        public async Task<IActionResult> RemoveProfileImage()
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(User.JwtUserId());
+                if (user == null)
+                {
+                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
+
+                var result = await _profileImageService.DeleteImageFromBlobAsync(user.ProfileImageUrl);
+                user.ProfileImageUrl = null;
+                await _userManager.UpdateAsync(user);
+
+                return ApiOk(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+            return BadRequest("Error setting saving image.");
+        }
+
         [AllowAnonymous]
         [HttpPost("ConfirmEmail/{userId}")]
         public async Task<IActionResult> OnGetAsync(string userId, [FromQuery(Name = "code")] string code)
@@ -252,17 +257,13 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             {
                 modelState.AddModelError("Email", "Email is required.");
             }
-            if (string.IsNullOrEmpty(input.UserName))
-            {
-                modelState.AddModelError("UserName", "UserName is required.");
-            }
 
             if (errors.Any())
             {
                 return ApiModelInvalid(modelState);
             }
 
-            var user = new ApplicationUser { UserName = input.UserName, Email = input.Email, DisplayName = input.DisplayName };
+            var user = new ApplicationUser { UserName = input.Email, Email = input.Email, DisplayName = input.DisplayName };
             var result = await _userManager.CreateAsync(user, input.Password);
             if (result.Succeeded)
             {

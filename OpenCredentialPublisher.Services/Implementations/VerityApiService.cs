@@ -595,6 +595,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                         (int)CredentialRequestStepEnum.PendingCredentialDefinitionEndorsement)));
             }
 
+            await _blobStoreService.StoreAsync($"{message.Thread.Thid}.json", JsonConvert.SerializeObject(message), "creddefendorsement");
+
             var agentContext = await GetAgentContextAsync();
             var notification = new CredentialDefinitionNeedsEndorsementNotification(agentContext.IssuerDid, agentContext.IssuerVerKey, message.Thread.Thid, message.CredDefId, message.CredDefJson);
             await _queueService.SendMessageAsync(CredentialDefinitionNeedsEndorsementNotification.QueueName, JsonConvert.SerializeObject(notification));

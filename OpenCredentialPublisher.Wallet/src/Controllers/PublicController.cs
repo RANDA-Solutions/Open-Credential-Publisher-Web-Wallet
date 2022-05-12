@@ -298,7 +298,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 // visit https://go.microsoft.com/fwlink/?LinkID=532713
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/access/reset-password?code={code}", UriKind.Absolute, out var callbackUrl);
+                Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/access/reset-password?code={code}&email={email}", UriKind.Absolute, out var callbackUrl);
                 await _emailSender.SendEmailAsync(
                     email,
                     "Reset Password",
@@ -309,6 +309,34 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
             return ApiModelInvalid(ModelState);
         }
+
+
+        [HttpPost("Account/Confirmation/Resend/{email}")]
+        [ProducesResponseType(200, Type = typeof(ApiResponse))]  /* success returns 200 - Ok */
+        public async Task<IActionResult> ResendConfirmationAsync(string email)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return ApiOk(null);
+                }
+
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                Uri callbackUrl;
+                Uri.TryCreate($"{Request.Scheme}://{Request.Host}{Request.PathBase}/access/email-confirmation?userId={user.Id}&code={code}", UriKind.Absolute, out callbackUrl);
+                await _emailSender.SendEmailAsync(email, "Confirm your email",
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl.AbsoluteUri)}'>clicking here</a>.");
+
+                return ApiOk(null);
+            }
+
+            return ApiModelInvalid(ModelState);
+        }
+
         [HttpPost("Account/Password/Reset")]
         [ProducesResponseType(200, Type = typeof(ApiResponse))]  /* success returns 200 - Ok */
         public async Task<IActionResult> ResetPassword(PasswordResetModel.InputModel input)
@@ -366,11 +394,11 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 {
                     achIds = clr.ClrAchievements.Select(a => a.Achievement.Id).ToList();
                     var clrVM = ClrVM.FromModel(clr, achIds);
-                    clrVM.EnableSmartResume = _siteSettings.EnableSmartResume;
+                    clrVM.EnableSmartResume = _siteSettings.EnableSmartResume && clr.CredentialPackage.UserId == _userId;
                     return ApiOk(clrVM);
                 }
                 var model = ClrVM.FromModel(clr);
-                model.EnableSmartResume = _siteSettings.EnableSmartResume;
+                model.EnableSmartResume = _siteSettings.EnableSmartResume && clr.CredentialPackage.UserId == _userId;
                 return ApiOk(model);
             }
             catch (Exception ex)

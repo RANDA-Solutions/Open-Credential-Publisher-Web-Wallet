@@ -15,7 +15,7 @@ export class AuthService {
 	private _loggedInBehavior: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 	public isLoggedIn$: Observable<boolean> = this._loggedInBehavior.asObservable();
 
-	
+
 	public accessTokenExpiring: EventEmitter<any> = new EventEmitter<any>();
 	public accessTokenExpired: EventEmitter<any> = new EventEmitter<any>();
 	public silentRenewError: EventEmitter<any> = new EventEmitter<any>();
@@ -26,7 +26,7 @@ export class AuthService {
 
 	constructor(private authSettings: AuthSettings) {
 		this._userManager = new UserManager(authSettings);
-		
+
 
 		this._userManager.events.addAccessTokenExpired((ev) => {
 			if (environment.debug) console.log("Access token expired");
@@ -59,7 +59,7 @@ export class AuthService {
 			if (environment.debug) console.log("User is signed in");
 			this.userSignedIn.emit(true);
 		});
-		
+
 		this._userManager.events.addUserSessionChanged(() => {
 			if (environment.debug) console.log("User session changed");
 			this.userSessionChanged.emit();
@@ -99,7 +99,7 @@ export class AuthService {
 				obs.next(false);
 			}
 		})
-		
+
 	}
 
 	getAccessToken() {
@@ -111,12 +111,7 @@ export class AuthService {
 	}
 
 	checkLogin(): Promise<boolean> {
-		if (this._user?.expired === false)
-		{
-			this.startSilentRenew();
-			return Promise.resolve(true);
-		}
-		else if (this._user?.expired) {
+		if (this._user != null) {
 			return this.signIn();
 		}
 		return Promise.resolve(false);

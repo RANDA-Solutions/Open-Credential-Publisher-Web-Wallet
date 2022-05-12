@@ -1,10 +1,10 @@
 export class ChangePasswordVM {
   oldPassword: string;
-  password: string;
+  newPassword: string;
   confirmPassword: string;
   constructor() {
     this.oldPassword = '';
-    this.password = '';
+    this.newPassword = '';
     this.confirmPassword = '';
   }
 };

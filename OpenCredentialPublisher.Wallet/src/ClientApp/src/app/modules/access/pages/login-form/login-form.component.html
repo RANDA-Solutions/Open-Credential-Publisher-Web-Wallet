@@ -7,14 +7,16 @@
     <div asp-validation-summary="All" [ngClass]="{ 'alert alert-danger mt-2': modelErrors.length > 0 }" >
       <span *ngFor="let msg of modelErrors">{{msg}}</span>
     </div>
-
+    <div class="form-group">
     <div class="input-group my-3">
       <div class="input-group-prepend mr-3">
           <span><i class="fal fa-user fa-2x icon-color"></i></span>
       </div>
       <input id="email" type="text" required name="email" class="form-control" placeholder="Email" [ngModel]="credentials.email" #email="ngModel" tmFocus validateEmail>
-      <small [hidden]="email.valid || (email.pristine && !submitted)" class="text-danger">Please enter a valid email</small>
     </div>
+    <small [hidden]="email.valid || (email.pristine && !submitted)" class="text-danger form-text text-right pr-2">Please enter a valid email</small>
+
+  </div>
     <div class="input-group mb-3">
       <div class="input-group-prepend mr-3">
           <span><i class="fal fa-lock-alt fa-2x icon-color"></i></span>
@@ -25,13 +27,17 @@
       <div class="input-group-prepend mr-3">
           <span class="blank-icon"></span>
       </div>
-      <button type="submit" class="btn btn-primary" [disabled]="showSpinner">LOGIN</button>
+      <button type="submit" class="btn btn-tertiary btn-login" [disabled]="loginSpinner">
+        Login
+        <span class="spinner-border spinner-border-sm" role="status" *ngIf="loginSpinner" aria-hidden="true"></span>
+      </button>
     </div>
     <div class="input-group">
       <div class="input-group-prepend mr-3">
           <span class="blank-icon"></span>
       </div>
       <div class="form-control-plaintext">
+        <a id="resend-confirmation" [routerLink]="['/access/resend-confirmation']">Resend Account Confirmation Email</a> <br />
           <a id="forgot-password" [routerLink]="['/access/forgot-password']">Forgot your password?</a> <br />
           <a [routerLink]="['/access/register']">Register as a new user</a>
       </div>

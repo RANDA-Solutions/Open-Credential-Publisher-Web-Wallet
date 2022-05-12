@@ -12,7 +12,7 @@ export class TimeoutService implements OnDestroy {
   private _watching: boolean = false;
   private _debug: boolean = environment.debug;
   private _onBadRefresh = new EventEmitter<boolean>();
-  
+
   private INTERRUPT_SOURCES: any[] = [new StorageInterruptSource(), new WindowInterruptSource('keyup scroll touch focus')];
   private id: string;
   constructor(
@@ -38,6 +38,11 @@ export class TimeoutService implements OnDestroy {
         console.log("Access token is expiring");
         //this.authService.checkLogin();
 
+    });
+
+    this.authService.accessTokenExpired.pipe(untilDestroyed(this)).subscribe(val => {
+      if (this._debug)
+        console.log("Access token is expired");
     });
   }
 

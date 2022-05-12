@@ -397,7 +397,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     return new RevocationListModel(revocations, "Revocation list refreshed, no changes.");
                 }
             }
-            return new RevocationListModel(null, error: "Could not retrieve RevocationList.");
+            return new RevocationListModel(null, error: "Could not retrieve revocation list.");
         }
         
         public async Task<List<RevocationModel>> GetSavedRevocationListAsync(string userId, int sourceId)

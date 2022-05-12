@@ -11,10 +11,6 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
     {
         [Required]
         [MaxLength(255)]
-        [Display(Name = "Username")]
-        public string UserName { get; set; }
-        [Required]
-        [MaxLength(255)]
         [Display(Name = "Displayable Name")]
         public string DisplayName { get; set; }
         [Required]

@@ -32,13 +32,13 @@ namespace OpenCredentialPublisher.Data.Models
 
             if (dictionary.ContainsKey("L"))
             {
-                sb.Append($"{dictionary["L"]}");
+                sb.Append($", {dictionary["L"]}");
                 if (dictionary.ContainsKey("S"))
                     sb.Append($", {dictionary["S"]}");
             }
 
             if (dictionary.ContainsKey("C"))
-                sb.Append($"{dictionary["C"]}");
+                sb.Append($", {dictionary["C"]}");
 
             if (sb.Length == 0 && dictionary.ContainsKey("CN"))
                 sb.Append($"{dictionary["CN"]}");

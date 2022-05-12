@@ -1,6 +1,6 @@
 export interface ResetPasswordModel {
+  email: string;
 	code: string;
-	email: string;
 	password: string;
 	confirmPassword: string;
 }

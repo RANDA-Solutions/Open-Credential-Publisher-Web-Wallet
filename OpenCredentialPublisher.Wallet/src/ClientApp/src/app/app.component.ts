@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Event as NavigationEvent, NavigationStart, Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
 import { environment } from '@environment/environment';
 import { Idle } from '@ng-idle/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { protectedRoutes } from './app-routing.module';
 import { AuthService } from './auth/auth-client.service';
 import { LoginService } from './auth/login.service';
 import { TimeoutService } from './services/timeout.service';
@@ -16,7 +17,7 @@ import { TimeoutService } from './services/timeout.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
 	title = 'Open Credential Publisher';
-  
+
 	envName = environment.name;
 
 
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
 			  		(event: NavigationEvent) => {
 						if(event instanceof NavigationStart) {
 							this.currentUrl = event.url;
-							if (this.debug) console.log(this.currentUrl);
+							if (this.debug) console.log(this.currentUrl, protectedRoutes.test(this.currentUrl) ? 'protected' : 'not protected');
 						}
 				});
 	}
@@ -51,48 +52,26 @@ export class AppComponent implements OnInit, OnDestroy {
 		  });
 
 		this.authService.clearStaleStorage();
-		
+
 		this.authService.silentRenewError.pipe(untilDestroyed(this)).subscribe(ev => {
 			if (this.debug) {
 				console.log(`Current url is ${this.currentUrl} and silent renew error is ${ev}`);
 			}
-		})
+      if (protectedRoutes.test(this.currentUrl)) {
+        this.loginService.signOut();
+      }
+		});
+
 		this.authService.checkLogin();
-		this.authService.signIn();
-		
-		// if (environment.debug) console.log('AppComponent ngOnInit');
-		// this.loginService.checkAuthIncludingServer().subscribe((result) => {
-		// 		if (environment.debug) console.log("Auth Result: ", result);
-		// }, (error) => {
-		// 	if (environment.debug) {
-		// 		console.log(error);
-		// 	}
-		// });
-
-		// if (environment.debug) {
-		// 	this.eventService
-		// 		.registerForEvents()
-		// 		.pipe(filter((notification) => notification.type === EventTypes.ConfigLoaded))
-		// 		.subscribe((config) => {
-		// 			// console.log('ConfigLoaded', config);
-		// 		});
-			
-		// 	this.eventService
-		// 		.registerForEvents()
-		// 		.subscribe(notification => console.log(notification));
-		// }
-		// this.eventService
-		// 	.registerForEvents()
-		// 	.pipe(filter((notification) => notification.type === EventTypes.NewAuthenticationResult))
-		// 	.subscribe((result: OidcClientNotification<AuthStateResult>) => {
-		// 		if (environment.debug) {
-		// 			console.log(`Auth State (isAuthenticated: ${result.value?.isAuthenticated}) (isRenewProcess: ${result.value?.isRenewProcess})`);
-		// 		}
-
-		// 		this.loginService.reportAuthState(result.value);
-		// 	});
-
 	}
+
+  @HostListener('login_required')
+  onLoginRequired() {
+    if (this.debug) console.log("onLoginRequired event caught");
+    if (protectedRoutes.test(this.currentUrl)) {
+      this.loginService.signOut();
+    }
+  }
 
 	ngOnDestroy() {
 		this.navigationEvents$.unsubscribe();
@@ -100,6 +79,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   getData():any {
     if (environment.debug) console.log('AppComponent getData');
-    
+
   }
 }

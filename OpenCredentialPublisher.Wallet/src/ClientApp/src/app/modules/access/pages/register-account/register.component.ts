@@ -16,11 +16,12 @@ export class RegisterAccountComponent implements OnInit {
   modelErrors = new Array<string>();
   input: RegisterAccountVM = new RegisterAccountVM();
   showSpinner = false;
+  buttonSpinner = false;
   private returnUrl: string | null;
   private debug = false;
   constructor(private accountService: AccountService
     , private loginService: LoginService
-    , private router: Router) 
+    , private router: Router)
     { }
 
   ngOnInit(): void {
@@ -29,7 +30,7 @@ export class RegisterAccountComponent implements OnInit {
     if (this.debug) console.log(`RegisterAccountComponent register`);
 		if (valid) {
       value.returnUrl = this.loginService.returnUrl;
-			this.showSpinner = true;
+			this.buttonSpinner = true;
 			this.accountService.registerAccount(value)
         .pipe(take(1)).subscribe(data => {
           if (data.statusCode == 200) {
@@ -38,8 +39,10 @@ export class RegisterAccountComponent implements OnInit {
             this.router.navigateByUrl(url);
           } else {
             this.modelErrors = (<ApiBadRequestResponse>data).errors;
+            this.buttonSpinner = false;
           }
-          this.showSpinner = false;
+        }, (error) => {
+          this.buttonSpinner = false;
         });
 		}
 	}

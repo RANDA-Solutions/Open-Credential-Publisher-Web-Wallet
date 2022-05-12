@@ -223,6 +223,7 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task<ClrModel> GetSingleClrAsync(int id)
         {
             var clr = await _context.Clrs.AsNoTracking()
+                .Include(c => c.CredentialPackage)
                 .Include(c => c.Learner)
                 .Include(c => c.Publisher)
                 .Include(c => c.SmartResume)

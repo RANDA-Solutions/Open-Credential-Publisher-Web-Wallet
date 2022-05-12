@@ -4,25 +4,38 @@
 <ng-template #theContent>
   <section>
       <span class="h1">Change Profile Picture</span>
+      <hr />
       <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label class="control-label">Current Picture</label>
+        <div class="col-12 col-md-6">
+                <h2>Current Picture</h2>
                 <div class="">
+                <ng-container *ngIf="hasPicture">
                     <img [src]="currentImage" alt="Profile Picture" />
-                </div>
-            </div>
+                </ng-container>
+                <ng-container *ngIf="!hasPicture">
+                  <i class="fal fa-user-circle fa-10x mb-3" aria-details="Default Profile Picture"></i>
+                </ng-container>
+              </div>
+            <button type="button" class="btn btn-outline-danger btn-lg my-3" *ngIf="hasPicture" (click)="removeImage()">Remove</button>
         </div>
       </div>
-
+      <hr />
       <div class="row">
-          <div class="col-md-6">
+          <div class="col-12 col-md-6">
               <form>
                   <div class="form-group">
-                      <label class="control-label">Profile Picture</label>
+                      <label class="control-label">Choose Picture</label>
+                      <div class="alert alert-info my-3">
+                        <h2 class="alert-header">Image Guidelines</h2>
+                        <ul>
+                          <li>Supported image formats are JPEG, PNG, GIF, Bitmap, and TIFF</li>
+                          <li>Images must be less than 20 MB</li>
+                          <li>Square images are best</li>
+                        </ul>
+                      </div>
                       <div class="input-group mb-3">
                           <div class="custom-file">
-                              <input type="file" #imageInput (change)="onFileSelected($event)"  class="custom-file-input" aria-describedby="inputGroupFileAddon01">
+                              <input type="file" #imageInput (change)="onFileSelected($event)" accept=".jpg, .jpeg, .png, .gif, .bmp, .bm, .tiff"  class="custom-file-input" aria-describedby="inputGroupFileAddon01">
                               <label class="custom-file-label" for="inputGroupFile01">{{fileName}}</label>
                           </div>
                       </div>

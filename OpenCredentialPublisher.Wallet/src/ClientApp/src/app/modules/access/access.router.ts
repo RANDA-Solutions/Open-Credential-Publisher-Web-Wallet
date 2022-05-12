@@ -2,6 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AccessComponent } from './access.component';
 import { AzEmailCredentialComponent } from './pages/az-email-credential/az-email-credential.component';
 import { AzLoginWithProofComponent } from './pages/az-login-with-proof/az-login-with-proof.component';
+import { ConfirmEmailChangeComponent } from './pages/confirm-email-change/confirm-email-change.component';
 import { EmailConfirmationComponent } from './pages/email-confirmation/email-confirmation.component';
 import { EmailCredentialComponent } from './pages/email-credential/email-credential.component';
 import { EmailVerificationComponent } from './pages/email-verification/email-verification.component';
@@ -14,6 +15,7 @@ import { LoginWith2faComponent } from './pages/login-with2fa/login-with2fa.compo
 import { LogoutComponent } from './pages/logout/logout.component';
 import { RegisterAccountComponent } from './pages/register-account/register.component';
 import { RegisterConfirmationComponent } from './pages/register-confirmation/register-confirmation.component';
+import { ResendConfirmationComponent } from './pages/resend-confirmation/resend-confirmation.component';
 import { ResetPasswordConfirmationComponent } from './pages/reset-password/reset-password-confirmation.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 
@@ -23,6 +25,10 @@ export const accessRoutes: Routes = [
     component: AccessComponent,
     data: { hideNavBar: true },
     children: [
+      {
+        path: 'resend-confirmation', component: ResendConfirmationComponent,
+        data: { hideNavBar: true }
+      },
       {
         path: 'forgot-password', component: ForgotPasswordComponent,
         data: { hideNavBar: true }
@@ -87,6 +93,7 @@ export const accessRoutes: Routes = [
         path: 'register', component: RegisterAccountComponent,
         data: { hideNavBar: true }
       },
+      {path: 'confirm-email-change', component: ConfirmEmailChangeComponent},
       {
         path: '',
         component: LoginFormComponent,

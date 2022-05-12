@@ -12,7 +12,14 @@
   <body>
     <script>
         window.onload = function () {
+          let loginRequired = new RegExp(/error=login_required/);
+          if (loginRequired.test(window.location.href)) {
+            let loginEvent = new CustomEvent("login_required", { bubbles: true });
+            parent.dispatchEvent(loginEvent);
+          }
+          else {
             new Oidc.UserManager().signinSilentCallback();
+          }
       };
     </script>
   </body>

@@ -34,7 +34,9 @@ ngOnInit() {
 		this.ngZone.run(() => {
 			this.authService.logout().then(
 				() => {
-					console.log(this._infoMessage);
+          if (environment.debug) {
+					  console.log(this._infoMessage);
+          }
 					this.router.navigate(["/access/login"], { queryParams: { infoMessage: this._infoMessage }});
 				}
 			);

@@ -54,7 +54,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             _logger.LogInformation(Request.Host.Value);
-            var callbackUrl = $"{Request.Scheme}://{Request.Host.Value}/access/reset-password/{code}";
+            var callbackUrl = $"{Request.Scheme}://{Request.Host.Value}/access/reset-password/{code}?email={input.Email}";
 
             await _emailSender.SendEmailAsync(
                 input.Email,
