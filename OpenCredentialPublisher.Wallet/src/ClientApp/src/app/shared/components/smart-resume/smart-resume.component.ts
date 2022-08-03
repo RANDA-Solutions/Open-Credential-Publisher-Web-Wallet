@@ -3,6 +3,7 @@ import { SmartResumeService } from '@core/services/smart-resume.service';
 import { UtilsService } from '@core/services/utils.service';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { ClrVM } from '@shared/models/clrVM';
+import { StatusEnum } from '@shared/models/enums/statusEnum';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -16,12 +17,13 @@ export class SmartResumeComponent implements OnInit {
   message = '';
   showSpinner = false;
   miniSpinner = false;
+  Status = StatusEnum;
   private debug = false;
 
   constructor(private utilsService: UtilsService, private smartResumeService: SmartResumeService) { }
 
   ngOnChanges() {
-    
+
     if (this.debug) console.log('SmartResumeComponent ngOnChanges');
   }
 
@@ -31,7 +33,7 @@ export class SmartResumeComponent implements OnInit {
 
   submit(){
     this.miniSpinner = true;
-    
+
     this.smartResumeService.submit({ packageId: this.clr.packageId, clrId: this.clr.id })
       .pipe(take(1)).subscribe(data => {
         if (this.debug)
@@ -40,8 +42,13 @@ export class SmartResumeComponent implements OnInit {
           this.clr.smartResumeUrl = (<ApiOkResponse>data).result;
           if (this.clr.smartResumeUrl)
             this.clr.hasSmartResume = true;
-        } 
+        }
         this.miniSpinner = false;
       });
+  }
+
+  errorMessage() : string[] {
+    let message = this.clr.smartResumeMessage;
+    return message.split('.');
   }
 }

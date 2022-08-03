@@ -2,12 +2,14 @@ using Azure.Messaging.EventGrid;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using OpenCredentialPublisher.Credentials.Transformations.Models;
 using OpenCredentialPublisher.Data.Models.Enums;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Shared.Commands;
 using OpenCredentialPublisher.Shared.Interfaces;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -36,7 +38,16 @@ namespace OpenCredentialPublisher.VerityFunctionApp
                 {
                     var body = await reader.ReadToEndAsync();
                     _log.LogInformation("C# HTTP trigger function processed a request.", body);
-                    await _idatafyService.UpdateSmartResumeAsync(body);
+                    var contentType = req.Headers.GetValues("Content-Type");
+                    if (contentType != null && contentType.Contains("application/json"))
+                    {
+                        var notification = JsonSerializer.Deserialize<IdatafyNotification>(body);
+                        await _idatafyService.UpdateSmartResumeAsync(notification.Id, notification.Status, notification.Message);
+                    }
+                    else
+                    {
+                        await _idatafyService.UpdateSmartResumeAsync(body);
+                    }
                 }
 
                 var response = req.CreateResponse(HttpStatusCode.OK);

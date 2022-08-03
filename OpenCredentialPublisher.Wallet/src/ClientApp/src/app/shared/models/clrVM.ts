@@ -1,4 +1,5 @@
 import { ProfileVM } from "./clrSimplified/profileVM";
+import { StatusEnum } from "./enums/statusEnum";
 
 export class ClrVM {
   id = -1;
@@ -17,6 +18,8 @@ export class ClrVM {
   enableSmartResume: boolean = false;
   hasSmartResume: boolean = false;
   smartResumeUrl: string = '';
+  smartResumeStatus: StatusEnum | null;
+  smartResumeMessage: string = '';
   learner: ProfileVM;
   publisher: ProfileVM;
   constructor(){
@@ -37,6 +40,8 @@ export class ClrVM {
     this.publisher = null;
     this.enableSmartResume = false;
     this.hasSmartResume = false;
+    this.smartResumeStatus = null;
+    this.smartResumeMessage = null;
     this.smartResumeUrl = '';
   }
 }

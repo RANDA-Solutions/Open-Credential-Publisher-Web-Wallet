@@ -194,12 +194,16 @@ namespace OpenCredentialPublisher.Data.Contexts
             modelBuilder.Entity<SmartResume>(sr =>
             {
                 sr.ToTable("SmartResumes", "idatafy");
-                sr.HasQueryFilter(sr => !sr.Clr.IsDeleted);
+                sr.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(s => s.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired(true);
             });
 
             modelBuilder.Entity<ClrModel>()
                 .HasOne(clr => clr.SmartResume)
-                .WithOne(sr => sr.Clr)
+                .WithOne()
                 .HasForeignKey<SmartResume>(sr => sr.ClrId);
             #endregion
 
