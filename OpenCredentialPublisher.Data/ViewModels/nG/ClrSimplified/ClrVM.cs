@@ -1,4 +1,5 @@
 using OpenCredentialPublisher.Data.Models;
+using OpenCredentialPublisher.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -24,6 +25,8 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG.ClrSimplified
         public bool HasSmartResume { get; set; }
         public bool EnableSmartResume { get; set; }
         public string SmartResumeUrl { get; set; }
+        public string SmartResumeMessage { get; private set; }
+        public StatusEnum? SmartResumeStatus { get; private set; }
 
         public static ClrVM FromModel(ClrModel clr, List<string> achievementIds = null)
         {
@@ -43,7 +46,9 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG.ClrSimplified
                 AchievementIds = achievementIds ?? new List<string>(),
                 Learner = ProfileVM.FromModel(clr.Learner),
                 Publisher = ProfileVM.FromModel(clr.Publisher),
-                HasSmartResume = clr?.SmartResume != null && clr.SmartResume.IsReady,
+                HasSmartResume = clr?.SmartResume != null,
+                SmartResumeMessage = clr?.SmartResume?.Message,
+                SmartResumeStatus = clr?.SmartResume?.StatusId,
                 SmartResumeUrl = clr?.SmartResume?.SmartResumeUrl,
             };
         }

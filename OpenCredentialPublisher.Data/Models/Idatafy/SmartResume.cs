@@ -1,3 +1,4 @@
+using OpenCredentialPublisher.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.Data.Models.Idatafy
 {
-    public class SmartResume: IBaseEntity
+    public class SmartResume : IBaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -17,12 +18,9 @@ namespace OpenCredentialPublisher.Data.Models.Idatafy
         public int ClrId { get; set; }
         public string SmartResumeUrl { get; set; }
         public string UploadName { get; set; }
-        public bool IsReady { get; set; }
-
-
-        [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; }
-        public ClrModel Clr { get; set; }
+        public StatusEnum StatusId { get; set; }
+        public string Message { get; set; }
+        public string StatusMessage { get; set; }
 
         public bool IsDeleted { get; set; }
         public DateTime CreatedAt { get; set; }

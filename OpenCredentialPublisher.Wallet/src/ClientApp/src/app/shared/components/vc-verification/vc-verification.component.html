@@ -1,8 +1,6 @@
 <div class="row">
-  <div class="col-12 col-sm-4 col-md-3">
+  <div class="col-12">
     <button type="button" class="btn btn-tertiary"(click)="verify()">Verify</button>
-  </div>
-  <div class="col-12 col-sm-8 col-md-9">
-      <span #vcproofresult [innerHtml]="proofResult.message" class="col-12 col-sm-8 col-md-9"></span>
+    <span #vcproofresult [innerHtml]="proofResult.message" class="col-12 col-sm-8 col-md-9"></span>
   </div>
 </div>

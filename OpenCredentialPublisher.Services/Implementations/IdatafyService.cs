@@ -66,7 +66,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 var uploadName = $"{userId}-{clrId}-{DateTime.UtcNow.Ticks}.json";
                 using (var stream = new MemoryStream(UTF8Encoding.UTF8.GetBytes(jsonFile)))
                 {
-                    sftp.UploadFile(stream, $"{userId}-{clrId}-{DateTime.UtcNow.Ticks}.json");
+                    sftp.UploadFile(stream, uploadName);
                 }
 
                 var smartResume = new SmartResume
@@ -74,7 +74,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     UserId = userId,
                     ClrId = clrId,
                     UploadName = uploadName,
-                    IsReady = false,
+                    StatusId = Data.Models.Enums.StatusEnum.Created,
                     CreatedAt = DateTime.UtcNow,
                     SmartResumeUrl = _idatafyOptions.SmartResumeUrl
                 };
@@ -97,9 +97,30 @@ namespace OpenCredentialPublisher.Services.Implementations
         public async Task UpdateSmartResumeAsync(string uploadName)
         {
             var smartResume = await _context.SmartResumes.FirstOrDefaultAsync(u => u.UploadName == uploadName);
-            smartResume.IsReady = true;
+            smartResume.StatusId = Data.Models.Enums.StatusEnum.Active;
             smartResume.ModifiedAt = DateTime.UtcNow;
 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateSmartResumeAsync(string id, string status, string message)
+        {
+            var smartResume = await _context.SmartResumes.FirstOrDefaultAsync(u => u.UploadName == id);
+            switch (status)
+            {
+                case "success":
+                    smartResume.StatusId = Data.Models.Enums.StatusEnum.Active;
+                    break;
+                case "error":
+                    smartResume.StatusId = Data.Models.Enums.StatusEnum.Error;
+                    break;
+                default:
+                    smartResume.StatusId = Data.Models.Enums.StatusEnum.Pending;
+                    break;
+            }
+            smartResume.StatusMessage = status;
+            smartResume.Message = message;
+            smartResume.ModifiedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
         }
 
