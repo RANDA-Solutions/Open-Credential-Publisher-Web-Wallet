@@ -131,7 +131,7 @@ namespace OpenCredentialPublisher.Data.Models
                 }
             }
             var name = art.Name ?? art.Description;
-            model.NameContainsTranscript = name.Contains("transcript", StringComparison.OrdinalIgnoreCase);
+            model.NameContainsTranscript = name?.Contains("transcript", StringComparison.OrdinalIgnoreCase) ?? false;
             model.IsDeleted = false;
             return model;
         }
