@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenCredentialPublisher.Data.Dtos.Account;
 using OpenCredentialPublisher.Data.Options;
+using OpenCredentialPublisher.Services.Extensions;
 using OpenCredentialPublisher.Services.Implementations;
 using OpenCredentialPublisher.Wallet.Utilities;
 using System;
@@ -47,9 +48,9 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogException(ex, ex.Message);
+                return new BadRequestResult();
             }
-            return new BadRequestResult();
         }
 
         [HttpGet]
@@ -83,7 +84,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogException(ex, ex.Message);
             }
             return new EmailVerificationGetResponseModel
             {
@@ -105,7 +106,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogException(ex, ex.Message);
             }
             return new EmailVerificationCredentialStatusResponseModel
             {
