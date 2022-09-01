@@ -314,6 +314,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogException(ex, ex.Message);
                 return StatusCode(500, $"Internal server error: {ex}");
             }
             //if (Request.Form.Files.Count == 0)

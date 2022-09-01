@@ -35,16 +35,17 @@ namespace OpenCredentialPublisher.Services.Implementations
     {
         private readonly WalletDbContext _context;
         private readonly SchemaService _schemaService;
-        private readonly Serilog.ILogger _logger = Log.ForContext<ETLService>();
+        private readonly ILogger<ETLService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOptions<HostSettings> _hostSettings;
 
-        public ETLService(SchemaService schemaService, WalletDbContext context, IHttpContextAccessor httpContextAccessor, IOptions<HostSettings> hostSettings)
+        public ETLService(SchemaService schemaService, WalletDbContext context, IHttpContextAccessor httpContextAccessor, IOptions<HostSettings> hostSettings, ILogger<ETLService> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _schemaService = schemaService;            
             _context = context;
             _hostSettings = hostSettings;
+            _logger = logger;
         }
         public async Task<CredentialResponse> ProcessJson(ControllerBase controller, string userId, string json, AuthorizationModel authorization)
         {
@@ -145,6 +146,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogException(ex, ex.Message);
                 throw;
             }
         }
@@ -167,6 +169,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                 catch (Exception ex)
                 {
                     modelState.AddModelError(string.Empty, ex.Message);
+                    _logger.LogException(ex, ex.Message);
+
                     return;
                 }
 
@@ -202,6 +206,8 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogException(ex, ex.Message);
+
                 throw;
             }
         }
@@ -297,6 +303,8 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogException(ex, ex.Message);
+
                 throw;
             }
         }
@@ -397,7 +405,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "ETLService.ProcessVerifiableCredential", null);
+                _logger.LogException(ex, "ETLService.ProcessVerifiableCredential", null);
                 credentialResponse.ErrorMessages.Add(ex.Message);
             }
             return credentialResponse;
@@ -530,7 +538,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "ETLService.ProcessVerifiableCredential", null);
+                _logger.LogException(ex, "ETLService.ProcessVerifiableCredential", null);
             }
         }
 
@@ -944,7 +952,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, ex.Message);
+                _logger.LogException(ex, ex.Message);
                 hostSettings = new HostSettings { ClientName = "Default Client", DnsName = "https://localhost" };
             }
             var publisherProfile = new ProfileDType

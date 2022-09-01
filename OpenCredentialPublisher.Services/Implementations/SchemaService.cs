@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using NJsonSchema;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Abstracts;
@@ -29,8 +30,12 @@ namespace OpenCredentialPublisher.Services.Implementations
         public const string ObcManifestResponseJsonSchema = "imsob_v2p1v2p1-getmanifest-200-responsepayload-schemav1p0.json";
         public const string ObcProfileResponseJsonSchema = "imsob_v2p1v2p1-getprofile-200-responsepayload-schemav1p0.json";
         public readonly IUrlHelper _urlHelper;
-        public SchemaService(IConfiguration configuration, IUrlHelper urlHelper)
+
+        private readonly ILogger<SchemaService> _logger;
+        public SchemaService(IConfiguration configuration, IUrlHelper urlHelper, ILogger<SchemaService> logger)
         {
+            _logger = logger;
+
             _urlHelper = urlHelper;
             var clrSchemaLocation = configuration["ClrSchemaLocation"];
             var obcSchemaLocation = configuration["ObcSchemaLocation"];
@@ -74,6 +79,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception e)
             {
+                _logger.LogException(e, e.Message);
                 schemaResult.ErrorMessages.Add(e.Message);
                 return schemaResult;
             }
@@ -131,6 +137,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             catch (Exception e)
             {
+                _logger.LogException(e, e.Message);
                 schemaResult.ErrorMessages.Add(e.Message);
             }
             return schemaResult;
