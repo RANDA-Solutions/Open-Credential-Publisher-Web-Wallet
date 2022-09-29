@@ -77,5 +77,8 @@ export class LoginWithProofComponent implements OnInit, OnDestroy {
 			}
 		});
 	}
-	ngOnDestroy(){}
+	ngOnDestroy() {
+        if (this.timeout)
+            clearInterval(this.timeout);
+    }
 }
