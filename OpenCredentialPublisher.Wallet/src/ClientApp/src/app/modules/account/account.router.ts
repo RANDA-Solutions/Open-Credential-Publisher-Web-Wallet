@@ -36,32 +36,6 @@ export const accountRoutes: Routes = [
       {path: 'reset-authenticator', component: ResetAuthenticatorComponent},
     ]
   }
-  // {
-  //   path: 'change-password',
-  //   component: ChangePasswordComponent,
-  //   canActivate: [AuthGuard]
-  // },
-  // {
-  //   path: 'email',
-  //   component: EmailComponent,
-  //   canActivate: [AuthGuard]
-  // },
-  // {
-  //   path: 'personal-data',
-  //   component: PersonalDataComponent,
-  //   canActivate: [AuthGuard]
-
-  // },
-  // {
-  //   path: 'profile-image',
-  //   component: ProfileImageComponent,
-  //   canActivate: [AuthGuard]
-  // },
-  // {
-  //   path: 'two-factor-auth',
-  //   component: TwoFactorAuthComponent,
-  //   canActivate: [AuthGuard]
-  // }
 ];
 
 export const accountRouter = RouterModule.forChild(accountRoutes);

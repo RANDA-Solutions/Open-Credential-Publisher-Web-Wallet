@@ -9,4 +9,5 @@ export class PdfRequest {
   artifactId: number;
   artifactName: string;
   createLink: boolean;
+  accessKey: string;
 }
