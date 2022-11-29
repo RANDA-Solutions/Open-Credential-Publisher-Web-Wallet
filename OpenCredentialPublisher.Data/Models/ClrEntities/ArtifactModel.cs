@@ -38,6 +38,8 @@ namespace OpenCredentialPublisher.Data.Models
         public string MediaType { get; set; }
         public bool NameContainsTranscript { get; set; }
 
+        public string UserId { get; set; }
+
         //EnhancedArtifactFields
         public int? ClrId { get; set; }
         public string AssertionId { get; set; }
@@ -106,7 +108,6 @@ namespace OpenCredentialPublisher.Data.Models
 
         //Relationships
         public virtual EvidenceArtifact EvidenceArtifact { get; set; }
-        public virtual ClrModel Clr { get; set; }
 
         public static ArtifactModel FromArtifactDType(ArtifactDType art)
         {

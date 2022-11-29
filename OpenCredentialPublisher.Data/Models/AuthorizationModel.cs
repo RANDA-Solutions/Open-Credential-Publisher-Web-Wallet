@@ -19,11 +19,6 @@ namespace OpenCredentialPublisher.Data.Models
         /// Authorization code. Only has a value during ACG flow.
         /// </summary>
         public string AuthorizationCode { get; set; }
-        
-        /// <summary>
-        /// All the CLRs tied to this authorization.
-        /// </summary>
-        public List<ClrModel> Clrs { get; set; }
 
         /// <summary>
         /// PKCE code verifier. Only has a value during ACG flow.
@@ -67,10 +62,6 @@ namespace OpenCredentialPublisher.Data.Models
         public ApplicationUser User { get; set; }
 
         public DateTime ValidTo { get; set; }
-        /// <summary>
-        /// All the CredentialPackages tied to this authorization.
-        /// </summary>
-        public List<CredentialPackageModel> CredentialPackages { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAt { get; set; }

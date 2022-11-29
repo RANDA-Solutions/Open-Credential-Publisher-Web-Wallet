@@ -151,700 +151,75 @@ namespace OpenCredentialPublisher.Data.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            #region clr schema tables
-            modelBuilder.Entity<BadgrAssertionModel>().ToTable("BadgrAssertions", schema: "cred");
-            modelBuilder.Entity<BadgrBackpackModel>().ToTable("BadgrBackpacks", schema: "cred");
-            modelBuilder.Entity<DiscoveryDocumentModel>().ToTable("DiscoveryDocumentModel", schema: "cred");
-            modelBuilder.Entity<CredentialPackageModel>().ToTable("CredentialPackages", schema: "cred");
-            modelBuilder.Entity<VerifiableCredentialModel>().ToTable("VerifiableCredentials", schema: "cred");
-            modelBuilder.Entity<AchievementModel>().ToTable("Achievements", schema: "cred");
-            modelBuilder.Entity<AlignmentModel>().ToTable("Alignments", schema: "cred");
-            modelBuilder.Entity<ArtifactModel>().ToTable("Artifacts", schema: "cred");
-            modelBuilder.Entity<AssertionModel>().ToTable("Assertions", schema: "cred");
-            modelBuilder.Entity<AssociationModel>().ToTable("Associations", schema: "cred");
-            modelBuilder.Entity<ClrModel>().ToTable("Clrs", schema: "cred");
-            modelBuilder.Entity<ClrSetModel>().ToTable("ClrSets", schema: "cred");
-            modelBuilder.Entity<CriteriaModel>().ToTable("Criteria", schema: "cred");
-            modelBuilder.Entity<EndorsementClaimModel>().ToTable("EndorsementClaims", schema: "cred");
-            modelBuilder.Entity<EndorsementModel>().ToTable("Endorsements", schema: "cred");
-            modelBuilder.Entity<EvidenceModel>().ToTable("Evidence", schema: "cred");
-            modelBuilder.Entity<Models.ClrEntities.IdentityModel>().ToTable("Identities", schema: "cred");
-            modelBuilder.Entity<ProfileModel>().ToTable("Profiles", schema: "cred");
-            modelBuilder.Entity<ResultDescriptionModel>().ToTable("ResultDescriptions", schema: "cred");
-            modelBuilder.Entity<ResultModel>().ToTable("Results", schema: "cred");
-            modelBuilder.Entity<RubricCriterionLevelModel>().ToTable("RubricCriterionLevels", schema: "cred");
-            modelBuilder.Entity<VerificationModel>().ToTable("Verifications", schema: "cred");
-
-            modelBuilder.Entity<AchievementAlignment>().ToTable("AchievementAlignments", schema: "cred");
-            modelBuilder.Entity<AchievementAssociation>().ToTable("AchievementAssociations", schema: "cred");
-            modelBuilder.Entity<AchievementEndorsement>().ToTable("AchievementEndorsements", schema: "cred");
-            modelBuilder.Entity<AssertionEndorsement>().ToTable("AssertionEndorsements", schema: "cred");
-            modelBuilder.Entity<AssertionEvidence>().ToTable("AssertionEvidence", schema: "cred");
-            modelBuilder.Entity<ClrAchievement>().ToTable("ClrAchievements", schema: "cred");
-            modelBuilder.Entity<ClrAssertion>().ToTable("ClrAssertions", schema: "cred");
-            modelBuilder.Entity<ClrEndorsement>().ToTable("ClrEndorsements", schema: "cred");
-            modelBuilder.Entity<EvidenceArtifact>().ToTable("EvidenceArtifacts", schema: "cred");
-            modelBuilder.Entity<ProfileEndorsement>().ToTable("ProfileEndorsements", schema: "cred");
-            modelBuilder.Entity<ResultAlignment>().ToTable("ResultAlignments", schema: "cred");
-            modelBuilder.Entity<ResultDescriptionAlignment>().ToTable("ResultDescriptionAlignments", schema: "cred");
-            modelBuilder.Entity<RubricCriterionLevelAlignment>().ToTable("RubricCriterionLevelAlignments", schema: "cred");
-            #endregion
-
-            #region Idatafy
-            modelBuilder.Entity<SmartResume>(sr =>
+            modelBuilder.Entity<AchievementAlignment>(eb =>
             {
-                sr.ToTable("SmartResumes", "idatafy");
-                sr.HasOne<ApplicationUser>()
-                    .WithMany()
-                    .HasForeignKey(s => s.UserId)
-                    .OnDelete(DeleteBehavior.NoAction)
-                    .IsRequired(true);
+                eb.ToTable("AchievementAlignments", schema: "cred");
+                eb.HasOne(pc => pc.Achievement)
+                    .WithMany(c => c.AchievementAlignments)
+                    .HasForeignKey(pt => pt.AchievementId);
+
+                eb.HasOne(pc => pc.Alignment)
+                    .WithOne(c => c.AchievementAlignment)
+                    .HasForeignKey<AchievementAlignment>(pt => pt.AlignmentId);
             });
 
-            modelBuilder.Entity<ClrModel>()
-                .HasOne(clr => clr.SmartResume)
-                .WithOne()
-                .HasForeignKey<SmartResume>(sr => sr.ClrId);
-            #endregion
+            modelBuilder.Entity<AchievementAssociation>(eb =>
+            {
+                eb.ToTable("AchievementAssociations", schema: "cred");
+                eb.HasOne(pc => pc.Achievement)
+                    .WithMany(c => c.AchievementAssociations)
+                    .HasForeignKey(pt => pt.AchievementId);
 
-            modelBuilder.Entity<DiscoveryDocumentModel>()
-                .Property(x => x.ScopesOffered)
-                .HasConversion(v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null));
+                eb.HasOne(pc => pc.Association)
+                    .WithOne(c => c.AchievementAssociation)
+                    .HasForeignKey<AchievementAssociation>(pt => pt.AssociationId);
+            });
 
-            modelBuilder
-                .Entity<DiscoveryDocumentModel>()
-                .Property(x => x.ScopesOffered)
-                .Metadata
-                .SetValueComparer(StringValueComparer());
+            modelBuilder.Entity<AchievementEndorsement>(eb => {
+                eb.ToTable("AchievementEndorsements", schema: "cred");
+                eb.HasOne(pc => pc.Achievement)
+                    .WithMany(c => c.AchievementEndorsements)
+                    .HasForeignKey(pt => pt.AchievementId);
 
-            modelBuilder.Entity<AuthorizationModel>()
-                .Property(x => x.Scopes)
-                .HasConversion(v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null));
-
-            modelBuilder.Entity<AuthorizationModel>()
-                .Property(x => x.Scopes)
-                .Metadata
-                .SetValueComparer(StringValueComparer());
-
-            modelBuilder.Entity<AchievementModel>()
-                .Property(x => x.Tags)
-                .HasConversion(v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null));
-
-            modelBuilder.Entity<AchievementModel>()
-                .Property(x => x.Tags)
-                .Metadata
-                .SetValueComparer(StringValueComparer());
-
-            modelBuilder.Entity<ResultDescriptionModel>()
-                .Property(x => x.AllowedValues)
-                .HasConversion(v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null));
-
-            modelBuilder.Entity<ResultDescriptionModel>()
-                .Property(x => x.AllowedValues)
-                .Metadata
-                .SetValueComparer(StringValueComparer());
-
-            modelBuilder.Entity<VerificationModel>()
-                .Property(x => x.AllowedOrigins)
-                .HasConversion(v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null));
-
-            modelBuilder.Entity<VerificationModel>()
-                .Property(x => x.AllowedOrigins)
-                .Metadata
-                .SetValueComparer(StringValueComparer());
-
-            modelBuilder.Entity<VerificationModel>()
-                .Property(x => x.StartsWith)
-                .HasConversion(v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null));
-
-            modelBuilder.Entity<VerificationModel>()
-                .Property(x => x.StartsWith)
-                .Metadata
-                .SetValueComparer(StringValueComparer());
-
-            #region AdditionalProperties
-            modelBuilder.Entity<AchievementModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
+                eb.HasOne(pc => pc.Endorsement)
+                    .WithOne(c => c.AchievementEndorsement)
+                    .HasForeignKey<AchievementEndorsement>(pt => pt.EndorsementId);
+            });
 
             modelBuilder
-                .Entity<AchievementModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
+                .Entity<AchievementModel>(eb =>
+                {
+                    eb.ToTable("Achievements", schema: "cred");
+                    eb.Property(x => x.Tags)
+                        .HasConversion(v => JsonSerializer.Serialize(v, null),
+                            v => JsonSerializer.Deserialize<List<string>>(v, null));
+
+                    eb.Property(x => x.Tags)
+                        .Metadata
+                        .SetValueComparer(StringValueComparer());
+
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+
+
+                    eb.Property(b => b.Identifiers)
+                        .HasConversion(
+                            v => JsonSerializer.Serialize(v, null),
+                            v => JsonSerializer.Deserialize<List<SystemIdentifierDType>>(v, null)
+                        );
+                    eb.Property(b => b.Identifiers)
+                        .Metadata
+                        .SetValueComparer(SystemIdentifierDTypeValueComparer());
+                });
 
-            modelBuilder.Entity<AchievementModel>()
-               .Property(b => b.Identifiers)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<List<SystemIdentifierDType>>(v, null)
-               );
 
-            modelBuilder
-                .Entity<AchievementModel>()
-                .Property(b => b.Identifiers)
-                .Metadata
-                .SetValueComparer(SystemIdentifierDTypeValueComparer());
 
-            modelBuilder.Entity<AlignmentModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<AlignmentModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<AssociationModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<AssociationModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<ClrModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<ClrModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<CriteriaModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<CriteriaModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<EndorsementClaimModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<EndorsementClaimModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<EndorsementModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<EndorsementModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<ResultDescriptionModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<ResultDescriptionModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<ResultModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<ResultModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<RubricCriterionLevelModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<RubricCriterionLevelModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<VerificationModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<VerificationModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<ProfileModel>()
-               .Property(b => b.PublicKey)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<CryptographicKeyDType>(v, null)
-               );
-
-            // add converter
-
-            modelBuilder.Entity<ProfileModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<ProfileModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<ProfileModel>()
-               .Property(b => b.Identifiers)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<List<SystemIdentifierDType>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<ProfileModel>()
-                .Property(b => b.Identifiers)
-                .Metadata
-                .SetValueComparer(SystemIdentifierDTypeValueComparer());
-            // add list converter
-
-            modelBuilder.Entity<Models.ClrEntities.IdentityModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<Models.ClrEntities.IdentityModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<BadgrAssertionModel>()
-               .Property(b => b.AdditionalProperties)
-               .HasConversion(
-                   v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
-               );
-
-            modelBuilder
-                .Entity<BadgrAssertionModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<AssertionModel>()
-                .Property(x => x.SignedEndorsements)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, null)
-                );
-
-            modelBuilder
-                .Entity<AssertionModel>()
-                .Property(x => x.SignedEndorsements)
-                .Metadata
-                .SetValueComparer(StringValueComparer());
-
-            modelBuilder.Entity<AssertionModel>()
-                .Property(x => x.AdditionalProperties)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
-                );
-
-            modelBuilder
-                .Entity<AssertionModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<ArtifactModel>()
-                .Property(x => x.AdditionalProperties)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
-                );
-
-            modelBuilder
-                .Entity<ArtifactModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-
-            modelBuilder.Entity<EvidenceModel>()
-                .Property(x => x.AdditionalProperties)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
-                );
-
-            modelBuilder
-                .Entity<EvidenceModel>()
-                .Property(x => x.AdditionalProperties)
-                .Metadata
-                .SetValueComparer(DictionaryValueComparer());
-            #endregion
-
-            modelBuilder.Entity<AssertionModel>()
-                    .HasOne(a => a.ParentAssertion)
-                    .WithMany(a => a.ChildAssertions)
-                    .HasForeignKey(pt => pt.ParentAssertionId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ClrModel>()
-                .HasMany(clrModel => clrModel.Links)
-                .WithOne(linkModel => linkModel.Clr)
-                .HasForeignKey(linkModel => linkModel.ClrForeignKey);
-
-            modelBuilder.Entity<ClrAssertion>()
-                .HasOne(ca => ca.Clr)
-                .WithMany(c => c.ClrAssertions)
-                .HasForeignKey(pt => pt.ClrId);
-
-            modelBuilder.Entity<ClrAssertion>()
-                .HasOne(ca => ca.Assertion)
-                .WithOne(a => a.ClrAssertion)
-                .HasForeignKey<ClrAssertion>(pt => pt.AssertionId);
-
-            modelBuilder.Entity<AssertionEvidence>()
-                .HasOne(ae => ae.Assertion)
-                .WithMany(a => a.AssertionEvidences)
-                .HasForeignKey(pt => pt.AssertionId);
-
-            modelBuilder.Entity<AssertionEvidence>()
-                .HasOne(ae => ae.Evidence)
-                .WithOne(a => a.AssertionEvidence)
-                .HasForeignKey<AssertionEvidence>(pt => pt.EvidenceId);
-
-            modelBuilder.Entity<EvidenceArtifact>()
-                .HasOne(ea => ea.Evidence)
-                .WithMany(e => e.EvidenceArtifacts)
-                .HasForeignKey(pt => pt.EvidenceId);
-
-            modelBuilder.Entity<EvidenceArtifact>()
-                .HasOne(ea => ea.Artifact)
-                .WithOne(a => a.EvidenceArtifact)
-                .HasForeignKey<EvidenceArtifact>(pt => pt.ArtifactId);
-
-            modelBuilder.Entity<ClrAchievement>()
-                .HasOne(pc => pc.Clr)
-                .WithMany(c => c.ClrAchievements)
-                .HasForeignKey(pt => pt.ClrId);
-
-            modelBuilder.Entity<ClrAchievement>()
-                .HasOne(pc => pc.Achievement)
-                .WithOne(c => c.ClrAchievement)
-                .HasForeignKey<ClrAchievement>(pt => pt.AchievementId);
-
-            modelBuilder.Entity<ClrEndorsement>()
-                .HasOne(pc => pc.Clr)
-                .WithMany(c => c.ClrEndorsements)
-                .HasForeignKey(pt => pt.ClrId);
-
-            modelBuilder.Entity<ClrEndorsement>()
-                .HasOne(pc => pc.Endorsement)
-                .WithOne(c => c.ClrEndorsement)
-                .HasForeignKey<ClrEndorsement>(pt => pt.EndorsementId);
-
-            modelBuilder.Entity<ClrModel>()
-                .HasMany(cl => cl.Artifacts)
-                .WithOne(ar => ar.Clr)
-                .HasForeignKey(ar => ar.ClrId)
-                .IsRequired(false);
-
-            modelBuilder.Entity<AchievementAlignment>()
-                .HasOne(pc => pc.Achievement)
-                .WithMany(c => c.AchievementAlignments)
-                .HasForeignKey(pt => pt.AchievementId);
-
-            modelBuilder.Entity<AchievementAlignment>()
-                .HasOne(pc => pc.Alignment)
-                .WithOne(c => c.AchievementAlignment)
-                .HasForeignKey<AchievementAlignment>(pt => pt.AlignmentId);
-
-            modelBuilder.Entity<AchievementAssociation>()
-                .HasOne(pc => pc.Achievement)
-                .WithMany(c => c.AchievementAssociations)
-                .HasForeignKey(pt => pt.AchievementId);
-
-            modelBuilder.Entity<AchievementAssociation>()
-                .HasOne(pc => pc.Association)
-                .WithOne(c => c.AchievementAssociation)
-                .HasForeignKey<AchievementAssociation>(pt => pt.AssociationId);
-
-            modelBuilder.Entity<AchievementEndorsement>()
-                .HasOne(pc => pc.Achievement)
-                .WithMany(c => c.AchievementEndorsements)
-                .HasForeignKey(pt => pt.AchievementId);
-
-            modelBuilder.Entity<AchievementEndorsement>()
-                .HasOne(pc => pc.Endorsement)
-                .WithOne(c => c.AchievementEndorsement)
-                .HasForeignKey<AchievementEndorsement>(pt => pt.EndorsementId);
-
-            modelBuilder.Entity<AssertionEndorsement>()
-                .HasOne(pc => pc.Assertion)
-                .WithMany(c => c.AssertionEndorsements)
-                .HasForeignKey(pt => pt.AssertionId);
-
-            modelBuilder.Entity<AssertionEndorsement>()
-                .HasOne(pc => pc.Endorsement)
-                .WithOne(c => c.AssertionEndorsement)
-                .HasForeignKey<AssertionEndorsement>(pt => pt.EndorsementId);
-
-            modelBuilder.Entity<ProfileEndorsement>()
-                .HasOne(pc => pc.Profile)
-                .WithMany(c => c.ProfileEndorsements)
-                .HasForeignKey(pt => pt.ProfileId);
-
-            modelBuilder.Entity<ProfileEndorsement>()
-                .HasOne(pc => pc.Endorsement)
-                .WithOne(c => c.ProfileEndorsement)
-                .HasForeignKey<ProfileEndorsement>(pt => pt.EndorsementId);
-
-            modelBuilder.Entity<ResultAlignment>()
-                .HasOne(pc => pc.Result)
-                .WithMany(c => c.ResultAlignments)
-                .HasForeignKey(pt => pt.ResultId);
-
-            modelBuilder.Entity<ResultAlignment>()
-                .HasOne(pc => pc.Alignment)
-                .WithOne(c => c.ResultAlignment)
-                .HasForeignKey<ResultAlignment>(pt => pt.AlignmentId);
-
-            modelBuilder.Entity<ResultDescriptionAlignment>()
-                .HasOne(pc => pc.ResultDescription)
-                .WithMany(c => c.ResultDescriptionAlignments)
-                .HasForeignKey(pt => pt.ResultDescriptionId);
-
-            modelBuilder.Entity<ResultDescriptionAlignment>()
-                .HasOne(pc => pc.Alignment)
-                .WithOne(c => c.ResultDescriptionAlignment)
-                .HasForeignKey<ResultDescriptionAlignment>(pt => pt.AlignmentId);
-
-            modelBuilder.Entity<RubricCriterionLevelModel>()
-                .HasOne(pc => pc.ResultDescription)
-                .WithMany(c => c.RubricCriterionLevels)
-                .HasForeignKey(pt => pt.ResultDescriptionId);
-
-            modelBuilder.Entity<SourceModel>()
-                .HasMany(sourceModel => sourceModel.Authorizations)
-                .WithOne(authorizationModel => authorizationModel.Source)
-                .HasForeignKey(authorizationModel => authorizationModel.SourceForeignKey);
-
-            modelBuilder.Entity<AuthorizationModel>()
-                .HasMany(authorizationModel => authorizationModel.Clrs)
-                .WithOne(clrModel => clrModel.Authorization)
-                .HasForeignKey(clrModel => clrModel.AuthorizationForeignKey);
-
-            modelBuilder.Entity<AuthorizationModel>()
-               .HasMany(authorizationModel => authorizationModel.CredentialPackages)
-               .WithOne(pkg => pkg.Authorization)
-               .HasForeignKey(pkg => pkg.AuthorizationForeignKey)
-               .OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<SourceModel>()
-                .HasOne(sourceModel => sourceModel.DiscoveryDocument)
-                .WithOne(documentModel => documentModel.Source)
-                .HasForeignKey<DiscoveryDocumentModel>(documentModel => documentModel.SourceForeignKey);
-
-            modelBuilder.Entity<CredentialPackageModel>()
-                .Property(model => model.TypeId)
-                .HasConversion<int>();            
-
-            modelBuilder.Entity<CredentialPackageModel>()
-                .HasMany(c => c.ContainedClrs)
-                .WithOne(c => c.CredentialPackage)
-                .HasForeignKey(c => c.CredentialPackageId)
-                .IsRequired(true);
-
-            modelBuilder.Entity<CredentialPackageModel>()
-                .HasOne(c => c.ClrSet)
-                .WithOne(c => c.ParentCredentialPackage)
-                .HasForeignKey<ClrSetModel>(c => c.ParentCredentialPackageId)
-                .IsRequired(false);
-
-            modelBuilder.Entity<CredentialPackageModel>()
-                .HasOne(c => c.VerifiableCredential)
-                .WithOne(c => c.ParentCredentialPackage)
-                .HasForeignKey<VerifiableCredentialModel>(c => c.ParentCredentialPackageId)
-                .IsRequired(false);
-
-            modelBuilder.Entity<CredentialPackageModel>()
-                .HasOne(c => c.BadgrBackpack)
-                .WithOne(c => c.ParentCredentialPackage)
-                .HasForeignKey<BadgrBackpackModel>(c => c.ParentCredentialPackageId)
-                .IsRequired(false);
-
-            modelBuilder.Entity<CredentialPackageModel>()
-                .HasOne(c => c.Authorization)
-                .WithMany(a => a.CredentialPackages)
-                .HasForeignKey(c => c.AuthorizationForeignKey)
-                .IsRequired(false);
-
-            modelBuilder.Entity<VerifiableCredentialModel>()
-                .HasMany(c => c.ClrSets)
-                .WithOne(c => c.ParentVerifiableCredential)
-                .HasForeignKey("ParentVerifiableCredentialId")
-                .IsRequired(false);
-
-            modelBuilder.Entity<VerifiableCredentialModel>()
-                .HasMany(c => c.Clrs)
-                .WithOne(c => c.ParentVerifiableCredential)
-                .HasForeignKey("ParentVerifiableCredentialId")
-                .IsRequired(false);
-
-            modelBuilder.Entity<ClrSetModel>()
-                .HasMany(c => c.Clrs)
-                .WithOne(c => c.ParentClrSet)
-                .HasForeignKey("ParentClrSetId")
-                .IsRequired(false);
-
-            modelBuilder.Entity<BadgrAssertionModel>()
-               .HasOne(c => c.BadgrBackpack)
-               .WithMany(a => a.BadgrAssertions)
-               .HasForeignKey(a => a.BadgrBackpackId)
-               .IsRequired(true);
-
-            modelBuilder.Entity<RevocationModel>()
-                .HasOne(r => r.Source)
-                .WithMany(s => s.Revocations)
-                .HasForeignKey(s => s.SourceId);
-
-            modelBuilder.Entity<StatusModel>()
-                .Property(s => s.Id)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<StatusModel>()
-                .HasData(Enum.GetValues(typeof(StatusEnum)).Cast<StatusEnum>().Select(s => new StatusModel { Id = s, Name = s.ToString() }));
-
-            modelBuilder.Entity<LoginProofRequest>()
-                .Property(s => s.ProofRequestStatus)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<LoginProofRequest>()
-                .Property(s => s.Status)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<EmailVerification>()
-                .Property(s => s.Status)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<EmailVerification>()
-                .Property(model => model.Type)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<ShareTypeModel>()
-                .Property(s => s.Id)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<ShareTypeModel>()
-                .HasData(Enum.GetValues(typeof(ShareTypeEnum)).Cast<ShareTypeEnum>().Select(s => new ShareTypeModel { Id = s, Name = s.ToString() }));
-
-            modelBuilder.Entity<ShareModel>()
-                .Property(s => s.StatusId)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<ShareModel>()
-               .Property(s => s.StatusId)
-               .HasConversion<int>();
-
-            modelBuilder.Entity<SourceModel>()
-                .Property(s => s.SourceTypeId)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<MessageModel>()
-                .Property(m => m.StatusId)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<CredentialSchema>()
-                .Property(m => m.StatusId)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<CredentialDefinition>()
-                .Property(m => m.StatusId)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<ConnectionRequestStep>()
-                .Property(s => s.Id)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<ConnectionRequestStep>()
-                .HasData(Enum.GetValues(typeof(ConnectionRequestStepEnum)).Cast<ConnectionRequestStepEnum>().Select(s => new ConnectionRequestStep { Id = s, Name = s.ToString() }));
-
-            modelBuilder.Entity<CredentialRequestStep>()
-                .Property(s => s.Id)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<CredentialRequestStep>()
-                .HasData(Enum.GetValues(typeof(CredentialRequestStepEnum)).Cast<CredentialRequestStepEnum>().Select(s => new CredentialRequestStep { Id = s, Name = s.ToString() }));
-
-            modelBuilder.Entity<ConnectionRequestModel>()
-                .HasIndex(w => w.ThreadId)
-                .IsUnique();
-
-            modelBuilder.Entity<ConnectionRequestModel>()
-                .Property(w => w.ConnectionRequestStep)
-                .HasConversion<int>();
-
-            modelBuilder.Entity<CredentialRequestModel>()
-                .Property(w => w.CredentialRequestStep)
-                .HasConversion<int>();
 
             modelBuilder.Entity<AgentContextModel>(acm =>
             {
@@ -853,15 +228,457 @@ namespace OpenCredentialPublisher.Data.Contexts
                 acm.HasQueryFilter(x => !x.IsDeleted);
             });
 
-            modelBuilder.Entity<ProofRequestStep>(prs =>
+            modelBuilder
+                .Entity<AlignmentModel>(eb =>
+                {
+                    eb.ToTable("Alignments", schema: "cred");
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+                });
+
+            modelBuilder.Entity<ApplicationUser>(eb =>
             {
-                prs.Property(s => s.Id)
-                    .HasConversion<int>();
-                prs.HasData(
-                    Enum.GetValues(typeof(ProofRequestStepEnum))
-                        .Cast<ProofRequestStepEnum>()
-                        .Select(s => new ProofRequestStep { Id = s, Name = s.ToString() }));
+                eb.Property(a => a.CreatedDate)
+                  .HasDefaultValueSql("getdate()");
             });
+
+            modelBuilder.Entity<ArtifactModel>(eb =>
+            {
+                eb.ToTable("Artifacts", schema: "cred");
+                eb.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(a => a.UserId)
+                    .IsRequired(true)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                eb.Property(x => x.AdditionalProperties)
+                    .HasConversion(
+                        v => JsonSerializer.Serialize(v, null),
+                        v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
+                    );
+                eb.Property(x => x.AdditionalProperties)
+                    .Metadata
+                    .SetValueComparer(DictionaryValueComparer());
+            });
+
+            modelBuilder.Entity<AssertionEndorsement>(eb =>
+            {
+                eb.ToTable("AssertionEndorsements", schema: "cred");
+                eb.HasOne(pc => pc.Assertion)
+                    .WithMany(c => c.AssertionEndorsements)
+                    .HasForeignKey(pt => pt.AssertionId);
+
+                eb.HasOne(pc => pc.Endorsement)
+                    .WithOne(c => c.AssertionEndorsement)
+                    .HasForeignKey<AssertionEndorsement>(pt => pt.EndorsementId);
+            });
+
+            modelBuilder.Entity<AssertionEvidence>(eb =>
+            {
+                eb.ToTable("AssertionEvidence", schema: "cred");
+                eb.HasOne(ae => ae.Assertion)
+                    .WithMany(a => a.AssertionEvidences)
+                    .HasForeignKey(pt => pt.AssertionId);
+
+                eb.HasOne(ae => ae.Evidence)
+                    .WithOne(a => a.AssertionEvidence)
+                    .HasForeignKey<AssertionEvidence>(pt => pt.EvidenceId);
+            });
+
+            modelBuilder.Entity<AssertionModel>(eb =>
+            {
+                eb.ToTable("Assertions", schema: "cred");
+                eb.HasOne(a => a.ParentAssertion)
+                    .WithMany(a => a.ChildAssertions)
+                    .HasForeignKey(pt => pt.ParentAssertionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                eb.Property(x => x.SignedEndorsements)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, null)
+                );
+
+                eb.Property(x => x.SignedEndorsements)
+                    .Metadata
+                    .SetValueComparer(StringValueComparer());
+
+                eb.Property(x => x.AdditionalProperties)
+                    .HasConversion(
+                        v => JsonSerializer.Serialize(v, null),
+                        v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
+                    );
+
+                eb.Property(x => x.AdditionalProperties)
+                    .Metadata
+                    .SetValueComparer(DictionaryValueComparer());
+            });
+
+            modelBuilder
+                .Entity<AssociationModel>(eb =>
+                {
+                    eb.ToTable("Associations", schema: "cred");
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+                });
+
+            modelBuilder.Entity<AuthorizationModel>(eb =>
+            {
+                eb.Property(x => x.Scopes)
+                    .HasConversion(v => JsonSerializer.Serialize(v, null),
+                        v => JsonSerializer.Deserialize<List<string>>(v, null));
+
+                eb.Property(x => x.Scopes)
+                    .Metadata
+                    .SetValueComparer(StringValueComparer());
+
+                eb
+                   .HasMany<CredentialPackageModel>()
+                   .WithOne(pkg => pkg.Authorization)
+                   .HasForeignKey(pkg => pkg.AuthorizationForeignKey)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+                eb.HasQueryFilter(x => !x.Source.IsDeleted);
+            });
+
+            modelBuilder.Entity<BadgrAssertionModel>(eb =>
+            {
+                eb.ToTable("BadgrAssertions", schema: "cred");
+                eb.HasOne(c => c.BadgrBackpack)
+                   .WithMany(a => a.BadgrAssertions)
+                   .HasForeignKey(a => a.BadgrBackpackId)
+                   .IsRequired(true);
+
+                eb.Property(b => b.AdditionalProperties)
+                    .HasConversion(
+                        v => JsonSerializer.Serialize(v, null),
+                        v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                    );
+
+                eb
+                    .Property(x => x.AdditionalProperties)
+                    .Metadata
+                    .SetValueComparer(DictionaryValueComparer());
+
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<BadgrBackpackModel>(eb =>
+            {
+                eb.ToTable("BadgrBackpacks", schema: "cred");
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<ClrAchievement>(eb =>
+            {
+                eb.ToTable("ClrAchievements", schema: "cred");
+            });
+
+            modelBuilder.Entity<ClrAssertion>(eb =>
+            {
+                eb.ToTable("ClrAssertions", schema: "cred");
+            });
+
+            modelBuilder.Entity<ClrEndorsement>(eb =>
+            {
+                eb.ToTable("ClrEndorsements", schema: "cred");
+            });
+
+            modelBuilder.Entity<ClrModel>(eb =>
+            {
+                eb.ToTable("Clrs", schema: "cred");
+                eb.HasOne(clr => clr.Authorization)
+                    .WithMany()
+                    .HasForeignKey(auth => auth.AuthorizationForeignKey);
+
+                eb.HasMany(clr => clr.ClrAchievements)
+                  .WithOne()
+                  .HasForeignKey(ca => ca.ClrId);
+
+                eb.HasMany(cl => cl.Artifacts)
+                    .WithOne()
+                    .HasForeignKey(ar => ar.ClrId)
+                    .IsRequired(false);
+
+                eb.HasMany(pc => pc.ClrEndorsements)
+                    .WithOne()
+                    .HasForeignKey(pt => pt.ClrId);
+
+                eb.HasMany(clr => clr.ClrAssertions)
+                    .WithOne()
+                    .HasForeignKey(ca => ca.ClrId);
+
+                eb.HasMany(clr => clr.Links)
+                    .WithOne(linkModel => linkModel.Clr)
+                    .HasForeignKey(linkModel => linkModel.ClrForeignKey);
+
+                eb.HasOne(clr => clr.SmartResume)
+                    .WithOne()
+                    .HasForeignKey<SmartResume>(sr => sr.ClrId);
+
+                eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                eb.Property(x => x.AdditionalProperties)
+                    .Metadata
+                    .SetValueComparer(DictionaryValueComparer());
+
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<ClrSetModel>(eb =>
+            {
+                eb.ToTable("ClrSets", schema: "cred");
+                eb.HasMany(c => c.Clrs)
+                    .WithOne(c => c.ParentClrSet)
+                    .HasForeignKey("ParentClrSetId")
+                    .IsRequired(false);
+
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<ConnectionRequestModel>(eb =>
+            {
+                eb.HasIndex(w => w.ThreadId)
+                    .IsUnique();
+                eb.Property(w => w.ConnectionRequestStep)
+                    .HasConversion<int>();
+
+                eb.HasQueryFilter(x => !x.IsDeleted);
+
+            });
+
+            modelBuilder.Entity<ConnectionRequestStep>(eb =>
+            {
+                eb.Property(s => s.Id)
+                    .HasConversion<int>();
+                eb.HasData(Enum.GetValues(typeof(ConnectionRequestStepEnum)).Cast<ConnectionRequestStepEnum>().Select(s => new ConnectionRequestStep { Id = s, Name = s.ToString() }));
+            });
+
+
+            modelBuilder.Entity<CredentialDefinition>(eb =>
+            {
+                eb.Property(m => m.StatusId)
+                .HasConversion<int>();
+                eb.HasQueryFilter(x => !x.IsDeleted);
+
+            });
+
+            modelBuilder.Entity<CredentialPackageModel>(eb =>
+            {
+                eb.ToTable("CredentialPackages", schema: "cred");
+                eb.Property(model => model.TypeId)
+                    .HasConversion<int>();
+                eb.HasMany(c => c.ContainedClrs)
+                    .WithOne(c => c.CredentialPackage)
+                    .HasForeignKey(c => c.CredentialPackageId)
+                    .IsRequired(true);
+                eb.HasOne(c => c.ClrSet)
+                    .WithOne(c => c.ParentCredentialPackage)
+                    .HasForeignKey<ClrSetModel>(c => c.ParentCredentialPackageId)
+                    .IsRequired(false);
+                eb.HasOne(c => c.VerifiableCredential)
+                    .WithOne(c => c.ParentCredentialPackage)
+                    .HasForeignKey<VerifiableCredentialModel>(c => c.ParentCredentialPackageId)
+                    .IsRequired(false);
+                eb.HasOne(c => c.BadgrBackpack)
+                    .WithOne(c => c.ParentCredentialPackage)
+                    .HasForeignKey<BadgrBackpackModel>(c => c.ParentCredentialPackageId)
+                    .IsRequired(false);
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<CredentialRequestModel>(eb =>
+            {
+                eb.Property(w => w.CredentialRequestStep)
+                    .HasConversion<int>();
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<CredentialRequestStep>(eb =>
+            {
+                eb.Property(s => s.Id)
+                    .HasConversion<int>();
+                eb.HasData(Enum.GetValues(typeof(CredentialRequestStepEnum)).Cast<CredentialRequestStepEnum>().Select(s => new CredentialRequestStep { Id = s, Name = s.ToString() }));
+            });
+
+            modelBuilder.Entity<CredentialSchema>(eb =>
+            {
+                eb.Property(m => m.StatusId)
+                    .HasConversion<int>();
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder
+                .Entity<CriteriaModel>(eb =>
+                {
+                    eb.ToTable("Criteria", schema: "cred");
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+                });
+
+            modelBuilder.Entity<DiscoveryDocumentModel>(eb =>
+            {
+                eb.ToTable("DiscoveryDocumentModel", schema: "cred");
+                eb.Property(x => x.ScopesOffered)
+                    .HasConversion(v => JsonSerializer.Serialize(v, null),
+                        v => JsonSerializer.Deserialize<List<string>>(v, null));
+
+                eb.Property(x => x.ScopesOffered)
+                    .Metadata
+                    .SetValueComparer(StringValueComparer());
+            });
+
+
+            modelBuilder.Entity<EmailVerification>(eb =>
+            {
+                eb.Property(s => s.Status)
+                    .HasConversion<int>();
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder
+                .Entity<EndorsementClaimModel>(eb =>
+                {
+                    eb.ToTable("EndorsementClaims", schema: "cred");
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+                });
+
+            modelBuilder
+                .Entity<EndorsementModel>(eb =>
+                {
+                    eb.ToTable("Endorsements", schema: "cred");
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+                });
+
+            modelBuilder.Entity<EvidenceArtifact>(eb => {
+                eb.ToTable("EvidenceArtifacts", schema: "cred");
+            });
+
+            modelBuilder.Entity<EvidenceModel>(eb => {
+                eb.ToTable("Evidence", schema: "cred");
+                eb.Property(x => x.AdditionalProperties)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<Dictionary<String, Object>>(v, null)
+                );
+
+                eb
+                .Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
+            });
+
+            modelBuilder.Entity<Models.ClrEntities.IdentityModel>(eb =>
+            {
+                eb.ToTable("Identities", schema: "cred");
+                eb.Property(b => b.AdditionalProperties)
+               .HasConversion(
+                   v => JsonSerializer.Serialize(v, null),
+                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+               );
+
+                eb.Property(x => x.AdditionalProperties)
+                .Metadata
+                .SetValueComparer(DictionaryValueComparer());
+            });
+
+            modelBuilder.Entity<LinkModel>(eb =>
+            {
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<LoginProofRequest>(eb =>
+            {
+                eb.Property(s => s.ProofRequestStatus)
+                    .HasConversion<int>();
+
+                eb.Property(s => s.Status)
+                    .HasConversion<int>();
+            });
+
+            modelBuilder.Entity<MessageModel>(eb =>
+            {
+                eb.Property(m => m.StatusId)
+                    .HasConversion<int>();
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<ProfileEndorsement>(eb => {
+                eb.ToTable("ProfileEndorsements", schema: "cred");
+                eb.HasOne(pc => pc.Profile)
+                    .WithMany(c => c.ProfileEndorsements)
+                    .HasForeignKey(pt => pt.ProfileId);
+
+                eb.HasOne(pc => pc.Endorsement)
+                    .WithOne(c => c.ProfileEndorsement)
+                    .HasForeignKey<ProfileEndorsement>(pt => pt.EndorsementId);
+            });
+
+            modelBuilder.Entity<ProfileModel>(eb =>
+            {
+                eb.ToTable("Profiles", schema: "cred");
+                eb.Property(b => b.PublicKey)
+                   .HasConversion(
+                       v => JsonSerializer.Serialize(v, null),
+                       v => JsonSerializer.Deserialize<CryptographicKeyDType>(v, null)
+                   );
+
+                eb.Property(b => b.AdditionalProperties)
+                   .HasConversion(
+                       v => JsonSerializer.Serialize(v, null),
+                       v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                   );
+
+                eb.Property(x => x.AdditionalProperties)
+                    .Metadata
+                    .SetValueComparer(DictionaryValueComparer());
+
+                eb.Property(b => b.Identifiers)
+                   .HasConversion(
+                       v => JsonSerializer.Serialize(v, null),
+                       v => JsonSerializer.Deserialize<List<SystemIdentifierDType>>(v, null)
+                   );
+
+                eb.Property(b => b.Identifiers)
+                    .Metadata
+                    .SetValueComparer(SystemIdentifierDTypeValueComparer());
+            });
+
 
             modelBuilder.Entity<ProofRequest>(pr =>
             {
@@ -887,38 +704,217 @@ namespace OpenCredentialPublisher.Data.Contexts
                 pr.HasQueryFilter(x => !x.IsDeleted);
             });
 
-            modelBuilder.Entity<VerityThread>()
-                .Property(w => w.FlowTypeId)
+            modelBuilder.Entity<ProofRequestStep>(prs =>
+            {
+                prs.Property(s => s.Id)
+                    .HasConversion<int>();
+                prs.HasData(
+                    Enum.GetValues(typeof(ProofRequestStepEnum))
+                        .Cast<ProofRequestStepEnum>()
+                        .Select(s => new ProofRequestStep { Id = s, Name = s.ToString() }));
+            });
+
+            modelBuilder.Entity<ProofResponse>(eb =>
+            {
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<ProvisioningTokenModel>(eb =>
+            {
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<RecipientModel>(eb =>
+            {
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<ResultAlignment>(eb => {
+                eb.ToTable("ResultAlignments", schema: "cred");
+                eb.HasOne(pc => pc.Result)
+                    .WithMany(c => c.ResultAlignments)
+                    .HasForeignKey(pt => pt.ResultId);
+
+                eb.HasOne(pc => pc.Alignment)
+                    .WithOne(c => c.ResultAlignment)
+                    .HasForeignKey<ResultAlignment>(pt => pt.AlignmentId);
+            });
+
+            modelBuilder.Entity<ResultDescriptionAlignment>(eb =>
+            {
+                eb.ToTable("ResultDescriptionAlignments", schema: "cred");
+
+                eb.HasOne(pc => pc.ResultDescription)
+                    .WithMany(c => c.ResultDescriptionAlignments)
+                    .HasForeignKey(pt => pt.ResultDescriptionId);
+
+                eb.HasOne(pc => pc.Alignment)
+                    .WithOne(c => c.ResultDescriptionAlignment)
+                    .HasForeignKey<ResultDescriptionAlignment>(pt => pt.AlignmentId);
+            });
+
+            modelBuilder
+                .Entity<ResultDescriptionModel>(eb =>
+                {
+                    eb.ToTable("ResultDescriptions", schema: "cred");
+                    eb.Property(x => x.AllowedValues)
+                        .HasConversion(v => JsonSerializer.Serialize(v, null),
+                            v => JsonSerializer.Deserialize<List<string>>(v, null));
+
+                    eb.Property(x => x.AllowedValues)
+                        .Metadata
+                        .SetValueComparer(StringValueComparer());
+
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+                });
+
+            modelBuilder
+                .Entity<ResultModel>(eb =>
+                {
+                    eb.ToTable("Results", schema: "cred");
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+                });
+
+            modelBuilder.Entity<RevocationModel>(eb =>
+            {
+                eb.HasOne(r => r.Source)
+                    .WithMany()
+                    .HasForeignKey(s => s.SourceId);
+
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<RubricCriterionLevelAlignment>(eb =>
+            {
+                eb.ToTable("RubricCriterionLevelAlignments", schema: "cred");
+            });
+
+            modelBuilder.Entity<RubricCriterionLevelModel>(eb =>
+            {
+                eb.ToTable("RubricCriterionLevels", schema: "cred");
+                eb.Property(b => b.AdditionalProperties)
+                   .HasConversion(
+                       v => JsonSerializer.Serialize(v, null),
+                       v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                   );
+                eb.Property(x => x.AdditionalProperties)
+                    .Metadata
+                    .SetValueComparer(DictionaryValueComparer());
+                eb.HasOne(pc => pc.ResultDescription)
+                    .WithMany(c => c.RubricCriterionLevels)
+                    .HasForeignKey(pt => pt.ResultDescriptionId);
+            });
+
+            modelBuilder.Entity<ShareTypeModel>(eb =>
+            {
+                eb.Property(s => s.Id)
                 .HasConversion<int>();
 
-            // IsDeleted Filters, use .IgnoreQueryFilters() to include deleted items
-            // IsDeleted Filters, use .IgnoreQueryFilters() to include deleted items
-            modelBuilder.Entity<SourceModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<AuthorizationModel>().HasQueryFilter(x => !x.Source.IsDeleted);
-            modelBuilder.Entity<DiscoveryDocumentModel>().HasQueryFilter(x => !x.Source.IsDeleted);
-            modelBuilder.Entity<CredentialPackageModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<ClrSetModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<ClrModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<ClrEndorsement>().HasQueryFilter(x => !x.Clr.IsDeleted);
-            modelBuilder.Entity<ClrAchievement>().HasQueryFilter(x => !x.Clr.IsDeleted);
-            modelBuilder.Entity<ClrAssertion>().HasQueryFilter(x => !x.Clr.IsDeleted);
-            modelBuilder.Entity<LinkModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<VerifiableCredentialModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<BadgrBackpackModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<BadgrAssertionModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<ShareModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<CredentialRequestModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<ConnectionRequestModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<WalletRelationshipModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<RecipientModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<ProvisioningTokenModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<ProofResponse>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<MessageModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<CredentialSchema>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<CredentialDefinition>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<RevocationModel>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<EmailVerification>().HasQueryFilter(x => !x.IsDeleted);
+                eb.HasData(Enum.GetValues(typeof(ShareTypeEnum)).Cast<ShareTypeEnum>().Select(s => new ShareTypeModel { Id = s, Name = s.ToString() }));
+            });
 
+            modelBuilder.Entity<SmartResume>(sr =>
+            {
+                sr.ToTable("SmartResumes", "idatafy");
+                sr.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(s => s.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired(true);
+            });
+
+            modelBuilder.Entity<SourceModel>(eb =>
+            {
+                eb.Property(s => s.SourceTypeId)
+                    .HasConversion<int>();
+
+                eb.HasMany(sourceModel => sourceModel.Authorizations)
+                    .WithOne(authorizationModel => authorizationModel.Source)
+                    .HasForeignKey(authorizationModel => authorizationModel.SourceForeignKey);
+
+                eb.HasOne(sourceModel => sourceModel.DiscoveryDocument)
+                    .WithOne()
+                    .HasForeignKey<DiscoveryDocumentModel>(documentModel => documentModel.SourceForeignKey);
+
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<StatusModel>(eb => {
+                eb.Property(s => s.Id)
+                    .HasConversion<int>();
+
+                eb.HasData(Enum.GetValues(typeof(StatusEnum)).Cast<StatusEnum>().Select(s => new StatusModel { Id = s, Name = s.ToString() }));
+            });
+
+            modelBuilder.Entity<VerifiableCredentialModel>(eb =>
+            {
+                eb.ToTable("VerifiableCredentials", schema: "cred");
+                eb.HasMany(c => c.ClrSets)
+                    .WithOne(c => c.ParentVerifiableCredential)
+                    .HasForeignKey("ParentVerifiableCredentialId")
+                    .IsRequired(false);
+                eb.HasMany(c => c.Clrs)
+                    .WithOne(c => c.ParentVerifiableCredential)
+                    .HasForeignKey("ParentVerifiableCredentialId")
+                    .IsRequired(false);
+
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder
+                .Entity<VerificationModel>(eb =>
+                {
+                    eb.ToTable("Verifications", schema: "cred");
+                    eb.Property(x => x.AllowedOrigins)
+                        .HasConversion(v => JsonSerializer.Serialize(v, null),
+                            v => JsonSerializer.Deserialize<List<string>>(v, null));
+
+                    eb.Property(x => x.AllowedOrigins)
+                        .Metadata
+                        .SetValueComparer(StringValueComparer());
+
+                    eb.Property(x => x.StartsWith)
+                        .HasConversion(v => JsonSerializer.Serialize(v, null),
+                            v => JsonSerializer.Deserialize<List<string>>(v, null));
+
+                    eb.Property(x => x.StartsWith)
+                        .Metadata
+                        .SetValueComparer(StringValueComparer());
+
+                    eb.Property(b => b.AdditionalProperties)
+                       .HasConversion(
+                           v => JsonSerializer.Serialize(v, null),
+                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null)
+                       );
+                    eb.Property(x => x.AdditionalProperties)
+                        .Metadata
+                        .SetValueComparer(DictionaryValueComparer());
+                });
+
+            modelBuilder.Entity<VerityThread>(eb =>
+            {
+                eb.Property(w => w.FlowTypeId)
+                    .HasConversion<int>();
+            });
+
+            modelBuilder.Entity<WalletRelationshipModel>(eb =>
+            {
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
 
             // Views
             modelBuilder.Entity<CredentialPackageArtifactView>(eb =>
@@ -941,6 +937,7 @@ namespace OpenCredentialPublisher.Data.Contexts
 
             base.OnModelCreating(modelBuilder);
         }
+
         public async Task<Int32> SaveChangesAsync()
         {
             return await this.SaveChangesAsync(true);

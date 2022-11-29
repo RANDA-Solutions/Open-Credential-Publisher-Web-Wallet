@@ -24,18 +24,17 @@ namespace OpenCredentialPublisher.Data.Models.ClrEntities.Relationships
             this.ModifiedAt = DateTime.UtcNow;
         }
 
-        public static ClrAchievement Combine(ClrModel clr, AchievementModel achievement, int order = 0)
+        public static ClrAchievement Combine(int clrId, AchievementModel achievement, int order = 0)
         {
             return new ClrAchievement()
             {
-                Clr = clr,
+                ClrId = clrId,
                 Achievement = achievement,
                 IsDeleted = false,
                 Order = order
             };
         }
         //Relationships
-        public ClrModel Clr { get; set; }
         public AchievementModel Achievement { get; set; }
     }
 }

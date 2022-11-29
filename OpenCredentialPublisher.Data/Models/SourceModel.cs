@@ -43,11 +43,6 @@ namespace OpenCredentialPublisher.Data.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// All the revocations tied to this resource server.
-        /// </summary>
-        public List<RevocationModel> Revocations { get; set; }
-
-        /// <summary>
         /// The scopes the authorization server and resource server support.
         /// </summary>
         public string Scope { get; set; }

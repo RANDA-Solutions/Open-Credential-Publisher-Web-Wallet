@@ -14,15 +14,15 @@ namespace OpenCredentialPublisher.Data.Models
         public string ClrName { get; set; }
         public string EvidenceName { get; set; }
 
-        public static EnhancedArtifactFields FromArtifact(ArtifactModel art)
+        public static EnhancedArtifactFields FromArtifact(ClrModel clr, ArtifactModel art)
         {
             var model = new EnhancedArtifactFields()
             {
                 AssertionId = art.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.Id,
-                ClrIssuedOn = art.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.ClrAssertion.Clr.IssuedOn,
-                ClrName = art.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.ClrAssertion.Clr.Name,
+                ClrIssuedOn = clr.IssuedOn,
+                ClrName = clr.Name,
                 EvidenceName = art.EvidenceArtifact.Evidence.Name,
-                ClrId = art.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.ClrAssertion.Clr.ClrId
+                ClrId = clr.ClrId
             };
             return model;
         }

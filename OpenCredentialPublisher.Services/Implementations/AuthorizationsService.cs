@@ -87,13 +87,16 @@ namespace OpenCredentialPublisher.Services.Implementations
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == userId && x.Id == id);
         }
-        public async Task<AuthorizationModel> GetDeepAsync(string id)
+        public async Task<(AuthorizationModel authorization, List<ClrModel> clrs)> GetDeepAsync(string id)
         {
-            return await _context.Authorizations.AsNoTracking()
-                .Include(a => a.Clrs)
+            var authorization =
+                await _context.Authorizations.AsNoTracking()
                 .Include(a => a.Source)
                 .ThenInclude(s => s.DiscoveryDocument)
                 .SingleOrDefaultAsync(a => a.Id == id);
+
+            var clrs = await _context.Clrs.AsNoTracking().Where(c => c.AuthorizationForeignKey == id).ToListAsync();
+            return (authorization, clrs);
         }
         public async Task<SourceTypeEnum> GetSourceTypeAsync(string id)
         {

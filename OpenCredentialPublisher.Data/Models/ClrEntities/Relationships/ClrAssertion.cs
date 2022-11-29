@@ -24,18 +24,17 @@ namespace OpenCredentialPublisher.Data.Models.ClrEntities.Relationships
             this.ModifiedAt = DateTime.UtcNow;
         }
 
-        public static ClrAssertion Combine(ClrModel clr, AssertionModel assertion, int order = 0)
+        public static ClrAssertion Combine(int clrId, AssertionModel assertion, int order = 0)
         {
             return new ClrAssertion()
             {
-                Clr = clr,
+                ClrId = clrId,
                 Assertion = assertion,
                 IsDeleted = false,
                 Order = order
             };
         }
         //Relationships
-        public ClrModel Clr { get; set; }
         public AssertionModel Assertion { get; set; }
     }
 }

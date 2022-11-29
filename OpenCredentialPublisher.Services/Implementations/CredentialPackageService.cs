@@ -27,15 +27,6 @@ namespace OpenCredentialPublisher.Services.Implementations
             _logger = logger;
         }
 
-        public async Task<List<ArtifactModel>> GetPackagePdfArtifactsAsync(int id)
-        {
-            return await _context.Artifacts
-                .Where(a => a.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.ClrAssertion.Clr.CredentialPackage.Id == id
-                    && a.IsPdf)
-                .OrderByDescending(a => a.CreatedAt)
-                .ToListAsync();
-        }
-
         public async Task<bool> UpdateCredentialPackageNameAsync(string userId, int credentialPackageId, string name)
         {
             try

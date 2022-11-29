@@ -419,7 +419,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 {
                     order++;
                     var achievementModel = ConvertAchievement(achievementDType);
-                    var clrAchievement = ClrAchievement.Combine(clr, achievementModel, order);
+                    var clrAchievement = ClrAchievement.Combine(clr.ClrId, achievementModel, order);
                     clr.ClrAchievements.Add(clrAchievement);
                 }
             }
@@ -443,7 +443,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     var decoded = asrtDType.DeserializePayload<AssertionDType>();
                     var signedAsrt = AssertionModel.FromDTypeShallow(decoded, asrtDType);
                     AddAssertionChildren(ref signedAsrt, decoded);
-                    var clrAssertion = ClrAssertion.Combine(clr, signedAsrt, order);
+                    var clrAssertion = ClrAssertion.Combine(clr.ClrId, signedAsrt, order);
                     clr.ClrAssertions.Add(clrAssertion);
                 }
             }
@@ -454,7 +454,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     order++;
                     var clrAsrt = AssertionModel.FromDTypeShallow(asrtDType);
                     AddAssertionChildren(ref clrAsrt, asrtDType);
-                    var clrAssertion = ClrAssertion.Combine(clr, clrAsrt, order);
+                    var clrAssertion = ClrAssertion.Combine(clr.ClrId, clrAsrt, order);
                     clr.ClrAssertions.Add(clrAssertion);
                 }
             }
@@ -677,7 +677,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 foreach (var endorsementModel in endorsementModels)
                 {
                     order++;
-                    var clrEndorsement = ClrEndorsement.Combine(clrEntity, endorsementModel, order);
+                    var clrEndorsement = ClrEndorsement.Combine(clrEntity.ClrId, clrEntity, endorsementModel, order);
                     clrEntity.ClrEndorsements.Add(clrEndorsement);
                 }
             }
@@ -687,7 +687,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 foreach (var endorsementModel in endorsementModels)
                 {
                     order++;
-                    var clrEndorsement = ClrEndorsement.Combine(clrEntity, endorsementModel, order);
+                    var clrEndorsement = ClrEndorsement.Combine(clrEntity.ClrId, clrEntity, endorsementModel, order);
                     clrEntity.ClrEndorsements.Add(clrEndorsement);
                 }
             }
@@ -1098,19 +1098,24 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             var clrIds = pkg.ContainedClrs.Select(c => c.ClrId).ToList();
 
+            if (!clrIds.Any())
+                return;
+
+            var clrs = await _context.Clrs.Where(clr => clrIds.Contains(clr.ClrId)).ToDictionaryAsync(clr => clr.ClrId);
+
             var artifacts = await _context.Artifacts
                 .Include(a => a.EvidenceArtifact)
                 .ThenInclude(ea => ea.Evidence)
                 .ThenInclude(e => e.AssertionEvidence)
                 .ThenInclude(ae => ae.Assertion)
                 .ThenInclude(a => a.ClrAssertion)
-                .ThenInclude(ca => ca.Clr)
-                .Where(a => clrIds.Contains(a.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.ClrAssertion.Clr.ClrId))
+                .Where(a => a.ClrId.HasValue && clrIds.Contains(a.ClrId.Value))
                 .ToListAsync();
 
             foreach (var art in artifacts)
             {
-                var eaf = EnhancedArtifactFields.FromArtifact(art);
+                var clr = clrs[art.ClrId.Value];
+                var eaf = EnhancedArtifactFields.FromArtifact(clr, art);
                 art.ClrId = eaf.ClrId;
                 art.AssertionId = eaf.AssertionId;
                 art.ClrIssuedOn = eaf.ClrIssuedOn;
