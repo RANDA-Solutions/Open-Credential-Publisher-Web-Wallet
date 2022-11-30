@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -92,6 +93,8 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             return NotFound();
         }
+
+        [AllowAnonymous]
         [HttpPost("Pdf")]
         [ProducesResponseType(200, Type = typeof(ApiResponse))]  /* success returns 200 - Ok */
         public async Task<IActionResult> ShowPdf(PdfRequest dReq)
@@ -114,7 +117,8 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                             return await _downloadService.GetLinkPdfAsync(Request, dReq, _userId);
                         }
                         return await _downloadService.GetPdfAsync(Request, dReq, _userId);
-                    default:
+                    case PdfRequestTypeEnum.LinkViewPdf:
+                    case PdfRequestTypeEnum.LinkDownloadPdf:
                         if (dReq.LinkId != null)
                         {
                             return await _downloadService.GetLinkPdfAsync(Request, dReq, _userId);
@@ -123,12 +127,10 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                         {
                             return await _downloadService.GetClrPdfAsync(Request, dReq, _userId);
                         }
-                        else
-                        {
-                            throw new ApplicationException("ShowPdf unexpected PdfRequest values.");
-                        }
                         break;
                 }
+                throw new ApplicationException("ShowPdf unexpected PdfRequest values.");
+
             }
             catch (Exception ex)
             {

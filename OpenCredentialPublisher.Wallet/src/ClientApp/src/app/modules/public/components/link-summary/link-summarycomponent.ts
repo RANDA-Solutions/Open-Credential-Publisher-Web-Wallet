@@ -9,6 +9,7 @@ import { LinkDisplayVM } from '@shared/models/linkDisplayVM';
 import { LinkDisplayVMNew } from '@shared/models/linkDisplayVMNew';
 import { PdfRequest } from '@shared/models/pdfRequest';
 import { PdfShare } from '@shared/models/pdfShare';
+import { EvidenceService } from '@shared/services/evidence.service';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -26,7 +27,7 @@ export class LinkSummaryComponent implements OnChanges, OnInit {
   public vm = new LinkDisplayVMNew();
   private debug = false;
 
-  constructor(private linkService: LinksService, private downloads: DownloadService, private verificationService: VerificationService, private ref: ChangeDetectorRef) { }
+  constructor(private linkService: LinksService, private evidenceService: EvidenceService, private downloads: DownloadService, private verificationService: VerificationService, private ref: ChangeDetectorRef) { }
 
   ngOnChanges() {
     if (this.debug) console.log('LinkSummaryComponent ngOnChanges');
@@ -68,7 +69,8 @@ export class LinkSummaryComponent implements OnChanges, OnInit {
       evidenceName:  pdf.evidenceName,
       artifactId:  pdf.artifactId,
       artifactName:  pdf.artifactName,
-      createLink: false
+      createLink: false,
+      accessKey: this.evidenceService.accessKey
     }
     this.message = 'downloading pdf';
     this.showSpinner = true;

@@ -341,7 +341,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             if (authorization != null)
             {
-                authorization = await _authorizationsService.GetDeepAsync(authorization.Id);
+                (authorization, _) = await _authorizationsService.GetDeepAsync(authorization.Id);
 
                 if (authorization.AccessToken == null)
                 {

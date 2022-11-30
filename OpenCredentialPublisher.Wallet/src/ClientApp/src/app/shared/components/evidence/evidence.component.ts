@@ -6,8 +6,8 @@ import { UtilsService } from '@core/services/utils.service';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { ArtifactVM } from '@shared/models/clrSimplified/artifactVM';
 import { EvidenceVM } from '@shared/models/clrSimplified/evidenceVM';
-import { PdfRequestTypeEnum } from '@shared/models/enums/pdfRequestTypeEnum';
 import { PdfRequest } from '@shared/models/pdfRequest';
+import { EvidenceService } from '@shared/services/evidence.service';
 import { BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -19,7 +19,7 @@ import { take } from 'rxjs/operators';
 export class EvidenceComponent implements OnInit {
   private _showSpinnerBehavior = new BehaviorSubject(false);
   private debug = false;
-  
+
   @Input() clrId: number;
   @Input() clrIdentifier: string;
   @Input() id: string;
@@ -30,8 +30,8 @@ export class EvidenceComponent implements OnInit {
   showSpinner$ = this._showSpinnerBehavior.asObservable();
   message = 'loading evidence';
   showIt = false;
-  
-  constructor(private appService: AppService, private clrService: ClrService, public utils: UtilsService, private downloads: DownloadService
+
+  constructor(private appService: AppService, private evidenceService: EvidenceService, private clrService: ClrService, public utils: UtilsService, private downloads: DownloadService
     , private utilsService: UtilsService) { }
 
   ngOnChanges() {
@@ -66,15 +66,17 @@ export class EvidenceComponent implements OnInit {
 
   showPdf(evidence: EvidenceVM, artifact: ArtifactVM){
     const dr : PdfRequest = {
-      requestType: this.appService.currentUrl.toLowerCase().includes('public/links')
-        ?  PdfRequestTypeEnum.LinkViewPdf : PdfRequestTypeEnum.OwnerViewPdf,
-      linkId: null,
+      // requestType: this.appService.currentUrl.toLowerCase().includes('public/links')
+      //   ?  PdfRequestTypeEnum.LinkViewPdf : PdfRequestTypeEnum.OwnerViewPdf,
+      requestType: this.evidenceService.requestType,
+      linkId: this.evidenceService.linkId,
       clrId: this.clrId,
       assertionId: this.id,
       evidenceName: artifact.evidenceName,
       artifactId: artifact.artifactId,
       artifactName: artifact.name,
-      createLink: false
+      createLink: false,
+      accessKey: this.evidenceService.accessKey
     }
     this.message = 'loading pdf';
     this._showSpinnerBehavior.next(true);

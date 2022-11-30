@@ -2,7 +2,6 @@ import { Component, OnChanges, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CredentialService } from '@core/services/credentials.service';
 import { DownloadService } from '@core/services/download.service';
-import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
@@ -67,7 +66,8 @@ export class DeleteCredentialComponent  implements OnChanges, OnInit{
       evidenceName: this.package.newestPdfTranscript.evidenceName,
       artifactId: this.package.newestPdfTranscript.artifactId,
       artifactName: this.package.newestPdfTranscript.artifactName,
-      createLink: true
+      createLink: true,
+      accessKey: null
     }
     this.miniSpinner = true;
       if (this.debug) console.log('DeleteCredentialComponent showPdf');

@@ -11,6 +11,7 @@ import { PackageTypeEnum } from '@shared/models/enums/packageTypeEnum';
 import { PdfRequestTypeEnum } from '@shared/models/enums/pdfRequestTypeEnum';
 import { PackageVM } from '@shared/models/packageVM';
 import { PdfRequest } from '@shared/models/pdfRequest';
+import { EvidenceService } from '@shared/services/evidence.service';
 import { take } from 'rxjs/operators';
 
 
@@ -31,7 +32,9 @@ export class DisplayCredentialComponent  implements OnChanges, OnInit{
   private sub: any;
 
   constructor(private route: ActivatedRoute, private router: Router, private credentialService: CredentialService
-    , private downloads: DownloadService, @Inject(DOCUMENT) private document: any) {
+    , private evidenceService: EvidenceService
+    , private downloads: DownloadService
+    , @Inject(DOCUMENT) private document: any) {
   }
   ngOnChanges() {
     this.showSpinner = true;
@@ -46,6 +49,10 @@ export class DisplayCredentialComponent  implements OnChanges, OnInit{
       console.log(params['id']);
       this.getData(this.packageId );
    });
+
+   this.evidenceService.setAccessKey(null);
+   this.evidenceService.setRequestType(PdfRequestTypeEnum.OwnerViewPdf);
+
   }
   downloadVCJson(){
     this.miniSpinner = true;
@@ -69,7 +76,8 @@ export class DisplayCredentialComponent  implements OnChanges, OnInit{
       evidenceName: this.package.newestPdfTranscript.evidenceName,
       artifactId: this.package.newestPdfTranscript.artifactId,
       artifactName: this.package.newestPdfTranscript.artifactName,
-      createLink: true
+      createLink: true,
+      accessKey: null
     }
     this.miniSpinner = true;
       if (this.debug) console.log('DisplayCredentialComponent showPdf');

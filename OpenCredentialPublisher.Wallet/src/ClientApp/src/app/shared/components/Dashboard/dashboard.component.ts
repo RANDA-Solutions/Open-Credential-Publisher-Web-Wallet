@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DownloadService } from '@core/services/download.service';
-import { environment } from '@environment/environment';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { PdfRequestTypeEnum } from '@shared/models/enums/pdfRequestTypeEnum';
 import { PdfRequest } from '@shared/models/pdfRequest';
@@ -56,7 +55,8 @@ export class DashboardComponent implements OnDestroy, OnInit {
       evidenceName: evidenceName,
       artifactId: artifactId,
       artifactName:artifactName,
-      createLink: true
+      createLink: true,
+      accessKey: null
     }
     this.message = 'downloading transcript';
     this.showSpinner = true;
