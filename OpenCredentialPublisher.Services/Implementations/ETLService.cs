@@ -558,6 +558,8 @@ namespace OpenCredentialPublisher.Services.Implementations
                         {
                             eOrder++;
                             var artifactModel = ArtifactModel.FromArtifactDType(artifactDType);
+                            artifactModel.UserId = _httpContextAccessor.HttpContext.User.JwtUserId();
+                            
                             var evidenceArtifact = EvidenceArtifact.Combine(evidenceModel, artifactModel, eOrder);
                             evidenceModel.EvidenceArtifacts.Add(evidenceArtifact);
                         }
