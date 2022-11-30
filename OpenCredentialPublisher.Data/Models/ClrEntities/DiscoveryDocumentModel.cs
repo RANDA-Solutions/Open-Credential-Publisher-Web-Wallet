@@ -8,7 +8,6 @@ namespace OpenCredentialPublisher.Data.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int DiscoveryDocumentId { get; set; }
-        public SourceModel Source { get; set; }
         public int SourceForeignKey { get; set; }
 
         //BadgeConnect additional properties

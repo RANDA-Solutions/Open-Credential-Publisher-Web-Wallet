@@ -81,6 +81,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             return new LinkListVM { Credentials = credentials };
         }
+
         public async Task<LinkVM> GetLinkVMAsync(string userId, string id, HttpRequest request)
         {
             var link = await _context.Links.AsNoTracking()

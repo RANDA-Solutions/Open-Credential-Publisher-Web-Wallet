@@ -12,5 +12,6 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
         public int? ArtifactId {get; set;}
         public string ArtifactName {get; set;}
         public bool CreateLink { get; set; }
+        public string AccessKey { get; set; }
     }
 }

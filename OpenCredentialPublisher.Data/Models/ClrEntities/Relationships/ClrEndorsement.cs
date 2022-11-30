@@ -20,18 +20,17 @@ namespace OpenCredentialPublisher.Data.Models.ClrEntities.Relationships
             this.ModifiedAt = DateTime.UtcNow;
         }
 
-        public static ClrEndorsement Combine(ClrModel clr, EndorsementModel endorsement, int order = 0)
+        public static ClrEndorsement Combine(int clrId, ClrModel clr, EndorsementModel endorsement, int order = 0)
         {
             return new ClrEndorsement()
             {
-                Clr = clr,
+                ClrId = clrId,
                 Endorsement = endorsement,
                 IsDeleted = false,
                 Order = order
             };
         }
         //Relationships
-        public ClrModel Clr { get; set; }
         public EndorsementModel Endorsement { get; set; }
     }
 }

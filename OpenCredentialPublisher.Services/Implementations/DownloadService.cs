@@ -79,9 +79,9 @@ namespace OpenCredentialPublisher.Services.Implementations
 
             return await GetFileContentResultAsync(request, artifact, dReq, userId, shareModel);
         }
+
         public async Task<IActionResult> GetLinkPdfAsync(HttpRequest request, PdfRequest dReq, string userId = null)
         {
-
             var link = await _linkService.GetAsync(userId, dReq.LinkId);
 
             var linkVM = await _linkService.GetLinkVMAsync(userId, dReq.LinkId, request);
@@ -89,24 +89,43 @@ namespace OpenCredentialPublisher.Services.Implementations
             if (linkVM == null)
                 return new NotFoundResult();
 
-            var shareModel = new ShareModel
+            ShareModel shareModel;
+            if (dReq.AccessKey == null)
             {
-                LinkId = link.Id,
-                ShareTypeId = ShareTypeEnum.Pdf,
-                AccessKey = Crypto.CreateRandomString(16),
-                UseCount = 0,
-                CreatedAt = DateTime.UtcNow,
-                StatusId = StatusEnum.Active
-            };
+                shareModel = new ShareModel
+                {
+                    LinkId = link.Id,
+                    ShareTypeId = ShareTypeEnum.Pdf,
+                    AccessKey = Crypto.CreateRandomString(16),
+                    UseCount = 0,
+                    CreatedAt = DateTime.UtcNow,
+                    StatusId = StatusEnum.Active
+                };
+
+                link.ModifiedAt = DateTime.UtcNow;
+                link.RequiresAccessKey = true;
+                await _linkService.AddShareAsync(shareModel);
+                await _linkService.UpdateAsync(link);
+            }
+            else
+            {
+                shareModel = link.Shares.FirstOrDefault(s => s.AccessKey == dReq.AccessKey);
+                if (link.UserId != userId)
+                {
+                    shareModel.UseCount++;
+                    shareModel.ModifiedAt = DateTime.UtcNow;
+                    var entry = _context.Entry(shareModel);
+                    if (entry.State == EntityState.Detached)
+                        entry.State = EntityState.Modified;
+
+                    _context.Update(shareModel);
+                    await _context.SaveChangesAsync();
+                }
+            }
 
             var artifact = await _context.Artifacts.AsNoTracking()
-                .Where(a => a.ArtifactId == dReq.ArtifactId.Value && a.EvidenceName == dReq.EvidenceName && a.AssertionId == dReq.AssertionId)
-                .FirstOrDefaultAsync();
-
-            link.ModifiedAt = DateTime.UtcNow;
-            link.RequiresAccessKey = true;
-            await _linkService.AddShareAsync(shareModel);
-            await _linkService.UpdateAsync(link);
+                    .Where(a => a.ArtifactId == dReq.ArtifactId.Value && a.EvidenceName == dReq.EvidenceName && a.AssertionId == dReq.AssertionId)
+                    .FirstOrDefaultAsync();
 
             return await GetFileContentResultAsync(request, artifact, dReq, userId, shareModel);
         }

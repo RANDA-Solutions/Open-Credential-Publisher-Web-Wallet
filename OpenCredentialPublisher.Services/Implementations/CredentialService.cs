@@ -84,16 +84,8 @@ namespace OpenCredentialPublisher.Services.Implementations
         }
         public async Task<PdfShareViewModel> GetNewestPdfTranscriptAsync(string userId)
         {
-            var artifact = await _context.Artifacts
-                .Include(a => a.EvidenceArtifact)
-                .ThenInclude(ea => ea.Evidence)
-                .ThenInclude(e => e.AssertionEvidence)
-                .ThenInclude(ae => ae.Assertion)
-                .ThenInclude(a => a.ClrAssertion)
-                .ThenInclude(ca => ca.Clr)
-                .ThenInclude(c => c.CredentialPackage)
-                .Where(a => a.EvidenceArtifact.Evidence.AssertionEvidence.Assertion.ClrAssertion.Clr.CredentialPackage.UserId == userId
-                    && a.IsPdf && a.NameContainsTranscript)
+            var artifact = await _context.Artifacts.AsNoTracking()
+                .Where(c => c.UserId == userId && c.IsPdf && !c.IsDeleted && c.NameContainsTranscript)
                 .OrderByDescending(a => a.CreatedAt)
                 .FirstOrDefaultAsync();
 
@@ -467,7 +459,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                     order++;
                     var decoded = asrt.DeserializePayload<AssertionDType>();
                     var signedAsrt = AssertionModel.FromDTypeShallow(decoded, asrt);
-                    var clrAssertion = ClrAssertion.Combine(clr, signedAsrt, order);
+                    var clrAssertion = ClrAssertion.Combine(clr.ClrId, signedAsrt, order);
                     clrAssertions.Add(clrAssertion);
                 }
             }
@@ -477,7 +469,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 {
                     order++;
                     var clrAsrt = AssertionModel.FromDTypeShallow(asrt);
-                    var clrAssertion = ClrAssertion.Combine(clr, clrAsrt, order);
+                    var clrAssertion = ClrAssertion.Combine(clr.ClrId, clrAsrt, order);
                     clrAssertions.Add(clrAssertion);
                 }
             }
@@ -596,7 +588,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var assertions = await _context.Assertions
                 .IgnoreQueryFilters()
                 .Include(clr => clr.ClrAssertion)
-                .ThenInclude(ca => ca.Clr)
+                //.ThenInclude(ca => ca.Clr)
                 .ToListAsync();
 
             return assertions;

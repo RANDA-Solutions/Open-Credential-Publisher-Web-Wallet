@@ -118,7 +118,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         {
             try
             {
-                var auth = await _authorizationsService.GetDeepAsync(id);
+                var (auth, clrs) = await _authorizationsService.GetDeepAsync(id);
 
                 var vm = new SourceDetailVM();
                 vm.Clrs = new List<SourceClrVM>();
@@ -142,7 +142,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                         break;
                 }
                 vm.SourceIsDeletable = auth.Source.IsDeletable;
-                foreach (var clr in auth.Clrs)
+                foreach (var clr in clrs)
                 {
                     var clrVM = new SourceClrVM();
                     clrVM.CredentialPackageId = clr.CredentialPackageId;
@@ -156,7 +156,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CredentialksController.GetPackageList", null);
+                _logger.LogError(ex, "CredentialsController.GetDetail", null);
                 throw;
             }
         }
@@ -171,7 +171,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
             try
             {
                 ModelStateDictionary modelState = new ModelStateDictionary();
-                var auth = await _authorizationsService.GetDeepAsync(id);
+                var (auth, _) = await _authorizationsService.GetDeepAsync(id);
                 await _authorizationsService.DeleteSourceAsync(auth.Source.Id);
                 return ApiOk(null);
 
@@ -313,7 +313,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     return ApiModelInvalid(modelState);
                 }
 
-                var authorization = await _authorizationsService.GetDeepAsync(data.State);
+                var (authorization, _) = await _authorizationsService.GetDeepAsync(data.State);
 
                 if (authorization == null)
                 {

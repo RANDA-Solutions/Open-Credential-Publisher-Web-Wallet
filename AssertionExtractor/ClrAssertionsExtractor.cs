@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using OpenCredentialPublisher.ClrLibrary.Extensions;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using OpenCredentialPublisher.Data.Constants;
@@ -31,7 +32,7 @@ namespace DataUtility
 
         }
         public async Task PopulateAssertionNamesAsync()
-        {            
+        {
             var assertions = await _credentialService.GetAssertionsAsync();
             foreach (var assertion in assertions)
             {
@@ -45,10 +46,12 @@ namespace DataUtility
         {
             var pkgIds = await _credentialService.GetPackageUniverseIdsAsync();
             var assertions = await _credentialService.GetAssertionsWithClrAsync();
+            var clrIds = assertions.Select(x => x.ClrAssertion.ClrId).ToArray();
+            var clrs = await _context.Clrs.AsNoTracking().Where(clr => clrIds.Contains(clr.ClrId)).ToDictionaryAsync(clr => clr.ClrId);
             foreach (var assertion in assertions)
             {
                 ConsoleUtil.ConsoleWrite($"Extracting CLR: {assertion.ClrAssertion.ClrId}...", Configuration.ConsoleColors.InProgress);
-                var clr = JsonSerializer.Deserialize<ClrDType>(assertion.ClrAssertion.Clr.Json);
+                var clr = JsonSerializer.Deserialize<ClrDType>(clrs[assertion.ClrAssertion.ClrId].Json);
                 var allAssertions = new List<MiniAssertion>();
 
                 if (clr.SignedAssertions != null)
@@ -75,6 +78,7 @@ namespace DataUtility
             }
         }
     }
+
     internal class MiniAssertion
     {
         internal string Id { get; set; }

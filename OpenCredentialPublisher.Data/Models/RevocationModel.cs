@@ -17,7 +17,6 @@ namespace OpenCredentialPublisher.Data.Models
         public ApplicationUser User { get; set; }
         public string RevocationListId { get; set; }
         public int? SourceId { get; set; }
-        [ForeignKey("SourceId")]
         public SourceModel Source { get; set; }
         public string IssuerId { get; set; }
         public string RevokedId { get; set; }

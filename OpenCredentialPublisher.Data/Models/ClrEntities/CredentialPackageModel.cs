@@ -23,7 +23,6 @@ namespace OpenCredentialPublisher.Data.Models
         /// </summary>
         [StringLength(450)]
         public string AuthorizationForeignKey { get; set; }
-        [ForeignKey("AuthorizationForeignKey")]
         public AuthorizationModel Authorization { get; set; }
         public ClrModel Clr { get; set; }
         public ClrSetModel ClrSet { get; set; }

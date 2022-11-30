@@ -76,7 +76,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return;
             }
 
-            var authorization = await _authorizationsService.GetDeepAsync(id);
+            var (authorization, _) = await _authorizationsService.GetDeepAsync(id);
 
             if (authorization == null)
             {
@@ -236,7 +236,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 return;
             }
 
-            var authorization = await _authorizationsService.GetDeepAsync(id);
+            var (authorization, _) = await _authorizationsService.GetDeepAsync(id);
 
             if (authorization == null)
             {

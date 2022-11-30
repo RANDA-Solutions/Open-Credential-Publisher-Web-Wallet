@@ -38,7 +38,8 @@ export class LinkListComponent implements OnInit {
       evidenceName: evidenceName,
       artifactId: artifactId,
       artifactName: artifactName,
-      createLink: false
+      createLink: false,
+      accessKey: null
     }
     this.message = 'retrieving pdf';
     this.showSpinner = true;

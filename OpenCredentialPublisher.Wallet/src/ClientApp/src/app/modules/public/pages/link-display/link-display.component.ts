@@ -2,11 +2,12 @@ import { DOCUMENT } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
-import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ApiBadRequestResponse } from '@shared/models/apiBadRequestResponse';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
+import { PdfRequestTypeEnum } from '@shared/models/enums/pdfRequestTypeEnum';
 import { LinkDisplayVM } from '@shared/models/linkDisplayVM';
+import { EvidenceService } from '@shared/services/evidence.service';
 import { take } from 'rxjs/operators';
 import { LinksService } from '../../../links/links.service';
 
@@ -28,8 +29,10 @@ export class LinkDisplayComponent {
   message: string = 'Loading';
   private debug = false;
   private sub: any;
-  constructor(private route: ActivatedRoute, private router: Router, private linksService: LinksService
-    ,  public appService: AppService
+  constructor(private route: ActivatedRoute,  private router: Router
+    , private evidenceService: EvidenceService
+    , private linksService: LinksService
+    , public appService: AppService
     , @Inject(DOCUMENT) private document: any) {
   }
 
@@ -59,6 +62,8 @@ export class LinkDisplayComponent {
         if (this.debug) console.log(data);
         if (data.statusCode == 200) {
           this.linkDisplay = (<ApiOkResponse>data).result as LinkDisplayVM;
+          if (!this.linkDisplay.requiresAccessKey)
+            this.evidenceService.setRequestType(PdfRequestTypeEnum.OwnerViewPdf);
           if (this.debug) console.log(`link clrId: ${this.linkDisplay.clrId}`);
         } else {
           this.linkDisplay = new LinkDisplayVM();
@@ -75,6 +80,9 @@ export class LinkDisplayComponent {
         if (this.debug) console.log(data);
         if (data.statusCode == 200) {
           this.linkDisplay = (<ApiOkResponse>data).result as LinkDisplayVM;
+          this.evidenceService.setAccessKey(this.accessKey);
+          this.evidenceService.setRequestType(PdfRequestTypeEnum.LinkViewPdf);
+          this.evidenceService.setLinkId(this.id);
           if (this.debug) console.log(`link clrId: ${this.linkDisplay.clrId}`);
         } else {
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
