@@ -4,6 +4,7 @@ import { AppService } from '@core/services/app.service';
 import { AuthorizationService } from '@core/services/authorization.service';
 import { environment } from '@environment/environment';
 import { AccessService } from '@modules/access/services/access.service';
+import { CodeService } from '@modules/access/services/code.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AuthService } from '@root/app/auth/auth.service';
 import { LoginService } from '@root/app/auth/login.service';
@@ -30,18 +31,20 @@ export class LoginFormComponent implements OnInit {
 	errors: string;
 	showSpinner = false;
   loginSpinner = false;
+  codeSpinner = false;
 	submitted = false;
 	credentials: Credentials = { email: '', password: '' };
 	infoMessage?: string;
 	//externalProviders: AuthenticationSchemeModel[];
   showMicrosoftLogin: boolean = environment?.showMicrosoftLogin == true;
-  public
+
 	private sub: Subscription;
 	private returnUrl: string | null;
 	private debug = false;
 
 	constructor(private authorizationService: AuthorizationService,
 		private loginService: LoginService,
+    private codeService: CodeService,
 		private appService: AppService,
 		private accessService: AccessService,
 		private authService: AuthService,
@@ -78,6 +81,34 @@ export class LoginFormComponent implements OnInit {
 			}
 		});
 	}
+
+  code(f) {
+    if (environment.debug) {
+      console.log(f);
+    }
+    if (f.controls.email.valid) {
+      this.codeSpinner = true;
+      this.codeService.sendCode(f.value.email).subscribe(
+        data => {
+          if (data.invalid) {
+            this.router.navigate(['/access/code/invalid']);
+          }
+          if (data.locked) {
+            this.router.navigate(['/public/lockout']);
+          }
+          if (data.created) {
+            this.router.navigate(["/access/code/waiting"]);
+          }
+        },
+        error => {
+          this.codeSpinner = false;
+        },
+        () => {
+          this.codeSpinner = false;
+        }
+      );
+    }
+  }
 
 	login({ value, valid }: { value: Credentials; valid: boolean }) {
 		if (this.debug) console.log(`LoginFormComponent login`);

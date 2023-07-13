@@ -1,4 +1,4 @@
 export class SelOption {
-  id: string;
+  id: number;
   name: string;
 }

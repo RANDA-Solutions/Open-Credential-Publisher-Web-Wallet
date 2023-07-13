@@ -54,19 +54,19 @@ namespace OpenCredentialPublisher.Services.Implementations
             var credentialResponse = new CredentialResponse();
             if (json.Contains("https://www.w3.org/2018/credentials/v1"))
             {
-                schemaResult = await _schemaService.ValidateSchemaAsync<VerifiableCredential>(controller.Request, json);
+                (schemaResult, _) = await _schemaService.ValidateSchemaAsync<VerifiableCredential>(controller.Request, json);
                 if (schemaResult.IsValid)
                     return await ProcessVerifiableCredential(userId, null, json, authorization);
             }
             else if (json.Contains("CLRSet"))
             {
-                schemaResult = await _schemaService.ValidateSchemaAsync<ClrSetDType>(controller.Request, json);
+                (schemaResult, _) = await _schemaService.ValidateSchemaAsync<ClrSetDType>(controller.Request, json);
                 if (schemaResult.IsValid)
                     await SaveClrSetPackageAsync(modelState, json, authorization);
             }
             else
             {
-                schemaResult = await _schemaService.ValidateSchemaAsync<ClrDType>(controller.Request, json);
+                (schemaResult, _) = await _schemaService.ValidateSchemaAsync<ClrDType>(controller.Request, json);
                 if (schemaResult.IsValid)
                     await SaveClrPackageAsync(modelState, json, authorization);
             }
@@ -90,25 +90,79 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
             return credentialResponse;
         }
+
+        public async Task<(string email, VerifiableCredential credential)> ProcessExternalJson(ControllerBase controller, string json, AuthorizationModel authorization)
+        {
+            var document = JsonDocument.Parse(json);
+
+            if (document.RootElement.TryGetProperty("@context", out JsonElement contextElement))
+            {
+                var context = contextElement.ToString();
+                if (context.Contains("https://www.w3.org/2018/credentials/v1"))
+                {
+                    var validationResult = await _schemaService.ValidateSchemaAsync<VerifiableCredential>(controller.Request, json);
+                    if (validationResult.result.IsValid)
+                    {
+                        string email = null;
+                        foreach (var cred in validationResult.instance.CredentialSubjects)
+                        {
+                            if (cred is ClrSetSubject clrSet)
+                            {
+                                var clrs = new List<ClrDType>();
+                                clrs.AddRange(clrSet.Clrs);
+
+                                foreach (var signedClr in clrSet.SignedClrs)
+                                {
+                                    var clr = signedClr.DeserializePayload<ClrDType>();
+                                    clrs.Add(clr);
+                                }
+
+                                var learner = clrs.Select(clr => clr.Learner).FirstOrDefault(learner =>
+                                    !String.IsNullOrEmpty(learner.Email));
+                                if (learner != null)
+                                {
+                                    email = learner.Email;
+                                    break;
+                                }
+                            }
+
+                            if (cred is ClrSubject clrSubject)
+                            {
+                                email = clrSubject.Learner.Email;
+                                if (email != null) break;
+                            }
+                        }
+                        if (!String.IsNullOrEmpty(email))
+                        {
+                            return (email, validationResult.instance);
+                        }
+                    }
+                }
+                
+                
+            }
+            return (null, default);
+        }
+
         public async Task<CredentialResponse> ProcessJson(HttpRequest request, ModelStateDictionary modelState, string userId, string fileName, string json, AuthorizationModel authorization)
         {
             var credentialResponse = new CredentialResponse();
             SchemaResult schemaResult;
             if (json.Contains("https://www.w3.org/2018/credentials/v1"))
             {
-                schemaResult = await _schemaService.ValidateSchemaAsync<VerifiableCredential>(request, json);
+                (schemaResult, _) = await _schemaService.ValidateSchemaAsync<VerifiableCredential>(request, json);
                 if (schemaResult.IsValid)
                     return await ProcessVerifiableCredential(userId, fileName, json, authorization);
             }
             else if (json.Contains("CLRSet"))
             {
-                schemaResult = await _schemaService.ValidateSchemaAsync<ClrSetDType>(request, json);
+                (schemaResult, _) = await _schemaService.ValidateSchemaAsync<ClrSetDType>(request, json);
                 if (schemaResult.IsValid)
                     await SaveClrSetPackageAsync(modelState, json, authorization);
             }
             else
             {
-                schemaResult = await _schemaService.ValidateSchemaAsync<ClrDType>(request, json);
+                (schemaResult, _) = await _schemaService.ValidateSchemaAsync<ClrDType>(request, json);
                 if (schemaResult.IsValid)
                     await SaveClrPackageAsync(modelState, json, authorization);
             }

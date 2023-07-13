@@ -28,16 +28,18 @@ namespace OpenCredentialPublisher.Wallet.Controllers
         private readonly LinkService _linkService;
         private readonly CredentialService _credentialService;
         private readonly SiteSettingsOptions _siteSettings;
+        private readonly NorthDakotaOptions _northDakotaOptions;
 
         public LinksController(UserManager<ApplicationUser> userManager, ILogger<LinksController> logger, LinkService linkService
             , CredentialService credentialService, EmailService emailSender, EmailHelperService emailHelperService
-            , IOptions<SiteSettingsOptions> siteSettings ) : base(userManager, logger)
+            , IOptions<SiteSettingsOptions> siteSettings, IOptions<NorthDakotaOptions> northDakotaOptions ) : base(userManager, logger)
         {
             _siteSettings = siteSettings?.Value;
             _linkService = linkService;
             _credentialService = credentialService;
             _emailSender = emailSender;
             _emailHelperService = emailHelperService;
+            _northDakotaOptions = northDakotaOptions?.Value;
         }
 
         [HttpGet("LinkList")]
@@ -90,12 +92,24 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                     ModelState.AddModelError(string.Empty, $"Cannot find link {input.LinkId}.");
                 }
 
-                var recipient = await _emailHelperService.GetRecipientAsync(_userId, input.RecipientId.Value);
+                int? recipientId = null;
+                string recipientEmail = null;
+                if (input.SendToBSC)
+                {
+                    recipientEmail = _northDakotaOptions.BSCEmailAddress;
+                }
+                else
+                {
+                    var recipient = await _emailHelperService.GetRecipientAsync(_userId, input.RecipientId.Value);
+                    recipientId = recipient.Id;
+                    recipientEmail = recipient.Email;
+                }
+                
 
                 var shareModel = new ShareModel
                 {
                     LinkId = input.LinkId,
-                    RecipientId = recipient.Id,
+                    RecipientId = recipientId,
                     ShareTypeId = ShareTypeEnum.Email,
                     AccessKey = Crypto.CreateRandomString(16),
                     UseCount = 0,
@@ -109,7 +123,7 @@ namespace OpenCredentialPublisher.Wallet.Controllers
 
                 var message = new MessageModel
                 {
-                    Recipient = recipient.Email,
+                    Recipient = recipientEmail,
                     Body = new StringBuilder().Append($"Hello!<br />You have received a verifiable credential from {learner_name}. ")
                         .Append($"This credential is the student’s official electronic transcript.<br /><br />Use this unique link to locate the credential: ")
                         .Append($"<a href=\"{LinkService.GetLinkUrl(Request, linkIn.Id)}\">{_siteSettings.SpaClientUrl}</a><br />You will need this key to access the credential: {shareModel.AccessKey}<br /><br />")

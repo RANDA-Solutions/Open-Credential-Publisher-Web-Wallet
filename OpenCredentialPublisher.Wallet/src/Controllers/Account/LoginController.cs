@@ -144,6 +144,8 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
                     ReturnUrl = credentials.ReturnUrl,
                     Email = credentials.Email
                 };
+                user.LastLoggedInDate = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
                 return ApiOk(authModel);
             }
             if (result.RequiresTwoFactor)
@@ -190,6 +192,9 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
+                user.LastLoggedInDate = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
+
                 return new JsonResult(new TwoFactorAuthenticationModel { Result = TwoFactorAuthenticationResultEnum.Success });
             }
             else if (result.IsLockedOut)
@@ -219,6 +224,8 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
+                user.LastLoggedInDate = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
                 return new JsonResult(new TwoFactorAuthenticationModel { Result = TwoFactorAuthenticationResultEnum.Success });
             }
             else if (result.IsLockedOut)
@@ -232,6 +239,8 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
                 return new JsonResult(new TwoFactorAuthenticationModel { Result = TwoFactorAuthenticationResultEnum.Error, ErrorMessage = "Invalid recovery code entered." });
             }
         }
+
+        
 
         private OkObjectResult ApiOk(object model, string message = null, string redirectUrl = null)
         {

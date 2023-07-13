@@ -3,7 +3,7 @@
     <section class="default-container p-5">
       <span class="h1">Email your credential</span>
       <ng-container *ngIf="vm.linkId != null">
-      <ng-container *ngIf="infoMessage"> 
+      <ng-container *ngIf="infoMessage">
         <div class="alert alert-info my-3">
           {{infoMessage}}
         </div>
@@ -24,14 +24,22 @@
                   </div>
                   <div class="form-group">
                     <label for="recipient" class="">Send to:</label>
-                    <select class="form-control" id="recipient" [(ngModel)]="vm.recipientId" required name="recipient">
-                      <option selected value="">- Select Recipient -</option>
+                    <select class="form-control" id="recipient" [(ngModel)]="vm.recipientId" [disabled]="vm.sendToBSC" name="recipient">
+                      <option selected value="null">- Select Recipient -</option>
                       <option *ngFor="let option of vm.recipients"  [value]="option.id">
                         {{option.name}}
                       </option>
                     </select>
                     <!--div [hidden]="recipient.valid || recipient.pristine" class="alert alert-danger">
                     </div-->
+                  </div>
+                  <p class="text-center">
+                    <b>OR</b>
+                  </p>
+                  <div class="form-group">
+                    <label class="shareBSC">
+                      <input type="checkBox" [(ngModel)]="vm.sendToBSC" name="sendToBSC" value="true" /> BSC Admissions Credit Transfer
+                    </label>
                   </div>
                   <div class="form-group">
                     <input type="submit" [disabled]="!shareForm.form.valid"

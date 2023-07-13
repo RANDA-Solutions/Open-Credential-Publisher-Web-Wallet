@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using OpenCredentialPublisher.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace OpenCredentialPublisher.Data.ViewModels.nG
         public string LinkId { get; set; }
         public string LinkNickname { get; set; }
 
-        [Required]
+        public bool SendToBSC { get; set; }
         public int? RecipientId { get; set; }
 
         public List<Option> Recipients { get; set; }

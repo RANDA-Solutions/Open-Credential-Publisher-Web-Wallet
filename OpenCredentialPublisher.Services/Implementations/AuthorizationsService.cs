@@ -70,7 +70,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             var result = await _context.Authorizations.AsNoTracking()
                 //.Include(a => a.Clrs)
                 .Include(a => a.Source)
-                .Where(l => l.UserId == userId && !l.IsDeleted)
+                .Where(l => l.UserId == userId && !l.IsDeleted && l.Source.SourceTypeId != SourceTypeEnum.Other)
                 .Select(a => new AuthorizationVM() {
                     Id = a.Id, Name = a.Source.Name, SourceUrl = a.Source.Url,
                     Type = a.Source.SourceTypeId == SourceTypeEnum.Clr ? $"CLRs" : a.Source.SourceTypeId == SourceTypeEnum.OpenBadge ? $"Open Badges v2.0" : a.Source.SourceTypeId == SourceTypeEnum.OpenBadgeConnect ? $"Open Badge v2.1" : "Other",
@@ -129,7 +129,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             return await _context.Sources.AsNoTracking()
                 .Include(x => x.Authorizations)
                 .Include(x => x.DiscoveryDocument)
-                .Where(s => s.Authorizations.All(a => (a.UserId != userId) || a.IsDeleted))
+                .Where(s => s.SourceTypeId != SourceTypeEnum.Other && s.Authorizations.All(a => (a.UserId != userId) || a.IsDeleted))
                 .Select(s => new SourceVM { Id = s.Id.ToString(), Name =
                     s.SourceTypeId == SourceTypeEnum.Clr ? $"CLRs - {s.Name} ({s.Url})" : s.SourceTypeId == SourceTypeEnum.OpenBadge ? $"Badges v2.0 - {s.Name} ({s.Url})" : s.SourceTypeId == SourceTypeEnum.OpenBadgeConnect ? $"Badges v2.1 - {s.Name} ({s.Url})" : s.Name
                 })

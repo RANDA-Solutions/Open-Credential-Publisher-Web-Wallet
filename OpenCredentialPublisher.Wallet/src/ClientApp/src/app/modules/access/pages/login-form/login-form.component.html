@@ -32,6 +32,15 @@
         <span class="spinner-border spinner-border-sm" role="status" *ngIf="loginSpinner" aria-hidden="true"></span>
       </button>
     </div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend mr-3">
+          <span class="blank-icon"></span>
+      </div>
+      <button type="button" class="btn btn-tertiary btn-login" (click)="code(f)" [disabled]="codeSpinner">
+        Login with Emailed Link
+        <span class="spinner-border spinner-border-sm" role="status" *ngIf="codeSpinner" aria-hidden="true"></span>
+      </button>
+    </div>
     <div class="input-group">
       <div class="input-group-prepend mr-3">
           <span class="blank-icon"></span>

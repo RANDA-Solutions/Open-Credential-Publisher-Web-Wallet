@@ -86,6 +86,7 @@ namespace OpenCredentialPublisher.ClrWallet
 
             services.Configure<VerityOptions>(Configuration.GetSection(VerityOptions.Section));
             services.Configure<MSVCOptions>(Configuration.GetSection(MSVCOptions.Section));
+            services.Configure<NorthDakotaOptions>(Configuration.GetSection(NorthDakotaOptions.Section));
             services.Configure<HostSettings>(Configuration.GetSection(nameof(HostSettings)));
             var keyVaultSection = Configuration.GetSection(nameof(KeyVaultOptions));
             services.Configure<KeyVaultOptions>(keyVaultSection);

@@ -48,10 +48,15 @@ export class ShareLinkComponent implements OnInit {
         if (this.debug) console.log(data);
         this.showSpinner = false;
         if (data.statusCode == 200) {
-          let recipient = this.vm.recipients.find((recipient) => {
-            return recipient.id == this.vm.recipientId;
-          });
-          this.infoMessage = `Credential shared with ${recipient.name}`;
+          if (this.vm.sendToBSC) {
+            this.infoMessage = `Credential shared with Bismarck State College.`;
+          }
+          else {
+            let recipient = this.vm.recipients.find((recipient) => {
+              return recipient.id == this.vm.recipientId;
+            });
+            this.infoMessage = `Credential shared with ${recipient.name}`;
+          }
         } else {
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
         }
@@ -66,7 +71,7 @@ export class ShareLinkComponent implements OnInit {
         this.showIt = true;
         if (data.statusCode == 200) {
           this.vm = (<ApiOkResponse>data).result as LinkShareVM;
-          this.vm.recipientId = "";
+          this.vm.recipientId = null;
           if (this.debug) console.log('link-share gotData');
         } else {
           this.vm = new LinkShareVM();

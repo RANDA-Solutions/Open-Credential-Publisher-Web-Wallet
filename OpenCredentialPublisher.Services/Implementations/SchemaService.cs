@@ -51,13 +51,13 @@ namespace OpenCredentialPublisher.Services.Implementations
             BasePath = configuration["BasePath"];
         }
 
-        public async Task<SchemaResult> ValidateSchemaAsync<T>(HttpRequest request, string content)
+        public async Task<(SchemaResult result, T instance)> ValidateSchemaAsync<T>(HttpRequest request, string content)
         {
             var schemaResult = new SchemaResult();
             if (string.IsNullOrEmpty(content))
             {
                 schemaResult.ErrorMessages.Add("JSON is null or empty.");
-                return schemaResult;
+                return (schemaResult, default(T));
             }
             
             var builder = new UriBuilder(request.Scheme, request.Host.Host);
@@ -81,7 +81,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             {
                 _logger.LogException(e, e.Message);
                 schemaResult.ErrorMessages.Add(e.Message);
-                return schemaResult;
+                return (schemaResult, default(T));
             }
 
             string url;
@@ -89,7 +89,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             if (typeof(T) == typeof(VerifiableCredential)) // bypass schema check for now until the correct VC schema is found
             {
                 //schemaResult.IsValid = true;
-                return schemaResult;
+                return (schemaResult, value);
             }
             else if (typeof(T) == typeof(ClrDType))
                 url = $"{ClrSchemaLocation.EnsureTrailingSlash()}{ClrJsonSchema}";
@@ -104,7 +104,7 @@ namespace OpenCredentialPublisher.Services.Implementations
             else
             {
                 schemaResult.ErrorMessages.Add($"Unknown type {typeof(T)}");
-                return schemaResult;
+                return (schemaResult, value);
             }
 
             // Validate the response
@@ -140,7 +140,7 @@ namespace OpenCredentialPublisher.Services.Implementations
                 _logger.LogException(e, e.Message);
                 schemaResult.ErrorMessages.Add(e.Message);
             }
-            return schemaResult;
+            return (schemaResult, value);
         }
     }
 
