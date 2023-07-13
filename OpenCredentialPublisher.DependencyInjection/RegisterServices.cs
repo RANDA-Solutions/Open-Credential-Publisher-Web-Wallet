@@ -34,6 +34,7 @@ namespace OpenCredentialPublisher.DependencyInjection
             services.AddTransient<EventHandlerService>();
             services.AddTransient<IdRampApiService>();
             services.AddTransient<LogHttpClientService>();
+            services.AddTransient<LoginLinkService>();
             services.AddTransient<LoginProofService>();
             services.AddTransient<ProfileImageService>();
             services.AddTransient<RecipientService>();

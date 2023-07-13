@@ -85,7 +85,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
                     try
                     {
-                        await client.SendAsync(message);
+                        var response = await client.SendAsync(message);
                     }
                     catch (Exception ex)
                     {

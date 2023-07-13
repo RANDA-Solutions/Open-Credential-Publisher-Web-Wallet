@@ -12,6 +12,8 @@ namespace OpenCredentialPublisher.Data.Models
 		public string ProfileImageUrl { get; set; }
 
         public DateTime CreatedDate { get; set; }
+
+        public DateTime? LastLoggedInDate { get; set; }
         
     }
 }

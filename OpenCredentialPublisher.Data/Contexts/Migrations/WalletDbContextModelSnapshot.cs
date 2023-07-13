@@ -443,6 +443,9 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("LastLoggedInDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -2914,6 +2917,50 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.ToTable("Links");
                 });
 
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.LoginLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Claimed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MessageId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReturnUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset>("ValidUntil")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LoginLinks");
+                });
+
             modelBuilder.Entity("OpenCredentialPublisher.Data.Models.LoginProofRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -4428,6 +4475,15 @@ namespace OpenCredentialPublisher.Data.Contexts.Migrations
                     b.Navigation("Clr");
 
                     b.Navigation("CredentialRequest");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("OpenCredentialPublisher.Data.Models.LoginLink", b =>
+                {
+                    b.HasOne("OpenCredentialPublisher.Data.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });

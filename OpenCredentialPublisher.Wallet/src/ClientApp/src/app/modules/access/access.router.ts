@@ -2,6 +2,11 @@ import { RouterModule, Routes } from '@angular/router';
 import { AccessComponent } from './access.component';
 import { AzEmailCredentialComponent } from './pages/az-email-credential/az-email-credential.component';
 import { AzLoginWithProofComponent } from './pages/az-login-with-proof/az-login-with-proof.component';
+import { CodeClaimComponent } from './pages/code-claim/code-claim.component';
+import { CodeCredentialComponent } from './pages/code-credential/code-credential.component';
+import { CodeExpiredComponent } from './pages/code-expired/code-expired.component';
+import { CodeInvalidComponent } from './pages/code-invalid/code-invalid.component';
+import { CodeWaitingComponent } from './pages/code-waiting/code-waiting.component';
 import { ConfirmEmailChangeComponent } from './pages/confirm-email-change/confirm-email-change.component';
 import { EmailConfirmationComponent } from './pages/email-confirmation/email-confirmation.component';
 import { EmailCredentialComponent } from './pages/email-credential/email-credential.component';
@@ -18,6 +23,8 @@ import { RegisterConfirmationComponent } from './pages/register-confirmation/reg
 import { ResendConfirmationComponent } from './pages/resend-confirmation/resend-confirmation.component';
 import { ResetPasswordConfirmationComponent } from './pages/reset-password/reset-password-confirmation.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { CodeCredentialResolver } from './services/code-credential-resolver.service';
+import { CodeResolver } from './services/code-resolver.service';
 
 export const accessRoutes: Routes = [
   {
@@ -97,6 +104,40 @@ export const accessRoutes: Routes = [
       {
         path: '',
         component: LoginFormComponent,
+        data: { hideNavBar: true }
+      }
+    ]
+  },
+  {
+    path: 'code',
+    component: AccessComponent,
+    data: { hideNavBar: true },
+    children: [
+      {
+        path: 'claim/:code',
+        component: CodeClaimComponent,
+        resolve: { response: CodeResolver },
+        data: { hideNavBar: true }
+      },
+      {
+        path: 'waiting',
+        component: CodeWaitingComponent,
+        data: { hideNavBar: true }
+      },
+      {
+        path: 'invalid',
+        component: CodeInvalidComponent,
+        data: { hideNavBar: true }
+      },
+      {
+        path: 'credential/:code',
+        component: CodeCredentialComponent,
+        resolve: { response: CodeCredentialResolver },
+        data: { hideNavBar: true }
+      },
+      {
+        path: 'expired',
+        component: CodeExpiredComponent,
         data: { hideNavBar: true }
       }
     ]

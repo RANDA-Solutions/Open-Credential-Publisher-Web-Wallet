@@ -76,14 +76,18 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 var appUser = await _userManager.FindByIdAsync(_userId);
 
                 input.User = appUser;
-
-                await _recipientService.AddAsync(input);
-
+                input.Email = input.Email.ToLower();
+                var (_, alreadyExists) = await _recipientService.AddAsync(input);
+                if (alreadyExists)
+                {
+                   ModelState.AddModelError("*", "There is already a recipient for that email address.");
+                   return ApiModelInvalid(ModelState);
+                }
                 return ApiOk(null);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "RecipientsController.DeleteRecipient", null);
+                _logger.LogError(ex, "RecipientsController.CreateRecipient", null);
                 throw;
             }
         }

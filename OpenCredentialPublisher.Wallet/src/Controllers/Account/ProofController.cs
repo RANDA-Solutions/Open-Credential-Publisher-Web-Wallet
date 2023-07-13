@@ -118,6 +118,8 @@ namespace OpenCredentialPublisher.Wallet.Controllers.Account
                     if (!response.Error)
                     {
                         await _signInManager.SignInAsync(user, false);
+                        user.LastLoggedInDate = DateTime.UtcNow;
+                        await _userManager.UpdateAsync(user);
                         await _loginProofService.SetLoginProofStatusAsync(proof.Id, Data.Models.Enums.StatusEnum.Used);
                     }
                 }

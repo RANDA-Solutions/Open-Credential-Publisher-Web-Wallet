@@ -85,6 +85,8 @@ namespace OpenCredentialPublisher.Data.Contexts
 
         public DbSet<EmailVerification> EmailVerifications { get; set; }
 
+        public DbSet<LoginLink> LoginLinks { get; set; }
+
         public DbSet<IdentityCertificateModel> IdentityCertificates { get; set; }
 
         /// <summary>
@@ -618,6 +620,11 @@ namespace OpenCredentialPublisher.Data.Contexts
             });
 
             modelBuilder.Entity<LinkModel>(eb =>
+            {
+                eb.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+            modelBuilder.Entity<LoginLink>(eb =>
             {
                 eb.HasQueryFilter(x => !x.IsDeleted);
             });

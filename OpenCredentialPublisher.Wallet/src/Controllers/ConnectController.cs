@@ -36,5 +36,21 @@ namespace OpenCredentialPublisher.Wallet.Controllers
                 return new JsonResult(new PostModel { ErrorMessages = new List<string> { ex.Message } });
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost, Route("External")]
+        public async Task<IActionResult> ExternalAsync([FromBody] ConnectGetModel model)
+        {
+            try
+            {
+                var result = await _connectService.ConnectExternalAsync(this, model);
+                return new JsonResult(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was a problem processing this request.", model);
+                return new JsonResult(new PostModel { ErrorMessages = new List<string> { ex.Message } });
+            }
+        }
     }
 }

@@ -14,11 +14,15 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             _context = context;
         }
-        public async Task<RecipientModel> AddAsync(RecipientModel input)
+        public async Task<(RecipientModel recipient, bool alreadyExists)> AddAsync(RecipientModel input)
         {
-            await _context.Recipients.AddAsync(input);
-            await _context.SaveChangesAsync();
-            return input;
+            bool newRecipient = false;
+            if ((newRecipient = !await _context.Recipients.AnyAsync(x => x.UserId == input.User.Id && x.Email == input.Email)))
+            {
+                await _context.Recipients.AddAsync(input);
+                await _context.SaveChangesAsync();
+            }
+            return (input, !newRecipient);
         }
         public async Task DeleteAsync(int id)
         {

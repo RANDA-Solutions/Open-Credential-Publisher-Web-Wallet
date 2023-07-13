@@ -102,7 +102,7 @@ namespace OpenCredentialPublisher.Services.Implementations
 
                 // Validate the response data
 
-                var result = await _schemaService.ValidateSchemaAsync<ClrDType>(_httpContextAccessor.HttpContext.Request, content);
+                var (result, _) = await _schemaService.ValidateSchemaAsync<ClrDType>(_httpContextAccessor.HttpContext.Request, content);
 
                 if (!result.IsValid) return null;
 

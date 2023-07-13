@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '@core/services/app.service';
@@ -18,7 +19,7 @@ export class CreateRecipientComponent implements OnInit {
   vm = new RecipientModel();
   linkId: string = null;
   private sub: any;
-  private debug = false;
+  private debug = true;
   showSpinner = false;
   constructor(private appService: AppService, private linksService: LinksService
     , private route: ActivatedRoute, private router: Router) { }
@@ -47,6 +48,8 @@ export class CreateRecipientComponent implements OnInit {
           this.modelErrors = (<ApiBadRequestResponse>data).errors;
         }
         this.showSpinner = false;
+      }, (error: HttpErrorResponse) => {
+        console.log(error);
       });
   }
 }

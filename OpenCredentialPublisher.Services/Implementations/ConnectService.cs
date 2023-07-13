@@ -21,6 +21,10 @@ using System.Web;
 using System.Net.Mime;
 using OpenCredentialPublisher.ClrLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using OpenCredentialPublisher.Data.Models.Enums;
+using OpenCredentialPublisher.Data.Options;
+using Microsoft.Extensions.Options;
 
 namespace OpenCredentialPublisher.Services.Implementations
 {
@@ -35,8 +39,15 @@ namespace OpenCredentialPublisher.Services.Implementations
         private readonly ILogger<ConnectService> _logger;
         private readonly LogHttpClientService _logHttpClientService;
         private readonly ETLService _etlService;
-        public ConnectService(WalletDbContext context, CredentialService credentialService, HostSettings hostSettings, IHttpClientFactory httpClientFactory
-            , ETLService etlService, LogHttpClientService logHttpClientService, ILogger<ConnectService> logger)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly LoginLinkService _loginLinkService;
+        private readonly SiteSettingsOptions _siteSettings;
+        private readonly EmailHelperService _emailHelperService;
+        private readonly EmailService _emailService;
+
+        public ConnectService(UserManager<ApplicationUser> userManager, WalletDbContext context, CredentialService credentialService, EmailService emailService,
+            HostSettings hostSettings, IHttpClientFactory httpClientFactory, EmailHelperService emailHelperService, LoginLinkService loginLinkService
+            , ETLService etlService, LogHttpClientService logHttpClientService, IOptions<SiteSettingsOptions> siteSettingsOptions, ILogger<ConnectService> logger)
         {
             _context = context;
             _etlService = etlService;
@@ -45,6 +56,12 @@ namespace OpenCredentialPublisher.Services.Implementations
             _httpClientFactory = httpClientFactory;
             _logger = logger;
             _logHttpClientService = logHttpClientService;
+            _userManager = userManager;
+            _loginLinkService = loginLinkService;
+            _siteSettings = siteSettingsOptions?.Value;
+            _emailHelperService = emailHelperService;
+            _emailService = emailService;
+            
         }
 
         //public async Task<CredentialResponse> ConnectAsync(PageModel page, ConnectGetModel model)
@@ -79,6 +96,65 @@ namespace OpenCredentialPublisher.Services.Implementations
             }
         }
 
+        public async Task<CredentialResponse> ConnectExternalAsync(ControllerBase controller, ConnectGetModel model)
+        {
+            var source = await GetSourceAsync(model);
+            var authorization = new Data.Models.AuthorizationModel
+            {
+                Payload = model.Payload,
+                Method = model.Method,
+                Endpoint = model.Endpoint,
+                SourceForeignKey = source.Id
+            };
+
+            var (email, credential) = await GetCredentialAsync(controller, source, authorization);
+            var result = await _userManager.FindByEmailAsync(email);
+            if (result == null)
+            {
+                result = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                };
+                var identityResult = await _userManager.CreateAsync(result);
+                if (!identityResult.Succeeded)
+                    throw new ApplicationException($"An account for email {email} could not be created.");
+            }
+
+            authorization.UserId = result.Id;
+            _context.Authorizations.Add(authorization);
+            await _context.SaveChangesAsync();
+
+            var response = await _etlService.ProcessVerifiableCredential(result.Id, $"{Guid.NewGuid()}.json", credential, authorization);
+            if (!response.HasError)
+            {
+                // send message to email either letting them know that a new account was created for them
+                var loginLink = await _loginLinkService.CreateLoginLinkAsync(result.Id, DateTime.UtcNow.AddDays(1), response.Id);
+                // generate email code and send
+                var credentialMessage = new MessageModel
+                {
+                    Body = new StringBuilder($"You've received a new credential! Please click the link below to view your credential.<br />")
+                    .Append($"<a href=\"{_siteSettings.SpaClientUrl}/access/code/credential/{loginLink.Code}\" >{_siteSettings.SpaClientUrl}</a><br /><br />")
+                            .Append($"This link expires within 24 hours.<br />")
+                            .Append("<b>If the link has expired, you may still view your credential by requesting a code be sent to your email address.</b>").ToString(),
+                    Recipient = email,
+                    Subject = $"You've received a new credential!",
+                    SendAttempts = 0,
+                    StatusId = StatusEnum.Created,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _emailHelperService.AddMessageAsync(credentialMessage);
+                loginLink.MessageId = credentialMessage.Id;
+                await _loginLinkService.UpdateAsync(loginLink);
+
+                await _emailService.SendEmailAsync(credentialMessage.Recipient, credentialMessage.Subject, credentialMessage.Body, true);
+                credentialMessage.StatusId = StatusEnum.Sent;
+                await _emailHelperService.UpdateMessageAsync(credentialMessage);
+            }
+
+            return response;
+        }
+
         public async Task<TokenResponse> RequestTokenAsync(string clientId, string clientSecret, string scope, string tokenEndpoint)
         {
             using var client = _httpClientFactory.CreateClient();
@@ -104,6 +180,13 @@ namespace OpenCredentialPublisher.Services.Implementations
         {
             var contentString = await GetContentStringAsync(source, authorization, discoveryDocument);
             return await _etlService.ProcessJson(controller, userId, contentString, authorization);
+        }
+
+        public async Task<(String email, string json)> GetCredentialAsync(ControllerBase controller, SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
+        {
+            var contentString = await GetContentStringAsync(source, authorization, discoveryDocument);
+            var response = await _etlService.ProcessExternalJson(controller, contentString, authorization);
+            return (response.email, contentString);
         }
 
         private async Task<string> GetContentStringAsync(SourceModel source, AuthorizationModel authorization, DiscoveryDocumentResponse discoveryDocument = null)
