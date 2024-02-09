@@ -52,11 +52,11 @@
       </div>
   </div>
   </form>
-  <ng-container>
+  <ng-container *ngIf="showOtherLogin">
     <hr />
     <span class="h4">OTHER WAYS TO LOGIN</span>
     <div class="row">
-      <div class="col mt-2">
+      <div class="col mt-2" *ngIf="showWalletLogin">
         <span class="h4">Login using mobile wallet</span>
         <br />
         <a class="btn btn-tertiary" [routerLink]="['/access/login-with-proof']">Login with Proof</a>

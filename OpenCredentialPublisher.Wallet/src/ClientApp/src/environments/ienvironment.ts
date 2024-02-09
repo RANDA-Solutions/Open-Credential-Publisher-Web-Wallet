@@ -15,4 +15,5 @@ export interface baseEnvironment {
   allowSelfEmailConfirmation: boolean;
   logoutTimer: number;
   showMicrosoftLogin: boolean;
+  showWallets: boolean;
 }

@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DownloadService } from '@core/services/download.service';
+import { environment } from '@environment/environment';
 import { ApiOkResponse } from '@shared/models/apiOkResponse';
 import { PdfRequestTypeEnum } from '@shared/models/enums/pdfRequestTypeEnum';
 import { PdfRequest } from '@shared/models/pdfRequest';
@@ -12,6 +13,7 @@ import { DashboardService } from './dashboard.service';
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnDestroy, OnInit {
+  environment = environment;
   dashboard = new Dashboard();
   message = 'loading highlights';
   showSpinner = false;

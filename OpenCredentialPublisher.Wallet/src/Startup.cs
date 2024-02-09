@@ -84,7 +84,7 @@ namespace OpenCredentialPublisher.ClrWallet
                 services.Configure<IdatafyOptions>(Configuration.GetSection(IdatafyOptions.Section));
             }
 
-            services.Configure<VerityOptions>(Configuration.GetSection(VerityOptions.Section));
+            //services.Configure<VerityOptions>(Configuration.GetSection(VerityOptions.Section));
             services.Configure<MSVCOptions>(Configuration.GetSection(MSVCOptions.Section));
             services.Configure<NorthDakotaOptions>(Configuration.GetSection(NorthDakotaOptions.Section));
             services.Configure<HostSettings>(Configuration.GetSection(nameof(HostSettings)));
@@ -113,14 +113,14 @@ namespace OpenCredentialPublisher.ClrWallet
                     };
                 });
 
-            var verityOptions = Configuration.GetSection(VerityOptions.Section).Get<VerityOptions>();
+            //var verityOptions = Configuration.GetSection(VerityOptions.Section).Get<VerityOptions>();
 
-            if (verityOptions.UseAzureListener)
-            {
-                services.AddHostedService<VerityResponseBackgroundService>();
-            }
+            //if (verityOptions.UseAzureListener)
+            //{
+            //    services.AddHostedService<VerityResponseBackgroundService>();
+            //}
 
-            services.AddHostedService<VerityIssuerSetupBackgroundService>();
+            //services.AddHostedService<VerityIssuerSetupBackgroundService>();
 
             if (Environment.IsDevelopmentOrLocalhost())
             {

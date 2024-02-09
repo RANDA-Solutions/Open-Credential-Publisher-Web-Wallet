@@ -1,5 +1,5 @@
 import { APP_BASE_HREF, CommonModule } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -15,6 +15,7 @@ import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth-client.service';
 import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
 import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
+import { WalletsFeatureGuard } from './guards/wallets-feature.guard';
 import { LoginLayoutComponent } from './layout/login-layout/login-layout.component';
 import { PlainLayoutComponent } from './layout/plain-layout/plain-layout.component';
 import { SecureLayoutComponent } from './layout/secure-layout/secure-layout.component';
@@ -70,6 +71,7 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 	providers: [
 
 		{ provide: APP_BASE_HREF, useValue: '/' }
+    , WalletsFeatureGuard
 		, AppService
 		, MessageService
 		, SecureRoutesService
@@ -84,9 +86,9 @@ import { TokenInterceptorService } from './services/token-interceptor.service';
 })
 export class AppModule {
 	private debug = environment.debug;
-	
+
 	constructor() {
-		
+
 	}
 
 }

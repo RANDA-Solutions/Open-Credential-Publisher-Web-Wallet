@@ -3,6 +3,7 @@ import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
 import { SourcesCallbackComponent } from './components/sources-callback/sources-callback.component';
 import { SourcesErrorComponent } from './components/sources-error/sources-error.component';
+import { WalletsFeatureGuard } from './guards/wallets-feature.guard';
 import { LoginLayoutComponent } from './layout/login-layout/login-layout.component';
 import { PlainLayoutComponent } from './layout/plain-layout/plain-layout.component';
 import { SecureLayoutComponent } from './layout/secure-layout/secure-layout.component';
@@ -67,7 +68,7 @@ export const appRoutes: Routes = [
        {
          path: 'wallets',
          loadChildren: () => import('./modules/wallets/wallets.module').then(m =>m.WalletsModule),
-         canActivate: [AuthGuard]
+         canActivate: [AuthGuard, WalletsFeatureGuard]
        },
        {
          path: 'account',

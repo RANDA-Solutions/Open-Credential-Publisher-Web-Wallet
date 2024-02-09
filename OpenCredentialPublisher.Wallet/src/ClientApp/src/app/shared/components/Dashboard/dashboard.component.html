@@ -10,35 +10,43 @@
         Congratulations! <br /> You've published a credential.
       </div>
       <div class="mb-3"><a [routerLink]="['/links']" class="btn btn-outline-primary btn-lg">SHARE YOUR CREDENTIAL</a></div>
-      <div><span class="small-text">You'll need to connect a digital wallet to send your credential.</span></div>
-      <div class="mb-4"><a (click)="openPdf()">Learn more about digital wallets.</a></div>
-      <div class="h3 mb-1">Supported Wallets</div>
+      <ng-container *ngIf="environment?.showWallets == true">
+        <div><span class="small-text">You'll need to connect a digital wallet to send your credential.</span></div>
+        <div class="mb-4"><a (click)="openPdf()">Learn more about digital wallets.</a></div>
+        <div class="h3 mb-1">Supported Wallets</div>
         <table class="table table-borderless mb-0">
           <tbody>
             <tr>
               <td colspan="2" class="align-middle pb-0">
-                <a href="https://idramp.com" target="_blank"><img src="/images/idramp-passport-logo.png" style="width: 148px;"></a>
+                <a href="https://idramp.com" target="_blank"><img src="/images/idramp-passport-logo.png"
+                    style="width: 148px;"></a>
               </td>
               <td colspan="2" class="align-middle pb-0">
-                <a href="https://www.connect.me" target="_blank"><img src="/images/connect-me-logo.svg" style="width: 190px;"></a>
+                <a href="https://www.connect.me" target="_blank"><img src="/images/connect-me-logo.svg"
+                    style="width: 190px;"></a>
               </td>
             </tr>
             <tr>
               <td class="text-center align-middle">
-                <a href="https://apps.apple.com/us/app/idramp-cello/id1590801314" target="_blank" title="Get the Cello App from Apple App Store"><i class="fab fa-apple fa-4x"></i></a>
+                <a href="https://apps.apple.com/us/app/idramp-cello/id1590801314" target="_blank"
+                  title="Get the Cello App from Apple App Store"><i class="fab fa-apple fa-4x"></i></a>
               </td>
               <td class="text-center align-middle">
-                <a href="https://play.google.com/store/apps/details?id=com.cello" target="_blank" title="Get the Cello App from Google Play"><i class="fab fa-google-play fa-4x"></i></a>
+                <a href="https://play.google.com/store/apps/details?id=com.cello" target="_blank"
+                  title="Get the Cello App from Google Play"><i class="fab fa-google-play fa-4x"></i></a>
               </td>
               <td class="text-center align-middle">
-                <a href="https://itunes.apple.com/us/app/connect-me/id1260651672?mt=8" target="_blank"  title="Get ConnectME from Apple App Store"><i class="fab fa-apple fa-4x"></i></a>
+                <a href="https://itunes.apple.com/us/app/connect-me/id1260651672?mt=8" target="_blank"
+                  title="Get ConnectME from Apple App Store"><i class="fab fa-apple fa-4x"></i></a>
               </td>
               <td class="text-center align-middle">
-                <a href="https://play.google.com/store/apps/details?id=me.connect&hl=en" target="_blank"  title="Get ConnectME from Google Play"><i class="fab fa-google-play fa-4x"></i></a>
+                <a href="https://play.google.com/store/apps/details?id=me.connect&hl=en" target="_blank"
+                  title="Get ConnectME from Google Play"><i class="fab fa-google-play fa-4x"></i></a>
               </td>
             </tr>
           </tbody>
         </table>
+      </ng-container>
     </div>
     <div class="col-12 col-sm">
       <div *ngIf="showSpinner == true; else highlightsContent" class="d-flex flex-column">

@@ -18,5 +18,6 @@ export const environment: baseEnvironment = {
   logoutTimer: 5 // in minutes
   ,
   name: "[default]",
-  showMicrosoftLogin: true
+  showMicrosoftLogin: true,
+  showWallets: false
 };
