@@ -31,7 +31,6 @@ namespace OpenCredentialPublisher.DependencyInjection
             services.AddTransient<EmailHelperService>();
             services.AddTransient<EmailService>();
             services.AddTransient<EmailVerificationService>();
-            services.AddTransient<EventHandlerService>();
             services.AddTransient<IdRampApiService>();
             services.AddTransient<LogHttpClientService>();
             services.AddTransient<LoginLinkService>();
@@ -58,7 +57,6 @@ namespace OpenCredentialPublisher.DependencyInjection
             services.AddTransient<AgentContextService>();
             services.AddTransient<AzureBlobStoreService>();
 
-            services.AddTransient<ConnectionRequestService>();
             services.AddTransient<CredentialDefinitionService>();
             services.AddTransient<CredentialPackageService>();
             services.AddTransient<CredentialRequestService>();
@@ -66,12 +64,10 @@ namespace OpenCredentialPublisher.DependencyInjection
             services.AddTransient<ETLService>();
             services.AddTransient<IdatafyService>();
             services.AddTransient<LinkService>();
-            services.AddTransient<ProofService>();
             services.AddTransient<IQueueService, AzureQueueService>();
             services.AddTransient<RevocationDocumentService>();
             services.AddTransient<SchemaService>();
             services.AddTransient<VerityThreadService>();
-            services.AddTransient<WalletRelationshipService>();
 
             return services;
         }

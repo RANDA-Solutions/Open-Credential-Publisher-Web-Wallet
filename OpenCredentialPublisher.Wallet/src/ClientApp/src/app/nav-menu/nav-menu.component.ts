@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { environment } from '@environment/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Observable } from 'rxjs';
 import { filter, map, mergeMap } from 'rxjs/operators';
@@ -11,6 +12,7 @@ import { LoginService } from '../auth/login.service';
   styleUrls: ['./nav-menu.component.scss']
 })
 export class NavMenuComponent implements OnInit {
+  public environment = environment;
 	public isExpanded = false;
 	public isAuthenticated() : Observable<boolean> { return this.loginService.isLoggedIn; };
 	public userName: string;
@@ -19,7 +21,7 @@ export class NavMenuComponent implements OnInit {
 	constructor(private loginService: LoginService, private router: Router, private activatedRoute: ActivatedRoute) {
     this.showNavMenu = true;
 
-		
+
     router.events
       .pipe(filter(event => event instanceof NavigationEnd), untilDestroyed(this))
       .subscribe((val) => {

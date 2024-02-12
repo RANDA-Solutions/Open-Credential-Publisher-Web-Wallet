@@ -37,6 +37,8 @@ export class LoginFormComponent implements OnInit {
 	infoMessage?: string;
 	//externalProviders: AuthenticationSchemeModel[];
   showMicrosoftLogin: boolean = environment?.showMicrosoftLogin == true;
+  showWalletLogin: boolean = environment?.showWallets == true;
+  showOtherLogin: boolean = this.showMicrosoftLogin || this.showWalletLogin;
 
 	private sub: Subscription;
 	private returnUrl: string | null;

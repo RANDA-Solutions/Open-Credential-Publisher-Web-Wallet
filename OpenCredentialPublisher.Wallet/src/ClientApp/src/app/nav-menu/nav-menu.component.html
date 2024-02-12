@@ -18,7 +18,7 @@
           <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-light" [routerLink]="['/credentials']"><span class="credential-icon-default mr-2 align-middle"></span><span class="h2"> Credentials</span></a>
           </li>
-          <li class="d-none nav-item text-nowrap" [routerLinkActive]="['link-active']">
+          <li class="d-none nav-item text-nowrap" [routerLinkActive]="['link-active']" *ngIf="environment.showWallets">
             <a class="nav-link text-light" [routerLink]="['/wallets/wallet-list']"><span class="fal fa-wallet font-1-5x mr-2 align-middle"></span><span class="h2"> Wallets</span></a>
           </li>
         </ul>

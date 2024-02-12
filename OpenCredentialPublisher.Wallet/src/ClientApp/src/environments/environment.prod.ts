@@ -18,5 +18,6 @@ export const environment: baseEnvironment  = {
   allowSelfEmailConfirmation: false,
   logoutTimer: 10 // in minutes
   ,
-  showMicrosoftLogin: false
+  showMicrosoftLogin: false,
+  showWallets: false
 };
