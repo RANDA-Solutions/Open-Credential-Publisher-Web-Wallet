@@ -14,45 +14,45 @@ using System.Threading.Tasks;
 
 namespace OpenCredentialPublisher.VerityFunctionApp.Handlers
 {
-    public class CreateCredentialDefinitionHandler : BaseCommandHandler, ICommandHandler<CreateCredentialDefinitionCommand>
-    {
-        private readonly IVerityIntegrationService _verityService;
-        private readonly CredentialDefinitionService _credentialDefinitionService;
+    //public class CreateCredentialDefinitionHandler : BaseCommandHandler, ICommandHandler<CreateCredentialDefinitionCommand>
+    //{
+    //    private readonly IVerityIntegrationService _verityService;
+    //    private readonly CredentialDefinitionService _credentialDefinitionService;
 
-        public CreateCredentialDefinitionHandler(IVerityIntegrationService verityService, CredentialDefinitionService credentialDefinitionService, IOptions<AzureBlobOptions> blobOptions, WalletDbContext context, ILogger<BaseCommandHandler> log) : base(blobOptions, context, log)
-        {
-            _verityService = verityService;
-            _credentialDefinitionService = credentialDefinitionService;
-        }
+    //    public CreateCredentialDefinitionHandler(IVerityIntegrationService verityService, CredentialDefinitionService credentialDefinitionService, IOptions<AzureBlobOptions> blobOptions, WalletDbContext context, ILogger<BaseCommandHandler> log) : base(blobOptions, context, log)
+    //    {
+    //        _verityService = verityService;
+    //        _credentialDefinitionService = credentialDefinitionService;
+    //    }
 
-        public async Task HandleAsync(CreateCredentialDefinitionCommand command)
-        {
-            try
-            {
-                //var leaseId = await AcquireLockAsync("create-credential-definition", command.CredentialDefinitionId.ToString(), TimeSpan.FromSeconds(60));
-                var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(command.CredentialDefinitionId);
+    //    public async Task HandleAsync(CreateCredentialDefinitionCommand command)
+    //    {
+    //        try
+    //        {
+    //            //var leaseId = await AcquireLockAsync("create-credential-definition", command.CredentialDefinitionId.ToString(), TimeSpan.FromSeconds(60));
+    //            var credentialDefinition = await _credentialDefinitionService.GetCredentialDefinitionAsync(command.CredentialDefinitionId);
 
-                if (credentialDefinition.StatusId == StatusEnum.Pending)
-                {
-                    credentialDefinition.StatusId = StatusEnum.Sent;
-                    credentialDefinition = await _credentialDefinitionService.UpdateCredentialDefinitionAsync(credentialDefinition);
-                    try
-                    {
-                        await _verityService.CreateCredentialDefinitionAsync(credentialDefinition);
-                    }
-                    catch
-                    {
-                        credentialDefinition.StatusId = StatusEnum.Pending;
-                        await _credentialDefinitionService.UpdateCredentialDefinitionAsync(credentialDefinition);
-                        throw;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex, ex.Message, command);
-                throw;
-            }
-        }
-    }
+    //            if (credentialDefinition.StatusId == StatusEnum.Pending)
+    //            {
+    //                credentialDefinition.StatusId = StatusEnum.Sent;
+    //                credentialDefinition = await _credentialDefinitionService.UpdateCredentialDefinitionAsync(credentialDefinition);
+    //                try
+    //                {
+    //                    await _verityService.CreateCredentialDefinitionAsync(credentialDefinition);
+    //                }
+    //                catch
+    //                {
+    //                    credentialDefinition.StatusId = StatusEnum.Pending;
+    //                    await _credentialDefinitionService.UpdateCredentialDefinitionAsync(credentialDefinition);
+    //                    throw;
+    //                }
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Log.LogError(ex, ex.Message, command);
+    //            throw;
+    //        }
+    //    }
+    //}
 }

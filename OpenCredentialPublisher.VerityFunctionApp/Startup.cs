@@ -12,14 +12,7 @@ using Microsoft.Extensions.Hosting;
 using OpenCredentialPublisher.Data.Contexts;
 using OpenCredentialPublisher.Data.Models;
 using OpenCredentialPublisher.Data.Options;
-using OpenCredentialPublisher.Data.Settings;
 using OpenCredentialPublisher.DependencyInjection;
-using OpenCredentialPublisher.Services.Implementations;
-using OpenCredentialPublisher.Services.Interfaces;
-using OpenCredentialPublisher.Shared.Interfaces;
-using OpenCredentialPublisher.VerityFunctionApp.Dispatchers;
-using OpenCredentialPublisher.VerityRestApi.Api;
-using OpenCredentialPublisher.VerityRestApi.Client;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -84,66 +77,13 @@ namespace OpenCredentialPublisher.VerityFunctionApp
             services.AddMediatR(typeof(Startup));
             services.AddHttpClient(ClrHttpClient.Default);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddCommandQueryHandlers(typeof(ICommandHandler<>));
-            services.AddCredentialMappingHandlers(typeof(ICredentialMapper<,>));
-            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
-            services.AddScoped<ICredentialMapperDispatcher, CredentialDispatcher>();
+            //services.AddCommandQueryHandlers(typeof(ICommandHandler<>));
+            //services.AddCredentialMappingHandlers(typeof(ICredentialMapper<,>));
+            //services.AddScoped<ICommandDispatcher, CommandDispatcher>();
+            //services.AddScoped<ICredentialMapperDispatcher, CredentialDispatcher>();
             services.AddSingleton(urlHelper);
 
             RegisterServices.FunctionsAppRegistration(services);
-
-            var verityOptions = verityConfig.Get<VerityOptions>();
-            if (verityOptions.UseVerityApi)
-            {
-                services.AddTransient<IVerityIntegrationService, VerityApiService>();
-                services.AddTransient<VerityRestApi.Client.Configuration>((services) => {
-                    var agentContextModel = JsonSerializer.Deserialize<AgentContextModel>(verityOptions.Token);
-                    return new VerityRestApi.Client.Configuration(
-                        new Dictionary<string, string>(),
-                        new Dictionary<string, string> { { VerityRestApi.Constants.ApiKeyHeader, agentContextModel.ApiKey } },
-                        new Dictionary<string, string>(),
-                        verityOptions.EndpointUrl
-                        );  
-                });
-
-                services.AddTransient<IIssueCredentialApi, IssueCredentialApi>((services) => {
-                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
-                    return new IssueCredentialApi(configuration);
-                });
-                services.AddTransient<IIssuerSetupApi, IssuerSetupApi>((services) => {
-                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
-                    return new IssuerSetupApi(configuration);
-                });
-                services.AddTransient<IPresentProofApi, PresentProofApi>((services) => {
-                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
-                    return new PresentProofApi(configuration);
-                });
-                services.AddTransient<IRelationshipApi, RelationshipApi>((services) => {
-                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
-                    return new RelationshipApi(configuration);
-                });
-                services.AddTransient<IUpdateConfigsApi, UpdateConfigsApi>((services) => {
-                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
-                    return new UpdateConfigsApi(configuration);
-                });
-                services.AddTransient<IUpdateEndpointApi, UpdateEndpointApi>((services) => {
-                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
-                    return new UpdateEndpointApi(configuration);
-                });
-                services.AddTransient<IWriteCredDefApi, WriteCredDefApi>((services) => {
-                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
-                    return new WriteCredDefApi(configuration);
-                });
-                services.AddTransient<IWriteSchemaApi, WriteSchemaApi>((services) => {
-                    var configuration = services.GetService<VerityRestApi.Client.Configuration>();
-                    return new WriteSchemaApi(configuration);
-                });
-
-            }
-            else
-            {
-                services.AddTransient<IVerityIntegrationService, VeritySdkService>();
-            }
         }
     }
 
