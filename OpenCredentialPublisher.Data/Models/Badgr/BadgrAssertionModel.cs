@@ -42,6 +42,9 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         [JsonIgnore]
         public string RecipientJson { get; set; }
 
+        [Newtonsoft.Json.JsonIgnore, System.Text.Json.Serialization.JsonIgnore]
+        public string Image { get; set; }
+
         /// <summary>
         /// Complete BadgeClass JSON from BadgeclassOpenBadgeId 
         /// </summary>
@@ -93,7 +96,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
                 AdditionalProperties = badgrObcAssertionDType.AdditionalProperties,
                 BadgeClassOpenBadgeId = badgrObcAssertionDType.BadgeClassOpenBadgeId,
                 Expires = badgrObcAssertionDType.Expires,
-                Image = badgrObcAssertionDType.Image,
+                Image = badgrObcAssertionDType.Image?.Id,
                 IssuedOn = badgrObcAssertionDType.IssuedOn,
                 Narrative = badgrObcAssertionDType.Narrative,
                 OpenBadgeId = badgrObcAssertionDType.Id,

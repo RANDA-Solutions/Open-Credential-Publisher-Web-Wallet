@@ -1,0 +1,77 @@
+{
+  "status": {
+    "error": null,
+    "statusCode": 200,
+    "statusText": "OK"
+  },
+  "assertions": [
+    {
+      "type": "Assertion",
+      "id": "https://api.badgr.io/public/assertions/w08z4xZuTw2sJZRE5roi4Q",
+      "@context": "https://w3id.org/openbadges/v2",
+      "recipient": {
+        "type": "email",
+        "salt": "5e1b7e91d5444317aa354013a4552cb7",
+        "hashed": true,
+        "identity": "sha256$4528b8e2c54b655aa292f492f258987e4da4d1e527a7d8e3308a9a9c47b3ed38"
+      },
+      "badge": "https://api.badgr.io/public/badges/mo0HAUqaT_WJJi_obJcx1Q",
+      "issuedOn": "2021-09-29T05:00:00Z",
+      "image": {
+        "id": "https://api.badgr.io/public/assertions/w08z4xZuTw2sJZRE5roi4Q/image",
+        "caption": null
+      },
+      "evidence": [],
+      "narrative": null,
+      "expires": null,
+      "revoked": false,
+      "revocationReason": null,
+      "verification": {
+        "type": "HostedBadge",
+        "verificationProperty": null,
+        "startsWith": null,
+        "allowedOrigins": null,
+        "url": null,
+        "creator": null
+      },
+      "extensions:recipientProfile": {
+        "@context": "https://openbadgespec.org/extensions/recipientProfile/context.json",
+        "type": [
+          "Extension",
+          "extensions:RecipientProfile"
+        ],
+        "name": "Keith Williams"
+      }
+    },
+    {
+      "type": "Assertion",
+      "id": "https://api.badgr.io/public/assertions/uaD_z59cSA6POIGSsgxLcg",
+      "@context": "https://w3id.org/openbadges/v2",
+      "recipient": {
+        "type": "email",
+        "salt": "d622f84bd4184491ae8e5b6e490a9356",
+        "hashed": true,
+        "identity": "sha256$1d60e0c85a3391f7b60826fbd2cdef23b336181b1265b0225a53c68507b9586c"
+      },
+      "badge": "https://api.badgr.io/public/badges/mo0HAUqaT_WJJi_obJcx1Q",
+      "issuedOn": "2021-05-04T05:00:00Z",
+      "image": {
+        "id": "https://api.badgr.io/public/assertions/uaD_z59cSA6POIGSsgxLcg/image",
+        "caption": null
+      },
+      "evidence": [],
+      "narrative": null,
+      "expires": null,
+      "revoked": false,
+      "revocationReason": null,
+      "verification": {
+        "type": "HostedBadge",
+        "verificationProperty": null,
+        "startsWith": null,
+        "allowedOrigins": null,
+        "url": null,
+        "creator": null
+      }
+    }
+  ]
+}

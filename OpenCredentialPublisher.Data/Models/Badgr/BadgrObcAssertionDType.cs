@@ -63,9 +63,9 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         /// IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
         /// </summary>
         /// <value>IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.</value>
-        [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image")]
+        [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image"), Newtonsoft.Json.JsonConverter(typeof(ObcLibrary.Converters.Newtonsoft.StringOrTypeConverter<BadgrImageDType>)), System.Text.Json.Serialization.JsonConverter(typeof(ObcLibrary.Converters.Json.StringOrTypeConverter<BadgrImageDType>))]
         [Description("IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.")]
-        public string Image { get; set; }
+        public BadgrImageDType Image { get; set; }
 
         //// <summary>
         /// Gets or Sets Recipient

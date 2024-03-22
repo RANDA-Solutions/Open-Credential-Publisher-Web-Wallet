@@ -1,6 +1,7 @@
 using OpenCredentialPublisher.ObcLibrary.Models;
 using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using ClrModels = OpenCredentialPublisher.ClrLibrary.Models;
 
@@ -63,9 +64,10 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         /// IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
         /// </summary>
         /// <value>IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.</value>
-        [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image")]
+        [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image"), Newtonsoft.Json.JsonConverter(typeof(ObcLibrary.Converters.Newtonsoft.StringOrTypeConverter<BadgrImageDType>)), System.Text.Json.Serialization.JsonConverter(typeof(ObcLibrary.Converters.Json.StringOrTypeConverter<BadgrImageDType>))]
         [Description("IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.")]
-        public string Image { get; set; }
+        [IgnoreDataMember]
+        public BadgrImageDType ImageObject { get; set; }
 
         //// <summary>
         /// Gets or Sets Recipient
@@ -169,7 +171,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
                 Acceptance = null,
                 AdditionalProperties = badgrObcAssertionDType.AdditionalProperties,
                 Expires = badgrObcAssertionDType.Expires,
-                Image = badgrObcAssertionDType.Image,
+                ImageObject = badgrObcAssertionDType.Image,
                 IssuedOn = badgrObcAssertionDType.IssuedOn,
                 Narrative = badgrObcAssertionDType.Narrative,
                 OpenBadgeId = badgrObcAssertionDType.Id,
