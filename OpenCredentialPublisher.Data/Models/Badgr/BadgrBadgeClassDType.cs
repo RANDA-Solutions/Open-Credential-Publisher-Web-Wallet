@@ -46,8 +46,9 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         public string Description { get; set; }
 
 
-        [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image")]
-        public Object Image { get; set; }
+        [JsonPropertyName("image"), Newtonsoft.Json.JsonProperty("image"), Newtonsoft.Json.JsonConverter(typeof(ObcLibrary.Converters.Newtonsoft.StringOrTypeConverter<BadgrImageDType>)), System.Text.Json.Serialization.JsonConverter(typeof(ObcLibrary.Converters.Json.StringOrTypeConverter<BadgrImageDType>))]
+        [Description("IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.")]
+        public BadgrImageDType Image { get; set; }
 
         /// <summary>
         /// URI or embedded criteria document describing how to earn the achievement. Model Primitive Datatype = NormalizedString.

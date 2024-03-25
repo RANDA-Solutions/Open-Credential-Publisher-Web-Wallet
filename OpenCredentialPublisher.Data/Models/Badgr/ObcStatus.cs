@@ -22,7 +22,7 @@ namespace OpenCredentialPublisher.Data.Models.Badgr
         [Required]
         [JsonPropertyName("statusCode")]
         [Description("StatusCode")]
-        public string StatusCode { get; set; }
+        public int StatusCode { get; set; }
         /// <summary>
         /// Gets or Sets status code
         /// </summary>
